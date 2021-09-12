@@ -1,6 +1,9 @@
-# thesis-2021
+# Masters Thesis timeline
 
-# Sep  1st - Start Writing
-# Oct 15th - Committee Submission
-# Nov  1st - Defense
-# Nov 15th - Deadline
+# Jan  1st - Finish / technical work
+# Jan 15th - Start Writing
+# Feb 28ht - Finish Writing
+# Mar  1st - Committee Submission
+# Mar 15th - Defense
+# Apr 15th - Deadline
+# May 15th - Graduation
