@@ -1,0 +1,778 @@
+/* --------- */
+/* - Names - */
+/* --------- */
+
+/* Total Bits:
+ e = Epoch
+ a = Agents
+
+ e * [a + a*(a-1)]
+   ===
+ e * a^2
+
+*/
+
+/* Agents: Alice, Bob, Charlie, David, Eve */
+mtype = { A, B, E };
+
+/* Types of control messages */
+mtype = { CM_Create, CM_Welcome CM_Add, CM_Rem, CM_Upd };
+
+/* Enumeration of Epochs */
+mtype = { Epoch_1, Epoch_2, Epoch_3 }
+
+/* Which memebers are included in the group */
+bit members[3];
+
+/* For each epoch, for each agent, for each internal tree node, does the agent know the private key? */
+bool knowledge[3][3][3];
+
+/*
+         15
+       /    \
+      3     12
+     / \    / \
+   1    2  4  (8)
+
+
+         15
+       /    \
+      3     12
+     / \    / \
+   1    2  4  (8)
+
+*/
+
+
+chan Comm = [0] of {mtype, mtype, mtype, mtype, mtype, mtype, mtype, mtype,
+    mtype, mtype, mtype, mtype, mtype};
+
+
+
+
+
+
+
+/* ------------- */
+/* - Variables - */
+/* ------------- */
+
+bit inirunningab = 0;
+bit inicommitab  = 0;
+bit resrunningab = 0;
+bit rescommitab  = 0;
+
+bit inirunningba = 0;
+bit inicommitba  = 0;
+bit resrunningba = 0;
+bit rescommitba  = 0;
+
+bit arunning = 0;
+bit brunning = 0;
+
+/* Agreement terms at running and commit checkpoints */
+mtype atra = NULL;
+mtype atrb = NULL;
+mtype atca = NULL;
+mtype atcb = NULL;
+
+/* Secrecy terms */
+mtype sta = NULL;
+mtype stb = NULL;
+
+/* ---------- */
+/* - Macros - */
+/* ---------- */
+
+/*
+ * If a has completed a session, then a has computed a secrecy term
+ * and the adversary does not know this term. Same for b.
+ */
+
+# define Invsecrecy ( \
+    (!inicommitab || !rescommitba || sta != NULL && !Knows[sta]) && \
+    (!rescommitab || !inicommitba || stb != NULL && !Knows[stb]) )
+
+/*
+ * If a has completed a session as initiator, apparently with b, then b has been
+ * running a session
+ *
+ * Same for b as responder, a as responder, and b as initiator.
+ */
+
+# define Invaliveness ( \
+        (!inicommitab || brunning) \
+    &&  (!rescommitab || arunning) \
+    &&  (!inicommitba || arunning) \
+    &&  (!rescommitba || brunning) )
+
+/*
+ * If a has completed a session as initiator, apparently with b, then b has been
+ * running a session, apparently with a.
+ *
+ * Same for b as responder, a as responder, and b as initiator.
+ */
+
+# define Invweakagree ( \
+        (!inicommitab || resrunningab || inirunningba) \
+    &&  (!rescommitab || inirunningab || resrunningba) \
+    &&  (!inicommitba || resrunningba || inirunningab) \
+    &&  (!rescommitba || inirunningba || resrunningab) )
+
+/*
+ * If a has completed a session as initiator, then a has computed an agreement
+ * commit term, b has been running a session as responder, apparently with a,
+ * and the agreement running term of b is equal to the agreement commit term of
+ * a.
+ *
+ * Same for b as responder, a as responder, and b as initiator.
+ */
+
+# define Invniagree ( \
+        (!inicommitab || resrunningab && atca != NULL && atca == atrb) \
+    &&  (!rescommitab || inirunningab && atcb != NULL && atcb == atra) \
+    &&  (!inicommitba || resrunningba && atcb != NULL && atcb == atra) \
+    &&  (!rescommitba || inirunningba && atca != NULL && atca == atrb) )
+
+inline Inirunning(i, r, t)
+{
+
+    if
+    ::  i == A -> arunning = 1; atra = t
+    ::  i == B -> brunning = 1; atrb = t
+    ::  else -> skip
+    fi;
+
+    if
+    ::  i == A && r == B -> inirunningab = 1
+    ::  i == B && r == A -> inirunningba = 1
+    ::  else -> skip
+    fi
+
+}
+
+inline Resrunning(i, r, t)
+{
+
+	if
+	:: r == A -> arunning = 1; atra = t
+	:: r == B -> brunning = 1; atrb = t
+	:: else -> skip
+	fi;
+
+	if
+	:: i == A && r == B -> resrunningab = 1
+	:: i == B && r == A -> resrunningba = 1
+	:: else -> skip
+	fi
+
+}
+
+inline Inicommit(i, r, t)
+{
+
+    if
+    ::  i == A && r == B -> inicommitab = 1; atca = t
+    ::  i == B && r == A -> inicommitba = 1; atcb = t
+    ::  else -> skip
+    fi;
+
+}
+
+inline Rescommit(i, r, t)
+{
+
+    if
+    ::  i == A && r == B -> rescommitab = 1; atcb = t
+    ::  i == B && r == A -> rescommitba = 1; atca = t
+    ::  else -> skip
+    fi
+
+}
+
+inline Secret(agent, t)
+{
+
+    if
+    ::  agent == A -> sta = t
+    ::  agent == B -> stb = t
+    ::  else -> skip
+    fi;
+
+}
+
+/* Performs Diffie-Hellman exponentiation. Assigns the result to k. */
+inline Dhexp(x, ke, k)
+{
+
+    if
+    ::  x == XA && ke == KEA -> k = KAA
+    ::  x == XA && ke == KEB -> k = KAB
+    ::  x == XB && ke == KEA -> k = KAB
+    ::  x == XA && ke == KEC -> k = KAC
+    ::  x == XC && ke == KEA -> k = KAC
+    ::  x == XB && ke == KEB -> k = KBB
+    ::  x == XB && ke == KEC -> k = KBC
+    ::  x == XC && ke == KEB -> k = KBC
+    ::  x == XC && ke == KEC -> k = KCC
+    fi
+
+}
+
+/* We check the type of payloads like a real IKEv2 host would do. */
+inline Checktype(p, type)
+{
+
+	if
+	::  (type == KETYPE) -> ( p == KEA || p == KEB || p == KEC )
+	::  (type == NTYPE) -> ( p == NA || p == NB || p == NC )
+	::  (type == AGENTTYPE) -> ( p == A || p == B || p == C )
+	fi
+
+}
+
+inline Setvar(id, type, var)
+{
+
+    if
+
+    ::  ( type == KETYPE && id == A ) -> var = KEA
+    ::  ( type == KETYPE && id == B ) -> var = KEB
+    ::  ( type == KETYPE && id == C ) -> var = KEC
+
+    ::  ( type == XTYPE && id == A ) -> var = XA
+    ::  ( type == XTYPE && id == B ) -> var = XB
+    ::  ( type == XTYPE && id == C ) -> var = XC
+
+	::  ( type == NTYPE && id == A ) -> var = NA
+	::  ( type == NTYPE && id == B ) -> var = NB
+	::  ( type == NTYPE && id == C ) -> var = NC
+
+    ::  ( type == PRKTYPE && id == A ) -> var = PRKA
+    ::  ( type == PRKTYPE && id == B ) -> var = PRKB
+    ::  ( type == PRKTYPE && id == C ) -> var = PRKC
+
+    fi
+
+}
+
+inline Inv(key, keyinv)
+{
+
+    if
+
+    ::  key == KA -> keyinv = KA
+    ::  key == KB -> keyinv = KB
+    ::  key == KC -> keyinv = KC
+
+    ::  key == PBKA -> keyinv = PRKA
+    ::  key == PBKB -> keyinv = PRKB
+    ::  key == PBKC -> keyinv = PRKC
+
+    ::  key == PRKA -> keyinv = PBKA
+    ::  key == PRKB -> keyinv = PBKB
+    ::  key == PRKC -> keyinv = PBKC
+
+    fi
+
+}
+
+inline Addtoknowledge(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13)
+{
+
+    /*
+     * From an init message, we learn p5 and p6. Nothing to learn from the
+     * decryption of an auth message.
+     */
+
+	if
+	::  p1 == M1 || p1 == M2 -> Knows[p5] = 1; Knows[p6] = 1;
+	::  else -> skip
+	fi;
+
+    /*
+     * With its new knowledge, the adversary may obtain some keys through DH
+     * exponentiation.
+     */
+
+    if
+    ::  Knows[XA] && Knows[KEA] ->
+        Knows[KAA] = 1; Keys[KAA] = 1;
+    ::  else -> skip
+    fi;
+
+    if
+    ::  Knows[XB] && Knows[KEB] ->
+        Knows[KBB] = 1; Keys[KBB] = 1;
+    ::  else -> skip
+    fi;
+
+    if
+    ::  Knows[XA] && Knows[KEB] || Knows[XB] && Knows[KEA]->
+        Knows[KAB] = 1; Keys[KAB] = 1;
+    ::  else -> skip
+    fi;
+
+    if
+    ::  Knows[XA] && Knows[KEC] || Knows[XC] && Knows[KEA]->
+        Knows[KAC] = 1; Keys[KAC] = 1;
+    ::  else -> skip
+    fi;
+
+    if
+    ::  Knows[XB] && Knows[KEC] || Knows[XC] && Knows[KEB]->
+        Knows[KBC] = 1; Keys[KBC] = 1;
+    ::  else -> skip
+    fi;
+
+}
+
+inline Randinitmessage(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13)
+{
+
+	/* The message is M1 or M2. */
+	/* We set the Response and Initiator flags. */
+	if
+	::  p1 = M1; p2 = RF0; p3 = IF1
+	::  p1 = M2; p2 = RF1; p3 = IF0
+	fi;
+
+	/* The message ID is 0. */
+	p4 = MID0;
+
+	/* We set the Key Exchange payload. */
+	if
+	::  Knows[KEA] -> p5 = KEA
+	::  Knows[KEB] -> p5 = KEB
+	::  Knows[KEC] -> p5 = KEC
+	fi;
+
+	/* We set the Nonce payload. */
+	if
+	::  Knows[NA] -> p6 = NA
+	::  Knows[NB] -> p6 = NB
+	::  Knows[NC] -> p6 = NC
+	fi;
+
+    /*
+     * All other payloads are empty: they are only used for M3 and M4.
+     */
+
+	p7 = NULL;
+	p8 = NULL;
+	p9 = NULL;
+	p10 = NULL;
+	p11 = NULL;
+	p12 = NULL;
+	p13 = NULL;
+
+}
+
+inline Randauthmessage(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, \
+    p13, pp1, pp2, pp3, pp4, pp5, pp6, pp7, pp8, pp9, pp10, pp11, pp12, pp13)
+{
+
+	if
+	::  pp1 == M3 || pp1 == M4 ->
+		p1 = pp1;
+		p2 = pp2;
+		p3 = pp3;
+		p4 = pp4;
+		p5 = pp5;
+		p6 = pp6;
+		p7 = pp7;
+		p8 = pp8;
+		p9 = pp9;
+		p10 = pp10;
+		p11 = pp11;
+		p12 = pp12;
+		p13 = pp13;
+		goto allset;
+	::  skip
+	fi;
+
+	if
+	::  Keys[KAA] -> p2 = KAA
+	::  Keys[KAB] -> p2 = KAB
+	::  Keys[KAC] -> p2 = KAC
+	::  Keys[KBB] -> p2 = KBB
+	::  Keys[KBC] -> p2 = KBC
+	::  Keys[KCC] -> p2 = KCC
+	fi;
+
+    /*
+     * The message is M3 or M4.
+     *
+     * We set the Response and Initiator flags.
+     */
+
+	if
+	::  p1 = M3; p3 = RF0; p4 = IF1
+	::  p1 = M4; p3 = RF1; p4 = IF0
+	fi;
+
+	/* The message ID of an auth message is 1. */
+	p5 = MID1;
+
+    /* The message will not be accepted by roles if p6 != p2 */
+	p6 = p2;
+
+	if
+	::  Knows[A] -> p7 = A
+	::  Knows[B] -> p7 = B
+	::  Knows[C] -> p7 = C
+	fi;
+
+    /*
+     * Adversary can have access to the signature in the saved message only if
+     * it is an auth message and if he knows key pp2.
+     */
+
+	if
+	::  (pp1 == M3 || pp1 == M4) && Knows[pp2] ->
+		p8 = pp8;
+		p9 = pp9;
+		p10 = pp10;
+		p11 = pp11;
+		p12 = pp12;
+		p13 = pp13;
+		goto allset;
+	::  skip
+	fi;
+
+	if
+	::  Keys[PRKA] -> p8 = PRKA
+	::  Keys[PRKB] -> p8 = PRKB
+	::  Keys[PRKC] -> p8 = PRKC
+	fi;
+
+    /* The message will not be accepted by roles otherwise. */
+	p9 = p2;
+	p10 = p7;
+	
+	if
+	::  Knows[KEA] -> p11 = KEA
+	::  Knows[KEB] -> p11 = KEB
+	::  Knows[KEC] -> p11 = KEC
+	fi;
+
+	if
+	::  Knows[NA] -> p12 = NA
+	::  Knows[NB] -> p12 = NB
+	::  Knows[NC] -> p12 = NC
+	fi;
+
+	if
+	::  Knows[NA] -> p13 = NA
+	::  Knows[NB] -> p13 = NB
+	::  Knows[NC] -> p13 = NC
+	fi;
+
+allset:
+	skip;
+
+}
+
+/* ------------- */
+/* - Processes - */
+/* ------------- */
+
+proctype Monitorsecrecy()
+{
+    atomic
+    {
+        do
+        ::  !Invsecrecy -> assert(Invsecrecy)
+        od
+    }
+}
+
+proctype Monitoraliveness()
+{
+    atomic
+    {
+        do
+        ::  !Invaliveness -> assert(Invaliveness)
+        od
+    }
+}
+
+proctype Monitorweakagree()
+{
+    atomic
+    {
+        do
+        ::  !Invweakagree -> assert(Invweakagree)
+        od
+    }
+}
+
+proctype Monitorniagree()
+{
+    atomic
+    {
+        do
+        ::  !Invniagree -> assert(Invniagree)
+        od
+    }
+}
+
+proctype Adversary()
+{
+    /*
+     * p1 = payload 1
+     * pp1 = previous payload 1
+     */
+
+    mtype p1 = NULL, p2 = NULL, p3 = NULL, p4 = NULL, p5 = NULL, p6 = NULL, \
+        p7 = NULL, p8 = NULL, p9 = NULL, p10 = NULL, p11 = NULL, p12 = NULL, \
+        p13 = NULL;
+
+    mtype pp1 = NULL, pp2 = NULL, pp3 = NULL, pp4 = NULL, pp5 = NULL, \
+        pp6 = NULL, pp7 = NULL, pp8 = NULL, pp9 = NULL, pp10 = NULL, \
+        pp11 = NULL, pp12 = NULL, pp13 = NULL;
+
+    do
+
+    /* Receive from the channel */
+    ::  Comm?p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13;
+        atomic {
+
+            Addtoknowledge(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13);
+
+            if
+            ::  skip
+            ::  pp1 = p1; pp2 = p2; pp3 = p3; pp4 = p4; pp5 = p5; pp6 = p6; \
+                pp7 = p7; pp8 = p8; pp9 = p9; pp10 = p10; pp11 = p11; \
+                pp12 = p12; pp13 = p13;
+            fi;
+
+            if
+            ::  skip
+            ::  Comm!p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13
+            fi
+
+        }
+
+    /* Forge an init message and send it */
+    ::  atomic {
+
+            Randinitmessage(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, \
+                p12, p13);
+            Comm!p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13;
+
+        }
+
+    /* Forge an auth message and send it */
+    ::  atomic {
+
+            Randauthmessage(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, \
+                p12, p13, pp1, pp2, pp3, pp4, pp5, pp6, pp7, pp8, pp9, \
+                pp10, pp11, pp12, pp13);
+            Comm!p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13;
+
+        }
+
+    od
+
+}
+
+proctype Initiator(mtype i, r)
+{
+
+    mtype x;
+    mtype ni, nr;
+    mtype kei, ker;
+    mtype k;
+    mtype prki, prkr;
+
+    atomic {
+
+        Setvar(i, XTYPE, x);
+        Setvar(i, KETYPE, kei);
+        Setvar(i, NTYPE, ni);
+
+        /* M1 */
+        Comm!M1, RF0, IF1, MID0, kei, ni, NULL, NULL, NULL, NULL, NULL, \
+            NULL, NULL;
+
+    };
+
+    atomic {
+
+        /* M2 */
+        Comm?M2, RF1, IF0, MID0, ker, nr, NULL, NULL, NULL, NULL, NULL, \
+            NULL, NULL;
+
+        Checktype(ker, KETYPE);
+        Checktype(nr, NTYPE)
+
+    };
+
+    atomic {
+
+        Dhexp(x, ker, k);
+        Setvar(i, PRKTYPE, prki);
+        Inirunning(i, r, k);
+
+        /* Auth request */
+        Comm!M3, k, RF0, IF1, MID1, k, i, prki, k, i, kei, ni, nr;
+
+    };
+
+    atomic {
+
+        Setvar(r, PRKTYPE, prkr);
+
+        /* Auth response */
+        Comm?M4, eval(k), RF1, IF0, MID1, eval(k), eval(r), eval(prkr), \
+            eval(k), eval(r), eval(ker), eval(nr), eval(ni);
+
+        Inicommit(i, r, k);
+        Secret(i, k);
+
+    };
+}
+
+proctype Responder(mtype r)
+{
+
+    mtype x;
+    mtype ni, nr;
+    mtype kei, ker;
+    mtype k;
+    mtype i, receivedi;
+    mtype prki, receivedprki, prkr;
+
+    atomic {
+
+        /* Init request */
+        Comm?M1, RF0, IF1, MID0, kei, ni, NULL, NULL, NULL, NULL, NULL, NULL, NULL;
+
+        Checktype(kei, KETYPE);
+        Checktype(ni, NTYPE)
+
+    };
+
+    atomic {
+
+        Setvar(r, XTYPE, x);
+        Setvar(r, KETYPE, ker);
+        Setvar(r, NTYPE, nr);
+
+        /* Init response */
+        Comm!M2, RF1, IF0, MID0, ker, nr, NULL, NULL, NULL, NULL, NULL, NULL, NULL;
+
+    };
+
+    atomic {
+
+        Dhexp(x, kei, k);
+
+        /*
+         * We cannot do eval(prki) since we do not know i yet.
+         *
+         * We need to differentiate i and receivedi because Spin cannot check
+         * their equality upon reception.
+         */
+
+        /* Auth request */
+        Comm?M3, eval(k), RF0, IF1, MID1, eval(k), i, receivedprki, eval(k), \
+            receivedi, eval(kei), eval(ni), eval(nr);
+
+        receivedi == i;
+
+        /*
+         * Now we know i, so we can set all authentication variables and
+         * evaluate authkeyi 
+         */
+
+        Setvar(i, PRKTYPE, prki);
+        receivedprki == prki;
+
+    };
+
+    atomic {
+
+        Setvar(r, PRKTYPE, prkr);
+        Resrunning(i, r, k);
+
+        /* Auth response */
+        Comm!M4, k, RF1, IF0, MID1, k, r, prkr, k, r, ker, nr, ni;
+
+        Rescommit(i, r, k);
+        Secret(r, k);
+
+    };
+
+}
+
+init {
+
+    atomic {
+        /* Epoch 1 */
+        knowledge[0][0][0] = 1;
+        knowledge[0][1][1] = 1;
+        knowledge[0][2][3] = 1;
+        
+        /* Epoch 2 */
+        knowledge[1][0][0] = 1;
+        knowledge[1][1][1] = 1;
+        knowledge[1][2][3] = 1;
+        
+        /* Epoch 3 */
+        knowledge[2][0][0] = 1;
+        knowledge[2][1][1] = 1;
+        knowledge[2][2][3] = 1;
+
+
+
+        Knows[A] = 1;
+        Knows[B] = 1;
+        Knows[C] = 1;
+        Knows[D] = 1;
+        Knows[E] = 1;
+
+        Knows[NULL] = 1;
+
+        Knows[M1] = 1;
+        Knows[M2] = 1;
+        Knows[M3] = 1;
+        Knows[M4] = 1;
+
+        Knows[G] = 1;
+        Knows[RF0] = 1;
+        Knows[RF1] = 1;
+        Knows[IF0] = 1;
+        Knows[IF1] = 1;
+        Knows[MID0] = 1;
+        Knows[MID1] = 1;
+
+        Knows[PUB_A] = 1;
+        Knows[PUB_B] = 1;
+        Knows[PUB_C] = 1;
+        Knows[PUB_D] = 1;
+        Knows[PUB_E] = 1;
+
+        Keys[PRV_E] = 1;
+        Knows[XE] = 1;
+        Knows[NE] = 1;
+        Knows[KEE] = 1;
+
+        run Monitorsecrecy();
+        run Monitoraliveness();
+        run Monitorweakagree();
+        run Monitorniagree();
+
+        run Adversary();
+
+        if
+        ::  run Initiator(A, B);
+        ::  run Initiator(A, C);
+        fi;
+
+        run Responder(B);
+
+    }
+
+}
