@@ -49,14 +49,26 @@
 	\date{}
 	\title{\vspace{-8ex} \textbf{Verification of the Secure Group Messaging}\\ \Large Alex Washburn\vspace{-7ex}}
 	%\setlength{\droptitle}{-10em}   % This is your set screw
-	\maketitle
 	\thispagestyle{plain}
+
+	\twocolumn[
+	\begin{@twocolumnfalse}
+		
+		\maketitle
+		
+		\begin{abstract}
+		  I present the features of Secure Group Messaging, the security guarantees of Message Layer Security, and the TreeKEM protocol designed to satisfy these guarantees and features.
+		  Next, a motivation for formal verification is argued based on its technical and societal merits.
+		  I show that the how TreeKEM can be formally verified using explicit state model checking and provide a reference modeling of TreeKEM in Promela and verified by SPINS.
+		\end{abstract}
 	
+	\end{@twocolumnfalse}
+	]
 	
 	\section*{Introduction}
 	
 	In an ideal world, secure communication channels are available and accessible to members of our society.
-	Secure communication facilitates open and confident communication between parties without fear of impersonation or message interception by malicious parties.
+	Secure communication facilitates open and confident communication between parties without fear of impersonation or message interception by malicious actors.
 	Not only is secure communication important for individual use, but it is the cornerstone of commercial confidence in our progressively digitized economy.
 	Without secure communication channels, online retail, banking, and collaboration would not exist as we know it today.
 	The field of cryptography is the practice and study of techniques which lay the mathematical foundations for the secure communication we all benefit from daily.
