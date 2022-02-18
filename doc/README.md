@@ -1,9 +1,13 @@
-# Masters Thesis timeline
+# Masters Thesis of [Alex Washburn][0]
 
-# Jan  1st - Finish / technical work
-# Jan 15th - Start Writing
-# Feb 28ht - Finish Writing
-# Mar  1st - Committee Submission
-# Mar 15th - Defense
-# Apr 15th - Deadline
-# May 15th - Graduation
+## Hunter College in the City of New York
+
+---
+
+### Timeline
+
+I have laid out a [tentative timeline][1] for completing my thesis.
+
+[0][https://recursion.ninja]
+[1][https://github.com/recursion-ninja/masters-thesis/blob/master/doc/TIMELINE.md]
+
