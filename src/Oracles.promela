@@ -1,0 +1,897 @@
+/********
+    *
+    * Advantage:
+    *
+    * In the following, a (`t`, `c`, `n`)-attacker is an attacker `A` that runs in time at most `t`,
+    * makes at most `c` challenge queries, and never produces a group with more than `n` members.
+    * The attacker wins the CGKA security game if they correctly guesses the random bit `b` in
+    * the end and the safety predicate `P` evaluates to true on the queries made by the attacker.
+    *
+    * Hence we define our (`t`, `c` `n`) constants below:
+    *
+********/
+
+
+#define T  3
+#define C 12
+#define N  4
+#define L 24 // Limit to a Counter value.
+#define NONE 255
+
+/****
+  *
+  * Special types required for the protocol.
+  *
+****/
+
+mtype:Secret = { Empty, Known, Unknown };
+
+typedef ID         { byte         identity      };
+typedef Count      { byte         counter       };
+typedef Epoch      { byte         epoch         };
+typedef Membership { bool         membership[N] };
+typedef Group      { Membership   reference[N]  };
+typedef Enigma     { mtype:Secret secret[T]     };
+typedef Welcome    { bool present };
+typedef Transform  { bool present };
+
+
+/****
+  *
+  * Global state of the CGKA security game.
+  *
+****/
+
+ID      lead[T];
+Group      G[T];
+bool   chall[T]; // Has the attacker challenged in an epoch?
+Enigma        I; // Root node secrets over epochs
+
+Enigma gamma[N]; // User state
+Epoch     ep[N]; // The Epoch of each user.
+Count    ctr[N]; // The (local to epoch) counter of operations inititated by each user.
+bool       D[N]; // Does the user delete old secrets?
+
+chan M[N] = [2] of { Epoch, ID, ID, Count, Welcome, Transform };
+
+
+/****
+  *
+  * Global constants for typedefs.
+  *
+****/
+
+ID Unspecified;
+Epoch NonParticipant;
+
+
+/****
+  *
+  * Global (local) variable for inline functions.
+  *
+****/
+
+local byte i = 0
+local byte j = 0;
+local byte absentees = 0;
+local byte attendees = N;
+
+
+/*
+bool knowledge[2 * N - 1];
+
+     vvv   KNOWLEDGE BITS    vvv
+
+           +----(14)----+
+          /              \
+        (12)             (13)
+       /   \            /    \
+    (8)     (9)      (10)     (11)
+   /   \   /   \    /    \   /    \
+  0     1 2     3  4      5 6      7
+
+     ^^^   MEMBERSHIP BITS   ^^^
+*/
+
+
+/********
+    *
+    * Inline utilities:
+    *
+    *   - Select Attendee
+    *   - Select Absentee
+    *   - Select Epoch
+    *
+********/
+
+
+/****
+  * External result variable(s):
+  *   - groupFull
+****/
+inline group_full( input )
+{   d_step {
+
+    take_attendance( input )
+    groupFull = absentees == 0;
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - groupDyad
+****/
+inline group_dyad( input )
+{   d_step {
+
+    take_attendance( input )
+    groupDyad = attendees == 2;
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - queueFull
+****/
+inline queue_full()
+{   d_step {
+
+    bool found = false
+    for( i : 0 .. N - 1 )
+    {
+        if
+        :: full( M[i] ) -> found = true
+        :: else -> skip
+        fi
+    }
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - absentees
+  *   - attendees
+****/
+inline take_attendance( input )
+{   d_step {
+
+    byte included = 0;
+    byte e_i = lead[input.epoch].identity;
+    
+    for ( i : 0 .. N - 1 ) {
+         if
+         :: G[input.epoch].reference[e_i].membership[i] -> included++
+         :: else -> skip
+         fi
+    }
+    attendees = included;
+    absentees = N - attendees;
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - selectedID
+****/
+inline select_attendee( input )
+{   atomic {
+
+    byte bound, sample;
+    byte selection = NONE;
+    byte ref = lead[input.epoch].identity
+
+    take_attendance( input );
+
+    select( sample : 0 .. attendees - 1 );
+    
+    printf("\nSELECTING ATTENDEE:\n");
+    printf("  attendees           = %d\n", attendees);
+    printf("  absentees           = %d\n", absentees);
+    printf("  sample              = %d\n", sample);
+
+    for ( i : 0 .. N - 1 ) {
+        printf("  i = %d v = %d s = %d g = %d\n", i, selection, sample, selection == NONE && G[input.epoch].reference[ref].membership[i]);
+        if
+        :: selection == NONE && G[input.epoch].reference[ref].membership[i] && sample != 0 -> sample--
+        :: selection == NONE && G[input.epoch].reference[ref].membership[i] && sample == 0 -> selection = i
+        :: else -> skip;
+        fi
+    }
+
+    selectedID.identity = selection;
+    printf("  selection           = %d\n", selectedID.identity);
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - selectedID
+****/
+inline select_absentee( input )
+{   atomic {
+
+    byte sample;
+    byte selection = NONE;
+    byte ref = lead[input.epoch].identity
+
+    take_attendance( input );
+    select( sample : 0 .. absentees - 1 );
+
+    printf("\nSELECTING ABSENTEE:\n");
+    printf("  attendees           = %d\n", attendees);
+    printf("  absentees           = %d\n", absentees);
+    printf("  sample              = %d\n", sample);
+
+    for ( i : 0 .. N - 1 ) {
+        printf("  i = %d v = %d s = %d g = %d\n", i, selection, sample, selection == NONE && G[input.epoch].reference[ref].membership[i]);
+        if
+        :: selection == NONE && !G[input.epoch].reference[ref].membership[i] && sample != 0 -> sample--
+        :: selection == NONE && !G[input.epoch].reference[ref].membership[i] && sample == 0 -> selection = i
+        :: else -> skip;
+        fi
+    }
+
+    selectedID.identity = selection;
+    printf("  selection           = %d\n", selectedID.identity);
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - senderID
+****/
+inline select_sender( input )
+{   d_step {
+
+    ID selectedID;
+    select_attendee( input );
+    senderID.identity = selectedID.identity;
+    printf("\nSelect Sender: %d\n", senderID.identity)
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - exiledID
+  *
+  * Similar to select_attendee
+****/
+inline select_exiled( banisher )
+{   atomic {
+
+    byte sample;
+    byte selection = NONE;
+    byte targets = 0;
+    byte t   = ep[banisher.identity].epoch;
+    byte ref = banisher.identity;
+    
+    for ( i : 0 .. N - 1 ) {
+         if
+         :: i != ref && G[t].reference[ref].membership[i] -> targets++
+         :: else -> skip
+         fi
+    }
+
+    select( sample : 0 .. targets - 1 );
+
+    printf("\nSELECTING EXILE:\n");
+    printf("  included           = %d\n", attendees);
+    printf("  sample             = %d\n", sample);
+
+    for ( i : 0 .. N - 1 ) {
+        printf("  i = %d v = %d s = %d g = %d\n", i, selection, sample, selection == NONE && G[t].reference[ref].membership[i]);
+        if
+        :: ref == i -> skip; // Don't remove yourself
+        :: selection == NONE && G[t].reference[ref].membership[i] && sample != 0 -> sample--
+        :: selection == NONE && G[t].reference[ref].membership[i] && sample == 0 -> selection = i
+        :: else -> skip;
+        fi
+    }
+
+    exiledID.identity = selection;
+    printf("  selection          = %d\n", exiledID.identity);
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - joinerID
+****/
+inline select_joiner( input )
+{   d_step {
+
+    ID selectedID;
+    select_absentee( input );
+    joinerID.identity = selectedID.identity;
+    printf("\nSelect Joiner: %d\n", joinerID.identity)
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - currentEpoch
+****/
+inline current_epoch()
+{   d_step {
+
+    byte x = 0;
+    for ( i : 0 .. T - 1 )
+    {
+        if
+        :: I.secret[i] != Empty -> x++
+        :: else                 -> skip
+        fi
+    }
+    currentEpoch.epoch = x - 1;
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - selectedEpoch
+****/
+inline select_epoch( input )
+{   atomic {
+
+    byte anyEpoch;
+    select ( anyEpoch : 0 .. input.epoch );
+    selectedEpoch.epoch = anyEpoch;
+
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - messagePending
+  *   - messageVacancy
+****/
+inline message_status()
+{   d_step {
+
+    printf("\nCHECKING AVAILABLE MESSAGES:\n");
+    byte pending = false;
+    bool vacancy = true;
+    for ( i : 0 .. N - 1 )
+    {
+        pending = pending || nempty( M[i] );
+        vacancy = vacancy &&  nfull( M[i] );
+    }
+    messagePending = pending;
+    messageVacancy = vacancy;
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - recipientID
+****/
+inline select_recipient()
+{   atomic {
+
+    printf("\nSELECT RECIPIENT:\n");
+
+    byte availableRecipient = 0;
+    for ( i : 0 .. N - 1 )
+    {
+        if
+        :: nempty(M[i]) -> availableRecipient++
+        ::  empty(M[i]) -> skip
+        fi
+    }
+
+    printf("\nAvailable Recipients: %d\n", availableRecipient);
+
+    byte sample;
+    select( sample : 0 .. availableRecipient - 1 )
+
+    printf("\nSample: %d\n", sample);
+
+    byte selection = NONE;
+    bool content;
+    for ( i : 0 .. N - 1 )
+    {
+        content =  nempty(M[i]);
+        printf("\n  i: %d  v: %d  s: %d  q: %d\n", i, selection, sample, content);
+        if
+        :: selection == NONE && nempty( M[i] ) && sample == 0 -> selection = i
+        :: selection == NONE && nempty( M[i] ) && sample != 0 -> sample--
+        :: selection == NONE &&  empty( M[i] ) && sample == 0 -> skip
+        :: selection != NONE -> skip
+        fi
+    }
+    
+    printf("\nRecipient: %d\n", selection);
+    recipientID.identity = selection;
+
+}   }
+
+
+/********
+    *
+    * Oracles available to the attacker:
+    *
+    *   - Corrupt
+    *   - Hoard
+    *   - Reveal
+    *
+********/
+
+
+/*
+D_proctype corrupt(ID input)
+{   d_step {
+
+    Epoch currentEpoch;
+    current_epoch();
+
+    gamma[input.identity].secret[currentEpoch.epoch] = Known;
+
+}   }
+
+
+D_proctype hoard(ID input)
+{   d_step {
+
+    D[input.identity] = false;
+
+} }
+
+
+D_proctype reveal(Epoch input)
+{   d_step {
+
+    byte t = input.epoch;
+    if
+    :: I.secret[t] == Empty || chall[t] -> skip;
+    :: else ->
+        chall[t] = true;
+        I.secret[t] = Known;
+    fi
+
+} }
+
+
+// Do I need this?
+D_proctype challenge(Epoch input)
+{   d_step {
+
+    byte t = input.epoch;
+    if
+    :: I.secret[t] == Empty || chall[t] -> skip;
+    :: else ->
+        chall[t] = true;
+        I.secret[t] = Known;
+    fi
+
+} }
+*/
+
+
+/********
+    *
+    * Oracles available to the Group Members:
+    *
+    *   - Insert Member ( ADD )
+    *   - Remove Member ( RMV )
+    *   - Oblige Update ( UPD )
+    *   - Convey Update ( DLV )
+    *
+********/
+
+
+// Precondition: joiningMember is not in the group!
+D_proctype insert_member( ID invitingMember; ID joiningMember )
+{   atomic {
+
+    Count c;
+    Epoch e;
+    Transform U;
+    Welcome W0, W1;
+    byte t;
+    
+    d_step {
+
+        printf("\nINSERT MEMBER:\n  Inviter: %d\n  joiner: %d\n", invitingMember.identity, joiningMember.identity)
+    
+        t = ep[invitingMember.identity].epoch;
+    
+        printf("\nINSERT EPOCH:\n  Inviter: %d\n  Epoch: %d\n", invitingMember.identity, t)
+    
+        ctr[invitingMember.identity].counter++;
+        c.counter = ctr[invitingMember.identity].counter;
+        
+        gamma[invitingMember.identity].secret[t+1] = Unknown;
+    
+        e.epoch = t + 1;
+        W0.present = false;
+        W1.present = true;
+        U.present = true;
+    
+        printf("\nINSERT MESSAGE:\n  Epoch:  \t %d\n  Inviter:\t %d\n  Joiner:\t %d\n  Counter:\t %d\n  W:    \t %d\n  T:    \t %d\n", e.epoch, invitingMember.identity, joiningMember.identity, c.counter, W1.present, U.present)
+        assert(joiningMember.identity < N);
+    }
+        
+    M[joiningMember.identity] ! e, invitingMember, joiningMember, c, W1, U;
+    
+    d_step {
+
+        for ( i : 0 .. N - 1 ) {
+            G[t+1].reference[invitingMember.identity].membership[i] = G[t].reference[invitingMember.identity].membership[i]
+        }
+        G[t+1].reference[invitingMember.identity].membership[joiningMember.identity] = true
+        
+        for ( i : 0 .. N - 1 ) {
+            if
+            :: G[t].reference[invitingMember.identity].membership[i] ->
+                ID receivingMember;
+                receivingMember.identity = i;
+                assert(i < N);
+                M[i] ! e, invitingMember, receivingMember, c, W0, U;
+            :: else -> skip;
+            fi
+        }
+    }    
+}   }
+
+
+/**/
+// Precondition: exiledMemeber is in the group!
+D_proctype remove_member( ID dismissingMember; ID exiledMember )
+{   atomic {
+
+    byte  t;
+    Count c;
+    Epoch e;
+    Welcome   W;
+    Transform U;
+
+    d_step {
+        t = ep[dismissingMember.identity].epoch;
+        
+        printf("\nREMOVE MEMBER:\n  Banisher: \t%d\n  Exile: \t%d\n  Epoch: \t%d\n", dismissingMember.identity, exiledMember.identity, t);
+    
+        ctr[dismissingMember.identity].counter++;
+        c.counter = ctr[dismissingMember.identity].counter;
+    
+        gamma[dismissingMember.identity].secret[t+1] = Unknown;
+    
+        e.epoch = t + 1;
+        W.present = false;
+        U.present = true;
+        byte ref  = dismissingMember.identity;
+    
+        for ( i : 0 .. N - 1 ) {
+            if
+            :: i == exiledMember.identity ->
+                G[t+1].reference[ref].membership[i] = false;
+//                ep[i].epoch = NonParticipant.epoch
+            :: else ->
+                G[t+1].reference[ref].membership[i] = G[t].reference[ref].membership[i]
+            fi
+        }
+    }    
+
+    for ( i : 0 .. N - 1 ) {
+        if
+        :: G[t].reference[dismissingMember.identity].membership[i] ->
+            ID receivingMember;
+            receivingMember.identity = i;
+            M[i] ! e, dismissingMember, receivingMember, c, W, U;
+        :: else -> skip;
+        fi
+    }
+
+}   }
+/**/
+
+
+inline member_update( receivingMember )
+{   atomic {
+
+    ID sender, receiver;
+    Epoch     t_i;
+    Count     c_i;
+    Welcome   W_i;
+    Transform U_i;
+
+    printf("\nMEMBER UPDATE:\n  Target\t %d\n", receivingMember.identity);
+
+    M[receivingMember.identity] ? t_i, sender, receiver, c_i, W_i, U_i;
+
+    d_step {
+        printf("\nUPDATE MESSAGE:\n  Target\t %d\n  Epoch \t %d\n  Sender\t %d\n  Receiver\t %d\n", receivingMember.identity, t_i.epoch, sender.identity, receiver.identity);
+    
+        byte ref = receiver.identity;
+        gamma[ref].secret[t_i.epoch] = Unknown;
+    
+        if
+        :: lead[t_i.epoch].identity == Unspecified.identity ->
+            lead[t_i.epoch].identity = sender.identity;
+            printf("SET lead[%d] <- %d\n", t_i.epoch, sender.identity);
+            I.secret[t_i.epoch] = Unknown;
+        :: else -> skip
+        fi
+        ep[ ref].epoch   = t_i.epoch;
+        ctr[ref].counter = 0;
+    
+        for ( i : 0 .. N - 1 ) {
+            G[t_i.epoch].reference[ref].membership[i] = G[t_i.epoch].reference[sender.identity].membership[i]
+        }
+    }
+
+}   }
+
+
+D_proctype convey_update( ID receivingMember )
+{
+    member_update(receivingMember);
+}
+
+
+/********
+    *
+    * Initialization inline routines, in order of execution:
+    *
+    *   - Initialize
+    *   - Select Group
+    *   - Create Group
+    *   - CGKA Security Game
+    *
+********/
+
+
+inline CGKA_initialize()
+{   atomic {
+
+    Unspecified.identity = NONE;
+    NonParticipant.epoch = NONE;
+    
+    for( i : 0 .. N - 1 )
+    {
+        ep[i].epoch    = 0;
+        ctr[i].counter = 0;
+        D[i]           = true;
+        
+        for( j : 0 .. T - 1 )
+        {
+            gamma[i].secret[j] = Unknown;
+        }
+    };
+
+    for( i : 0 .. T - 1 )
+    {
+        I.secret[i]      = Empty;
+        chall[i]         = false;
+        lead[i].identity = Unspecified.identity;
+    }
+
+}   }
+
+
+inline CGKA_create_group()
+{   atomic {
+
+    // Set the "lead" ID to be the first member in the group.
+    ID id0;
+    id0.identity = 0;
+
+    Count c;
+    ctr[id0.identity].counter++;
+    c.counter = ctr[id0.identity].counter;
+
+    byte t = 0;
+    Epoch fst;
+    fst.epoch = t
+
+    Welcome   W;
+    Transform U;
+    W.present = true;
+    U.present = false;
+
+    // Number of members to add
+    byte n;
+    select ( n : 2 .. N );
+    printf("\nSELECTED n <- %d\n", n);
+    
+    for( i : 0 .. N - 1 )
+    {
+        G[fst.epoch].reference[id0.identity].membership[i] = i < n;
+    };
+
+    printf("\nINITIAL GROUP:");
+    for( i : 0 .. N - 1 )
+    {
+        if
+        :: G[fst.epoch].reference[id0.identity].membership[i] ->
+             printf("\n  [ T ]");
+        :: else ->
+             printf("\n  [ F ]");
+        fi
+    }
+    for( i : 0 .. N - 1 )
+    {
+        if
+        :: !G[fst.epoch].reference[id0.identity].membership[i] -> skip
+        ::  G[fst.epoch].reference[id0.identity].membership[i] ->
+            ID tmp;
+            tmp.identity = i;
+            M[i] ! fst, id0, tmp, c, W, U;
+            member_update( tmp )
+        fi
+    }
+
+}   }
+
+
+inline CGKA_security_game()
+{
+    endHere:
+    do
+    :: I.secret[T-1] == Empty -> atomic {
+        Epoch currentEpoch;
+        bool groupDyad, groupFull, messagePending, messageVacancy;
+ 
+        atomic {
+            printf("\nPRECOMPUTE GUARDS:\n");
+
+            current_epoch();
+            printf("  currentEpoch   = %d\n", currentEpoch.epoch);
+
+            message_status();
+            printf("  messagePending = %d\n", messagePending);
+            printf("  messageVacancy = %d\n", messageVacancy);
+
+            group_dyad( currentEpoch );
+            printf("  groupDyad      = %d\n", groupDyad);
+
+            group_full( currentEpoch );
+            printf("  groupFull      = %d\n", groupFull);
+            printf("  absentees      = %d\n", absentees);
+            printf("  attendees      = %d\n", attendees);
+
+        };
+
+        atomic {
+            printf("\nPRINT GLOBAL STATE:\n");
+
+            printf("\n  lead:\n    [ ");
+            for ( i : 0 .. T - 1)
+            {
+                if
+                :: i == 0 -> printf(  "%d ", lead[i].identity)
+                :: i != 0 -> printf("| %d ", lead[i].identity)
+                fi
+            }
+            printf("]\n");
+
+            printf("\n  chall:\n    [ ");
+            for ( i : 0 .. T - 1)
+            {
+                if
+                :: i == 0 -> printf(  "%d ", chall[i])
+                :: i != 0 -> printf("| %d ", chall[i])
+                fi
+            }
+            printf("]\n");
+
+            printf("\n  ep:\n    [ ");
+            for ( i : 0 .. T - 1)
+            {
+                if
+                :: i == 0 -> printf(  "%d ", ep[i].epoch)
+                :: i != 0 -> printf("| %d ", ep[i].epoch)
+                fi
+            }
+            printf("]\n");
+
+            printf("\n  M:\n    [ ");
+            for ( i : 0 .. N - 1)
+            {
+                byte v = len(M[i]);
+                if
+                :: i == 0 -> printf(  "%d ", v)
+                :: i != 0 -> printf("| %d ", v)
+                fi
+            }
+            printf("]\n");
+
+//ID      lead[T];
+//Group      G[T];
+//bool   chall[T]; // Has the attacker challenged in an epoch?
+//Enigma        I; // Root node secrets over epochs
+
+//Enigma gamma[N]; // User state
+//Epoch     ep[N]; // The Epoch of each user.
+//Count    ctr[N]; // The (local to epoch) counter of operations inititated by each user.
+//bool       D[N]; // Does the user delete old secrets?
+
+
+        };
+
+        do
+        // General options:
+/**/
+        :: !groupDyad && messageVacancy -> atomic
+            {
+                printf("\nBRANCHING: remove_member\n")
+                ID senderID, exiledID;
+                select_sender( currentEpoch );
+                select_exiled( senderID );
+                run remove_member( senderID, exiledID );
+                member_update( senderID );
+            };
+            break
+/**/
+        :: !groupFull && messageVacancy -> atomic
+            {
+                printf("\nBRANCHING: insert_member\n")
+                ID senderID, joinerID;
+                select_sender( currentEpoch );
+                select_joiner( currentEpoch );
+                run insert_member( senderID, joinerID );
+                member_update( senderID );
+            };
+            break
+            
+        :: messagePending -> atomic
+            {
+                printf("\nBRANCHING: convey_update\n")
+                ID recipientID;
+                select_recipient();
+                run convey_update ( recipientID );
+            };
+            break
+/*
+        // Attacker Exclusive options:
+        :: atomic
+            {
+                Epoch selectedEpoch;
+                select_epoch( currentEpoch );
+                run corrupt( selectedEpoch );
+            };
+            break
+
+        :: atomic
+            {
+                
+                ID selectedID;
+                select_attendee( currentEpoch );
+                run hoard( selectedID );
+            };
+            break
+
+        :: atomic
+            {
+                ID selectedID;
+                select_attendee( currentEpoch );
+                run reveal( selectedID );
+            };
+            break
+*/
+        :: else -> break
+        od
+    }
+    :: else -> break
+    od
+}
+
+
+init
+{
+    CGKA_initialize();
+    CGKA_create_group();
+    CGKA_security_game();
+}
+
+//ltl attendees_more_than_one { [](attendees > 1) }
+ltl attendees_absentees_sum { [](attendees + absentees == N) }
