@@ -489,8 +489,9 @@ D_proctype challenge(Epoch input)
 ********/
 
 
+/**/
 // Precondition: joiningMember is not in the group!
-D_proctype insert_member( ID invitingMember; ID joiningMember )
+proctype insert_member( ID invitingMember; ID joiningMember )
 {   atomic {
 
     Count c;
@@ -542,11 +543,12 @@ D_proctype insert_member( ID invitingMember; ID joiningMember )
         }
     }    
 }   }
+/**/
 
 
 /**/
 // Precondition: exiledMemeber is in the group!
-D_proctype remove_member( ID dismissingMember; ID exiledMember )
+proctype remove_member( ID dismissingMember; ID exiledMember )
 {   atomic {
 
     byte  t;
@@ -608,10 +610,10 @@ inline member_update( receivingMember )
 
     M[receivingMember.identity] ? t_i, sender, receiver, c_i, W_i, U_i;
 
+    byte ref = receiver.identity;
     d_step {
         printf("\nUPDATE MESSAGE:\n  Target\t %d\n  Epoch \t %d\n  Sender\t %d\n  Receiver\t %d\n", receivingMember.identity, t_i.epoch, sender.identity, receiver.identity);
     
-        byte ref = receiver.identity;
         gamma[ref].secret[t_i.epoch] = Unknown;
     
         if
@@ -623,16 +625,15 @@ inline member_update( receivingMember )
         fi
         ep[ ref].epoch   = t_i.epoch;
         ctr[ref].counter = 0;
-    
-        for ( i : 0 .. N - 1 ) {
-            G[t_i.epoch].reference[ref].membership[i] = G[t_i.epoch].reference[sender.identity].membership[i]
-        }
     }
-
+    
+    for ( i : 0 .. N - 1 ) {
+        G[t_i.epoch].reference[ref].membership[i] = G[t_i.epoch].reference[sender.identity].membership[i]
+    }
 }   }
 
 
-D_proctype convey_update( ID receivingMember )
+proctype convey_update( ID receivingMember )
 {
     member_update(receivingMember);
 }
@@ -737,150 +738,138 @@ inline CGKA_security_game()
 {
     endHere:
     do
-    :: I.secret[T-1] == Empty -> atomic {
-        Epoch currentEpoch;
-        bool groupDyad, groupFull, messagePending, messageVacancy;
- 
-        atomic {
-            printf("\nPRECOMPUTE GUARDS:\n");
-
-            current_epoch();
-            printf("  currentEpoch   = %d\n", currentEpoch.epoch);
-
-            message_status();
-            printf("  messagePending = %d\n", messagePending);
-            printf("  messageVacancy = %d\n", messageVacancy);
-
-            group_dyad( currentEpoch );
-            printf("  groupDyad      = %d\n", groupDyad);
-
-            group_full( currentEpoch );
-            printf("  groupFull      = %d\n", groupFull);
-            printf("  absentees      = %d\n", absentees);
-            printf("  attendees      = %d\n", attendees);
-
-        };
-
-        atomic {
-            printf("\nPRINT GLOBAL STATE:\n");
-
-            printf("\n  lead:\n    [ ");
-            for ( i : 0 .. T - 1)
-            {
-                if
-                :: i == 0 -> printf(  "%d ", lead[i].identity)
-                :: i != 0 -> printf("| %d ", lead[i].identity)
-                fi
-            }
-            printf("]\n");
-
-            printf("\n  chall:\n    [ ");
-            for ( i : 0 .. T - 1)
-            {
-                if
-                :: i == 0 -> printf(  "%d ", chall[i])
-                :: i != 0 -> printf("| %d ", chall[i])
-                fi
-            }
-            printf("]\n");
-
-            printf("\n  ep:\n    [ ");
-            for ( i : 0 .. T - 1)
-            {
-                if
-                :: i == 0 -> printf(  "%d ", ep[i].epoch)
-                :: i != 0 -> printf("| %d ", ep[i].epoch)
-                fi
-            }
-            printf("]\n");
-
-            printf("\n  M:\n    [ ");
-            for ( i : 0 .. N - 1)
-            {
-                byte v = len(M[i]);
-                if
-                :: i == 0 -> printf(  "%d ", v)
-                :: i != 0 -> printf("| %d ", v)
-                fi
-            }
-            printf("]\n");
-
-//ID      lead[T];
-//Group      G[T];
-//bool   chall[T]; // Has the attacker challenged in an epoch?
-//Enigma        I; // Root node secrets over epochs
-
-//Enigma gamma[N]; // User state
-//Epoch     ep[N]; // The Epoch of each user.
-//Count    ctr[N]; // The (local to epoch) counter of operations inititated by each user.
-//bool       D[N]; // Does the user delete old secrets?
-
-
-        };
-
-        do
-        // General options:
-/**/
-        :: !groupDyad && messageVacancy -> atomic
-            {
-                printf("\nBRANCHING: remove_member\n")
-                ID senderID, exiledID;
-                select_sender( currentEpoch );
-                select_exiled( senderID );
-                run remove_member( senderID, exiledID );
-                member_update( senderID );
+    :: I.secret[T-1] == Empty -> atomic
+        {
+            Epoch currentEpoch;
+            bool groupDyad, groupFull, messagePending, messageVacancy;
+     
+            atomic {
+                printf("\nPRECOMPUTE GUARDS:\n");
+    
+                current_epoch();
+                printf("  currentEpoch   = %d\n", currentEpoch.epoch);
+    
+                message_status();
+                printf("  messagePending = %d\n", messagePending);
+                printf("  messageVacancy = %d\n", messageVacancy);
+    
+                group_dyad( currentEpoch );
+                printf("  groupDyad      = %d\n", groupDyad);
+    
+                group_full( currentEpoch );
+                printf("  groupFull      = %d\n", groupFull);
+                printf("  absentees      = %d\n", absentees);
+                printf("  attendees      = %d\n", attendees);
+    
             };
-            break
-/**/
-        :: !groupFull && messageVacancy -> atomic
-            {
-                printf("\nBRANCHING: insert_member\n")
-                ID senderID, joinerID;
-                select_sender( currentEpoch );
-                select_joiner( currentEpoch );
-                run insert_member( senderID, joinerID );
-                member_update( senderID );
+    
+            d_step {
+                printf("\nPRINT GLOBAL STATE:\n");
+    
+                printf("\n  lead:\n    [ ");
+                for ( i : 0 .. T - 1)
+                {
+                    if
+                    :: i == 0 -> printf(  "%d ", lead[i].identity)
+                    :: i != 0 -> printf("| %d ", lead[i].identity)
+                    fi
+                }
+                printf("]\n");
+    
+                printf("\n  chall:\n    [ ");
+                for ( i : 0 .. T - 1)
+                {
+                    if
+                    :: i == 0 -> printf(  "%d ", chall[i])
+                    :: i != 0 -> printf("| %d ", chall[i])
+                    fi
+                }
+                printf("]\n");
+    
+                printf("\n  ep:\n    [ ");
+                for ( i : 0 .. T - 1)
+                {
+                    if
+                    :: i == 0 -> printf(  "%d ", ep[i].epoch)
+                    :: i != 0 -> printf("| %d ", ep[i].epoch)
+                    fi
+                }
+                printf("]\n");
+    
+                printf("\n  M:\n    [ ");
+                for ( i : 0 .. N - 1)
+                {
+                    byte v = len(M[i]);
+                    if
+                    :: i == 0 -> printf(  "%d ", v)
+                    :: i != 0 -> printf("| %d ", v)
+                    fi
+                }
+                printf("]\n");
+    
             };
-            break
-            
-        :: messagePending -> atomic
-            {
-                printf("\nBRANCHING: convey_update\n")
-                ID recipientID;
-                select_recipient();
-                run convey_update ( recipientID );
-            };
-            break
-/*
-        // Attacker Exclusive options:
-        :: atomic
-            {
-                Epoch selectedEpoch;
-                select_epoch( currentEpoch );
-                run corrupt( selectedEpoch );
-            };
-            break
-
-        :: atomic
-            {
+    
+            do
+            // General options:
+    /**/
+            :: !groupDyad && messageVacancy -> atomic
+                {
+                    printf("\nBRANCHING: remove_member\n")
+                    ID senderID, exiledID;
+                    select_sender( currentEpoch );
+                    select_exiled( senderID );
+                    run remove_member( senderID, exiledID );
+                    member_update( senderID );
+                }; //break
+    /**/
+    /**/
+            :: !groupFull && messageVacancy -> atomic
+                {
+                    printf("\nBRANCHING: insert_member\n")
+                    ID senderID, joinerID;
+                    select_sender( currentEpoch );
+                    select_joiner( currentEpoch );
+                    run insert_member( senderID, joinerID );
+                    member_update( senderID );
+                }; //break
+    /**/
                 
-                ID selectedID;
-                select_attendee( currentEpoch );
-                run hoard( selectedID );
-            };
-            break
-
-        :: atomic
-            {
-                ID selectedID;
-                select_attendee( currentEpoch );
-                run reveal( selectedID );
-            };
-            break
-*/
-        :: else -> break
-        od
-    }
+            :: messagePending -> atomic
+                {
+                    printf("\nBRANCHING: convey_update\n")
+                    ID recipientID;
+                    select_recipient();
+                    run convey_update ( recipientID );
+                }; //break
+    /*
+            // Attacker Exclusive options:
+            :: atomic
+                {
+                    Epoch selectedEpoch;
+                    select_epoch( currentEpoch );
+                    run corrupt( selectedEpoch );
+                };
+                break
+    
+            :: atomic
+                {
+                    
+                    ID selectedID;
+                    select_attendee( currentEpoch );
+                    run hoard( selectedID );
+                }; break
+    
+            :: atomic
+                {
+                    ID selectedID;
+                    select_attendee( currentEpoch );
+                    run reveal( selectedID );
+                };
+                break
+    */
+    //        :: else -> break
+            od
+        }
     :: else -> break
     od
 }
