@@ -491,7 +491,7 @@ D_proctype challenge(Epoch input)
 
 /**/
 // Precondition: joiningMember is not in the group!
-proctype insert_member( ID invitingMember; ID joiningMember )
+inline insert_member( invitingMember, joiningMember )
 {   atomic {
 
     Count c;
@@ -548,7 +548,7 @@ proctype insert_member( ID invitingMember; ID joiningMember )
 
 /**/
 // Precondition: exiledMemeber is in the group!
-proctype remove_member( ID dismissingMember; ID exiledMember )
+inline remove_member( dismissingMember, exiledMember )
 {   atomic {
 
     byte  t;
@@ -631,12 +631,6 @@ inline member_update( receivingMember )
         G[t_i.epoch].reference[ref].membership[i] = G[t_i.epoch].reference[sender.identity].membership[i]
     }
 }   }
-
-
-proctype convey_update( ID receivingMember )
-{
-    member_update(receivingMember);
-}
 
 
 /********
@@ -722,12 +716,12 @@ inline CGKA_create_group()
     for( i : 0 .. N - 1 )
     {
         if
-        :: !G[fst.epoch].reference[id0.identity].membership[i] -> skip
         ::  G[fst.epoch].reference[id0.identity].membership[i] ->
             ID tmp;
             tmp.identity = i;
             M[i] ! fst, id0, tmp, c, W, U;
             member_update( tmp )
+        :: else -> skip
         fi
     }
 
@@ -818,9 +812,9 @@ inline CGKA_security_game()
                     ID senderID, exiledID;
                     select_sender( currentEpoch );
                     select_exiled( senderID );
-                    run remove_member( senderID, exiledID );
+                    remove_member( senderID, exiledID );
                     member_update( senderID );
-                }; //break
+                }; break
     /**/
     /**/
             :: !groupFull && messageVacancy -> atomic
@@ -829,9 +823,9 @@ inline CGKA_security_game()
                     ID senderID, joinerID;
                     select_sender( currentEpoch );
                     select_joiner( currentEpoch );
-                    run insert_member( senderID, joinerID );
+                    insert_member( senderID, joinerID );
                     member_update( senderID );
-                }; //break
+                }; break
     /**/
                 
             :: messagePending -> atomic
@@ -839,8 +833,8 @@ inline CGKA_security_game()
                     printf("\nBRANCHING: convey_update\n")
                     ID recipientID;
                     select_recipient();
-                    run convey_update ( recipientID );
-                }; //break
+                    member_update ( recipientID );
+                }; break
     /*
             // Attacker Exclusive options:
             :: atomic
