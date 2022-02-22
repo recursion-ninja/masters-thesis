@@ -490,9 +490,6 @@ D_proctype challenge(Epoch input)
 inline insert_member( invitingMember, joiningMember )
 {   atomic {
 
-    byte e;
-    bool U;
-    bool W0, W1;
     byte t;
     
     d_step {
@@ -505,16 +502,11 @@ inline insert_member( invitingMember, joiningMember )
     
         gamma[invitingMember].secret[t+1] = Unknown;
     
-        e = t + 1;
-        W0 = false;
-        W1 = true;
-        U = true;
-    
-        printf("\nINSERT MESSAGE:\n  byte:  \t %d\n  Inviter:\t %d\n  Joiner:\t %d\n  W:    \t %d\n  T:    \t %d\n", e, invitingMember, joiningMember, W1, U)
+        printf("\nINSERT MESSAGE:\n  Epoch:  \t %d\n  Inviter:\t %d\n  Joiner:\t %d\n  W:    \t %d\n  T:    \t %d\n", t+1, invitingMember, joiningMember, W1, U)
         assert(joiningMember < N);
     }
         
-    M[joiningMember] ! e, invitingMember, W1, U;
+    M[joiningMember] ! t+1, invitingMember, true, true;
     
     d_step {
 
@@ -526,10 +518,7 @@ inline insert_member( invitingMember, joiningMember )
         for ( i : 0 .. N - 1 ) {
             if
             :: G[t].reference[invitingMember].membership[i] ->
-                byte receivingMember;
-                receivingMember = i;
-                assert(i < N);
-                M[i] ! e, invitingMember, W0, U;
+                M[i] ! t+1, invitingMember, false, true;
             :: else -> skip;
             fi
         }
