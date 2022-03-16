@@ -72,7 +72,7 @@ bool   chall[T]; // Has the attacker challenged in an epoch?
 byte      ep[N]; // The epoch of each user
 byte       D[N]; // Epoch from which the user saves secrets
 bool  unsafe[N]; // Members which require a change to update
-bool  mailed[N]; 
+bool testmailed[N]; 
 
 // Epoch, Sender
 chan M[N] = [2] of { byte, byte };
@@ -944,7 +944,7 @@ inline propogate ( t, sender, insert, remove )
         for ( i : 0 .. N - 1 )
         {
             G[t+1].membership[i] = G[t].membership[i]
-            mailed[i] = false
+            testmailed[i] = false
         }
         if
         :: insert != NONE -> G[t+1].membership[insert] = true
@@ -1027,7 +1027,7 @@ inline insert_member( t, sender, joiner, commitment )
     }
     if
     :: !commitment ->
-        mailed[sender] = true;
+        testmailed[sender] = true;
     ::  commitment ->
         d_step
         {
@@ -1120,19 +1120,27 @@ inline CGKA_initialize()
 {   atomic {
     printf("\n***********************\n* CGKA: Initialize!   *\n***********************\n");
 
-    for( i : 0 .. N - 1 )
+    d_step
     {
-        ep[i] = 0;
-        D[i]  = NONE;
+        for( i : 0 .. N - 1 )
+        {
+            ep[i] = 0;
+            D[i]  = NONE;
+        };
+    
+        for( i : 0 .. T - 1 )
+        {
+            chall[i] = false;
+            lead[i]  = NONE;
+        };
+    
+        for ( i : 0 .. N - 1 )
+        {
+            testmailed[i] = false;
+        }
     };
 
-    for( i : 0 .. T - 1 )
-    {
-        chall[i] = false;
-        lead[i]  = NONE;
-    }
-
-    initialize_attacker_knowledge();
+    initialize_attacker_knowledge()
 
 }   }
 
@@ -1592,8 +1600,8 @@ init
 {
     CGKA_initialize();
     CGKA_create_group();
-    new_loop_outline();
-//    CGKA_security_game();
+//    new_loop_outline();
+    CGKA_security_game();
     CGKA_safety_check();
 }
 
