@@ -485,6 +485,7 @@ inline select_sender_constrained ( banned, forced, commitment )
     byte candidates = 0;
     d_step {
         for ( i : 0 .. N - 1 ) {
+/*
              d_step
              {
                  printf("\n  membership[%d]     = %d", i, membership[i]);
@@ -499,7 +500,7 @@ inline select_sender_constrained ( banned, forced, commitment )
                  printf("\n  (!(forced) && (commitment || !(epochQuerried[%d]))) || unsafe[%d] = %d", i, i, (!(forced) && (commitment || !(epochQuerried[i]))) || unsafe[i]);
                  printf("\n")
              }
-             
+*/
              if
              :: membership[i] && i != banned &&
                 ((!(forced) && (commitment || !(epochQuerried[i]))) || unsafe[i]) -> candidates++
@@ -1089,7 +1090,7 @@ inline insert_member( t, sender, joiner, commitment )
 inline remove_member( t, sender, exiled, commitment )
 {
     d_step {
-        printf("\nREMOVE MEMBER:\n  Sender: \t%d\n  Exiled: \t%d\n  Epoch: \t%d\n", sender, exiled, t);
+//        printf("\nREMOVE MEMBER:\n  Sender: \t%d\n  Exiled: \t%d\n  Epoch: \t%d\n", sender, exiled, t);
         assert(sender < N);
         assert(exiled < N);
     }
