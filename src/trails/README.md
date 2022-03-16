@@ -1,1 +1,0 @@
-A location for the `makefile` to place trail files.
