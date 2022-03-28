@@ -36,7 +36,8 @@
 #define C    3
 #define N    4
 #define TREE 7
-#define ROOT (TREE - 1)
+#define NODE (TREE / 2)
+#define ROOT 0
 
 
 /****
@@ -46,19 +47,10 @@
 ****/
 
 
-//        Void - This node does not exist  and there exists 0 leaves in the subtree
-// UnknownRefs - This node does not exist  and there exists 1 leaf   in the subtree
-//   KnownRefs - This node does not exist  and there exists 1 leaf   in the subtree
-// UnknownNode - This node          exists and there exists 1 or more leaves in the subtree
-//   KnownNode - This node          exists and there exists 1 or more leaves in the subtree
-mtype:Secret = { Void, UnknownRefs, KnownRefs, UnknownNode, KnownNode };
-
 mtype:Message = { ADD, RMV, UPD };
 
 //typedef Group      { bool         membership[N] };
 //typedef Enigma     { mtype:Secret secret[T]     };
-typedef TreeKeys   { mtype:Secret node[ TREE ]  };
-
 
 /****
   *
@@ -78,7 +70,42 @@ bool epochQuerried[N];
 // Epoch, Sender
 // chan M[N] = [2] of { byte, byte };
 
+/****
+  *
+  * Global state of the attacker.
+  *
+****/
+
+//        Void - This node does not exist  and there exists 0 leaves in the subtree
+// UnknownRefs - This node does not exist  and there exists 1 leaf   in the subtree
+//   KnownRefs - This node does not exist  and there exists 1 leaf   in the subtree
+// UnknownNode - This node          exists and there exists 1 or more leaves in the subtree
+//   KnownNode - This node          exists and there exists 1 or more leaves in the subtree
+mtype:Secret = { Void, UnknownRefs, KnownRefs, UnknownNode, KnownNode };
+
+typedef TreeKeys   { mtype:Secret node[ TREE ]  };
+
 TreeKeys attackerKnowledge[T];
+
+/****
+  *
+  * Left-balanced Binary Tree:
+  *
+  *            +-----(14)-----+
+  *           /                \
+  *         (12)              (13)
+  *        /    \            /    \
+  *     (8)     (9)       (10)     (11)
+  *    /   \   /   \     /    \   /    \
+  *   0     1 2     3   4      5 6      7 
+  *
+  * Binary Heap Layout:
+  *
+  * Index:   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14
+  * Array: [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
+  * Node:   14  12  13   8   9  10  11   0   1   2   3   4   5   6   7
+  *
+****/
 
 
 /****
@@ -89,6 +116,7 @@ TreeKeys attackerKnowledge[T];
 
 local byte i = 0
 local byte j = 0;
+local byte k = 0;
 local byte t = 0;
 local byte absentees = 0;
 local byte attendees = N;
@@ -292,27 +320,6 @@ inline group_dyad( input )
 }   }
 
 
-/*
-/****
-  * External result variable(s):
-  *   - queueFull
-****/
-inline queue_full()
-{   d_step {
-
-    bool found = false
-    for( i : 0 .. N - 1 )
-    {
-        if
-        :: full( M[i] ) -> found = true
-        :: else
-        fi
-    }
-
-}   }
-*/
-
-
 /****
   * External result variable(s):
   *   - unsafeIDs
@@ -338,54 +345,19 @@ inline safety_poll()
   *   - attendees
 ****/
 inline take_attendance( t )
-{   d_step {
-
-    byte included = 0;
-    for ( i : 0 .. N - 1 ) {
-         if
-         :: membership[i] -> included++
-         :: else
-         fi
+{
+    d_step {
+        byte included = 0;
+        for ( i : 0 .. N - 1 ) {
+             if
+             :: membership[i] -> included++
+             :: else
+             fi
+        }
+        attendees = included;
+        absentees = N - attendees;
     }
-    attendees = included;
-    absentees = N - attendees;
-
-}   }
-
-
-/****
-  * External result variable(s):
-  *   - selectedID
-****/
-inline select_attendee( t )
-{   atomic {
-
-    byte bound, sample;
-    byte selection = NONE;
-
-    take_attendance( t );
-    select( sample : 0 .. attendees - 1 );
-
-/*
-    printf("\nSELECTING ATTENDEE:\n");
-    printf("  attendees           = %d\n", attendees);
-    printf("  absentees           = %d\n", absentees);
-    printf("  sample              = %d\n", sample);
-*/
-
-    for ( i : 0 .. N - 1 ) {
-//        printf("  i = %d v = %d s = %d g = %d\n", i, selection, sample, selection == NONE && membership[i]);
-        if
-        :: selection == NONE && membership[i] && sample != 0 -> sample--
-        :: selection == NONE && membership[i] && sample == 0 -> selection = i
-        :: else
-        fi
-    }
-
-    selectedID = selection;
-//    printf("  selection           = %d\n", selectedID);
-
-}   }
+}
 
 
 /****
@@ -438,8 +410,6 @@ inline select_sender( commitment )
 /****
   * External result variable(s):
   *   - exiledID
-  *
-  * Similar to select_attendee
 ****/
 inline select_exiled( forced, commitment )
 {
@@ -479,9 +449,8 @@ inline select_updater( forced, commitment )
   *   - selectedID
 ****/
 inline select_sender_constrained ( banned, forced, commitment )
-{ atomic {
-    printf("\nSELECTING Sender %d %d %d", banned, forced, commitment);
-
+{   atomic {
+//    printf("\nSELECTING Sender %d %d %d", banned, forced, commitment);
     byte candidates = 0;
     d_step {
         for ( i : 0 .. N - 1 ) {
@@ -563,8 +532,6 @@ inline select_joiner( input )
 /****
   * External result variable(s):
   *   - corruptedID
-  *
-  * Similar to select_attendee
 ****/
 inline select_corrupted( t )
 {   atomic {
@@ -584,7 +551,9 @@ inline select_corrupted( t )
                 if
                 :: selection == NONE ->
                     if
-                    :: hoarding[i] == NONE && attackerKnowledge[t].node[i] == UnknownNode ->
+                    :: hoarding[i] == NONE &&
+                       membership[i] &&
+                       attackerKnowledge[t].node[i] == UnknownNode ->
                         if
                         :: sample == 0 -> selection = i
                         :: sample != 0 -> sample--
@@ -615,7 +584,9 @@ inline candidate_corrupteds( t )
             {   // The corrupted user must not previously been instructed to hoard!
                 // Violates the "Safety Predicate SAFE" described in Alwen 2020.
                 if
-                :: hoarding[i] == NONE && attackerKnowledge[t].node[i] == UnknownNode -> candidates++
+                :: hoarding[i] == NONE &&
+                   membership[i] &&
+                   attackerKnowledge[t].node[i] == UnknownNode -> candidates++
                 :: else
                 fi
             }
@@ -734,8 +705,11 @@ inline select_hoarder()
             for ( i : 0 .. N - 1 )
             {
                 if
-                :: sample == 0 && selection == NONE && hoarding[i] == NONE && membership[i] -> selection = i
-                :: sample != 0 && selection == NONE && hoarding[i] == NONE && membership[i] -> sample--
+                :: selection == NONE && hoarding[i] == NONE && membership[i] ->
+                    if
+                    :: sample == 0 -> selection = i
+                    :: sample != 0 -> sample--
+                    fi
                 :: else
                 fi
             }
@@ -875,123 +849,22 @@ inline broadcast ( t, sender, subject, commitment, message )
     atomic
     {
         // Attacker observes network messages
+        attacker_observes_message( t, sender, i, commitment, message );
+/*        
         for ( i : 0 .. N - 1 ) {
+            bool messageSentADD = message == RMV && (membership[i] || i == subject)
+            bool messageSentRMV = message == ADD &&  membership[i] && i != subject
+            bool messageSentUPD = message == UPD &&  membership[i]
             if
-            :: ((message != RMV || i != subject) && membership[i]) ||
-               ( message == ADD && i == subject) ||
-               ( message == UPD && membership[i] ) ->
-                printf("\n OBSERVING: %d -> %d : %e @ %d", sender, i, message, subject)
-                // attacker_observes_message( t, sender, i, commitment, message );
+            :: messageSentADD ||
+               messageSentRMV ||
+               messageSentUPD ->
+//                printf("\n OBSERVING: %d -> %d : %e @ %d", sender, i, message, subject)
             :: else
             fi
         };
-
-/*
-        if
-        :: commitment -> leadership[t] = sender
-        :: else
-        fi
 */
     }
-}
-
-
-inline attacker_observes_message( t, sender, commitment, message )
-{
-    // Row 1, leaves
-    for ( i : 0 .. N - 1 )
-    {
-        if
-        // No knowledge from excluded group members
-        :: !membership[i] ->
-            attackerKnowledge[t].node[i] = Void
-        // The sender has refreshed their secrets, hence Unknown
-        :: membership[i] && (i == sender || attackerKnowledge[t].node[i] != KnownNode) ->
-            attackerKnowledge[t+1].node[i] = UnknownNode
-        :: membership[i] &&  i != sender && attackerKnowledge[t].node[i] == KnownNode  ->
-            attackerKnowledge[t+1].node[i] = KnownNode
-        fi
-    }
-
-    // Row 2, parents
-    for ( i : N .. N + (N / 2) )
-    {
-        byte c0 = i - N
-        byte c1 = i - N + 1
-        if
-        // If neither child exists in this epoch
-        :: attackerKnowledge[t+1].node[c0] == Void && attackerKnowledge[t+1].node[c1] == Void ->
-            attackerKnowledge[t+1].node[i] = Void
-        // If only the left child exists in this epoch
-        :: attackerKnowledge[t+1].node[c0] != Void && attackerKnowledge[t+1].node[c1] == Void ->
-            if
-            :: attackerKnowledge[t+1].node[c0] == KnownNode || attackerKnowledge[t+1].node[c0] == KnownRefs ->
-                attackerKnowledge[t+1].node[i] =  KnownRefs
-            :: else
-                attackerKnowledge[t+1].node[i] = UnknownRefs
-            fi
-        // If only the right child exists in this epoch
-        :: attackerKnowledge[t+1].node[c0] == Void && attackerKnowledge[t+1].node[c1] != Void ->
-            if
-            :: attackerKnowledge[t+1].node[c1] == KnownNode || attackerKnowledge[t+1].node[c1] == KnownRefs ->
-                attackerKnowledge[t+1].node[i] =  KnownRefs
-            :: else
-                attackerKnowledge[t+1].node[i] = UnknownRefs
-            fi
-        // If both children exist in this epoch
-        :: attackerKnowledge[t+1].node[c0] != Void && attackerKnowledge[t+1].node[c1] != Void ->
-            if
-            // If both children existed in the previous epoch
-            :: (attackerKnowledge[t].node[c0] == KnownNode || attackerKnowledge[t].node[c0] == UnknownNode) &&
-               (attackerKnowledge[t].node[c1] == KnownNode || attackerKnowledge[t].node[c1] == UnknownNode) ->
-               if
-               :: attackerKnowledge[t].node[c0] == KnownNode || attackerKnowledge[t].node[c0] == KnownNode ->
-                   attackerKnowledge[t+1].node[i] = KnownNode
-               :: else
-                   attackerKnowledge[t+1].node[i] = UnknownNode
-               fi
-            :: else
-                   attackerKnowledge[t+1].node[i] = UnknownNode            
-            fi
-        fi
-    }
-
-/*
-    if
-    :: N > 4 ->
-    for ( i : N .. N + (N / 2) )
-    {
-        c0 = i - N
-        c2 = i - N + 1
-        if
-        // If neither child exists in this epoch
-        :: attackerKnowledge[t].node[c0] == Void && attackerKnowledge[t].node[c1] == Void ->
-            attackerKnowledge[t].node[i] = Known
-        // If only the left child exists in this epoch
-        :: attackerKnowledge[t].node[c0] != Void && attackerKnowledge[t].node[c1] == Void ->
-            attackerKnowledge[t].node[i] = Space
-        // If only the right child exists in this epoch
-        :: attackerKnowledge[t].node[c0] == Void && attackerKnowledge[t].node[c1] != Void ->
-            attackerKnowledge[t].node[i] = Space
-        // If both children exist in this epoch
-        :: attackerKnowledge[t].node[c0] != Void && attackerKnowledge[t].node[c1] != Void ->
-            if
-            // If both children existed in the previous epoch
-            :: (attackerKnowledge[e].node[c0] == Known || attackerKnowledge[e].node[c0] == Unknown) &&
-               (attackerKnowledge[e].node[c1] == Known || attackerKnowledge[e].node[c1] == Unknown) && ->
-               if
-               :: attackerKnowledge[e].node[c0] == Known || attackerKnowledge[e].node[c0] == Known ->
-                   attackerKnowledge[t].node[i] = Known
-               :: else
-                   attackerKnowledge[t].node[i] = Unknown
-               fi
-            :: else
-                   attackerKnowledge[t].node[i] = Unknown                
-            fi
-        fi
-    }
-*/
-
 }
 
 
@@ -1011,6 +884,248 @@ inline propogate ( t, sender, insert, remove )
 }
 
 
+/****
+  *
+  * The following methods:
+  *   - attacker_initializes_knowledge
+  *   - attacker_observes_message
+  *
+  * Are used by the security game moves:
+  *   - broadcast
+  *   - CGKA_initialize
+  *
+****/
+
+
+inline attacker_initializes_knowledge()
+{
+    d_step
+    {
+        for( i : 0 .. T - 1 )
+        {
+            for( j : N .. TREE - 1)
+            {
+                attackerKnowledge[i].node[j] = Void
+            }
+        }
+    }
+}
+
+
+inline attacker_observes_message( t, sender, subject, commitment, message )
+{
+    if
+    :: !commitment -> skip
+    :: else ->
+        // If the attacker has know knowledge of the epoch,
+        // meaning that all cell values are "Void,"
+        // then it is the first time we have entered the epoch
+        // and the cell values should be initialized as either:
+        //   * UnknownNode
+        //   * UnknownRefs
+        //   *        Void
+        bool noEpochKnowledge;
+        attacker_has_no_epoch_knowledge( t );
+        if
+        :: noEpochKnowledge -> attacker_init_epoch_knowledge( t );
+        :: else
+        fi
+        
+        //   referenceEpoch = (t == 0) ? t : t - 1;
+        byte referenceEpoch = t ;
+        if
+        :: t != 0 -> referenceEpoch--;
+        :: else
+        fi
+
+        attacker_copy_epoch_knowledge( referenceEpoch );
+        attacker_wipe_sender_knowledge( sender, t );
+        attacker_updates_knowledge ( t );
+    fi
+}
+
+
+inline attacker_has_no_epoch_knowledge ( e )
+{
+    d_step
+    {
+        bool allVoid = true;
+        for ( i : 0 .. TREE - 1 )
+        {
+            allVoid = allVoid && attackerKnowledge[e].node[i] == Void
+        }
+        noEpochKnowledge = allVoid;
+    }
+}
+
+
+inline attacker_init_epoch_knowledge( e )
+{   atomic {
+
+    bool leaves = true;
+    byte offset = NODE;
+    byte width  = TREE + 1;
+    do
+    :: width == 0 -> break
+    :: width != 0 -> d_step
+        {
+            width = width / 2;
+            for ( i : 0 .. width - 1 )
+            {
+                j = offset + i;
+                // Leaf node case(s)
+                if
+                :: leaves ->
+                    if
+                    // No knowledge from excluded group members
+                    :: !membership[i] -> attackerKnowledge[e].node[j] = Void
+                    :: else           -> attackerKnowledge[e].node[j] = UnknownNode
+                    fi
+                // Internal node case(s)
+                :: else ->
+                    byte childL = j * 2 + 1;
+                    byte childR = j * 2 + 2;
+                    // Check current epoch for existance of subtrees
+                    bool existanceOfSubtree;
+                    existance_of_subtree( e, childL);
+                    bool voidL = !existanceOfSubtree;
+                    existance_of_subtree( e, childR);
+                    bool voidR = !existanceOfSubtree;
+                    if
+                    ::  voidL &&  voidR -> attackerKnowledge[e].node[j] =        Void
+                    :: !voidL &&  voidR -> attackerKnowledge[e].node[j] = UnknownRefs
+                    ::  voidL && !voidR -> attackerKnowledge[e].node[j] = UnknownRefs
+                    :: !voidL && !voidR -> attackerKnowledge[e].node[j] = UnknownNode
+                    fi
+                fi
+            };
+            offset = offset / 2;
+            leaves = false;
+        }
+    od
+}   }
+
+
+inline attacker_copy_epoch_knowledge( e )
+{   atomic {
+
+    byte offset = NODE;
+    byte width  = TREE + 1;
+    do
+    :: width == 0 -> break
+    :: width != 0 -> d_step
+        {
+            width = width / 2;
+            for ( i : 0 .. width - 1 )
+            {
+                j = offset + i;
+                bool knowledgeOfSubtree;
+                knowledge_of_subtree( e, j);
+                if
+                ::  attackerKnowledge[e+1].node[j] == UnknownNode && knowledgeOfSubtree ->
+                    attackerKnowledge[e+1].node[j] = KnownNode
+                ::  attackerKnowledge[e+1].node[j] == UnknownRefs && knowledgeOfSubtree ->
+                    attackerKnowledge[e+1].node[j] = KnownRefs
+                :: else
+                fi
+            };
+            offset = offset / 2;
+        }
+    od
+}   }
+
+
+inline attacker_wipe_sender_knowledge( sender, e )
+{   atomic {
+
+    byte offset = NODE;
+    byte width  = TREE + 1;
+    do
+    :: width == 0 -> break
+    :: width != 0 -> d_step
+        {
+            width = width / 2;
+            j = offset + sender;
+            if
+            ::  attackerKnowledge[e].node[j] == UnknownNode ||
+                attackerKnowledge[e].node[j] ==   KnownNode ->
+                attackerKnowledge[e].node[j] =  UnknownNode
+            ::  attackerKnowledge[e].node[j] == UnknownRefs ||
+                attackerKnowledge[e].node[j] ==   KnownRefs ->
+                attackerKnowledge[e].node[j] =  UnknownRefs
+            :: else
+            fi
+            offset = offset / 2;
+        }
+    od
+}   }
+
+
+inline attacker_updates_knowledge( e )
+{   atomic {
+
+    bool leaves = true;
+    byte offset = NODE;
+    byte width  = TREE + 1;
+    do
+    :: width == 0 -> break
+    :: width != 0 -> d_step
+        {
+            width = width / 2;
+            for ( i : 0 .. width - 1 )
+            {
+                j = offset + i;
+                if
+                :: leaves -> skip
+                :: else ->
+                    byte childL = j * 2 + 1;
+                    byte childR = j * 2 + 2;
+                    // Check current epoch for existance of subtrees
+                    bool existanceOfSubtree;
+                    existance_of_subtree( e, childL);
+                    bool voidL = !existanceOfSubtree;
+                    existance_of_subtree( e, childR);
+                    bool voidR = !existanceOfSubtree;
+                    // Check previous epoch for knowledge of subtrees
+                    bool knowledgeOfSubtree;
+                    knowledge_of_subtree( e, childL);
+                    bool knowsL = knowledgeOfSubtree;
+                    knowledge_of_subtree( e, childR);
+                    bool knowsR = knowledgeOfSubtree;
+                    
+                    if
+                    ::  voidL &&  voidR                       -> attackerKnowledge[e].node[j] =        Void
+                    :: !voidL &&  voidR &&             knowsR -> attackerKnowledge[e].node[j] =   KnownRefs
+                    :: !voidL &&  voidR &&            !knowsR -> attackerKnowledge[e].node[j] = UnknownRefs
+                    ::  voidL && !voidR &&  knowsL            -> attackerKnowledge[e].node[j] =   KnownRefs
+                    ::  voidL && !voidR && !knowsL            -> attackerKnowledge[e].node[j] = UnknownRefs
+                    :: !voidL && !voidR &&  knowsL &&  knowsR -> attackerKnowledge[e].node[j] =   KnownNode
+                    :: !voidL && !voidR && !knowsL &&  knowsR -> attackerKnowledge[e].node[j] =   KnownNode
+                    :: !voidL && !voidR &&  knowsL && !knowsR -> attackerKnowledge[e].node[j] =   KnownNode
+                    :: !voidL && !voidR && !knowsL && !knowsR -> attackerKnowledge[e].node[j] = UnknownNode
+                    fi
+                fi
+            };
+            offset = offset / 2;
+            leaves = false;
+        }
+    od
+    }
+}
+
+
+inline existance_of_subtree( i, j )
+{
+    existanceOfSubtree = attackerKnowledge[i].node[j] != Void
+}
+
+
+inline knowledge_of_subtree( i, j )
+{
+    knowledgeOfSubtree = attackerKnowledge[i].node[j] == KnownNode || attackerKnowledge[i].node[j] == KnownRefs
+}
+
+
 /********
     *
     * Oracles available to the attacker:
@@ -1026,20 +1141,64 @@ inline corrupt( t, memberID )
 {   atomic {
 
     // Learn the secret material of the user in their current epoch
-    attackerKnowledge[t].node[memberID] = KnownNode;
-    unsafe[memberID] = true;
+    byte upperBound = t;
+    byte lowerBound = upperBound;
 
     // Learn any additional secrets they have hoarded!
     byte epochSavedFrom = hoarding[memberID];
     if
-    :: epochSavedFrom < t ->
-        for ( i : epochSavedFrom .. t)
-        {
-            attackerKnowledge[i].node[memberID] = KnownNode;
-        }
+    :: epochSavedFrom < upperBound -> lowerBound = epochSavedFrom
     :: else
     fi
 
+    printf("Corrupting from: %d -- %d\n", lowerBound, upperBound);
+
+
+    // For each epoch which the member has secrets
+    // (this implies that the user was a member)
+    // Then the attacker learns the secrets on the direct path
+    // between the member and the root node on the LBBT.
+    byte peek;
+    for ( peek : lowerBound .. upperBound )
+    {
+        printf("Corrupting %d\n", peek);
+        if
+        :: !membership[memberID] -> skip
+        :: else ->
+            printf("Passed membership guard!\n");
+            byte off   = NODE;
+            byte level = TREE + 1;
+            do
+            :: level == 0 -> break
+            :: level != 0 -> d_step
+                {
+                    level = level / 2;
+                    k = off+memberID;
+                    printf("tree level: %d @ %d\n", level, j);
+                    if
+                    :: attackerKnowledge[peek].node[k] == UnknownNode -> attackerKnowledge[peek].node[k] = KnownNode
+                    :: attackerKnowledge[peek].node[k] == UnknownRefs -> attackerKnowledge[peek].node[k] = KnownRefs
+                    :: else
+                    fi
+                    off = off / 2;
+                }
+                printf("Check Index Post: %d\n", peek);
+                if
+                :: i == upperBound ->
+                    printf("UPPER BOUNDed %d\n", peek);
+                    attacker_updates_knowledge( peek );
+                :: else ->
+                    printf("Lower Pre %d\n", peek);
+                    attacker_copy_epoch_knowledge( peek  );
+                    printf("Lower Post %d\n", peek);
+                    attacker_updates_knowledge(   peek+1 );
+                fi
+                printf("Before hand off: %d\n", peek);
+            od
+        fi
+    }
+
+    unsafe[memberID] = true;
 }   }
 
 
@@ -1132,21 +1291,6 @@ inline convey_update( t, receiver )
 */
 
 
-inline initialize_attacker_knowledge()
-{
-    d_step
-    {
-        for( i : 0 .. T - 1 )
-        {
-            for( j : N .. TREE - 1)
-            {
-                attackerKnowledge[i].node[j] = Void
-            }
-        }
-    }
-}
-
-
 /********
     *
     * Initialization inline routines, in order of execution:
@@ -1183,7 +1327,7 @@ inline CGKA_initialize()
         }
     };
 
-    initialize_attacker_knowledge()
+    attacker_initializes_knowledge()
 
 }   }
 
@@ -1225,231 +1369,22 @@ inline CGKA_create_group()
 }   }
 
 
-/*
+
 inline CGKA_security_game()
 {
     printf("\n***********************\n* CGKA: Begin Play!   *\n***********************\n");
-    bool endGame = false;
-    endHere:
-    do
-    :: !endGame -> atomic
-        {
-            byte currentEpoch=0;
-            byte revelationEpoch;
-            bool forcedPlay, groupDyad, groupFull, messagePending, messageVacancy;
-            byte corruptedID, exiledID, banisherID, hoarderID, updaterID;
-
-            atomic
-            {
-//                printf("\nPRECOMPUTE GUARDS:\n");
     
-//                current_epoch();
-//                message_status();
-                forced_play(       currentEpoch );
-                group_dyad(        currentEpoch );
-                group_full(        currentEpoch );
-                select_revelation( currentEpoch );
-                select_corrupted(  currentEpoch );
-                select_hoarder(    currentEpoch );
-                select_updater(    currentEpoch, forcedPlay );
-                select_exiled(     currentEpoch, forcedPlay );
-                select_banisher(   currentEpoch, exiledID   );
-            };
-
-            print_global_state()
-
-            d_step
-            {
-                printf("  currentEpoch    = %d\n", currentEpoch);
-                printf("  messagePending  = %d\n", messagePending);
-                printf("  messageVacancy  = %d\n", messageVacancy);
-                printf("  forcedPlay,     = %d\n", forcedPlay);
-                printf("  groupDyad       = %d\n", groupDyad);
-                printf("  groupFull       = %d\n", groupFull);
-                printf("  absentees       = %d\n", absentees);
-                printf("  attendees       = %d\n", attendees);
-                printf("  revelationEpoch = %d\n", revelationEpoch);
-                printf("  corruptedID     = %d\n", corruptedID);
-                printf("  hoarderId       = %d\n", hoarderID);
-            }
-
-
-            d_step
-            {
-                printf("\nPRINT GLOBAL STATE:\n");
-    
-                printf("\n  lead:\n    [ ");
-                for ( i : 0 .. T - 1)
-                {
-                    if
-                    :: i == 0 -> printf(  "%d ", leadership[i])
-                    :: i != 0 -> printf("| %d ", leadership[i])
-                    fi
-                }
-                printf("]\n");
-    
-                printf("\n  chall:\n    [ ");
-                for ( i : 0 .. T - 1)
-                {
-                    if
-                    :: i == 0 -> printf(  "%d ", challenge[i])
-                    :: i != 0 -> printf("| %d ", challenge[i])
-                    fi
-                }
-                printf("]\n");
-    
-                printf("\n  ep:\n    [ ");
-                for ( i : 0 .. T - 1)
-                {
-                    if
-                    :: i == 0 -> printf(  "%d ", epoch[i])
-                    :: i != 0 -> printf("| %d ", epoch[i])
-                    fi
-                }
-                printf("]\n");
-    
-                printf("\n  M:\n    [ ");
-                for ( i : 0 .. N - 1)
-                {
-                    byte v = len(M[i]);
-                    if
-                    :: i == 0 -> printf(  "%d ", v)
-                    :: i != 0 -> printf("| %d ", v)
-                    fi
-                }
-                printf("]\n");
-            };
-
-            do
-            // ****************************************************
-            // *
-            // *  Corrupt
-            // **
-            :: corruptedID != NONE && !forcedPlay -> atomic
-                {
-                    printf("\n> > >\n> CGKA: Game Move = corrupt %d\n> > >\n", corruptedID);
-                    corrupt( corruptedID )
-                }; break
-            // ****************************************************
-            // *
-            // *  Hoard
-            // **
-            :: hoarderID != NONE -> atomic
-                {
-                    printf("\n> > >\n> CGKA: Game Move = hoard %d\n> > >\n", hoarderID);
-                    hoard( hoarderID )
-                }; break
-            // ****************************************************
-            // *
-            // *  Reveal
-            // **
-            :: revelationEpoch != NONE -> atomic
-                {
-                    printf("\n> > >\n> CGKA: Game Move = reveal %d\n> > >\n", revelationEpoch);
-                    reveal( revelationEpoch )
-                }; break
-            // ****************************************************
-            // *
-            // *  Convey
-            // **
-            /*
-            :: messagePending -> atomic
-                {   // Selection
-                    byte recipientID;
-                    select_recipient();
-                    // Execution
-                    printf("\n> > >\n> CGKA: Game Move = convey_update %d\n> > >\n", recipientID);
-                    convey_update ( recipientID );
-                }; break
-            // ****************************************************
-            // *
-            // *  Update
-            // **
-            :: messageVacancy && updaterID != NONE -> atomic
-                {
-                    bool commitEpochAdvance;
-                    decide_commitment();
-                    printf("\n> > >\n> CGKA: Game Move = oblige_update %d (committed? %d)\n> > >\n", updaterID, commitEpochAdvance);
-                    oblige_update( currentEpoch, updaterID, commitEpochAdvance );
-//                    convey_update( updaterID );
-                }; break
-            // ****************************************************
-            // *
-            // *  Remove
-            // **
-            :: !groupDyad && messageVacancy && exiledID != NONE && banisherID != NONE -> atomic
-                {
-                    bool commitEpochAdvance;
-                    decide_commitment();
-                    printf("\n> > >\n> CGKA: Game Move = remove_member %d %d (committed? %d)\n> > >\n", banisherID, exiledID, commitEpochAdvance);
-                    remove_member( currentEpoch, banisherID, exiledID, commitEpochAdvance );
-//                    convey_update( banisherID );
-                }; break
-            // ****************************************************
-            // *
-            // *  Insert
-            // **
-            :: !groupFull && !forcedPlay && messageVacancy -> atomic
-                {   // Selection
-                    byte joinerID, senderID;
-                    select_sender( currentEpoch );
-                    select_joiner( currentEpoch );
-                    bool commitEpochAdvance;
-                    decide_commitment();
-                    // Execution
-                    printf("\n> > >\n> CGKA: Game Move = insert_member %d %d (committed? %d)\n> > >\n", senderID, joinerID, commitEpochAdvance);
-                    insert_member( currentEpoch, senderID, joinerID, commitEpochAdvance );
-//                    convey_update( senderID );
-                }; break
-            od;
-
-           // **
-           // *  Post game move update.
-           // **
-            d_step
-            {
-                // After the operation is complete, check to see if the an endgame condition has been reached.
-//                current_epoch();
-                safety_poll();
-                endGame = unsafeIDs == 0;
-                printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< Endgame: %d\n< < < \n", T - currentEpoch - 1, unsafeIDs, endGame);
-            };
-        }
-    :: else -> break
-    od   
-}
-*/
-
-inline CGKA_safety_check()
-{
-    printf("\n***********************\n* CGKA: Safety Check! *\n***********************\n");
-
-    printf("\n? ? ? ? ? ? ? ? ? ? ? ?\n? Attacker  Knowledge ?\n? ? ? ? ? ? ? ? ? ? ? ?\n");
-    
-    for( t : 0 .. T - 1 )
-    {
-        printf("\n>>> %d vvv", t);
-        for( i : 0 .. TREE - 1 )
-        {
-            if
-            :: attackerKnowledge[t].node[i] == UnknownRefs -> printf("\n\t%d [ x ]", i)
-            :: attackerKnowledge[t].node[i] == UnknownNode -> printf("\n\t%d [ X ]", i)
-            :: attackerKnowledge[t].node[i] ==   KnownRefs -> printf("\n\t%d [ o ]", i)
-            :: attackerKnowledge[t].node[i] ==   KnownNode -> printf("\n\t%d [ O ]", i)
-            :: else                                        -> printf("\n\t%d [ ? ]", i)
-            fi
-        }
-    };
-    printf("\n");
-}
-
-
-inline new_loop_outline()
-{
+    // Loop through all epochs...
+    // EXCEPT the final epoch!
     for ( t : 0 .. T - 2)
     {
         bool commitmentRequired = false;
-        
+
+        // The first, the attacker must decide whether or not to:
+        //   1. Play a move which will *commit* the group members to advance to the next epoch
+        //   2. Play a move which where the group members remain in the current epoch
+        //
+        // We call selction option (1) "commitment" and option (2) "non-committal."
         do
         // NOTE: The attacker can always play a move which commits to a new epoch
         :: play_move_with_commitment( t ); break
@@ -1474,6 +1409,7 @@ inline new_loop_outline()
     loopFinal: skip
     finishedLoop = true;
 /*
+    // During the last epoch the attacker can only play a non-committal move
     bool endGame = false;
     do
     :: endGame -> break
@@ -1490,6 +1426,29 @@ inline new_loop_outline()
         };
     od;
 */
+}
+
+inline CGKA_safety_check()
+{
+    printf("\n***********************\n* CGKA: Safety Check! *\n***********************\n");
+
+    printf("\n? ? ? ? ? ? ? ? ? ? ? ?\n? Attacker  Knowledge ?\n? ? ? ? ? ? ? ? ? ? ? ?\n");
+    
+    for( t : 0 .. T - 1 )
+    {
+        printf("\n>>> %d vvv", t);
+        for( i : 0 .. TREE - 1 )
+        {
+            if
+            :: attackerKnowledge[t].node[i] == UnknownRefs -> printf("\n\t%d [ x ]", i)
+            :: attackerKnowledge[t].node[i] == UnknownNode -> printf("\n\t%d [ X ]", i)
+            :: attackerKnowledge[t].node[i] ==   KnownRefs -> printf("\n\t%d [ o ]", i)
+            :: attackerKnowledge[t].node[i] ==   KnownNode -> printf("\n\t%d [ O ]", i)
+            :: else                                        -> printf("\n\t%d [ ? ]", i)
+            fi
+        }
+    };
+    printf("\n");
 }
 
 
@@ -1535,6 +1494,8 @@ inline can_query()
 
     // Cannot send a final test mail when there is only one untested member remaining.
     // The last member will be the commitment member.
+    canQuery = false
+    // TODO: restore the more lenient definition
     canQuery = querriesUsed < groupSize - 1;
 }
 
@@ -1693,8 +1654,7 @@ init
 {
     CGKA_initialize();
     CGKA_create_group();
-    new_loop_outline();
-//    CGKA_security_game();
+    CGKA_security_game();
     CGKA_safety_check();
 }
 
