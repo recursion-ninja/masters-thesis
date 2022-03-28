@@ -35,7 +35,7 @@ $(model-code): $(source)
 	cat <(echo "#include <stdio.h>") pan.h > pan.h.temp
 	mv pan.h.temp pan.h
 
-$(executable): $(model-in-C)
+$(executable): $(model-code)
 	gcc -O3 $(directives) -o $(executable) $(model-in-C)
 
 verification: $(executable) backup
