@@ -36,7 +36,8 @@
 #define C    3
 #define N    4
 #define TREE 7
-#define ROOT (TREE - 1)
+#define NODE (TREE / 2)
+#define ROOT 0
 
 
 /****
@@ -44,20 +45,9 @@
   * Special types required for the protocol.
   *
 ****/
-
-
-//        Void - This node does not exist  and there exists 0 leaves in the subtree
-// UnknownRefs - This node does not exist  and there exists 1 leaf   in the subtree
-//   KnownRefs - This node does not exist  and there exists 1 leaf   in the subtree
-// UnknownNode - This node          exists and there exists 1 or more leaves in the subtree
-//   KnownNode - This node          exists and there exists 1 or more leaves in the subtree
-mtype:Secret = { Void, UnknownRefs, KnownRefs, UnknownNode, KnownNode };
-
 mtype:Message = { ADD, RMV, UPD };
 
 typedef Group      { bool         membership[N] };
-typedef Enigma     { mtype:Secret secret[T]     };
-typedef TreeKeys   { mtype:Secret node[ TREE ]  };
 
 
 /****
@@ -72,11 +62,48 @@ bool   chall[T]; // Has the attacker challenged in an epoch?
 byte      ep[N]; // The epoch of each user
 byte       D[N]; // Epoch from which the user saves secrets
 bool  unsafe[N]; // Members which require a change to update
+bool endGame;    // Are there more moves to be played?
 
 // Epoch, Sender
 chan M[N] = [2] of { byte, byte };
 
+
+/****
+  *
+  * Global state of the attacker.
+  *
+****/
+
+//        Void - This node does not exist  and there exists 0 leaves in the subtree
+// UnknownRefs - This node does not exist  and there exists 1 leaf   in the subtree
+//   KnownRefs - This node does not exist  and there exists 1 leaf   in the subtree
+// UnknownNode - This node          exists and there exists 1 or more leaves in the subtree
+//   KnownNode - This node          exists and there exists 1 or more leaves in the subtree
+mtype:Secret = { Void, UnknownRefs, KnownRefs, UnknownNode, KnownNode };
+
+typedef TreeKeys   { mtype:Secret node[ TREE ]  };
+
 TreeKeys attackerKnowledge[T];
+
+/****
+  *
+  * Left-balanced Binary Tree:
+  *
+  *            +-----(14)-----+
+  *           /                \
+  *         (12)              (13)
+  *        /    \            /    \
+  *     (8)     (9)       (10)     (11)
+  *    /   \   /   \     /    \   /    \
+  *   0     1 2     3   4      5 6      7 
+  *
+  * Binary Heap Layout:
+  *
+  * Index:   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14
+  * Array: [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
+  * Node:   14  12  13   8   9  10  11   0   1   2   3   4   5   6   7
+  *
+****/
 
 
 /****
@@ -85,8 +112,9 @@ TreeKeys attackerKnowledge[T];
   *
 ****/
 
-local byte i = 0
+local byte i = 0;
 local byte j = 0;
+local byte k = 0;
 local byte t = 0;
 local byte absentees = 0;
 local byte attendees = N;
@@ -229,6 +257,29 @@ inline print_user_messages()
 }
 
 
+inline print_attacker_knowledge()
+{
+    d_step
+    {
+        printf("\n\tAttacker Knowledge:");
+        for( t : 0 .. T - 1 )
+        {
+            printf("\n>>> %d vvv", t);
+            for( i : 0 .. TREE - 1 )
+            {
+                if
+                :: attackerKnowledge[t].node[i] == UnknownRefs -> printf("\n\t%d [ x ]", i)
+                :: attackerKnowledge[t].node[i] == UnknownNode -> printf("\n\t%d [ X ]", i)
+                :: attackerKnowledge[t].node[i] ==   KnownRefs -> printf("\n\t%d [ o ]", i)
+                :: attackerKnowledge[t].node[i] ==   KnownNode -> printf("\n\t%d [ O ]", i)
+                :: else                                        -> printf("\n\t%d [   ]", i)
+                fi
+            }
+        };
+        printf("\n");
+    }
+}
+
 inline print_global_state()
 {
     d_step
@@ -241,6 +292,7 @@ inline print_global_state()
         print_user_hoarding()
         print_user_messages()
         print_user_unsafe()
+        print_attacker_knowledge()
     }
 }
 
@@ -415,12 +467,11 @@ inline select_updater( t, forced )
 ****/
 inline select_sender_constrained ( t, banned, forced )
 { atomic {
-
     byte candidates = 0;
     d_step {
         for ( i : 0 .. N - 1 ) {
              if
-             :: G[t].membership[i] && ep[i] == t && i != banned && (!forced || unsafe[i]) -> candidates++
+             :: G[t].membership[i] && ep[i] == t && i != banned && (!(forced) || unsafe[i]) -> candidates++
              :: else
              fi
         }
@@ -438,11 +489,11 @@ inline select_sender_constrained ( t, banned, forced )
 /**/
 
         for ( i : 0 .. N - 1 ) {
-            printf("\n\ti = %d v = %d s = %d b = %d", i, selection, sample, G[t].membership[i] && ep[i] == t && i != banned && (!forced || unsafe[i]));
+            printf("\n\ti = %d v = %d s = %d b = %d", i, selection, sample, G[t].membership[i] && ep[i] == t && i != banned && (!(forced) || unsafe[i]));
             if
             :: selection == NONE ->
                 if
-                ::  G[t].membership[i] && ep[i] == t && i != banned && (!forced || unsafe[i]) ->
+                ::  G[t].membership[i] && ep[i] == t && i != banned && (!(forced) || unsafe[i]) ->
                     if
                     :: sample == 0 -> selection = i
                     :: sample != 0 -> sample--
@@ -496,7 +547,9 @@ inline select_corrupted( t )
             {   // The corrupted user must not previously been instructed to hoard!
                 // Violates the "Safety Predicate SAFE" described in Alwen 2020.
                 if
-                :: D[i] == NONE && attackerKnowledge[ep[i]].node[i] == UnknownNode -> candidateMembers++
+                :: D[i] == NONE &&
+                   G[ep[i]].membership[i] &&
+                   attackerKnowledge[ep[i]].node[NODE+i] == UnknownNode -> candidateMembers++
                 :: else
                 fi
             }
@@ -510,7 +563,7 @@ inline select_corrupted( t )
                 if
                 :: selection == NONE ->
                     if
-                    :: attackerKnowledge[ep[i]].node[i] == UnknownNode ->
+                    :: D[i] == NONE && G[ep[i]].membership[i] && attackerKnowledge[ep[i]].node[NODE+i] == UnknownNode ->
                         if
                         :: sample == 0 -> selection = i
                         :: sample != 0 -> sample--
@@ -578,37 +631,39 @@ inline select_revelation( t )
         {
             if
             ::  chall[i] -> challengesUsed++
+//            :: !chall[i] && attackerKnowledge[i].node[ROOT] != KnownNode -> candidateEpochs++
             :: !chall[i] && attackerKnowledge[i].node[ROOT] == UnknownNode -> candidateEpochs++
             ::  else
             fi
         }
     }
     
-    byte selection = NONE;
     if
-    :: candidateEpochs > 0 && challengesUsed < C ->
+    :: candidateEpochs == 0 || challengesUsed >= C -> revelationEpoch = NONE
+    :: else ->
         byte sample;
         select ( sample : 0 .. candidateEpochs - 1 );
-        for ( i : 0 .. t )
+        byte selection = NONE;
+        d_step
         {
-            if
-            :: selection == NONE ->
+            for ( i : 0 .. t )
+            {
                 if
-                :: !chall[i] && attackerKnowledge[i].node[ROOT] == UnknownNode ->
+                :: selection == NONE ->
                     if
-                    :: sample == 0 -> selection = i
-                    :: sample != 0 -> sample--
+                    :: !chall[i] && attackerKnowledge[i].node[ROOT] == UnknownNode ->
+                        if
+                        :: sample == 0 -> selection = i
+                        :: sample != 0 -> sample--
+                        fi
+                    :: else
                     fi
                 :: else
                 fi
-            :: else
-            fi
+            }
         }
-    :: else
+        revelationEpoch = selection
     fi
-
-    revelationEpoch = selection
-
 }   }
 
 
@@ -697,17 +752,19 @@ inline select_recipient()
 
 //    printf("\nSample: %d\n", sample);
 
+    bool noContent;
     byte selection = NONE;
-    bool content;
     for ( i : 0 .. N - 1 )
     {
-        content =  nempty(M[i]);
+        noContent = empty( M[i] );
 //        printf("\n  i: %d  v: %d  s: %d  q: %d\n", i, selection, sample, content);
         if
-        :: selection == NONE && nempty( M[i] ) && sample == 0 -> selection = i
-        :: selection == NONE && nempty( M[i] ) && sample != 0 -> sample--
-        :: selection == NONE &&  empty( M[i] ) && sample == 0 -> skip
-        :: selection != NONE -> skip
+        :: selection != NONE || noContent -> skip
+        :: else ->
+            if
+            :: sample == 0 -> selection = i
+            :: sample != 0 -> sample--
+            fi
         fi
     }
     
@@ -762,7 +819,7 @@ inline broadcast ( t, sender, commitment, message )
 {   atomic {
 
     // Attacker observes network messages
-    //attacker_observes_message( t, sender, commitment, message );
+    attacker_observes_message( t, sender, commitment, message );
     
     if
     :: commitment ->
@@ -781,100 +838,215 @@ inline broadcast ( t, sender, commitment, message )
 
 inline attacker_observes_message( t, sender, commitment, message )
 {
-    // Row 1, leaves
-    for ( i : 0 .. N - 1 )
-    {
-        if
-        // No knowledge from excluded group members
-        :: !G[t].membership[i] ->
-            attackerKnowledge[t+1].node[i] = Void
-        // The sender has refreshed their secrets, hence Unknown
-        :: G[t].membership[i] && (i == sender || attackerKnowledge[t].node[i] != KnownNode) ->
-            attackerKnowledge[t+1].node[i] = UnknownNode
-        :: G[t].membership[i] &&  i != sender && attackerKnowledge[t].node[i] == KnownNode  ->
-            attackerKnowledge[t+1].node[i] = KnownNode
-        fi
-    }
-
-    // Row 2, parents
-    for ( i : N .. N + (N / 2) )
-    {
-        byte c0 = i - N
-        byte c1 = i - N + 1
-        if
-        // If neither child exists in this epoch
-        :: attackerKnowledge[t+1].node[c0] == Void && attackerKnowledge[t+1].node[c1] == Void ->
-            attackerKnowledge[t+1].node[i] = Void
-        // If only the left child exists in this epoch
-        :: attackerKnowledge[t+1].node[c0] != Void && attackerKnowledge[t+1].node[c1] == Void ->
-            if
-            :: attackerKnowledge[t+1].node[c0] == KnownNode || attackerKnowledge[t+1].node[c0] == KnownRefs ->
-                attackerKnowledge[t+1].node[i] =  KnownRefs
-            :: else
-                attackerKnowledge[t+1].node[i] = UnknownRefs
-            fi
-        // If only the right child exists in this epoch
-        :: attackerKnowledge[t+1].node[c0] == Void && attackerKnowledge[t+1].node[c1] != Void ->
-            if
-            :: attackerKnowledge[t+1].node[c1] == KnownNode || attackerKnowledge[t+1].node[c1] == KnownRefs ->
-                attackerKnowledge[t+1].node[i] =  KnownRefs
-            :: else
-                attackerKnowledge[t+1].node[i] = UnknownRefs
-            fi
-        // If both children exist in this epoch
-        :: attackerKnowledge[t+1].node[c0] != Void && attackerKnowledge[t+1].node[c1] != Void ->
-            if
-            // If both children existed in the previous epoch
-            :: (attackerKnowledge[t].node[c0] == KnownNode || attackerKnowledge[t].node[c0] == UnknownNode) &&
-               (attackerKnowledge[t].node[c1] == KnownNode || attackerKnowledge[t].node[c1] == UnknownNode) ->
-               if
-               :: attackerKnowledge[t].node[c0] == KnownNode || attackerKnowledge[t].node[c0] == KnownNode ->
-                   attackerKnowledge[t+1].node[i] = KnownNode
-               :: else
-                   attackerKnowledge[t+1].node[i] = UnknownNode
-               fi
-            :: else
-                   attackerKnowledge[t+1].node[i] = UnknownNode            
-            fi
-        fi
-    }
-
-/*
     if
-    :: N > 4 ->
-    for ( i : N .. N + (N / 2) )
-    {
-        c0 = i - N
-        c2 = i - N + 1
+    :: !commitment -> skip
+    :: else ->
+        // If the attacker has know knowledge of the epoch,
+        // then it is the first time we have entered the epoch
+        // and the cell values should be initialized as either:
+        //   * UnknownNode
+        //   * UnknownRefs
+        //   *        Void
+        bool noEpochKnowledge;
+        attacker_has_no_epoch_knowledge( t );
         if
-        // If neither child exists in this epoch
-        :: attackerKnowledge[t].node[c0] == Void && attackerKnowledge[t].node[c1] == Void ->
-            attackerKnowledge[t].node[i] = Known
-        // If only the left child exists in this epoch
-        :: attackerKnowledge[t].node[c0] != Void && attackerKnowledge[t].node[c1] == Void ->
-            attackerKnowledge[t].node[i] = Space
-        // If only the right child exists in this epoch
-        :: attackerKnowledge[t].node[c0] == Void && attackerKnowledge[t].node[c1] != Void ->
-            attackerKnowledge[t].node[i] = Space
-        // If both children exist in this epoch
-        :: attackerKnowledge[t].node[c0] != Void && attackerKnowledge[t].node[c1] != Void ->
-            if
-            // If both children existed in the previous epoch
-            :: (attackerKnowledge[e].node[c0] == Known || attackerKnowledge[e].node[c0] == Unknown) &&
-               (attackerKnowledge[e].node[c1] == Known || attackerKnowledge[e].node[c1] == Unknown) && ->
-               if
-               :: attackerKnowledge[e].node[c0] == Known || attackerKnowledge[e].node[c0] == Known ->
-                   attackerKnowledge[t].node[i] = Known
-               :: else
-                   attackerKnowledge[t].node[i] = Unknown
-               fi
-            :: else
-                   attackerKnowledge[t].node[i] = Unknown                
-            fi
+        :: noEpochKnowledge -> attacker_init_epoch_knowledge( t );
+        :: else
         fi
-    }
-*/
+        
+        //   referenceEpoch = (t == 0) ? t : t - 1;
+        byte referenceEpoch = t ;
+        if
+        :: t != 0 -> referenceEpoch--;
+        :: else
+        fi
 
+        attacker_copy_epoch_knowledge( referenceEpoch );
+        attacker_wipe_sender_knowledge( sender, t );
+        attacker_updates_knowledge ( t );
+    fi
+}
+
+
+
+inline attacker_has_no_epoch_knowledge ( e )
+{
+    d_step
+    {
+        bool allVoid = true;
+        for ( i : 0 .. TREE - 1 )
+        {
+            allVoid = allVoid && attackerKnowledge[e].node[i] == Void
+        }
+        noEpochKnowledge = allVoid;
+    }
+}
+
+
+inline attacker_init_epoch_knowledge( e )
+{   atomic {
+
+    bool leaves = true;
+    byte offset = NODE;
+    byte width  = TREE + 1;
+    do
+    :: width == 0 -> break
+    :: width != 0 -> d_step
+        {
+            width = width / 2;
+            for ( i : 0 .. width - 1 )
+            {
+                j = offset + i;
+                // Leaf node case(s)
+                if
+                :: leaves ->
+                    if
+                    // No knowledge from excluded group members
+                    :: !G[e].membership[i] -> attackerKnowledge[e].node[j] = Void
+                    :: else                -> attackerKnowledge[e].node[j] = UnknownNode
+                    fi
+                // Internal node case(s)
+                :: else ->
+                    byte childL = j * 2 + 1;
+                    byte childR = j * 2 + 2;
+                    // Check current epoch for existance of subtrees
+                    bool existanceOfSubtree;
+                    existance_of_subtree( e, childL);
+                    bool voidL = !existanceOfSubtree;
+                    existance_of_subtree( e, childR);
+                    bool voidR = !existanceOfSubtree;
+                    if
+                    ::  voidL &&  voidR -> attackerKnowledge[e].node[j] =        Void
+                    :: !voidL &&  voidR -> attackerKnowledge[e].node[j] = UnknownRefs
+                    ::  voidL && !voidR -> attackerKnowledge[e].node[j] = UnknownRefs
+                    :: !voidL && !voidR -> attackerKnowledge[e].node[j] = UnknownNode
+                    fi
+                fi
+            };
+            offset = offset / 2;
+            leaves = false;
+        }
+    od
+}   }
+
+
+inline attacker_copy_epoch_knowledge( e )
+{   atomic {
+
+    byte offset = NODE;
+    byte width  = TREE + 1;
+    do
+    :: width == 0 -> break
+    :: width != 0 -> d_step
+        {
+            width = width / 2;
+            for ( i : 0 .. width - 1 )
+            {
+                j = offset + i;
+                bool knowledgeOfSubtree;
+                knowledge_of_subtree( e, j);
+                if
+                ::  attackerKnowledge[e+1].node[j] == UnknownNode && knowledgeOfSubtree ->
+                    attackerKnowledge[e+1].node[j] = KnownNode
+                ::  attackerKnowledge[e+1].node[j] == UnknownRefs && knowledgeOfSubtree ->
+                    attackerKnowledge[e+1].node[j] = KnownRefs
+                :: else
+                fi
+            };
+            offset = offset / 2;
+        }
+    od
+}   }
+
+
+inline attacker_wipe_sender_knowledge( sender, e )
+{   atomic {
+
+    byte offset = NODE;
+    byte width  = TREE + 1;
+    do
+    :: width == 0 -> break
+    :: width != 0 -> d_step
+        {
+            width = width / 2;
+            j = offset + sender;
+            if
+            ::  attackerKnowledge[e].node[j] == UnknownNode ||
+                attackerKnowledge[e].node[j] ==   KnownNode ->
+                attackerKnowledge[e].node[j] =  UnknownNode
+            ::  attackerKnowledge[e].node[j] == UnknownRefs ||
+                attackerKnowledge[e].node[j] ==   KnownRefs ->
+                attackerKnowledge[e].node[j] =  UnknownRefs
+            :: else
+            fi
+            offset = offset / 2;
+        }
+    od
+}   }
+
+
+inline attacker_updates_knowledge( e )
+{   atomic {
+
+    bool leaves = true;
+    byte offset = NODE;
+    byte width  = TREE + 1;
+    do
+    :: width == 0 -> break
+    :: width != 0 -> d_step
+        {
+            width = width / 2;
+            for ( i : 0 .. width - 1 )
+            {
+                j = offset + i;
+                if
+                :: leaves -> skip
+                :: else ->
+                    byte childL = j * 2 + 1;
+                    byte childR = j * 2 + 2;
+                    // Check current epoch for existance of subtrees
+                    bool existanceOfSubtree;
+                    existance_of_subtree( e, childL);
+                    bool voidL = !existanceOfSubtree;
+                    existance_of_subtree( e, childR);
+                    bool voidR = !existanceOfSubtree;
+                    // Check previous epoch for knowledge of subtrees
+                    bool knowledgeOfSubtree;
+                    knowledge_of_subtree( e, childL);
+                    bool knowsL = knowledgeOfSubtree;
+                    knowledge_of_subtree( e, childR);
+                    bool knowsR = knowledgeOfSubtree;
+                    
+                    if
+                    ::  voidL &&  voidR                       -> attackerKnowledge[e].node[j] =        Void
+                    :: !voidL &&  voidR &&             knowsR -> attackerKnowledge[e].node[j] =   KnownRefs
+                    :: !voidL &&  voidR &&            !knowsR -> attackerKnowledge[e].node[j] = UnknownRefs
+                    ::  voidL && !voidR &&  knowsL            -> attackerKnowledge[e].node[j] =   KnownRefs
+                    ::  voidL && !voidR && !knowsL            -> attackerKnowledge[e].node[j] = UnknownRefs
+                    :: !voidL && !voidR &&  knowsL &&  knowsR -> attackerKnowledge[e].node[j] =   KnownNode
+                    :: !voidL && !voidR && !knowsL &&  knowsR -> attackerKnowledge[e].node[j] =   KnownNode
+                    :: !voidL && !voidR &&  knowsL && !knowsR -> attackerKnowledge[e].node[j] =   KnownNode
+                    :: !voidL && !voidR && !knowsL && !knowsR -> attackerKnowledge[e].node[j] = UnknownNode
+                    fi
+                fi
+            };
+            offset = offset / 2;
+            leaves = false;
+        }
+    od
+    }
+}
+
+
+inline existance_of_subtree( i, j )
+{
+    existanceOfSubtree = attackerKnowledge[i].node[j] != Void
+}
+
+
+inline knowledge_of_subtree( i, j )
+{
+    knowledgeOfSubtree = attackerKnowledge[i].node[j] == KnownNode || attackerKnowledge[i].node[j] == KnownRefs
 }
 
 
@@ -909,30 +1081,72 @@ inline corrupt( memberID )
 {   atomic {
 
     // Learn the secret material of the user in their current epoch
-    byte e = ep[memberID];
-    attackerKnowledge[e].node[memberID] = KnownNode;
-    unsafe[memberID] = true;
+    byte upperBound = ep[memberID];
+//    attackerKnowledge[e].node[NODE+memberID] = KnownNode;
 
+    byte lowerBound = upperBound;
+    
     // Learn any additional secrets they have hoarded!
     byte epochSavedFrom = D[memberID];
     if
-    :: epochSavedFrom < e ->
-        for ( i : epochSavedFrom .. e)
-        {
-            attackerKnowledge[i].node[memberID] = KnownNode;
-        }
+    :: epochSavedFrom < upperBound -> lowerBound = epochSavedFrom
     :: else
     fi
 
+    printf("Corrupting from: %d -- %d\n", lowerBound, upperBound);
+
+    // For each epoch which the member has secrets
+    // (this implies that the user was a member)
+    // Then the attacker learns the secrets on the direct path
+    // between the member and the root node on the LBBT.
+    byte peek;
+    for ( peek : lowerBound .. upperBound )
+    {
+        printf("Corrupting %d\n", peek);
+        if
+        :: !G[peek].membership[memberID] -> skip
+        :: else ->
+            printf("Passed membership guard!\n");
+            byte off   = NODE;
+            byte level = TREE + 1;
+            do
+            :: level == 0 -> break
+            :: level != 0 -> d_step
+                {
+                    level = level / 2;
+                    k = off+memberID;
+                    printf("tree level: %d @ %d\n", level, j);
+                    if
+                    :: attackerKnowledge[peek].node[k] == UnknownNode -> attackerKnowledge[peek].node[k] = KnownNode
+                    :: attackerKnowledge[peek].node[k] == UnknownRefs -> attackerKnowledge[peek].node[k] = KnownRefs
+                    :: else
+                    fi
+                    off = off / 2;
+                }
+                printf("Check Index Post: %d\n", peek);
+                if
+                :: i == upperBound ->
+                    printf("UPPER BOUNDed %d\n", peek);
+                    attacker_updates_knowledge( peek );
+                :: else ->
+                    printf("Lower Pre %d\n", peek);
+                    attacker_copy_epoch_knowledge( peek  );
+                    printf("Lower Post %d\n", peek);
+                    attacker_updates_knowledge(   peek+1 );
+                fi
+                printf("Before hand off: %d\n", peek);
+            od
+        fi
+    }
+
+    unsafe[memberID] = true;
 }   }
 
 
 inline hoard( memberID )
-{   d_step {
-
+{
     D[memberID] = ep[memberID]
-
-} }
+}
 
 
 inline reveal( t )
@@ -1022,7 +1236,7 @@ inline initialize_attacker_knowledge()
     {
         for( i : 0 .. T - 1 )
         {
-            for( j : N .. TREE - 1)
+            for( j : 0 .. TREE - 1 )
             {
                 attackerKnowledge[i].node[j] = Void
             }
@@ -1061,6 +1275,8 @@ inline CGKA_initialize()
             lead[i]  = NONE;
         };
     };
+
+    endGame = false;
 
     initialize_attacker_knowledge()
 
@@ -1106,7 +1322,6 @@ inline CGKA_create_group()
 inline CGKA_security_game()
 {
     printf("\n***********************\n* CGKA: Begin Play!   *\n***********************\n");
-    bool endGame = false;
     endHere:
     do
     :: !endGame -> atomic
@@ -1133,6 +1348,19 @@ inline CGKA_security_game()
             };
 
             print_global_state()
+/**/
+            d_step
+            {
+                printf("\n\tforcedPlay  \t%d",  forcedPlay );
+                printf("\n\tgroupDyad   \t%d",   groupDyad );
+                printf("\n\tgroupFull   \t%d",   groupFull );
+                printf("\n\tcorruptedID \t%d", corruptedID );
+                printf("\n\texiledID    \t%d",    exiledID );
+                printf("\n\tbanisherID  \t%d",  banisherID );
+                printf("\n\thoarderID   \t%d",   hoarderID );
+                printf("\n\tupdaterID   \t%d",   updaterID );
+            }
+/**/
 
             do
             /****************************************************
@@ -1234,23 +1462,7 @@ inline CGKA_safety_check()
 {
     printf("\n***********************\n* CGKA: Safety Check! *\n***********************\n");
 
-    printf("\n? ? ? ? ? ? ? ? ? ? ? ?\n? Attacker  Knowledge ?\n? ? ? ? ? ? ? ? ? ? ? ?\n");
-    
-    for( t : 0 .. T - 1 )
-    {
-        printf("\n>>> %d vvv", t);
-        for( i : 0 .. TREE - 1 )
-        {
-            if
-            :: attackerKnowledge[t].node[i] == UnknownRefs -> printf("\n\t%d [ x ]", i)
-            :: attackerKnowledge[t].node[i] == UnknownNode -> printf("\n\t%d [ X ]", i)
-            :: attackerKnowledge[t].node[i] ==   KnownRefs -> printf("\n\t%d [ o ]", i)
-            :: attackerKnowledge[t].node[i] ==   KnownNode -> printf("\n\t%d [ O ]", i)
-            :: else                                        -> printf("\n\t%d [ ? ]", i)
-            fi
-        }
-    };
-    printf("\n");
+    print_attacker_knowledge();
 }
 
 
@@ -1263,5 +1475,6 @@ init
 }
 
 
-ltl attendees_more_than_one { [](attendees > 1) }
+//ltl end_game_implies_safety   { <>(endGame) }
+ltl attendees_more_than_one   { [](attendees > 1) }
 //ltl attendees_absentees_sum { [](attendees + absentees == N) }
