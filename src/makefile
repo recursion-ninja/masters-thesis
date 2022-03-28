@@ -5,41 +5,54 @@ component  = Oracles
 extension  = promela
 source     = $(component).$(extension)
 executable = $(component).analysis
-codedmodel = pan.c pan.h
+model-code = pan.b pan.c pan.h pan.m pan.p pan.t
+model-in-C = pan.c pan.h
 trail      = $(source).trail
-backups    = trails
-dot-output = counterexample
+backup-dir = trails
+dot-output = $(image-name).dot
+image-file = $(image-name).png
+image-name = counterexample
 #directives = -DCOLLAPSE -DNIBIS -DVECTORSZ=65536
 directives = -DVECTORSZ=65536
 
 # Default build target
-all: execute-pan inspect-pan
+all: verification
 
-transpile: $(codedmodel)
+transpile: $(model-code)
 compile:   $(executable)
-analyze:   $(execute-pan)
+analyze:   verification
+inspect:   verification inspection
+picture:   $(image-file)
 
-$(codedmodel): $(source)
-	spin -a $(component)*.$(extension)
+$(model-code): $(source)
+	spin -a $(source)
 	cat <(echo "#include <stdio.h>") pan.h > pan.h.temp
 	mv pan.h.temp pan.h
 
-$(executable): $(codedmodel)
-	gcc -O3 $(directives) -o $(executable) pan.h pan.c
+$(executable): $(model-in-C)
+	gcc -O3 $(directives) -o $(executable) $(model-in-C)
 
-execute-pan: $(executable)
-	mv --backup=t $(trail) $(backups)/$(trail) 2>/dev/null || true
+verification: $(executable) backup
 	time ./$(executable) -a
 
-inspect-pan:
+inspection:
 ifneq (,$(wildcard $(trail)))
 	spin -t $(source)
 endif
 
+$(dot-output): $(executable) backup
+	./$(executable) -a -D > $(dot-output)
+
+$(image-file): $(dot-output)
+	dot -Tpng -Gdpi=600 $(dot-output) > $(image-file)
+
+$(backup-dir):
+	mkdir -p $(backups)
+
+backup: $(backup-dir)
+	mv --backup=t $(trail) $(backups)/$(trail) 2>/dev/null || true
+
 clean:
-	rm -f $(executable) pan.* *~ *#
+	rm -f $(model-code) $(executable) *~ *#
 
-
-image: $(executable)
-	./$(executable) -a -D > $(dot-output).dot
-	dot -Tpng -Gdpi=600 $(dot-output).dot > $(dot-output).png
+.PHONY: all analyze backup clean compile verification image inspect inspection picture transpile
