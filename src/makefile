@@ -5,22 +5,31 @@ component  = Oracles
 extension  = promela
 source     = $(component).$(extension)
 executable = $(component).analysis
+codedmodel = pan.c pan.h
 trail      = $(source).trail
 backups    = trails
 dot-output = counterexample
+#directives = -DCOLLAPSE -DNIBIS -DVECTORSZ=65536
+directives = -DVECTORSZ=65536
 
 # Default build target
 all: execute-pan inspect-pan
 
-$(executable): $(source)
+transpile: $(codedmodel)
+compile:   $(executable)
+analyze:   $(execute-pan)
+
+$(codedmodel): $(source)
 	spin -a $(component)*.$(extension)
 	cat <(echo "#include <stdio.h>") pan.h > pan.h.temp
 	mv pan.h.temp pan.h
-	gcc -O3 -DVECTORSZ=65536 -o $(executable) pan.h pan.c
+
+$(executable): $(codedmodel)
+	gcc -O3 $(directives) -o $(executable) pan.h pan.c
 
 execute-pan: $(executable)
 	mv --backup=t $(trail) $(backups)/$(trail) 2>/dev/null || true
-	./$(executable) -a
+	time ./$(executable) -a
 
 inspect-pan:
 ifneq (,$(wildcard $(trail)))
@@ -28,7 +37,7 @@ ifneq (,$(wildcard $(trail)))
 endif
 
 clean:
-	rm -f $(executable) pan.* *~
+	rm -f $(executable) pan.* *~ *#
 
 
 image: $(executable)
