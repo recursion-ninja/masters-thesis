@@ -15,6 +15,12 @@ image-name = counterexample
 #directives = -DCOLLAPSE -DNIBIS -DVECTORSZ=65536
 directives = -DVECTORSZ=65536
 
+log-decree = 1> $(log-to-out) 2> $(log-to-err)
+log-prefix = verification
+log-to-out = $(log-prefix).log
+log-to-err = $(log-prefix).err
+
+
 # Default build target
 all: verification
 
@@ -33,7 +39,7 @@ $(executable): $(model-in-C)
 	gcc -O3 $(directives) -o $(executable) $(model-in-C)
 
 verification: $(executable) backup
-	time ./$(executable) -a
+	time ./$(executable) -a $(log-decree)
 
 inspection:
 ifneq (,$(wildcard $(trail)))
@@ -47,12 +53,12 @@ $(image-file): $(dot-output)
 	dot -Tpng -Gdpi=600 $(dot-output) > $(image-file)
 
 $(backup-dir):
-	mkdir -p $(backups)
+	mkdir -p $(backup-dir)
 
 backup: $(backup-dir)
-	mv --backup=t $(trail) $(backups)/$(trail) 2>/dev/null || true
+	mv --backup=t $(trail) $(backup-dir)/$(trail) 2>/dev/null || true
 
 clean:
-	rm -f $(model-code) $(executable) *~ *#
+	rm -f *~ *# $(executable) $(model-code) $(log-to-out) $(log-to-err)
 
 .PHONY: all analyze backup clean compile verification image inspect inspection picture transpile
