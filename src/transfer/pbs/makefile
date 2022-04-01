@@ -17,14 +17,14 @@ directives = $(opt-memory) \
     $(opt-thread) \
     $(opt-timing) \
 
-opt-memory = #-DCOLLAPSE \
-    -DVECTORSZ=65536 \
+opt-memory = -DCOLLAPSE \
+    -DVECTORSZ=65536 #\
     -DMA=256
 
 
 # 256 GB RAM
 # 32 Cores
-opt-thread = -DMEMLIM=262144 \
+opt-thread = #-DMEMLIM=262144 \
     -DNCORE=32
 
 opt-timing = #-DNOBOUNDCHECK -DSAFETY
