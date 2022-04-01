@@ -131,6 +131,12 @@
 	
 	There is one last important detail the verification. Recall that what differentiates SM from SGM is that SGM involves two or more parties. There is no theoretical limit to the number of parties the protocol supports. However we also stated that model checking represents all possible states of protocol as a finite diagram of transitions. Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while our model checker requires a finite number of states. The IETF states that MLS in practice should support approximately 50,000 participants \cite{Omara2020}, which is a finite, yet very large number that is problematic for model checking. To rectify this, we will use the mathematical principle of induction. Induction allows us to show that if the security guarantees hold for $n$ parties participating in the communication channel, that the security guarantees will also hold for $n+1$ parties, where $n$ has small and tractable lower bound. By applying induction, we only need to verify that the security guarantees hold up to the lower bound of $n$ parties (perhaps $n=5$), and that the inductive step also holds. By using the principle of induction, we can verify that the security guarantees hold for any number of participating parties.
 	
+	\section*{CGKA}
+	
+	Describe the oracle based security game
+	
+	Describe impotency of queries. Describe totality and terminate of game.
+	
 	\section*{Conclusion}
 	
 	Our goal is to use formal methods to verify the novel portions of the TreeKEM cryptograpic protocol before widespread adoption to mitigate potential disastrous future security lapses. To do so, we will translate the security guarantees defined by MLS into LTL, and use PROMELA to produce a model of the novel portions of TreeKEM. Lastly, we will use SPIN to produce either an exhaustive proof or counter example cryptographic attack(s) for each security guarantee of the protocol. The techniques described for completing this project represent a feasible and well defined plan. Furthermore, this project constitutes a productive effort towards improving the accessibility and confidence in secure communication channels available to the public. I am confident in this project's successful completion and positive broader impact.

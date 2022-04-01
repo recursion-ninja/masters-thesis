@@ -12,14 +12,12 @@ backup-dir = trails
 dot-output = $(image-name).dot
 image-file = $(image-name).png
 image-name = counterexample
-#directives = -DCOLLAPSE -DNIBIS -DVECTORSZ=65536
-directives = -DVECTORSZ=65536
+directives = -DCOLLAPSE -DVECTORSZ=65536
 
 log-decree = 1> $(log-to-out) 2> $(log-to-err)
 log-prefix = verification
 log-to-out = $(log-prefix).log
 log-to-err = $(log-prefix).err
-
 
 # Default build target
 all: verification
@@ -39,7 +37,7 @@ $(executable): $(model-code)
 	gcc -O3 $(directives) -o $(executable) $(model-in-C)
 
 verification: $(executable) backup
-	time ./$(executable) -a $(log-decree)
+	time ./$(executable) $(log-decree)
 
 inspection:
 ifneq (,$(wildcard $(trail)))
@@ -47,7 +45,7 @@ ifneq (,$(wildcard $(trail)))
 endif
 
 $(dot-output): $(executable) backup
-	./$(executable) -a -D > $(dot-output)
+	./$(executable) -D > $(dot-output)
 
 $(image-file): $(dot-output)
 	dot -Tpng -Gdpi=600 $(dot-output) > $(image-file)
@@ -61,4 +59,4 @@ backup: $(backup-dir)
 clean:
 	rm -f *~ *# $(executable) $(model-code) $(log-to-out) $(log-to-err)
 
-.PHONY: all analyze backup clean compile verification image inspect inspection picture transpile
+.PHONY: all analyze backup clean cluster compile verification image inspect inspection picture transpile
