@@ -73,7 +73,7 @@ cluster-connect: ask_password
 	@sshpass -p $(cluster-pass) ssh $(cluster-auth)
 
 cluster-pull: ask_password
-	@sshpass -p $(cluster-pass) scp '$(cluster-auth):./{$(example-dir),$(logging-dir)}' $(logging-des)
+	@sshpass -p $(cluster-pass) scp -Cpr '$(cluster-auth):./{$(example-dir),$(logging-dir)}' $(logging-des)
 
 cluster-push: $(local-pbs) $(local-code) ask_password
 	@echo "Transfering:"

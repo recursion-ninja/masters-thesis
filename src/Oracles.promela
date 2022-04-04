@@ -305,7 +305,6 @@ inline after_move_refresh( t )
         // Refresh "forcedPlay"
         forcedPlay = unsafeIDs > 0 && unsafeIDs == remainingEpochs;
         printf("\n\tremainingEpochs\t%d\n\tunsafeIDs\t%d\n", remainingEpochs, unsafeIDs);
-        assert( remainingEpochs >= unsafeIDs );
 
         // Refresh "revealRoot"
         revealRoot = !challenge[t] && (t != LAST_EPOCH) && attackerKnowledge[t].node[ROOT] == UnknownNode;
@@ -1344,6 +1343,7 @@ inline CGKA_security_game()
 {
     printf("\n***********************\n* CGKA: Begin Play!   *\n***********************\n");
 
+
     // Each time the attacker takes a turn, they must decide whether or not to:
     //
     //   1. End the game; under the assumption that the attacker has won.
@@ -1392,7 +1392,7 @@ init
     concludedCGKA = true;
 }
 
-//ltl tivial_safety { [](triviality <-> attackerKnowsRootKey) }
-//ltl finished_loop { <>concludedCGKA }
+//ltl trivial_safety { [](triviality <-> attackerKnowsRootKey) }
+ltl finished_loop  { <>concludedCGKA }
 //ltl attendees_more_than_one { [](attendees > 1) }
 //ltl attendees_absentees_sum { [](attendees + absentees == N) }

@@ -33,7 +33,9 @@ opt-timing = #-DNOBOUNDCHECK -DSAFETY
 all:     verification
 
 backup: $(backup-dir)
-	mv --backup=t $(trail-file) $(backup-dir)/$(trail-file) 2>/dev/null || true
+	mv  --backup=numbered \
+	    --suffix='backup-' \
+	    $(trail-file) $(backup-dir)/$(trail-file) 2>/dev/null || true
 
 clean:
 	rm -f *~ *# $(executable) $(model-code) $(log-to-out) $(log-to-err)
