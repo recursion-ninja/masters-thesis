@@ -38,19 +38,9 @@
 #define TREE 7
 #define NODE (TREE / 2)
 #define ROOT 0
-
-
-/****
-  *
-  * Special types required for the protocol.
-  *
-****/
-
-
-mtype:Message = { ADD, RMV, UPD };
-
-//typedef Group      { bool         membership[N] };
-//typedef Enigma     { mtype:Secret secret[T]     };
+#define LAST_EPOCH (T - 1)
+// Because the last challenge must be saved to end the game
+#define MAX_REVEAL (C - 1)
 
 /****
   *
@@ -59,11 +49,14 @@ mtype:Message = { ADD, RMV, UPD };
 ****/
 
 bool  challenge[T]; // Has the attacker challenged in an epoch?
-
 bool membership[N]; // Group membership of current epoch
-byte   hoarding[N]; // Epoch from which the user saves secrets
 bool     unsafe[N]; // Members which require a change to update
-//bool epochQuerried[N]; 
+byte   hoarding[N]; // Epoch from which the user saves secrets
+
+bool concludedCGKA = false; // Does the CGKA
+// Does a trivial attack exist?
+// i.e, does the SAFE predicate hold?
+bool triviality   = false; 
 
 
 /****
@@ -79,8 +72,8 @@ bool     unsafe[N]; // Members which require a change to update
 //   KnownNode - This node          exists and there exists 1 or more leaves in the subtree
 mtype:Secret = { Void, UnknownRefs, KnownRefs, UnknownNode, KnownNode };
 
+// Required for a multidimensional array
 typedef TreeKeys   { mtype:Secret node[ TREE ]  };
-
 TreeKeys attackerKnowledge[T];
 
 /****
@@ -103,6 +96,8 @@ TreeKeys attackerKnowledge[T];
   *
 ****/
 
+bool attackerKnowsRootKey = false;
+
 
 /****
   *
@@ -110,26 +105,63 @@ TreeKeys attackerKnowledge[T];
   *
 ****/
 
-local byte i = 0
+// Indexing variables
+local byte i = 0;
 local byte j = 0;
 local byte k = 0;
 local byte t = 0;
+
+// Group Composition
 local byte absentees = 0;
 local byte attendees = N;
-local byte unsafeIDs = 0;
+local bool groupDyad = false;
+local bool groupFull = false;
+local byte groupMost = 0; // The maximum member ID during any past/present epoch.
 
+// Protocol State
+local bool forcedPlay = false;
+local bool revealRoot = C > 1;
+local byte unsafeIDs  = 0;
 
-bool finishedLoop = false;
 
 /********
     *
     * Global state priniting utilities:
     *
+    *   - print_attacker_knowledge
     *   - print_challenges
-    *   - print_leadership
+    *   - print_group_composition
     *   - print_membership
+    *   - print_protocol_state
+    *   - print_user_hoarding
+    *   - print_user_unsafe
     *
 ********/
+
+
+inline print_attacker_knowledge()
+{
+    d_step
+    {
+        printf("\n\tAttacker Knowledge:");
+        for( i : 0 .. T - 1 )
+        {
+            printf("\n>>> %d vvv", t);
+            for( j : 0 .. TREE - 1 )
+            {
+                if
+                :: attackerKnowledge[i].node[j] == UnknownRefs -> printf("\n\t%d [ x ]", j)
+                :: attackerKnowledge[i].node[j] == UnknownNode -> printf("\n\t%d [ X ]", j)
+                :: attackerKnowledge[i].node[j] ==   KnownRefs -> printf("\n\t%d [ o ]", j)
+                :: attackerKnowledge[i].node[j] ==   KnownNode -> printf("\n\t%d [ O ]", j)
+                :: attackerKnowledge[i].node[j] ==        Void -> printf("\n\t%d [   ]", j)
+                :: else                                        -> printf("\n\t%d [ ? ]", j)
+                fi
+            }
+        };
+        printf("\n");
+    }
+}
 
 
 inline print_challenges()
@@ -148,22 +180,17 @@ inline print_challenges()
 }
 
 
-/*
-inline print_leadership()
+inline print_group_composition()
 {
-    d_step {
-        printf("\n\tLeadership:");
-        for ( i : 0 .. T - 1)
-        {
-            if
-            :: leadership[i] == NONE -> printf("\n\t    [\tNONE\t]")
-            :: else            -> printf("\n\t    [\t%d\t]", leadership[i])
-            fi
-        }
-        printf("\n");
+    d_step
+    {
+        printf("\n\tattendees \t%d", attendees );
+        printf("\n\tabsentees \t%d", absentees );
+        printf("\n\tgroupDyad \t%d", groupDyad );
+        printf("\n\tgroupFull \t%d", groupFull );
+        printf("\n\tgroupMost \t%d", groupMost );
     }
 }
-*/
 
 
 inline print_membership()
@@ -182,36 +209,13 @@ inline print_membership()
 }
 
 
-/*
-inline print_epochQuerried()
+inline print_protocol_state()
 {
-    d_step {
-        printf("\n\tEpochQuerried");
-        for( i : 0 .. N - 1 )
-        {
-            if
-            :: epochQuerried[i] -> printf("\n\t    [\tTrue\t]");
-            :: else          -> printf("\n\t    [\tFalse\t]");
-            fi
-        };
-        printf("\n");
-    }
-}
-*/
-
-
-inline print_user_epochs()
-{
-    d_step {
-        printf("\n\tEpoch observing:");
-        for ( i : 0 .. N - 1)
-        {
-            if
-            :: epoch[i] == NONE -> printf("\n\t    [\tNONE\t]")
-            :: else          -> printf("\n\t    [\t%d\t]", epoch[i])
-            fi
-        }
-        printf("\n");
+    d_step
+    {
+        printf("\n\trevealRoot \t%d", revealRoot );
+        printf("\n\tforcedPlay \t%d", forcedPlay );
+        printf("\n\tunsafeIDs  \t%d", unsafeIDs  );
     }
 }
 
@@ -248,110 +252,44 @@ inline print_user_unsafe()
 }
 
 
-/*
-inline print_user_messages()
-{
-    d_step {
-        printf("\n\tMessages available:");
-        for ( i : 0 .. N - 1)
-        {
-            if
-            :: nempty( M[i] ) -> printf("\n\t    [\tTrue\t]");
-            ::  empty( M[i] ) -> printf("\n\t    [\tFalse\t]");
-            fi
-        }
-        printf("\n");
-    }
-}
-*/
-
-
-inline print_attacker_knowledge()
-{
-    d_step
-    {
-        printf("\n\tAttacker Knowledge:");
-        for( i : 0 .. T - 1 )
-        {
-            printf("\n>>> %d vvv", t);
-            for( j : 0 .. TREE - 1 )
-            {
-                if
-                :: attackerKnowledge[i].node[j] == UnknownRefs -> printf("\n\t%d [ x ]", j)
-                :: attackerKnowledge[i].node[j] == UnknownNode -> printf("\n\t%d [ X ]", j)
-                :: attackerKnowledge[i].node[j] ==   KnownRefs -> printf("\n\t%d [ o ]", j)
-                :: attackerKnowledge[i].node[j] ==   KnownNode -> printf("\n\t%d [ O ]", j)
-                :: attackerKnowledge[i].node[j] ==        Void -> printf("\n\t%d [   ]", j)
-                :: else                                        -> printf("\n\t%d [ ? ]", j)
-                fi
-            }
-        };
-        printf("\n");
-    }
-}
-
-
 inline print_global_state()
 {
     d_step
     {
         printf("\n-=-=-=-=-=-=-=-=-=-=-=-\n-=-  GLOBAL  STATE  -=-\n-=-=-=-=-=-=-=-=-=-=-=-\n");
-        print_challenges()
-//        print_leadership()
-        print_membership()
-//        print_epochQuerried()
-//        print_user_epochs()
-        print_user_hoarding()
-//        print_user_messages()
-        print_user_unsafe()
+        print_challenges();
+        print_membership();
+        print_user_hoarding();
+        print_user_unsafe();
+        print_group_composition();
+        print_protocol_state();
         print_attacker_knowledge()
     }
 }
 
+
 /********
     *
-    * Inline utilities:
-    *
-    *   - Select Attendee
-    *   - Select Absentee
-    *   - Select byte
+    * Inline utilities for after move updates:
+    *   - after_move_refresh
+    *   - take_attendance
     *
 ********/
 
 
 /****
   * External result variable(s):
-  *   - groupFull
-****/
-inline group_full( input )
-{   d_step {
-
-    take_attendance( input )
-    groupFull = absentees == 0;
-
-}   }
-
-
-/****
-  * External result variable(s):
-  *   - groupDyad
-****/
-inline group_dyad( input )
-{   d_step {
-
-    take_attendance( input )
-    groupDyad = attendees == 2;
-
-}   }
-
-
-/****
-  * External result variable(s):
+  *   - commitmentRequired
+  *   - forcedPlay
+  *   - revealRoot
+  *   - triviality
   *   - unsafeIDs
 ****/
-inline safety_poll()
+inline after_move_refresh( t )
 {
     d_step {
+        // Refresh "unsafeIDs"
+        byte remainingEpochs = LAST_EPOCH - t;
         byte recoveriesRequired = 0;
         for ( i : 0 .. N - 1 ) {
             if
@@ -359,7 +297,55 @@ inline safety_poll()
             :: else
             fi
         }
-        unsafeIDs = recoveriesRequired;
+        unsafeIDs  = recoveriesRequired;
+
+        // Refresh "triviality"
+        triviality = unsafeIDs > 0; 
+
+        // Refresh "forcedPlay"
+        forcedPlay = unsafeIDs > 0 && unsafeIDs == remainingEpochs;
+        printf("\n\tremainingEpochs\t%d\n\tunsafeIDs\t%d\n", remainingEpochs, unsafeIDs);
+        assert( remainingEpochs >= unsafeIDs );
+
+        // Refresh "revealRoot"
+        revealRoot = !challenge[t] && (t != LAST_EPOCH) && attackerKnowledge[t].node[ROOT] == UnknownNode;
+        if
+        :: !revealRoot -> skip
+        :: else ->
+            byte challengesUsed = 0;
+            d_step
+            {
+                for ( i : 0 .. t )
+                {
+                    if
+                    :: challenge[i] -> challengesUsed++;
+                    :: else
+                    fi
+                }
+            };
+            revealRoot = challengesUsed < MAX_REVEAL;
+        fi
+
+        // Refresh "commitmentRequired"
+        bool canHoardMember = false;
+        d_step
+        {
+            byte candidateHoarders;
+            candidates_for_hoarding();
+            canHoardMember = candidateHoarders > 0;
+    //        printf("\n canHoardMember = %d", canHoardMember);
+        }
+    
+        bool canCorruptMember = false;
+        d_step
+        {
+            byte candidateCorruptibles;
+            candidates_for_corruption( t );
+            canCorruptMember = candidateCorruptibles > 0;
+    //        printf("\n canCorruptMember = %d", canCorruptMember);
+        }
+    
+        commitmentRequired = !revealRoot && !canHoardMember && !canCorruptMember
     }
 }
 
@@ -368,205 +354,54 @@ inline safety_poll()
   * External result variable(s):
   *   - absentees
   *   - attendees
+  *   - groupDyad
+  *   - groupFull
+  *   - groupMost
 ****/
-inline take_attendance( t )
+inline take_attendance()
 {
+    byte largestID
     d_step {
         byte included = 0;
         for ( i : 0 .. N - 1 ) {
              if
-             :: membership[i] -> included++
+             :: membership[i] -> included++; largestID = i
              :: else
              fi
         }
         attendees = included;
         absentees = N - attendees;
-    }
-}
-
-
-/****
-  * External result variable(s):
-  *   - selectedID
-****/
-inline select_absentee( t )
-{   atomic {
-
-    byte sample;
-    byte selection = NONE;
-
-    take_attendance( t );
-    select( sample : 0 .. absentees - 1 );
-
-/*
-    printf("\nSELECTING ABSENTEE:\n");
-    printf("  attendees           = %d\n", attendees);
-    printf("  absentees           = %d\n", absentees);
-    printf("  sample              = %d\n", sample);
-*/
-
-    for ( i : 0 .. N - 1 ) {
-//        printf("  i = %d v = %d s = %d g = %d\n", i, selection, sample, selection == NONE && membership[i]);
-        if
-        :: selection == NONE && !membership[i] && sample != 0 -> sample--
-        :: selection == NONE && !membership[i] && sample == 0 -> selection = i
-        :: else
-        fi
-    }
-
-    selectedID = selection;
-//    printf("  selection           = %d\n", selectedID);
-
-}   }
-
-
-/****
-  * External result variable(s):
-  *   - senderID
-****/
-inline select_sender( commitment )
-{
-    byte selectedID;
-    select_sender_constrained( NONE, false, commitment );
-    senderID = selectedID;
-}
-
-
-/****
-  * External result variable(s):
-  *   - exiledID
-****/
-inline select_exiled( forced, commitment )
-{
-    byte selectedID;
-    select_sender_constrained( NONE, forced, commitment );
-    exiledID = selectedID;
-}
-
-
-/****
-  * External result variable(s):
-  *   - banisherID
-****/
-inline select_banisher( banned, commitment )
-{
-    byte selectedID;
-    select_sender_constrained( banned, false, commitment );
-    banisherID = selectedID;
-}
-
-
-/****
-  * External result variable(s):
-  *   - updaterID
-****/
-inline select_updater( forced, commitment )
-{
-    byte selectedID;
-    select_sender_constrained( NONE, forced, commitment );
-    updaterID = selectedID;
-}
-
-
-
-/****
-  * External result variable(s):
-  *   - selectedID
-****/
-inline select_sender_constrained ( banned, forced, commitment )
-{   atomic {
-//    printf("\nSELECTING Sender %d %d %d", banned, forced, commitment);
-    byte candidates = 0;
-    d_step {
-        for ( i : 0 .. N - 1 ) {
-/*
-             d_step
-             {
-                 printf("\n  membership[%d]     = %d", i, membership[i]);
-                 printf("\n  i != banned        = %d", i != banned  );
-                 printf("\n  !forced            = %d", !(forced)    );
-                 printf("\n  commitment         = %d",  commitment);
-                 printf("\n  !epochQuerried[%d] = %d", i, !(epochQuerried[i]));
-                 printf("\n  unsafe[%d]         = %d", i, unsafe[i]);
-                 printf("\n");
-                 printf("\n  commitment || !(epochQuerried[%d]) = %d", i, (commitment || !(epochQuerried[i])));
-                 printf("\n  (!(forced) && (commitment || !(epochQuerried[%d]))) = %d", i, !(forced) && (commitment || !(epochQuerried[i])));
-                 printf("\n  (!(forced) && (commitment || !(epochQuerried[%d]))) || unsafe[%d] = %d", i, i, (!(forced) && (commitment || !(epochQuerried[i]))) || unsafe[i]);
-                 printf("\n")
-             }
-*/
-             bool senderCandidate;
-             sender_candidate( banned, forced, commitment, i );
-             if
-             :: senderCandidate -> candidates++
-             :: else
-             fi
-        }
+        groupDyad = attendees == 2;
+        groupFull = absentees == 0;
     }
 
     if
-    :: candidates == 0 -> selectedID = NONE
-    :: else ->
-        byte sample;
-        select( sample : 0 .. candidates - 1 );
-        byte selection = NONE;
-        d_step
-        {
-    /**/
-            printf("\n  candidates         = %d", candidates);
-            printf("\n  sample             = %d", sample);
-    /**/
-    
-            for ( i : 0 .. N - 1 ) {
-//                printf("\n\ti = %d v = %d s = %d b = %d", i, selection, sample, membership[i] && i != banned && ((!(forced) && (commitment || !(false))) || unsafe[i]));
-                if
-                :: selection == NONE ->
-                    bool senderCandidate;
-                    sender_candidate( banned, forced, commitment, i );
-                    if
-                    :: senderCandidate ->
-                        if
-                        :: sample == 0 -> selection = i
-                        :: sample != 0 -> sample--
-                        fi
-                    :: else
-                    fi
-                :: else
-                fi
-            }
-        }
-        selectedID = selection;
+    :: largestID + 1 > groupMost -> groupMost = largestID + 1;
+    :: else
     fi
-}   }
-
-
-/****
-  * External result variable(s):
-  *   - senderCandidate
-****/
-inline sender_candidate( banned, forced, commitment, i )
-{
-    bool isAnOption = membership[i] && (i != banned);
-//    bool querryOkay = commitment || !(epochQuerried[i]);
-    bool querryOkay = commitment || !(false);
-    bool forcesSafe = (!(forced) && commitment) || unsafe[i];
-    senderCandidate = isAnOption && forcesSafe
-}
-
-
-/****
-  * External result variable(s):
-  *   - joinerID
-****/
-inline select_joiner( input )
-{
     d_step
     {
-        byte selectedID;
-        select_absentee( input );
-        joinerID = selectedID;
+        printf("\n\tattendees \t%d", attendees );
+        printf("\n\tabsentees \t%d", absentees );
+        printf("\n\tgroupDyad \t%d", groupDyad );
+        printf("\n\tgroupFull \t%d", groupFull );
+        printf("\n\tgroupMost \t%d", groupMost );
     }
 }
+
+
+/********
+    *
+    * User ID selection inlines:
+    *   - select_corrupted
+    *   - select_banisher
+    *   - select_exiled
+    *   - select_hoarder
+    *   - select_joiner
+    *   - select_sender
+    *   - select_updater
+    *
+********/
 
 
 /****
@@ -609,13 +444,16 @@ inline select_corrupted( t )
 }   }
 
 
+/****
+  * External result variable(s):
+  *   - candidateCorruptibles
+****/
 inline candidates_for_corruption( t )
 {
-    safety_poll();
-    byte remainingEpochs = T - t - 1
+    byte remaining = LAST_EPOCH - t;
 
     if
-    :: unsafeIDs >= T - t - 1 -> candidateCorruptibles = 0;
+    :: unsafeIDs >= remaining -> candidateCorruptibles = 0;
     :: else ->
         byte candidates = 0;
         d_step
@@ -649,38 +487,26 @@ inline candidate_corruption( i )
 
 /****
   * External result variable(s):
-  *   - currentEpoch
+  *   - banisherID
 ****/
-/*
-inline current_epoch()
-{   d_step {
-
-    byte x = 0;
-    for ( i : 0 .. T - 1 )
-    {
-        if
-        :: leadership[i] != NONE -> x++
-        :: else
-        fi
-    }
-    currentEpoch = t;
-
-}   }
-*/
+inline select_banisher( banned )
+{
+    byte selectedID;
+    select_sender_constrained( banned, false );
+    banisherID = selectedID;
+}
 
 
 /****
   * External result variable(s):
-  *   - selectedEpoch
+  *   - exiledID
 ****/
-inline select_epoch( input )
-{   atomic {
-
-    byte anyEpoch;
-    select ( anyEpoch : 0 .. input );
-    selectedEpoch = anyEpoch;
-
-}   }
+inline select_exiled( forced )
+{
+    byte selectedID;
+    select_sender_constrained( NONE, forced );
+    exiledID = selectedID;
+}
 
 
 /****
@@ -724,6 +550,10 @@ inline select_hoarder()
 }   }
 
 
+/****
+  * External result variable(s):
+  *   - candidateHoarders
+****/
 inline candidates_for_hoarding()
 {
     byte candidates = 0;
@@ -752,98 +582,165 @@ inline candidate_hoarder( i )
 
 /****
   * External result variable(s):
-  *   - messagePending
-  *   - messageVacancy
+  *   - joinerID
 ****/
-/*
-inline message_status()
-{   d_step {
-
-//    printf("\nCHECKING AVAILABLE MESSAGES:\n");
-    byte pending = false;
-    bool vacancy = true;
-    for ( i : 0 .. N - 1 )
-    {
-        pending = pending || nempty( M[i] );
-        vacancy = vacancy &&  nfull( M[i] );
-    }
-    messagePending = pending;
-    messageVacancy = vacancy;
-}   }
-*/
-
-
-/****
-  * External result variable(s):
-  *   - recipientID
-****/
-/*
-inline select_recipient()
+inline select_joiner()
 {   atomic {
 
-//    printf("\nSELECT RECIPIENT:\n");
-
-    byte availableRecipient = 0;
-    for ( i : 0 .. N - 1 )
-    {
-        if
-        :: nempty(M[i]) -> availableRecipient++
-        ::  empty(M[i]) -> skip
-        fi
-    }
-
-//    printf("\nAvailable Recipients: %d\n", availableRecipient);
+    byte candidateJoiners;
+    candidates_for_joiner();
 
     byte sample;
-    select( sample : 0 .. availableRecipient - 1 )
-
-//    printf("\nSample: %d\n", sample);
-
     byte selection = NONE;
-    bool content;
-    for ( i : 0 .. N - 1 )
-    {
-        content =  nempty(M[i]);
-//        printf("\n  i: %d  v: %d  s: %d  q: %d\n", i, selection, sample, content);
+    select( sample : 0 .. candidateJoiners - 1 );
+
+    for ( i : 0 .. N - 1 ) {
         if
-        :: selection == NONE && nempty( M[i] ) && sample == 0 -> selection = i
-        :: selection == NONE && nempty( M[i] ) && sample != 0 -> sample--
-        :: selection == NONE &&  empty( M[i] ) && sample == 0 -> skip
-        :: selection != NONE -> skip
+        :: selection != NONE || membership[i] -> skip
+        :: else ->
+            if
+            :: sample != 0 -> sample--
+            :: sample == 0 -> selection = i
+            fi
         fi
     }
     
-//    printf("\nRecipient: %d\n", selection);
-    recipientID = selection;
-
+    joinerID = selection;
 }   }
-*/
 
 
 /****
   * External result variable(s):
-  *   - forcedPlay
+  *   - candidateJoiners
 ****/
-inline forced_play( t ) {
-    d_step {
-        byte remainingEpochs = T - t - 1;
-        safety_poll();
-        assert( T - t - 1 >= unsafeIDs );
-        forcedPlay = unsafeIDs > 0 && unsafeIDs == remainingEpochs;
+inline candidates_for_joiner()
+{
+    byte candidates = 0;
+    for ( i : 0 .. groupMost - 1 )
+    {
+        if
+        :: !(membership[i]) -> candidates++
+        :: else
+        fi
     }
+
+    printf("Candidate Joiners (1): %d", candidates);
+
+    // Consider adding the next user who has never been a member before...
+    // but make the consideration *if and only if* such a user exists.
+    if
+    :: groupMost == N -> skip
+    :: else -> candidates++
+    fi
+    
+    printf("Candidate Joiners (2): %d", candidates);
+
+    candidateJoiners = candidates
 }
 
 
 /****
   * External result variable(s):
-  *   - commitEpochAdvance
+  *   - senderID
 ****/
-inline decide_commitment()
+inline select_sender()
 {
-    do
-    :: commitEpochAdvance = true;  break
-    :: commitEpochAdvance = false; break
-    od
+    byte selectedID;
+    select_sender_constrained( NONE, false );
+    senderID = selectedID;
+}
+
+
+/****
+  * External result variable(s):
+  *   - updaterID
+****/
+inline select_updater( forced )
+{
+    byte selectedID;
+    select_sender_constrained( NONE, forced );
+    updaterID = selectedID;
+}
+
+
+/****
+  * External result variable(s):
+  *   - selectedID
+****/
+inline select_sender_constrained ( banned, forced )
+{   atomic {
+//    printf("\nSELECTING Sender %d %d %d", banned, forced);
+    byte candidates = 0;
+    d_step {
+        for ( i : 0 .. N - 1 ) {
+/*
+             d_step
+             {
+                 printf("\n  membership[%d]     = %d", i, membership[i]);
+                 printf("\n  i != banned        = %d", i != banned  );
+                 printf("\n  !forced            = %d", !(forced)    );
+                 printf("\n  !epochQuerried[%d] = %d", i, !(epochQuerried[i]));
+                 printf("\n  unsafe[%d]         = %d", i, unsafe[i]);
+                 printf("\n");
+                 printf("\n")
+             }
+*/
+             bool senderCandidate;
+             sender_candidate( banned, forced, i );
+             if
+             :: senderCandidate -> candidates++
+             :: else
+             fi
+        }
+    }
+
+    if
+    :: candidates == 0 -> selectedID = NONE
+    :: else ->
+        byte sample;
+        select( sample : 0 .. candidates - 1 );
+        byte selection = NONE;
+        d_step
+        {
+    /**/
+            printf("\n  candidates         = %d", candidates);
+            printf("\n  sample             = %d", sample);
+    /**/
+    
+            for ( i : 0 .. N - 1 ) {
+//                printf("\n\ti = %d v = %d s = %d b = %d", i, selection, sample, membership[i] && i != banned && ( !(forced) || unsafe[i]) );
+                if
+                :: selection == NONE ->
+                    bool senderCandidate;
+                    sender_candidate( banned, forced, i );
+                    if
+                    :: senderCandidate ->
+                        if
+                        :: sample == 0 -> selection = i
+                        :: sample != 0 -> sample--
+                        fi
+                    :: else
+                    fi
+                :: else
+                fi
+            }
+        }
+        selectedID = selection;
+    fi
+}   }
+
+
+/****
+  * External result variable(s):
+  *   - senderCandidate
+****/
+inline sender_candidate( banned, forced, i )
+{
+//    bool querryOkay = commitment || !(epochQuerried[i]);
+//    bool forcesSafe = (!(forced) && querryOkay) || unsafe[i];
+    bool forcesSafe = !(forced)  || unsafe[i];
+    bool isAnOption = membership[i] && (i != banned);
+    senderCandidate = isAnOption && forcesSafe
 }
 
 
@@ -861,44 +758,22 @@ inline decide_commitment()
 ****/
 
 
-inline broadcast ( t, sender, subject, commitment, message )
+inline broadcast ( t, sender, subject )
 {
-    atomic
-    {
-        // Attacker observes network messages
-        attacker_observes_message( t, sender, i, commitment, message );
-/*        
-        for ( i : 0 .. N - 1 ) {
-            bool messageSentADD = message == RMV && (membership[i] || i == subject)
-            bool messageSentRMV = message == ADD &&  membership[i] && i != subject
-            bool messageSentUPD = message == UPD &&  membership[i]
-            if
-            :: messageSentADD ||
-               messageSentRMV ||
-               messageSentUPD ->
-//                printf("\n OBSERVING: %d -> %d : %e @ %d", sender, i, message, subject)
-            :: else
-            fi
-        };
-*/
-    }
+    attacker_observes_message( t, sender, subject );
 }
 
 
-inline propogate ( t, sender, insert, remove )
+inline propogate ( sender, insert, remove )
 {
     d_step {
-/*
-        for ( i : 0 .. N - 1 )
-        {
-            epochQuerried[i] = false
-        }
-*/
         if
         :: insert != NONE -> membership[insert] = true
         :: remove != NONE -> membership[remove] = false
         :: else
         fi
+
+        take_attendance();
     }
 }
 
@@ -907,11 +782,13 @@ inline propogate ( t, sender, insert, remove )
   *
   * The following methods:
   *   - attacker_initializes_knowledge
+  *   - attacker_insight_check
   *   - attacker_observes_message
   *
   * Are used by the security game moves:
   *   - broadcast
   *   - CGKA_initialize
+  *   - corrupt
   *
 ****/
 
@@ -927,15 +804,15 @@ inline attacker_initializes_knowledge()
                 attackerKnowledge[i].node[j] = Void
             }
         }
+        attackerKnowsRootKey = false;
     }
 }
 
 
-inline attacker_observes_message( t, sender, subject, commitment, message )
+inline attacker_observes_message( t, sender, subject )
 {
-    if
-    :: !commitment -> skip
-    :: else ->
+    atomic
+    {
         // If the attacker has know knowledge of the epoch,
         // meaning that all cell values are "Void,"
         // then it is the first time we have entered the epoch
@@ -960,8 +837,23 @@ inline attacker_observes_message( t, sender, subject, commitment, message )
         attacker_copy_epoch_knowledge( referenceEpoch );
         attacker_wipe_sender_knowledge( sender, t );
         attacker_updates_knowledge ( t );
-    fi
+        attacker_insight_check( t );
+    }
 }
+
+inline attacker_insight_check( t )
+{
+    bool anyRootKnown = false;
+    d_step
+    {
+        for( i : 0 .. t )
+        {
+            anyRootKnown = anyRootKnown || attackerKnowledge[i].node[ROOT]
+        }
+    }
+    attackerKnowsRootKey = anyRootKnown;
+}
+
 
 
 inline attacker_has_no_epoch_knowledge ( e )
@@ -997,8 +889,8 @@ inline attacker_init_epoch_knowledge( e )
                 :: leaves ->
                     if
                     // No knowledge from excluded group members
-                    :: !membership[i] -> attackerKnowledge[e].node[j] = Void
-                    :: else           -> attackerKnowledge[e].node[j] = UnknownNode
+                    :: !(membership[i]) -> attackerKnowledge[e].node[j] = Void
+                    :: else             -> attackerKnowledge[e].node[j] = UnknownNode
                     fi
                 // Internal node case(s)
                 :: else ->
@@ -1172,7 +1064,6 @@ inline corrupt( t, memberID )
 
     printf("Corrupting from: %d -- %d\n", lowerBound, upperBound);
 
-
     // For each epoch which the member has secrets
     // (this implies that the user was a member)
     // Then the attacker learns the secrets on the direct path
@@ -1180,9 +1071,8 @@ inline corrupt( t, memberID )
     byte peek;
     for ( peek : lowerBound .. upperBound )
     {
-        printf("Corrupting %d\n", peek);
         if
-        :: !membership[memberID] -> skip
+        :: !(membership[memberID]) -> skip
         :: else ->
             printf("Passed membership guard!\n");
             byte off   = NODE;
@@ -1216,7 +1106,7 @@ inline corrupt( t, memberID )
             od
         fi
     }
-
+    attacker_insight_check( t );
     unsafe[memberID] = true;
 }   }
 
@@ -1243,71 +1133,149 @@ inline reveal( t )
     *   - Insert Member ( ADD )
     *   - Remove Member ( RMV )
     *   - Oblige Update ( UPD )
-    *   - Convey Update ( DLV )
     *
 ********/
 
 
 // Precondition: joiner is not in the group!
-inline insert_member( t, sender, joiner, commitment )
+inline insert_member( t, sender, joiner )
 {
     d_step {
-//        printf("\nINSERT MEMBER:\n  Inviter: %d\n  joiner: %d\n  Epoch: \t%d\n", sender, joiner, t)
         assert(sender < N);
         assert(joiner < N);
+        propogate( sender, joiner, NONE );
     }
-    if
-    :: !commitment -> skip // epochQuerried[sender] = true;
-    ::  commitment -> propogate ( t, sender, joiner, NONE );
-    fi
-    broadcast( t, sender, joiner, commitment, ADD );
+    broadcast( t, sender, joiner );
 }
 
 
 // Precondition: exiledMemeber is in the group!
-inline remove_member( t, sender, exiled, commitment )
+inline remove_member( t, sender, exiled )
 {
     d_step {
-//        printf("\nREMOVE MEMBER:\n  Sender: \t%d\n  Exiled: \t%d\n  Epoch: \t%d\n", sender, exiled, t);
         assert(sender < N);
         assert(exiled < N);
+        unsafe[exiled] = false;
+        propogate( sender, NONE, exiled);
     }
-    if
-    :: !commitment -> skip // epochQuerried[sender] = true;
-    ::  commitment -> propogate ( t, sender, NONE, exiled); unsafe[exiled] = false;
-    fi
-    broadcast( t, sender, exiled, commitment, RMV );
+    broadcast( t, sender, exiled );
 }
 
 
-inline oblige_update( t, sender, commitment )
+inline oblige_update( t, sender )
 {
     d_step {
-//        printf("\nOBLIGE UPDATE:\n  Sender: \t%d\n  Epoch: \t%d\n", sender, t);
         assert(sender < N);
+        unsafe[sender] = false;
+        propogate( sender, NONE, NONE );
     }
-    if
-    :: !commitment -> skip // epochQuerried[sender] = true;
-    ::  commitment -> propogate ( t, sender, NONE, NONE ); unsafe[sender] = false;
-    fi
-    broadcast( t, sender, NONE, commitment, UPD );
+    broadcast( t, sender, NONE );
 }
 
 
-/*
-inline convey_update( t, receiver )
+/********
+    *
+    * Attacker moves interacting with oracles:
+    *
+    *   - play_move_with_commitment
+    *   - play_move_without_commitment
+    *
+********/
+
+
+inline play_move_with_commitment( t )
 {
-    d_step {
-//        printf("\nUPDATE MESSAGE:\n  Target\t %d\n  Epoch \t %d\n  Sender\t %d\n", receiver, e, sender);
-        if
-        :: leadership[t] == NONE ->
-            leadership[t] = sender;
-            printf("SET leadership[%d] <- %d\n", t, sender);
-        :: else
-        fi
+    byte exiledID, banisherID, updaterID;
+    
+    atomic
+    {
+        select_updater(  forcedPlay );
+        select_exiled(   forcedPlay );
+        select_banisher( exiledID   );
+    };
+
+    d_step
+    {
+        printf("\nEpoch (t) = %d\n", t);
+        print_global_state()
+        printf("\n\texiledID    \t%d",    exiledID );
+        printf("\n\tbanisherID  \t%d",  banisherID );
+        printf("\n\tupdaterID   \t%d",   updaterID );
+        printf("\nCOMMITTING!\n");
+    }
+
+    do
+    // Update
+    :: updaterID != NONE -> atomic
+        {   printf("\n> > >\n> CGKA: Game Move = oblige_update %d (committed? %d)\n> > >\n", updaterID, true);
+            oblige_update( t, updaterID );
+        }; break
+
+    // Remove
+    :: !groupDyad && exiledID != NONE && banisherID != NONE -> atomic
+        {  printf("\n> > >\n> CGKA: Game Move = remove_member %d %d (committed? %d)\n> > >\n", banisherID, exiledID, true);
+            remove_member( t, banisherID, exiledID );
+        }; break
+
+    // Insert
+    :: !groupFull && !forcedPlay -> atomic
+        {
+            byte joinerID, senderID;
+            select_sender();
+            select_joiner();
+            printf("\n> > >\n> CGKA: Game Move = insert_member %d %d (committed? %d)\n> > >\n", senderID, joinerID, true);
+            insert_member( t, senderID, joinerID );
+        }; break
+    od
+
+    after_move_refresh( t + 1);
+}
+
+
+inline play_move_without_commitment( t )
+{   atomic
+    {
+        byte corruptedID, hoarderID;
+    
+        atomic
+        {
+            select_corrupted( t );
+            select_hoarder();
+        };
+    
+        d_step
+        {
+            printf("\nEpoch (t) = %d\n", t);
+            print_global_state()
+            printf("\n\tcanRevealKey\t%d", revealRoot );
+            printf("\n\tcorruptedID \t%d",     corruptedID );
+            printf("\n\thoarderID   \t%d",       hoarderID );
+            printf("\nNON-Committal!\n");
+        }
+    
+        do
+        //  Reveal
+        :: revealRoot -> atomic
+            {   printf("\n> > >\n> CGKA: Game Move = reveal %d\n> > >\n", t);
+                reveal( t )
+            }; break
+    
+        //  Corrupt
+        :: corruptedID != NONE && !forcedPlay -> atomic
+            {   printf("\n> > >\n> CGKA: Game Move = corrupt %d\n> > >\n", corruptedID);
+                corrupt( t, corruptedID )
+            }; break
+    
+        //  Hoard
+        :: hoarderID != NONE -> atomic
+            {   printf("\n> > >\n> CGKA: Game Move = hoard %d\n> > >\n", hoarderID);
+                hoard( t, hoarderID )
+            }; break
+        od
+    
+        after_move_refresh( t );
     }
 }
-*/
 
 
 /********
@@ -1324,47 +1292,33 @@ inline convey_update( t, receiver )
 
 inline CGKA_initialize()
 {   atomic {
-    printf("\n***********************\n* CGKA: Initialize!   *\n***********************\n");
-
     d_step
     {
+        printf("\n***********************\n* CGKA: Initialize!   *\n***********************\n");
+        
         for( i : 0 .. N - 1 )
         {
-//            epoch[i] = 0;
             hoarding[i]  = NONE;
         };
     
         for( i : 0 .. T - 1 )
         {
             challenge[i] = false;
-//            leadership[i]  = NONE;
         };
-/*
-        for ( i : 0 .. N - 1 )
-        {
-            epochQuerried[i] = false;
-        }
-*/
-    };
+        
+        concludedCGKA = false;
+        triviality    = false; 
 
-    attacker_initializes_knowledge()
+        attacker_initializes_knowledge()
+    };
 
 }   }
 
 
 inline CGKA_create_group()
 {   atomic {
-    printf("\n***********************\n* CGKA: Create Group! *\n***********************\n");
-
     byte id0, n, t;
     
-    // Set the "lead" byte to be the first member in the group.
-    d_step
-    {
-        id0 = 0;
-        t   = 0;
-    }
-
     // Number of members to add
     select ( n : 2 .. N );
     for( i : 0 .. N - 1 )
@@ -1372,20 +1326,16 @@ inline CGKA_create_group()
         membership[i] = i < n;
     };
 
-    print_membership();
-    
-    broadcast ( t, id0, NONE, true, UPD );
-
-/*
-    for( i : 0 .. N - 1 )
+    // Set the "lead" byte to be the first member in the group.
+    d_step
     {
-        if
-        :: membership[i] -> convey_update( t, i )
-        :: else
-        fi
-    };
-*/
-
+        printf("\n***********************\n* CGKA: Create Group! *\n***********************\n");
+        id0 = 0;
+        t   = 0;
+        print_membership();
+        propogate ( id0, NONE, NONE );
+        broadcast ( t,    id0, NONE );
+    }
 }   }
 
 
@@ -1393,263 +1343,44 @@ inline CGKA_create_group()
 inline CGKA_security_game()
 {
     printf("\n***********************\n* CGKA: Begin Play!   *\n***********************\n");
-    
-    // Loop through all epochs...
-    // EXCEPT the final epoch!
-    for ( t : 0 .. T - 2)
-    {
-        bool commitmentRequired = false;
 
-        // The first, the attacker must decide whether or not to:
-        //   1. Play a move which will *commit* the group members to advance to the next epoch
-        //   2. Play a move which where the group members remain in the current epoch
-        //
-        // We call selction option (1) "commitment" and option (2) "non-committal."
+    // Each time the attacker takes a turn, they must decide whether or not to:
+    //
+    //   1. End the game; under the assumption that the attacker has won.
+    //   2. Play a move which will *commit* the group members to advance to the next epoch
+    //   3. Play a move which where the group members remain in the current epoch
+    //
+    // We call selection the options "challenge," "commitment," and "non-committal" moves, respectively.
+    //
+    // NOTE: option (1), is implicitly the last move in the model
+
+    bool commitmentRequired = false;
+
+    // Loop through all epochs
+    for ( t : 0 .. LAST_EPOCH)
+    {
+
         do
-        // NOTE: The attacker can always play a move which commits to a new epoch
-        :: play_move_with_commitment( t ); break
+        // 1. Play the Challenge Move
+        //     The attacker ending the game is implicitly the last move of the model
+        //     so it always happens in the last epoch.
+        :: t == LAST_EPOCH -> break
         
-        // NOTE: Alternatively, the attacker can play a non-committal move and remain in the same epoch
-        :: !commitmentRequired -> atomic
-            {
-               play_noncommittal_move( t );
-               check_commitment_required( t );
-               printf("POST-noncommittal");
-            };
+        // 2. Play a Commitment Move
+        //     The attacker *may* play a move which commits to a new epoch...
+        //     unless it is the last epoch.
+        :: t != LAST_EPOCH -> play_move_with_commitment( t ); break
+        
+        // 3. Play a Non-commital Move
+        //     The attacker *may* play a move and remain in the same epoch...
+        //     unless the attacker has exhausted all indempotent non-comittal moves!
+        :: !(commitmentRequired) -> play_move_without_commitment( t )
         od;
-        printf("LOOP broken: %d", t);
 
-        d_step
-        {
-            // After the operation is complete, check to see if the an endgame condition has been reached.
-            safety_poll();
-            printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", T - t - 1, unsafeIDs);
-        }
+        // After the operation is complete, check to see if the an endgame condition has been reached.
+        printf("\nLOOP broken: %d", t);
+        printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", LAST_EPOCH - t, unsafeIDs);
     }
-    loopFinal: skip
-    finishedLoop = true;
-
-    safety_poll();
-    bool endGame = unsafeIDs == 0;
-
-/*
-    // During the last epoch the attacker can only play a non-committal move
-    do
-    :: endGame -> break
-    :: atomic
-        {
-           play_noncommittal_move( t );
-           d_step
-           {
-               // After the operation is complete, check to see if the an endgame condition has been reached.
-               safety_poll();
-               endGame = unsafeIDs == 0;
-               printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< Endgame: %d\n< < < \n", T - t - 1, unsafeIDs, endGame);
-           }
-        };
-    od;
-*/
-}
-
-inline can_reveal( t )
-{
-    canReveal = !challenge[t] && (t != T - 1) && attackerKnowledge[t].node[ROOT] == UnknownNode;
-    if
-    :: !canReveal -> skip
-    :: else ->
-        byte challengesUsed = 0;
-        d_step
-        {
-            for ( i : 0 .. t )
-            {
-                if
-                :: challenge[i] -> challengesUsed++;
-                :: else
-                fi
-            }
-        };
-        canReveal = challengesUsed < C
-    fi
-}
-
-
-inline can_query()
-{
-    canQuery = false
-// TODO: restore the more lenient definition
-/*
-    byte querriesUsed = 0;
-    byte groupSize    = 0;
-    d_step
-    {
-        for ( i : 0 .. N - 1 )
-        {
-            if
-            :: epochQuerried[i] -> querriesUsed++
-            :: else
-            fi;
-            
-            if
-            :: membership[i] -> groupSize++
-            :: else
-            fi
-        }
-    };
-    
-    printf("\n\tquerriesUsed < groupSize - 1\n\t%d < %d - 1 = %d", querriesUsed, groupSize, querriesUsed < groupSize - 1);
-
-    // Cannot send a final test mail when there is only one untested member remaining.
-    // The last member will be the commitment member.
-    canQuery = querriesUsed < groupSize - 1;
-*/
-}
-
-
-inline check_commitment_required( t )
-{
-    bool canQuery;
-    can_query();
-    printf("\n canQuery = %d", canQuery);
-
-    bool canReveal;
-    can_reveal( t );
-    printf("\n canReveal = %d", canReveal);
-
-    bool canHoardMember = false;
-    d_step
-    {
-        byte candidateHoarders;
-        candidates_for_hoarding();
-        canHoardMember = candidateHoarders > 0;
-        printf("\n canHoardMember = %d", canHoardMember);
-    }
-
-    bool canCorruptMember = false;
-    d_step
-    {
-        byte candidateCorruptibles;
-        candidates_for_corruption( t );
-        canCorruptMember = candidateCorruptibles > 0;
-        printf("\n canCorruptMember = %d", canCorruptMember);
-    }
-
-    commitmentRequired = !canQuery && !canReveal && !canHoardMember && !canCorruptMember
-}
-
-
-inline play_noncommittal_move( t )
-{
-    bool canQuery, canReveal, forcedPlay, groupDyad, groupFull;
-    byte corruptedID, exiledID, banisherID, hoarderID, updaterID;
-
-    assign_move_variables( t, false );
-    printf("\nNON-Committal!");
-
-    do
-    // Non-committing moves
-    :: canQuery -> play_move_maybe_commitment( t, false ); break
-
-    //  Reveal
-    :: canReveal -> atomic
-        {   printf("\n> > >\n> CGKA: Game Move = reveal %d\n> > >\n", t);
-            reveal( t )
-        }; break
-
-    //  Corrupt
-    :: corruptedID != NONE && !forcedPlay -> atomic
-        {   printf("\n> > >\n> CGKA: Game Move = corrupt %d\n> > >\n", corruptedID);
-            corrupt( t, corruptedID )
-        }; break
-
-    //  Hoard
-    :: hoarderID != NONE -> atomic
-        {   printf("\n> > >\n> CGKA: Game Move = hoard %d\n> > >\n", hoarderID);
-            hoard( t, hoarderID )
-        }; break
-
-/*
-    //  Convey
-    :: messagePending -> atomic
-        {
-            byte recipientID;
-            select_recipient();
-            printf("\n> > >\n> CGKA: Game Move = convey_update %d\n> > >\n", recipientID);
-            convey_update ( recipientID );
-        }; break
-*/        
-    od
-}
-
-
-inline play_move_with_commitment( t )
-{
-    bool canQuery, canReveal, forcedPlay, groupDyad, groupFull;
-    byte corruptedID, exiledID, banisherID, hoarderID, updaterID;
-    
-    assign_move_variables( t, true );
-    printf("\nCOMMITTING!");
-    play_move_maybe_commitment( t, true )
-}
-
-
-inline assign_move_variables( t, commitment )
-{
-    atomic
-    {
-        can_query();
-        can_reveal(  t );
-        forced_play( t );
-        group_dyad(  t );
-        group_full(  t );
-        select_corrupted( t );
-        select_hoarder();
-        select_updater(  forcedPlay && commitment, commitment );
-        select_exiled(   forcedPlay && commitment, commitment );
-        select_banisher( exiledID                , commitment );
-    };
-    printf("\nEpoch (t) = %d", t);
-    print_global_state()
-
-    d_step
-    {
-        printf("\n\tcanQuery    \t%d",    canQuery );
-        printf("\n\tforcedPlay  \t%d",  forcedPlay );
-        printf("\n\tgroupDyad   \t%d",   groupDyad );
-        printf("\n\tgroupFull   \t%d",   groupFull );
-        printf("\n\tcorruptedID \t%d", corruptedID );
-        printf("\n\texiledID    \t%d",    exiledID );
-        printf("\n\tbanisherID  \t%d",  banisherID );
-        printf("\n\thoarderID   \t%d",   hoarderID );
-        printf("\n\tupdaterID   \t%d",   updaterID );
-    }
-}
-
-
-inline play_move_maybe_commitment( t, commitment )
-{
-    do
-    // Update
-    :: updaterID != NONE -> atomic
-        {   printf("\n> > >\n> CGKA: Game Move = oblige_update %d (committed? %d)\n> > >\n", updaterID, commitment);
-            oblige_update( t, updaterID, commitment );
-        }; break
-
-    // Remove
-    :: !groupDyad && exiledID != NONE && banisherID != NONE -> atomic
-        {  printf("\n> > >\n> CGKA: Game Move = remove_member %d %d (committed? %d)\n> > >\n", banisherID, exiledID, commitment);
-            remove_member( t, banisherID, exiledID, commitment );
-        }; break
-
-    // Insert
-    :: !groupFull && !forcedPlay -> atomic
-        {
-            byte joinerID, senderID;
-            select_sender( commitment );
-            select_joiner( t );
-            printf("\n> > >\n> CGKA: Game Move = insert_member %d %d (committed? %d)\n> > >\n", senderID, joinerID, commitment);
-            insert_member( t, senderID, joinerID, commitment );
-        }; break
-    od
 }
 
 
@@ -1658,8 +1389,10 @@ init
     CGKA_initialize();
     CGKA_create_group();
     CGKA_security_game();
+    concludedCGKA = true;
 }
 
-//ltl finished_loop { <>finishedLoop }
-ltl attendees_more_than_one { [](attendees > 1) }
+//ltl tivial_safety { [](triviality <-> attackerKnowsRootKey) }
+//ltl finished_loop { <>concludedCGKA }
+//ltl attendees_more_than_one { [](attendees > 1) }
 //ltl attendees_absentees_sum { [](attendees + absentees == N) }
