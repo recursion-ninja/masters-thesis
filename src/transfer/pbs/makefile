@@ -6,8 +6,9 @@ source     = $(component).promela
 executable = $(component).analysis
 model-code = pan.b pan.c pan.h pan.m pan.p pan.t
 model-in-C = pan.c pan.h
-trail      = $(source).trail
-backup-dir = trails
+trail-suff = trail
+trail-file = $(source).$(trail-suff)
+backup-dir = ../trails
 
 dot-output = $(image-name).dot
 image-file = $(image-name).png
@@ -29,18 +30,20 @@ opt-thread = #-DMEMLIM=262144 \
 
 opt-timing = #-DNOBOUNDCHECK -DSAFETY
 
-# Default build target
-all: verification
+all:     verification
 
-compile:   $(executable)
-analyze:   verification
-inspect:   verification inspection
+backup: $(backup-dir)
+	mv --backup=t $(trail-file) $(backup-dir)/$(trail-file) 2>/dev/null || true
+
+clean:
+	rm -f *~ *# $(executable) $(model-code) $(log-to-out) $(log-to-err)
+
+verification: $(executable) backup
+	time ./$(executable) -a -i
+	@$(MAKE) --no-print-directory backup
 
 $(executable): $(model-code) $(source)
 	gcc -O3 $(directives) -o $(executable) $(model-in-C)
-
-verification: $(executable) backup
-	time ./$(executable) -a
 
 $(dot-output): $(executable) backup
 	./$(executable) -a -D > $(dot-output)
@@ -50,11 +53,5 @@ $(image-file): $(dot-output)
 
 $(backup-dir):
 	mkdir -p $(backup-dir)
-
-backup: $(backup-dir)
-	mv --backup=t $(trail) $(backup-dir)/$(trail) 2>/dev/null || true
-
-clean:
-	rm -f *~ *# $(executable) $(model-code) $(log-to-out) $(log-to-err)
 
 .PHONY: all analyze backup clean compile verification

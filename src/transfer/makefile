@@ -32,10 +32,9 @@ cluster-pbs-format := *$(cluster-pbs-suffix).*
 
 cluster-host := ${CLUSTER_HOST}
 cluster-user := ${CLUSTER_USER}
+cluster-pass := ${CLUSTER_PASS}
 cluster-auth := $(cluster-user)@$(cluster-host)
-cluster-pass :=
 cluster-pbs  := $(process)$(cluster-pbs-suffix)
-
 
 pbs-dir      := pbs
 pbs-prefix   := $(pbs-dir)/pbs.
@@ -45,12 +44,13 @@ pbs-defaults := $(pbs-prefix)defaults
 pbs-makefile := $(pbs-dir)/makefile
 pbs-template := $(pbs-prefix)template
 
-local-dir  := remote
-local-code := $(local-dir)/$(cluster-dir-remote)
-local-pbs  := $(local-dir)/$(cluster-pbs)
+local-dir    := remote
+local-code   := $(local-dir)/$(cluster-dir-remote)
+local-pbs    := $(local-dir)/$(cluster-pbs)
 
-retrieve-des = ../../log
-retrieve-dir = $(cluster-dir-format)/$(cluster-pbs-format)
+example-dir  := trails
+logging-des  := ../../log
+logging-dir  := $(cluster-dir-format)/$(cluster-pbs-format)
 
 #######
 ###
@@ -73,7 +73,7 @@ cluster-connect: ask_password
 	@sshpass -p $(cluster-pass) ssh $(cluster-auth)
 
 cluster-pull: ask_password
-	@sshpass -p $(cluster-pass) scp '$(cluster-auth):./$(retrieve-dir)' $(retrieve-des)
+	@sshpass -p $(cluster-pass) scp '$(cluster-auth):./{$(example-dir),$(logging-dir)}' $(logging-des)
 
 cluster-push: $(local-pbs) $(local-code) ask_password
 	@echo "Transfering:"
