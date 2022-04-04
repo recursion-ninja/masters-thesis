@@ -7,19 +7,33 @@
     * The attacker wins the CGKA security game if they correctly guesses the random bit `b` in
     * the end and the safety predicate `P` evaluates to true on the queries made by the attacker.
     *
+    * Security game's parameters' valid ranges:
+    *   - T <- [3, 254]
+    *   - C <- [1,   T]
+    *   - N <- [3, 254] 
+    *
     * Hence we define our (`t`, `c` `n`) constants below:
     *
 ********/
+#define C 3
+#define N 4
+#define T 3
 
-// A constant for missing data
-#define NONE 255
 
 /****
   *
-  * Security game's parameters' valid ranges:
-  *   - T <- [3, 255]
-  *   - C <- [1,   T]
-  *   - N <- [3, 127]
+  * Number of bits required to represent:
+  *   - N + 1
+  *   - T
+  *   - The maximum of T and (N + N - 1) 
+  *
+****/
+#define N_BITS 3
+#define T_BITS 2
+#define X_BITS 5
+
+
+/****
   *
   * Lookup table for TREE value derived from N:
   *   - [ 1,   1] ->   1
@@ -32,15 +46,29 @@
   *   - [65, 128] -> 255
   *
 ****/
-#define T    3
-#define C    3
-#define N    4
 #define TREE 7
-#define NODE (TREE / 2)
+
+
+/****
+  *
+  * Constants, respectively for the following:
+  *   - Sentinal value for missing data. Value should equal (2 ^ N_BITS - 1)
+  *   - Index of the root node in the heap
+  *   - Offset to index the first node of the heap
+  *   - Final epoch of the security game with implicit "challenge"
+  *   - Number of revelations the attacker may make during the game.
+  *     Note that revelation moves require using a challenge and,
+  *     because the last challenge must be saved to end the game,
+  *     a revelation move cannot use the last available challenge.
+  *
+****/
+//#define NONE 7
+#define NONE ( (1 << N_BITS) - 1 )
 #define ROOT 0
+#define NODE (TREE / 2)
 #define LAST_EPOCH (T - 1)
-// Because the last challenge must be saved to end the game
 #define MAX_REVEAL (C - 1)
+
 
 /****
   *
@@ -48,15 +76,18 @@
   *
 ****/
 
-bool  challenge[T]; // Has the attacker challenged in an epoch?
-bool membership[N]; // Group membership of current epoch
-bool     unsafe[N]; // Members which require a change to update
-byte   hoarding[N]; // Epoch from which the user saves secrets
+local unsigned epoch     : T_BITS; // The current epoch
+local unsigned unsafeIDs : N_BITS; // Number of unsafeIDs
 
-bool concludedCGKA = false; // Does the CGKA
+local bool           challenge[T]; // Has the attacker challenged in an epoch?
+local bool          membership[N]; // Group membership of current epoch
+local bool              unsafe[N]; // Members which require a change to update
+local byte            hoarding[N]; // Epoch from which the user saves secrets
+
+local bool concludedCGKA = false; // Does the CGKA end
 // Does a trivial attack exist?
 // i.e, does the SAFE predicate hold?
-bool triviality   = false; 
+local bool triviality   = false; 
 
 
 /****
@@ -96,7 +127,7 @@ TreeKeys attackerKnowledge[T];
   *
 ****/
 
-bool attackerKnowsRootKey = false;
+local bool attackerKnowsRootKey = false;
 
 
 /****
@@ -106,23 +137,21 @@ bool attackerKnowsRootKey = false;
 ****/
 
 // Indexing variables
-local byte i = 0;
-local byte j = 0;
-local byte k = 0;
-local byte t = 0;
+local unsigned i : X_BITS = 0;
+local unsigned j : X_BITS = 0;
+local unsigned k : X_BITS = 0;
+//local unsigned t : T_BITS = 0;
 
 // Group Composition
-local byte absentees = 0;
-local byte attendees = N;
+local unsigned absentees : N_BITS = 0;
+local unsigned attendees : N_BITS = N;
+local unsigned groupMost : N_BITS = 0; // The maximum member ID during any past/present epoch.
 local bool groupDyad = false;
 local bool groupFull = false;
-local byte groupMost = 0; // The maximum member ID during any past/present epoch.
 
 // Protocol State
 local bool forcedPlay = false;
 local bool revealRoot = C > 1;
-local byte unsafeIDs  = 0;
-
 
 /********
     *
@@ -143,18 +172,19 @@ inline print_attacker_knowledge()
 {
     d_step
     {
+        unsigned t : T_BITS;
         printf("\n\tAttacker Knowledge:");
-        for( i : 0 .. T - 1 )
+        for( t : 0 .. T - 1 )
         {
             printf("\n>>> %d vvv", t);
             for( j : 0 .. TREE - 1 )
             {
                 if
-                :: attackerKnowledge[i].node[j] == UnknownRefs -> printf("\n\t%d [ x ]", j)
-                :: attackerKnowledge[i].node[j] == UnknownNode -> printf("\n\t%d [ X ]", j)
-                :: attackerKnowledge[i].node[j] ==   KnownRefs -> printf("\n\t%d [ o ]", j)
-                :: attackerKnowledge[i].node[j] ==   KnownNode -> printf("\n\t%d [ O ]", j)
-                :: attackerKnowledge[i].node[j] ==        Void -> printf("\n\t%d [   ]", j)
+                :: attackerKnowledge[t].node[j] == UnknownRefs -> printf("\n\t%d [ x ]", j)
+                :: attackerKnowledge[t].node[j] == UnknownNode -> printf("\n\t%d [ X ]", j)
+                :: attackerKnowledge[t].node[j] ==   KnownRefs -> printf("\n\t%d [ o ]", j)
+                :: attackerKnowledge[t].node[j] ==   KnownNode -> printf("\n\t%d [ O ]", j)
+                :: attackerKnowledge[t].node[j] ==        Void -> printf("\n\t%d [   ]", j)
                 :: else                                        -> printf("\n\t%d [ ? ]", j)
                 fi
             }
@@ -289,8 +319,8 @@ inline after_move_refresh( t )
 {
     d_step {
         // Refresh "unsafeIDs"
-        byte remainingEpochs = LAST_EPOCH - t;
-        byte recoveriesRequired = 0;
+        unsigned remainingEpochs    : T_BITS = LAST_EPOCH - t;
+        unsigned recoveriesRequired : N_BITS = 0;
         for ( i : 0 .. N - 1 ) {
             if
             :: unsafe[i] -> recoveriesRequired++;
@@ -311,7 +341,7 @@ inline after_move_refresh( t )
         if
         :: !revealRoot -> skip
         :: else ->
-            byte challengesUsed = 0;
+            unsigned challengesUsed : T_BITS = 0;
             d_step
             {
                 for ( i : 0 .. t )
@@ -329,7 +359,7 @@ inline after_move_refresh( t )
         bool canHoardMember = false;
         d_step
         {
-            byte candidateHoarders;
+            unsigned candidateHoarders : N_BITS;
             candidates_for_hoarding();
             canHoardMember = candidateHoarders > 0;
     //        printf("\n canHoardMember = %d", canHoardMember);
@@ -338,7 +368,7 @@ inline after_move_refresh( t )
         bool canCorruptMember = false;
         d_step
         {
-            byte candidateCorruptibles;
+            unsigned candidateCorruptibles : N_BITS;
             candidates_for_corruption( t );
             canCorruptMember = candidateCorruptibles > 0;
     //        printf("\n canCorruptMember = %d", canCorruptMember);
@@ -359,9 +389,9 @@ inline after_move_refresh( t )
 ****/
 inline take_attendance()
 {
-    byte largestID
+    unsigned largestID : N_BITS;
     d_step {
-        byte included = 0;
+        unsigned included : N_BITS = 0;
         for ( i : 0 .. N - 1 ) {
              if
              :: membership[i] -> included++; largestID = i
@@ -407,20 +437,20 @@ inline take_attendance()
   * External result variable(s):
   *   - corruptedID
 ****/
-inline select_corrupted( t )
+inline select_corrupted()
 {   atomic {
 
-    byte candidateCorruptibles;
-    candidates_for_corruption( t );
+    unsigned candidateCorruptibles : N_BITS;
+    candidates_for_corruption( epoch );
     if
     :: candidateCorruptibles == 0 -> corruptedID = NONE
     :: else ->
-        byte sample;
+        unsigned selection : N_BITS = NONE;
+        unsigned sample : N_BITS;
         select ( sample : 0 .. candidateCorruptibles - 1 );
-        byte selection = NONE;
-        d_step
+        for ( i : 0 .. N )
         {
-            for ( i : 0 .. N )
+            d_step
             {
                 if
                 :: selection == NONE ->
@@ -449,23 +479,20 @@ inline select_corrupted( t )
 ****/
 inline candidates_for_corruption( t )
 {
-    byte remaining = LAST_EPOCH - t;
+    unsigned remaining : T_BITS = LAST_EPOCH - t;
 
     if
     :: unsafeIDs >= remaining -> candidateCorruptibles = 0;
     :: else ->
-        byte candidates = 0;
-        d_step
+        unsigned candidates : N_BITS = 0;
+        for ( i : 0 .. N - 1 )
         {
-            for ( i : 0 .. N - 1 )
-            {
-                bool candidateCorruption;
-                candidate_corruption( i );
-                if
-                :: candidateCorruption -> candidates++
-                :: else
-                fi
-            }
+            bool candidateCorruption;
+            candidate_corruption( i );
+            if
+            :: candidateCorruption -> candidates++
+            :: else
+            fi
         }
         candidateCorruptibles = candidates
     fi
@@ -476,11 +503,11 @@ inline candidates_for_corruption( t )
   * External result variable(s):
   *   - candidateCorruption
 ****/
-inline candidate_corruption( i )
+inline candidate_corruption( id )
 {
     // The corrupted user must not previously been instructed to hoard!
     // Violates the "Safety Predicate SAFE" described in Alwen 2020.
-    candidateCorruption = hoarding[i] == NONE && membership[i] && attackerKnowledge[t].node[NODE+i] == UnknownNode
+    candidateCorruption = hoarding[id] == NONE && membership[id] && attackerKnowledge[epoch].node[NODE+id] == UnknownNode
 }
 
 
@@ -490,7 +517,7 @@ inline candidate_corruption( i )
 ****/
 inline select_banisher( banned )
 {
-    byte selectedID;
+    unsigned selectedID : N_BITS;
     select_sender_constrained( banned, false );
     banisherID = selectedID;
 }
@@ -502,7 +529,7 @@ inline select_banisher( banned )
 ****/
 inline select_exiled( forced )
 {
-    byte selectedID;
+    unsigned selectedID : N_BITS;
     select_sender_constrained( NONE, forced );
     exiledID = selectedID;
 }
@@ -515,18 +542,18 @@ inline select_exiled( forced )
 inline select_hoarder()
 {   atomic {
 
-    byte candidateHoarders;
+    unsigned candidateHoarders : N_BITS;
     candidates_for_hoarding();
 
     if
     :: candidateHoarders == 0 -> hoarderID = NONE
     :: else ->
-        byte sample;
+        unsigned selection : N_BITS = NONE;
+        unsigned sample : N_BITS;
         select ( sample : 0 .. candidateHoarders - 1 );
-        byte selection = NONE;
-        d_step
+        for ( i : 0 .. N - 1 )
         {
-            for ( i : 0 .. N - 1 )
+            d_step
             {
                 if
                 :: selection != NONE -> skip
@@ -555,7 +582,7 @@ inline select_hoarder()
 ****/
 inline candidates_for_hoarding()
 {
-    byte candidates = 0;
+    unsigned candidates : N_BITS = 0;
     for ( i : 0 .. N - 1 )
     {
         bool candidateHoarder
@@ -586,22 +613,25 @@ inline candidate_hoarder( i )
 inline select_joiner()
 {   atomic {
 
-    byte candidateJoiners;
+    unsigned candidateJoiners : N_BITS;
     candidates_for_joiner();
 
-    byte sample;
-    byte selection = NONE;
-    select( sample : 0 .. candidateJoiners - 1 );
+    unsigned selection : N_BITS = NONE;
+    unsigned sample : N_BITS;
+    select(  sample : 0 .. candidateJoiners - 1 );
 
     for ( i : 0 .. N - 1 ) {
-        if
-        :: selection != NONE || membership[i] -> skip
-        :: else ->
+        d_step
+        {
             if
-            :: sample != 0 -> sample--
-            :: sample == 0 -> selection = i
+            :: selection != NONE || membership[i] -> skip
+            :: else ->
+                if
+                :: sample != 0 -> sample--
+                :: sample == 0 -> selection = i
+                fi
             fi
-        fi
+        }
     }
     
     joinerID = selection;
@@ -614,7 +644,7 @@ inline select_joiner()
 ****/
 inline candidates_for_joiner()
 {
-    byte candidates = 0;
+    unsigned candidates : N_BITS = 0;
     for ( i : 0 .. groupMost - 1 )
     {
         if
@@ -644,7 +674,7 @@ inline candidates_for_joiner()
 ****/
 inline select_sender()
 {
-    byte selectedID;
+    unsigned selectedID : N_BITS;
     select_sender_constrained( NONE, false );
     senderID = selectedID;
 }
@@ -656,7 +686,7 @@ inline select_sender()
 ****/
 inline select_updater( forced )
 {
-    byte selectedID;
+    unsigned selectedID : N_BITS;
     select_sender_constrained( NONE, forced );
     updaterID = selectedID;
 }
@@ -668,46 +698,27 @@ inline select_updater( forced )
 ****/
 inline select_sender_constrained ( banned, forced )
 {   atomic {
-//    printf("\nSELECTING Sender %d %d %d", banned, forced);
-    byte candidates = 0;
-    d_step {
-        for ( i : 0 .. N - 1 ) {
-/*
-             d_step
-             {
-                 printf("\n  membership[%d]     = %d", i, membership[i]);
-                 printf("\n  i != banned        = %d", i != banned  );
-                 printf("\n  !forced            = %d", !(forced)    );
-                 printf("\n  !epochQuerried[%d] = %d", i, !(epochQuerried[i]));
-                 printf("\n  unsafe[%d]         = %d", i, unsafe[i]);
-                 printf("\n");
-                 printf("\n")
-             }
-*/
-             bool senderCandidate;
-             sender_candidate( banned, forced, i );
-             if
-             :: senderCandidate -> candidates++
-             :: else
-             fi
-        }
+    unsigned candidates : N_BITS = 0;
+
+    for ( i : 0 .. N - 1 )
+    {
+        bool senderCandidate;
+        sender_candidate( banned, forced, i );
+        if
+        :: senderCandidate -> candidates++
+        :: else
+        fi
     }
 
     if
     :: candidates == 0 -> selectedID = NONE
     :: else ->
-        byte sample;
-        select( sample : 0 .. candidates - 1 );
-        byte selection = NONE;
-        d_step
-        {
-    /**/
-            printf("\n  candidates         = %d", candidates);
-            printf("\n  sample             = %d", sample);
-    /**/
-    
-            for ( i : 0 .. N - 1 ) {
-//                printf("\n\ti = %d v = %d s = %d b = %d", i, selection, sample, membership[i] && i != banned && ( !(forced) || unsafe[i]) );
+        unsigned selection : N_BITS = NONE;
+        unsigned sample : N_BITS;
+        select(  sample : 0 .. candidates - 1 );
+        for ( i : 0 .. N - 1 ) {
+            d_step
+            {
                 if
                 :: selection == NONE ->
                     bool senderCandidate;
@@ -733,12 +744,12 @@ inline select_sender_constrained ( banned, forced )
   * External result variable(s):
   *   - senderCandidate
 ****/
-inline sender_candidate( banned, forced, i )
+inline sender_candidate( banned, forced, id )
 {
-//    bool querryOkay = commitment || !(epochQuerried[i]);
-//    bool forcesSafe = (!(forced) && querryOkay) || unsafe[i];
-    bool forcesSafe = !(forced)  || unsafe[i];
-    bool isAnOption = membership[i] && (i != banned);
+//    bool querryOkay = commitment || !(epochQuerried[id]);
+//    bool forcesSafe = (!(forced) && querryOkay) || unsafe[id];
+    bool forcesSafe = !(forced)  || unsafe[id];
+    bool isAnOption = membership[id] && (id != banned);
     senderCandidate = isAnOption && forcesSafe
 }
 
@@ -826,8 +837,8 @@ inline attacker_observes_message( t, sender, subject )
         :: else
         fi
         
-        //   referenceEpoch = (t == 0) ? t : t - 1;
-        byte referenceEpoch = t ;
+        //       referenceEpoch = (t == 0) ? t : t - 1;
+        unsigned referenceEpoch : T_BITS = t ;
         if
         :: t != 0 -> referenceEpoch--;
         :: else
@@ -873,8 +884,8 @@ inline attacker_init_epoch_knowledge( e )
 {   atomic {
 
     bool leaves = true;
-    byte offset = NODE;
-    byte width  = TREE + 1;
+    unsigned offset : X_BITS = NODE;
+    unsigned width  : X_BITS = TREE + 1;
     do
     :: width == 0 -> break
     :: width != 0 -> d_step
@@ -893,8 +904,8 @@ inline attacker_init_epoch_knowledge( e )
                     fi
                 // Internal node case(s)
                 :: else ->
-                    byte childL = j * 2 + 1;
-                    byte childR = j * 2 + 2;
+                    unsigned childL : X_BITS = j * 2 + 1;
+                    unsigned childR : X_BITS = j * 2 + 2;
                     // Check current epoch for existance of subtrees
                     bool existanceOfSubtree;
                     existance_of_subtree( e, childL);
@@ -919,8 +930,8 @@ inline attacker_init_epoch_knowledge( e )
 inline attacker_copy_epoch_knowledge( e )
 {   atomic {
 
-    byte offset = NODE;
-    byte width  = TREE + 1;
+    unsigned offset : X_BITS = NODE;
+    unsigned width  : X_BITS = TREE + 1;
     do
     :: width == 0 -> break
     :: width != 0 -> d_step
@@ -948,8 +959,8 @@ inline attacker_copy_epoch_knowledge( e )
 inline attacker_wipe_sender_knowledge( sender, e )
 {   atomic {
 
-    byte offset = NODE;
-    byte width  = TREE + 1;
+    unsigned offset : X_BITS = NODE;
+    unsigned width  : X_BITS = TREE + 1;
     do
     :: width == 0 -> break
     :: width != 0 -> d_step
@@ -974,9 +985,9 @@ inline attacker_wipe_sender_knowledge( sender, e )
 inline attacker_updates_knowledge( e )
 {   atomic {
 
-    bool leaves = true;
-    byte offset = NODE;
-    byte width  = TREE + 1;
+    bool     leaves = true;
+    unsigned offset : X_BITS = NODE;
+    unsigned width  : X_BITS = TREE + 1;
     do
     :: width == 0 -> break
     :: width != 0 -> d_step
@@ -988,8 +999,8 @@ inline attacker_updates_knowledge( e )
                 if
                 :: leaves -> skip
                 :: else ->
-                    byte childL = j * 2 + 1;
-                    byte childR = j * 2 + 2;
+                    unsigned childL : X_BITS = j * 2 + 1;
+                    unsigned childR : X_BITS = j * 2 + 2;
                     // Check current epoch for existance of subtrees
                     bool existanceOfSubtree;
                     existance_of_subtree( e, childL);
@@ -1047,15 +1058,17 @@ inline knowledge_of_subtree( i, j )
 ********/
 
 
-inline corrupt( t, memberID )
+inline corrupt( memberID )
 {   atomic {
 
+    printf("\n> > >\n> CGKA: Game Move = COR %d\n> > >\n", memberID);
+
     // Learn the secret material of the user in their current epoch
-    byte upperBound = t;
-    byte lowerBound = upperBound;
+    unsigned upperBound : T_BITS = epoch;
+    unsigned lowerBound : T_BITS = upperBound;
 
     // Learn any additional secrets they have hoarded!
-    byte epochSavedFrom = hoarding[memberID];
+    unsigned epochSavedFrom : T_BITS = hoarding[memberID];
     if
     :: epochSavedFrom < upperBound -> lowerBound = epochSavedFrom
     :: else
@@ -1067,15 +1080,15 @@ inline corrupt( t, memberID )
     // (this implies that the user was a member)
     // Then the attacker learns the secrets on the direct path
     // between the member and the root node on the LBBT.
-    byte peek;
+    unsigned peek : T_BITS;
     for ( peek : lowerBound .. upperBound )
     {
         if
         :: !(membership[memberID]) -> skip
         :: else ->
             printf("Passed membership guard!\n");
-            byte off   = NODE;
-            byte level = TREE + 1;
+            unsigned off   : X_BITS = NODE;
+            unsigned level : X_BITS = TREE + 1;
             do
             :: level == 0 -> break
             :: level != 0 -> d_step
@@ -1105,22 +1118,26 @@ inline corrupt( t, memberID )
             od
         fi
     }
-    attacker_insight_check( t );
+    attacker_insight_check( epoch );
     unsafe[memberID] = true;
 }   }
 
 
-inline hoard( t, memberID )
+inline hoard( memberID )
 {
-    hoarding[memberID] = t
+    d_step {
+        printf("\n> > >\n> CGKA: Game Move = HOD %d\n> > >\n", memberID);
+        hoarding[memberID] = epoch
+    }
 }
 
 
-inline reveal( t )
+inline reveal()
 {
     d_step {
-        challenge[t] = true;
-        attackerKnowledge[t].node[ROOT] -> KnownNode;
+        printf("\n> > >\n> CGKA: Game Move = RVL %d\n> > >\n", epoch);
+        challenge[epoch] = true;
+        attackerKnowledge[epoch].node[ROOT] -> KnownNode;
     }
 }
 
@@ -1137,38 +1154,41 @@ inline reveal( t )
 
 
 // Precondition: joiner is not in the group!
-inline insert_member( t, sender, joiner )
+inline insert_member( sender, joiner )
 {
     d_step {
+        printf("\n> > >\n> CGKA: Game Move = ADD %d %d\n> > >\n", sender, joiner);
         assert(sender < N);
         assert(joiner < N);
         propogate( sender, joiner, NONE );
     }
-    broadcast( t, sender, joiner );
+    broadcast( epoch, sender, joiner );
 }
 
 
 // Precondition: exiledMemeber is in the group!
-inline remove_member( t, sender, exiled )
+inline remove_member( sender, exiled )
 {
     d_step {
+        printf("\n> > >\n> CGKA: Game Move = RMV %d %d\n> > >\n", sender, exiled);
         assert(sender < N);
         assert(exiled < N);
         unsafe[exiled] = false;
         propogate( sender, NONE, exiled);
     }
-    broadcast( t, sender, exiled );
+    broadcast( epoch, sender, exiled );
 }
 
 
-inline oblige_update( t, sender )
+inline oblige_update( sender )
 {
     d_step {
+        printf("\n> > >\n> CGKA: Game Move = UPD %d\n> > >\n", sender);
         assert(sender < N);
         unsafe[sender] = false;
         propogate( sender, NONE, NONE );
     }
-    broadcast( t, sender, NONE );
+    broadcast( epoch, sender, NONE );
 }
 
 
@@ -1182,9 +1202,9 @@ inline oblige_update( t, sender )
 ********/
 
 
-inline play_move_with_commitment( t )
+inline play_move_with_commitment()
 {
-    byte exiledID, banisherID, updaterID;
+    unsigned exiledID : N_BITS, banisherID : N_BITS, updaterID : N_BITS;
     
     atomic
     {
@@ -1195,84 +1215,74 @@ inline play_move_with_commitment( t )
 
     d_step
     {
-        printf("\nEpoch (t) = %d\n", t);
+        printf("\nEpoch (t) = %d\n", epoch );
         print_global_state()
-        printf("\n\texiledID    \t%d",    exiledID );
-        printf("\n\tbanisherID  \t%d",  banisherID );
-        printf("\n\tupdaterID   \t%d",   updaterID );
+        printf("\n\texiledID    \t%d",   exiledID );
+        printf("\n\tbanisherID  \t%d", banisherID );
+        printf("\n\tupdaterID   \t%d",  updaterID );
         printf("\nCOMMITTING!\n");
     }
 
     do
     // Update
-    :: updaterID != NONE -> atomic
-        {   printf("\n> > >\n> CGKA: Game Move = oblige_update %d (committed? %d)\n> > >\n", updaterID, true);
-            oblige_update( t, updaterID );
-        }; break
+    :: updaterID != NONE ->
+        oblige_update( updaterID ); break
 
     // Remove
-    :: !groupDyad && exiledID != NONE && banisherID != NONE -> atomic
-        {  printf("\n> > >\n> CGKA: Game Move = remove_member %d %d (committed? %d)\n> > >\n", banisherID, exiledID, true);
-            remove_member( t, banisherID, exiledID );
-        }; break
+    :: !groupDyad && exiledID != NONE && banisherID != NONE ->
+        remove_member( banisherID, exiledID ); break
 
     // Insert
     :: !groupFull && !forcedPlay -> atomic
         {
-            byte joinerID, senderID;
+            unsigned joinerID : N_BITS, senderID : N_BITS;
             select_sender();
             select_joiner();
-            printf("\n> > >\n> CGKA: Game Move = insert_member %d %d (committed? %d)\n> > >\n", senderID, joinerID, true);
-            insert_member( t, senderID, joinerID );
+            insert_member( senderID, joinerID );
         }; break
     od
 
-    after_move_refresh( t + 1);
+    after_move_refresh( epoch + 1);
 }
 
 
-inline play_move_without_commitment( t )
+/****
+  *
+  * Attacker moves without advancing the epoch via one of the following oracles:
+  *
+  *   - Corrupt
+  *   - Hoard
+  *   - Reveal
+  *
+****/
+inline play_move_without_commitment()
 {   atomic
     {
-        byte corruptedID, hoarderID;
+        unsigned corruptedID : N_BITS, hoarderID : N_BITS;
     
         atomic
         {
-            select_corrupted( t );
+            select_corrupted();
             select_hoarder();
         };
     
         d_step
         {
-            printf("\nEpoch (t) = %d\n", t);
+            printf("\nEpoch (t) = %d\n", epoch);
             print_global_state()
-            printf("\n\tcanRevealKey\t%d", revealRoot );
-            printf("\n\tcorruptedID \t%d",     corruptedID );
-            printf("\n\thoarderID   \t%d",       hoarderID );
+            printf("\n\tcanRevealKey\t%d",  revealRoot );
+            printf("\n\tcorruptedID \t%d", corruptedID );
+            printf("\n\thoarderID   \t%d",   hoarderID );
             printf("\nNON-Committal!\n");
         }
-    
+
         do
-        //  Reveal
-        :: revealRoot -> atomic
-            {   printf("\n> > >\n> CGKA: Game Move = reveal %d\n> > >\n", t);
-                reveal( t )
-            }; break
-    
-        //  Corrupt
-        :: corruptedID != NONE && !forcedPlay -> atomic
-            {   printf("\n> > >\n> CGKA: Game Move = corrupt %d\n> > >\n", corruptedID);
-                corrupt( t, corruptedID )
-            }; break
-    
-        //  Hoard
-        :: hoarderID != NONE -> atomic
-            {   printf("\n> > >\n> CGKA: Game Move = hoard %d\n> > >\n", hoarderID);
-                hoard( t, hoarderID )
-            }; break
+        :: corruptedID != NONE && !forcedPlay -> corrupt( corruptedID ); break
+        :: hoarderID   != NONE                -> hoard(     hoarderID ); break
+        :: revealRoot                         -> reveal(              ); break
         od
     
-        after_move_refresh( t );
+        after_move_refresh( epoch );
     }
 }
 
@@ -1294,16 +1304,21 @@ inline CGKA_initialize()
     d_step
     {
         printf("\n***********************\n* CGKA: Initialize!   *\n***********************\n");
-        
-        for( i : 0 .. N - 1 )
+
+        unsigned n : N_BITS;
+        for( n : 0 .. N - 1 )
         {
-            hoarding[i]  = NONE;
+            hoarding[n]  = NONE;
         };
     
-        for( i : 0 .. T - 1 )
+        unsigned t : T_BITS;
+        for( t : 0 .. T - 1 )
         {
-            challenge[i] = false;
+            challenge[t] = false;
         };
+
+        epoch     = 0;
+        unsafeIDs = 0;
         
         concludedCGKA = false;
         triviality    = false; 
@@ -1315,28 +1330,28 @@ inline CGKA_initialize()
 
 
 inline CGKA_create_group()
-{   atomic {
-    byte id0, n, t;
-    
-    // Number of members to add
-    select ( n : 2 .. N );
-    for( i : 0 .. N - 1 )
-    {
-        membership[i] = i < n;
-    };
-
-    // Set the "lead" byte to be the first member in the group.
+{
     d_step
     {
+        // Number of members to add
+        unsigned sample : N_BITS;
+        select ( sample : 2 .. N );
+        unsigned n      : N_BITS;
+        for( n : 0 .. N - 1 )
+        {
+            membership[i] = n < sample;
+        };
+
         printf("\n***********************\n* CGKA: Create Group! *\n***********************\n");
-        id0 = 0;
-        t   = 0;
+
+        // Set the "lead" byte to be the first member in the group.
+        unsigned id0 : N_BITS = 0;
+        unsigned t   : T_BITS = 0;
         print_membership();
         propogate ( id0, NONE, NONE );
         broadcast ( t,    id0, NONE );
     }
-}   }
-
+}
 
 
 inline CGKA_security_game()
@@ -1357,29 +1372,29 @@ inline CGKA_security_game()
     bool commitmentRequired = false;
 
     // Loop through all epochs
-    for ( t : 0 .. LAST_EPOCH)
+    for ( epoch : 0 .. LAST_EPOCH)
     {
 
         do
         // 1. Play the Challenge Move
         //     The attacker ending the game is implicitly the last move of the model
         //     so it always happens in the last epoch.
-        :: t == LAST_EPOCH -> break
+        :: epoch == LAST_EPOCH -> break
         
         // 2. Play a Commitment Move
         //     The attacker *may* play a move which commits to a new epoch...
         //     unless it is the last epoch.
-        :: t != LAST_EPOCH -> play_move_with_commitment( t ); break
+        :: epoch != LAST_EPOCH -> play_move_with_commitment(); break
         
         // 3. Play a Non-commital Move
         //     The attacker *may* play a move and remain in the same epoch...
         //     unless the attacker has exhausted all indempotent non-comittal moves!
-        :: !(commitmentRequired) -> play_move_without_commitment( t )
+        :: !(commitmentRequired) -> play_move_without_commitment()
         od;
 
         // After the operation is complete, check to see if the an endgame condition has been reached.
-        printf("\nLOOP broken: %d", t);
-        printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", LAST_EPOCH - t, unsafeIDs);
+        printf("\nLOOP broken: %d", epoch);
+        printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", LAST_EPOCH - epoch, unsafeIDs);
     }
 }
 
