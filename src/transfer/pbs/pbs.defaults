@@ -2,6 +2,6 @@
 name:     TreeKEM-CGKA
 email:    cluster-notifications@recursion.ninja
 time:     2-00:00:00
-cpus:     24
+cpus:     16
 memory:   256
 ---

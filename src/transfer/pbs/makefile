@@ -26,7 +26,7 @@ opt-memory = -DCOLLAPSE \
 # 256 GB RAM
 # 32 Cores
 opt-thread = #-DMEMLIM=262144 \
-    -DNCORE=32
+    -DNCORE=16
 
 opt-timing = #-DNOBOUNDCHECK -DSAFETY
 
