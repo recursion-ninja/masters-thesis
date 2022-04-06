@@ -14,7 +14,8 @@ image-file = $(image-name).png
 image-name = counterexample
 directives = -DCOLLAPSE -DVECTORSZ=65536
 
-log-decree = 1> $(log-to-out) 2> $(log-to-err)
+#log-decree = 1> $(log-to-out) 2> $(log-to-err)
+log-decree =
 log-prefix = verification
 log-to-out = $(log-prefix).log
 log-to-err = $(log-prefix).err
@@ -37,7 +38,7 @@ $(executable): $(model-code)
 	gcc -O3 $(directives) -o $(executable) $(model-in-C)
 
 verification: $(executable) backup
-	time ./$(executable) $(log-decree)
+	time ./$(executable) -a -i $(log-decree)
 
 inspection:
 ifneq (,$(wildcard $(trail)))

@@ -16,20 +16,20 @@
     *
 ********/
 #define C 3
-#define N 4
-#define T 3
+#define N 6
+#define T 8
 
 
 /****
   *
   * Number of bits required to represent:
   *   - N + 1
-  *   - T
-  *   - The maximum of T and (N + N - 1) 
+  *   - T + 1
+  *   - N + N - 1
   *
 ****/
-#define N_BITS 3
-#define T_BITS 2
+#define N_BITS 4
+#define T_BITS 4
 #define X_BITS 5
 
 
@@ -46,13 +46,14 @@
   *   - [65, 128] -> 255
   *
 ****/
-#define TREE 7
+#define TREE 15
 
 
 /****
   *
   * Constants, respectively for the following:
-  *   - Sentinal value for missing data. Value should equal (2 ^ N_BITS - 1)
+  *   - Sentinal value for missing "user ID" data. Value should equal (2 ^ N_BITS - 1)
+  *   - Sentinal value for missing "epoch  " data. Value should equal (2 ^ T_BITS - 1)
   *   - Index of the root node in the heap
   *   - Offset to index the first node of the heap
   *   - Final epoch of the security game with implicit "challenge"
@@ -62,8 +63,8 @@
   *     a revelation move cannot use the last available challenge.
   *
 ****/
-//#define NONE 7
-#define NONE ( (1 << N_BITS) - 1 )
+#define NONE  ( N )
+#define NEVER ( T )
 #define ROOT 0
 #define NODE (TREE / 2)
 #define LAST_EPOCH (T - 1)
@@ -79,16 +80,10 @@
 local unsigned epoch     : T_BITS; // The current epoch
 local unsigned unsafeIDs : N_BITS; // Number of unsafeIDs
 
-local bool           challenge[T]; // Has the attacker challenged in an epoch?
-local bool          membership[N]; // Group membership of current epoch
-local bool              unsafe[N]; // Members which require a change to update
-local byte            hoarding[N]; // Epoch from which the user saves secrets
-
-local bool concludedCGKA = false; // Does the CGKA end
-// Does a trivial attack exist?
-// i.e, does the SAFE predicate hold?
-local bool triviality   = false; 
-
+local bool  challenge[T]; // Has the attacker challenged in an epoch?
+local bool membership[N]; // Group membership of current epoch
+local bool     unsafe[N]; // Members which require a change to update
+local byte   hoarding[N]; // Epoch from which the user saves secrets
 
 /****
   *
@@ -132,26 +127,84 @@ local bool attackerKnowsRootKey = false;
 
 /****
   *
-  * Global (local) variable for inline functions.
+  * Global state of verifying used for LTL.
   *
 ****/
 
-// Indexing variables
-local unsigned i : X_BITS = 0;
-local unsigned j : X_BITS = 0;
-local unsigned k : X_BITS = 0;
-//local unsigned t : T_BITS = 0;
+/********
+    *
+    * Saftey Predicate (Triviality):
+    *
+    * Consider the following succession of attacker moves in the CKGA game.
+    * We will call each move a "query," as to remain in line with the literature.
+    * The attacker performs a non-empty sequence of queries to the oracles.
+    * The sequence then ends with an additional query to a special "challenge" oracle.
+    * By construction the sequence has at least 2 queries.
+    *
+    * Consider the function
+    *     whichEpoch(q) : query -> Natural
+    * This function returns the epoch during which the query was made.
+    *
+    * Now consider the array `Q` containing the sequence of queries.
+    *
+    *     triviality ( Q ):
+    *         for  (i,j) s.t. Q[i] = corrupt(ID) and Q[j] = challenge
+    *             if
+    *                 whichEpoch(Q[i]) <= whichEpoch(Q[j]) AND there does not exist `k` s.t.
+    *                     0 < whichEpoch(Q[i]) < whichEpoch(Q[k]) <= whichEpoch(Q[j]) AND
+    *                     Q[k] = update(ID) or Q[k] = remove(ID)
+    *             then
+    *                 return FALSE
+    *             done
+    *             if
+    *                 which(Q[i]) > whichEpoch(Q[j]) AND there exists `k` s.t.
+    *                   whichEpoch(Q[k]) <= whichEpoch(Q[j]) AND Q[k] = hoard(ID)
+    *             then
+    *                 return FALSE
+    *             done
+    *         end
+    *         return TRUE
+    *
+    * This predicate is described as the "Safety Predicate" `safe` in Alwen 2020.
+    * We use `triviality` as a synonym from `safe` because the term "safety predicate has
+    * a different connotation in  formal methods nomenclature.
+    *   
+********/
+
+/****
+  * Does a trivial attack exist? i.e, does the SAFE predicate hold?
+  *
+  * SYNC: Updated by `post_move_poll`
+****/
+local bool triviality = false; 
+
+
+/****
+  * Has the CGKA game end?
+  *
+  * SYNC: Bit flipped IFF at the end of `init`
+****/
+local bool concludedCGKA = false;
+
+
+/****
+  *
+  * Global state of derivative variables.
+  *   (Each can is defined in terms of the CGKA global state variables)
+  *
+****/
 
 // Group Composition
-local unsigned absentees : N_BITS = 0;
 local unsigned attendees : N_BITS = N;
+local unsigned absentees : N_BITS = 0;
 local unsigned groupMost : N_BITS = 0; // The maximum member ID during any past/present epoch.
-local bool groupDyad = false;
-local bool groupFull = false;
+local bool     groupDyad          = false;
+local bool     groupFull          = false;
 
 // Protocol State
 local bool forcedPlay = false;
 local bool revealRoot = C > 1;
+
 
 /********
     *
@@ -172,21 +225,25 @@ inline print_attacker_knowledge()
 {
     d_step
     {
-        unsigned t : T_BITS;
         printf("\n\tAttacker Knowledge:");
+        unsigned t : T_BITS;
         for( t : 0 .. T - 1 )
         {
             printf("\n>>> %d vvv", t);
-            for( j : 0 .. TREE - 1 )
+            d_step
             {
-                if
-                :: attackerKnowledge[t].node[j] == UnknownRefs -> printf("\n\t%d [ x ]", j)
-                :: attackerKnowledge[t].node[j] == UnknownNode -> printf("\n\t%d [ X ]", j)
-                :: attackerKnowledge[t].node[j] ==   KnownRefs -> printf("\n\t%d [ o ]", j)
-                :: attackerKnowledge[t].node[j] ==   KnownNode -> printf("\n\t%d [ O ]", j)
-                :: attackerKnowledge[t].node[j] ==        Void -> printf("\n\t%d [   ]", j)
-                :: else                                        -> printf("\n\t%d [ ? ]", j)
-                fi
+                unsigned v : X_BITS;
+                for( v : 0 .. TREE - 1 )
+                {
+                    if
+                    :: attackerKnowledge[t].node[v] == UnknownRefs -> printf("\n\t%d [ x ]", v)
+                    :: attackerKnowledge[t].node[v] == UnknownNode -> printf("\n\t%d [ X ]", v)
+                    :: attackerKnowledge[t].node[v] ==   KnownRefs -> printf("\n\t%d [ o ]", v)
+                    :: attackerKnowledge[t].node[v] ==   KnownNode -> printf("\n\t%d [ O ]", v)
+                    :: attackerKnowledge[t].node[v] ==        Void -> printf("\n\t%d [   ]", v)
+                    :: else                                        -> printf("\n\t%d [ ? ]", v)
+                    fi
+                }
             }
         };
         printf("\n");
@@ -198,11 +255,12 @@ inline print_challenges()
 {
     d_step {
         printf("\n\tChallenges:");
-        for ( i : 0 .. T - 1)
+        unsigned t : T_BITS;
+        for ( t : 0 .. T - 1)
         {
             if
-            :: challenge[i] -> printf("\n\t    [\tTrue\t]");
-            :: else     -> printf("\n\t    [\tFalse\t]");
+            :: challenge[t] -> printf("\n\t    [\tTrue\t]");
+            :: else         -> printf("\n\t    [\tFalse\t]");
             fi
         }
         printf("\n");
@@ -227,10 +285,11 @@ inline print_membership()
 {
     d_step {
         printf("\n\tMembership:");
-        for( i : 0 .. N - 1 )
+        unsigned p : N_BITS;
+        for( p : 0 .. N - 1 )
         {
             if
-            :: membership[i] -> printf("\n\t    [\tTrue\t]");
+            :: membership[p] -> printf("\n\t    [\tTrue\t]");
             :: else          -> printf("\n\t    [\tFalse\t]");
             fi
         };
@@ -254,11 +313,12 @@ inline print_user_hoarding()
 {
     d_step {
         printf("\n\tHoarding since:");
-        for ( i : 0 .. N - 1)
+        unsigned p : N_BITS;
+        for ( p : 0 .. N - 1)
         {
             if
-            :: hoarding[i] == NONE -> printf("\n\t    [\tNONE\t]")
-            :: else                -> printf("\n\t    [\t%d\t]", hoarding[i])
+            :: hoarding[p] == NONE -> printf("\n\t    [\tNONE\t]")
+            :: else                -> printf("\n\t    [\t%d\t]", hoarding[p])
             fi
         }
         printf("\n");
@@ -270,10 +330,11 @@ inline print_user_unsafe()
 {
     d_step {
         printf("\n\tRequired healing:");
-        for ( i : 0 .. N - 1)
+        unsigned p : N_BITS;
+        for ( p : 0 .. N - 1)
         {
             if
-            :: unsafe[i] -> printf("\n\t    [\tTrue\t]");
+            :: unsafe[p] -> printf("\n\t    [\tTrue\t]");
             :: else      -> printf("\n\t    [\tFalse\t]");
             fi
         }
@@ -301,7 +362,7 @@ inline print_global_state()
 /********
     *
     * Inline utilities for after move updates:
-    *   - after_move_refresh
+    *   - post_move_poll
     *   - take_attendance
     *
 ********/
@@ -315,17 +376,21 @@ inline print_global_state()
   *   - triviality
   *   - unsafeIDs
 ****/
-inline after_move_refresh( t )
+inline post_move_poll( e )
 {
     d_step {
         // Refresh "unsafeIDs"
-        unsigned remainingEpochs    : T_BITS = LAST_EPOCH - t;
+        unsigned remainingEpochs    : T_BITS = LAST_EPOCH - e;
         unsigned recoveriesRequired : N_BITS = 0;
-        for ( i : 0 .. N - 1 ) {
-            if
-            :: unsafe[i] -> recoveriesRequired++;
-            :: else
-            fi
+        d_step
+        {
+            unsigned n : N_BITS;
+            for ( n : 0 .. N - 1 ) {
+                if
+                :: unsafe[n] -> recoveriesRequired++;
+                :: else
+                fi
+            }
         }
         unsafeIDs  = recoveriesRequired;
 
@@ -337,17 +402,18 @@ inline after_move_refresh( t )
         printf("\n\tremainingEpochs\t%d\n\tunsafeIDs\t%d\n", remainingEpochs, unsafeIDs);
 
         // Refresh "revealRoot"
-        revealRoot = !challenge[t] && (t != LAST_EPOCH) && attackerKnowledge[t].node[ROOT] == UnknownNode;
+        revealRoot = !challenge[e] && (e != LAST_EPOCH) && attackerKnowledge[e].node[ROOT] == UnknownNode;
         if
         :: !revealRoot -> skip
         :: else ->
             unsigned challengesUsed : T_BITS = 0;
             d_step
             {
-                for ( i : 0 .. t )
+                unsigned n : N_BITS;
+                for ( n : 0 .. e )
                 {
                     if
-                    :: challenge[i] -> challengesUsed++;
+                    :: challenge[n] -> challengesUsed++;
                     :: else
                     fi
                 }
@@ -369,7 +435,7 @@ inline after_move_refresh( t )
         d_step
         {
             unsigned candidateCorruptibles : N_BITS;
-            candidates_for_corruption( t );
+            candidates_for_corruption();
             canCorruptMember = candidateCorruptibles > 0;
     //        printf("\n canCorruptMember = %d", canCorruptMember);
         }
@@ -392,11 +458,14 @@ inline take_attendance()
     unsigned largestID : N_BITS;
     d_step {
         unsigned included : N_BITS = 0;
-        for ( i : 0 .. N - 1 ) {
-             if
-             :: membership[i] -> included++; largestID = i
-             :: else
-             fi
+        d_step {
+            unsigned n : N_BITS;
+            for ( n : 0 .. N - 1 ) {
+                 if
+                 :: membership[n] -> included++; largestID = n
+                 :: else
+                 fi
+            }
         }
         attendees = included;
         absentees = N - attendees;
@@ -408,6 +477,7 @@ inline take_attendance()
     :: largestID + 1 > groupMost -> groupMost = largestID + 1;
     :: else
     fi
+
     d_step
     {
         printf("\n\tattendees \t%d", attendees );
@@ -441,31 +511,35 @@ inline select_corrupted()
 {   atomic {
 
     unsigned candidateCorruptibles : N_BITS;
-    candidates_for_corruption( epoch );
+    candidates_for_corruption();
     if
     :: candidateCorruptibles == 0 -> corruptedID = NONE
     :: else ->
         unsigned selection : N_BITS = NONE;
-        unsigned sample : N_BITS;
-        select ( sample : 0 .. candidateCorruptibles - 1 );
-        for ( i : 0 .. N )
+        d_step
         {
-            d_step
+            unsigned n      : N_BITS;
+            unsigned sample : N_BITS;
+            select ( sample : 0 .. candidateCorruptibles - 1 );
+            for ( n : 0 .. N )
             {
-                if
-                :: selection == NONE ->
-                    bool candidateCorruption;
-                    candidate_corruption( i );
+                d_step
+                {
                     if
-                    :: candidateCorruption ->
+                    :: selection == NONE ->
+                        bool candidateCorruption;
+                        candidate_corruption( n );
                         if
-                        :: sample == 0 -> selection = i
-                        :: sample != 0 -> sample--
+                        :: candidateCorruption ->
+                            if
+                            :: sample == 0 -> selection = n
+                            :: sample != 0 -> sample--
+                            fi
+                        :: else
                         fi
                     :: else
                     fi
-                :: else
-                fi
+                }
             }
         }
         corruptedID = selection
@@ -477,22 +551,26 @@ inline select_corrupted()
   * External result variable(s):
   *   - candidateCorruptibles
 ****/
-inline candidates_for_corruption( t )
+inline candidates_for_corruption()
 {
-    unsigned remaining : T_BITS = LAST_EPOCH - t;
+    unsigned remaining : T_BITS = LAST_EPOCH - epoch;
 
     if
     :: unsafeIDs >= remaining -> candidateCorruptibles = 0;
     :: else ->
         unsigned candidates : N_BITS = 0;
-        for ( i : 0 .. N - 1 )
+        d_step
         {
-            bool candidateCorruption;
-            candidate_corruption( i );
-            if
-            :: candidateCorruption -> candidates++
-            :: else
-            fi
+            unsigned n : N_BITS;
+            for ( n : 0 .. N - 1 )
+            {
+                bool candidateCorruption;
+                candidate_corruption( n );
+                if
+                :: candidateCorruption -> candidates++
+                :: else
+                fi
+            }
         }
         candidateCorruptibles = candidates
     fi
@@ -549,26 +627,30 @@ inline select_hoarder()
     :: candidateHoarders == 0 -> hoarderID = NONE
     :: else ->
         unsigned selection : N_BITS = NONE;
-        unsigned sample : N_BITS;
-        select ( sample : 0 .. candidateHoarders - 1 );
-        for ( i : 0 .. N - 1 )
+        d_step
         {
-            d_step
+            unsigned n      : N_BITS;
+            unsigned sample : N_BITS;
+            select ( sample : 0 .. candidateHoarders - 1 );
+            for ( n : 0 .. N - 1 )
             {
-                if
-                :: selection != NONE -> skip
-                :: else ->
-                    bool candidateHoarder
-                    candidate_hoarder( i );
+                d_step
+                {
                     if
-                    :: !(candidateHoarder) -> skip
+                    :: selection != NONE -> skip
                     :: else ->
+                        bool candidateHoarder
+                        candidate_hoarder( n );
                         if
-                        :: sample == 0 -> selection = i
-                        :: sample != 0 -> sample--
+                        :: !(candidateHoarder) -> skip
+                        :: else ->
+                            if
+                            :: sample == 0 -> selection = n
+                            :: sample != 0 -> sample--
+                            fi
                         fi
                     fi
-                fi
+                }
             }
         }
         hoarderID = selection
@@ -583,14 +665,18 @@ inline select_hoarder()
 inline candidates_for_hoarding()
 {
     unsigned candidates : N_BITS = 0;
-    for ( i : 0 .. N - 1 )
+    d_step
     {
-        bool candidateHoarder
-        candidate_hoarder( i );
-        if
-        :: candidateHoarder -> candidates++
-        :: else
-        fi
+        unsigned n : N_BITS;
+        for ( n : 0 .. N - 1 )
+        {
+            bool candidateHoarder
+            candidate_hoarder( n );
+            if
+            :: candidateHoarder -> candidates++
+            :: else
+            fi
+        }
     }
     candidateHoarders = candidates
 }
@@ -600,9 +686,9 @@ inline candidates_for_hoarding()
   * External result variable(s):
   *   - candidateHoarder
 ****/
-inline candidate_hoarder( i )
+inline candidate_hoarder( id )
 {
-    candidateHoarder = hoarding[i] == NONE && membership[i]
+    candidateHoarder = hoarding[id] == NONE && membership[id]
 }
 
 
@@ -617,18 +703,18 @@ inline select_joiner()
     candidates_for_joiner();
 
     unsigned selection : N_BITS = NONE;
-    unsigned sample : N_BITS;
-    select(  sample : 0 .. candidateJoiners - 1 );
-
-    for ( i : 0 .. N - 1 ) {
-        d_step
-        {
+    d_step
+    {
+        unsigned n      : N_BITS;
+        unsigned sample : N_BITS;
+        select(  sample : 0 .. candidateJoiners - 1 );
+        for ( n : 0 .. N - 1 ) {
             if
-            :: selection != NONE || membership[i] -> skip
+            :: selection != NONE || membership[n] -> skip
             :: else ->
                 if
                 :: sample != 0 -> sample--
-                :: sample == 0 -> selection = i
+                :: sample == 0 -> selection = n
                 fi
             fi
         }
@@ -645,25 +731,27 @@ inline select_joiner()
 inline candidates_for_joiner()
 {
     unsigned candidates : N_BITS = 0;
-    for ( i : 0 .. groupMost - 1 )
+    d_step
     {
-        if
-        :: !(membership[i]) -> candidates++
-        :: else
-        fi
+        unsigned n : N_BITS;
+        for ( n : 0 .. groupMost - 1 )
+        {
+            if
+            :: !(membership[n]) -> candidates++
+            :: else
+            fi
+        }
     }
-
-    printf("Candidate Joiners (1): %d", candidates);
 
     // Consider adding the next user who has never been a member before...
     // but make the consideration *if and only if* such a user exists.
-    if
-    :: groupMost == N -> skip
-    :: else -> candidates++
-    fi
-    
-    printf("Candidate Joiners (2): %d", candidates);
-
+    d_step
+    {
+        if
+        :: groupMost == N -> skip
+        :: else -> candidates++
+        fi
+    }
     candidateJoiners = candidates
 }
 
@@ -700,39 +788,47 @@ inline select_sender_constrained ( banned, forced )
 {   atomic {
     unsigned candidates : N_BITS = 0;
 
-    for ( i : 0 .. N - 1 )
+    d_step
     {
-        bool senderCandidate;
-        sender_candidate( banned, forced, i );
-        if
-        :: senderCandidate -> candidates++
-        :: else
-        fi
+        unsigned n : N_BITS;
+        for ( n : 0 .. N - 1 )
+        {
+            bool senderCandidate;
+            sender_candidate( banned, forced, n );
+            if
+            :: senderCandidate -> candidates++
+            :: else
+            fi
+        }
     }
 
     if
     :: candidates == 0 -> selectedID = NONE
     :: else ->
         unsigned selection : N_BITS = NONE;
-        unsigned sample : N_BITS;
-        select(  sample : 0 .. candidates - 1 );
-        for ( i : 0 .. N - 1 ) {
-            d_step
-            {
-                if
-                :: selection == NONE ->
-                    bool senderCandidate;
-                    sender_candidate( banned, forced, i );
+        d_step
+        {
+            unsigned n      : N_BITS;
+            unsigned sample : N_BITS;
+            select(  sample : 0 .. candidates - 1 );
+            for ( n : 0 .. N - 1 ) {
+                d_step
+                {
                     if
-                    :: senderCandidate ->
+                    :: selection == NONE ->
+                        bool senderCandidate;
+                        sender_candidate( banned, forced, n );
                         if
-                        :: sample == 0 -> selection = i
-                        :: sample != 0 -> sample--
+                        :: senderCandidate ->
+                            if
+                            :: sample == 0 -> selection = n
+                            :: sample != 0 -> sample--
+                            fi
+                        :: else
                         fi
                     :: else
                     fi
-                :: else
-                fi
+                }
             }
         }
         selectedID = selection;
@@ -768,9 +864,9 @@ inline sender_candidate( banned, forced, id )
 ****/
 
 
-inline broadcast ( t, sender, subject )
+inline broadcast ( e, sender, subject )
 {
-    attacker_observes_message( t, sender, subject );
+    attacker_observes_message( e, sender, subject );
 }
 
 
@@ -807,11 +903,13 @@ inline attacker_initializes_knowledge()
 {
     d_step
     {
-        for( i : 0 .. T - 1 )
+        unsigned t : T_BITS;
+        for( t : 0 .. T - 1 )
         {
-            for( j : 0 .. TREE - 1 )
+            unsigned v : X_BITS
+            for( v : 0 .. TREE - 1 )
             {
-                attackerKnowledge[i].node[j] = Void
+                attackerKnowledge[t].node[v] = Void
             }
         }
         attackerKnowsRootKey = false;
@@ -819,7 +917,7 @@ inline attacker_initializes_knowledge()
 }
 
 
-inline attacker_observes_message( t, sender, subject )
+inline attacker_observes_message( e, sender, subject )
 {
     atomic
     {
@@ -831,39 +929,39 @@ inline attacker_observes_message( t, sender, subject )
         //   * UnknownRefs
         //   *        Void
         bool noEpochKnowledge;
-        attacker_has_no_epoch_knowledge( t );
+        attacker_has_no_epoch_knowledge( e );
         if
-        :: noEpochKnowledge -> attacker_init_epoch_knowledge( t );
+        :: noEpochKnowledge -> attacker_init_epoch_knowledge( e );
         :: else
         fi
         
-        //       referenceEpoch = (t == 0) ? t : t - 1;
-        unsigned referenceEpoch : T_BITS = t ;
+        //       referenceEpoch = (e == 0) ? e : e - 1;
+        unsigned referenceEpoch : T_BITS = e ;
         if
-        :: t != 0 -> referenceEpoch--;
+        :: e != 0 -> referenceEpoch--;
         :: else
         fi
 
         attacker_copy_epoch_knowledge( referenceEpoch );
-        attacker_wipe_sender_knowledge( sender, t );
-        attacker_updates_knowledge ( t );
-        attacker_insight_check( t );
+        attacker_wipe_sender_knowledge( sender, e );
+        attacker_updates_knowledge ( e );
+        attacker_insight_check( e );
     }
 }
 
-inline attacker_insight_check( t )
+inline attacker_insight_check( e )
 {
     bool anyRootKnown = false;
     d_step
     {
-        for( i : 0 .. t )
+        unsigned t : T_BITS;
+        for( t : 0 .. e )
         {
-            anyRootKnown = anyRootKnown || attackerKnowledge[i].node[ROOT]
+            anyRootKnown = anyRootKnown || attackerKnowledge[t].node[ROOT]
         }
     }
     attackerKnowsRootKey = anyRootKnown;
 }
-
 
 
 inline attacker_has_no_epoch_knowledge ( e )
@@ -871,9 +969,10 @@ inline attacker_has_no_epoch_knowledge ( e )
     d_step
     {
         bool allVoid = true;
-        for ( i : 0 .. TREE - 1 )
+        unsigned v : X_BITS;
+        for ( v : 0 .. TREE - 1 )
         {
-            allVoid = allVoid && (attackerKnowledge[e].node[i] == Void)
+            allVoid = allVoid && (attackerKnowledge[e].node[v] == Void)
         }
         noEpochKnowledge = allVoid;
     }
@@ -885,38 +984,43 @@ inline attacker_init_epoch_knowledge( e )
 
     bool leaves = true;
     unsigned offset : X_BITS = NODE;
-    unsigned width  : X_BITS = TREE + 1;
+    unsigned width  : X_BITS = N + N;
     do
     :: width == 0 -> break
     :: width != 0 -> d_step
         {
             width = width / 2;
-            for ( i : 0 .. width - 1 )
+            unsigned n : X_BITS;
+            for ( n : 0 .. width - 1 )
             {
-                j = offset + i;
+                unsigned v : X_BITS = offset + n;
                 // Leaf node case(s)
                 if
                 :: leaves ->
                     if
                     // No knowledge from excluded group members
-                    :: !(membership[i]) -> attackerKnowledge[e].node[j] = Void
-                    :: else             -> attackerKnowledge[e].node[j] = UnknownNode
+                    :: !(membership[n]) -> attackerKnowledge[e].node[v] = Void
+                    :: else             -> attackerKnowledge[e].node[v] = UnknownNode
                     fi
                 // Internal node case(s)
                 :: else ->
-                    unsigned childL : X_BITS = j * 2 + 1;
-                    unsigned childR : X_BITS = j * 2 + 2;
-                    // Check current epoch for existance of subtrees
-                    bool existanceOfSubtree;
-                    existance_of_subtree( e, childL);
-                    bool voidL = !existanceOfSubtree;
-                    existance_of_subtree( e, childR);
-                    bool voidR = !existanceOfSubtree;
+                    bool voidL, voidR;
+                    d_step
+                    {
+                        unsigned childL : X_BITS = v * 2 + 1;
+                        unsigned childR : X_BITS = v * 2 + 2;
+                        // Check current epoch for existance of subtrees
+                        bool existanceOfSubtree;
+                        existance_of_subtree( e, childL);
+                        voidL = !existanceOfSubtree;
+                        existance_of_subtree( e, childR);
+                        voidR = !existanceOfSubtree;
+                    }
                     if
-                    ::  voidL &&  voidR -> attackerKnowledge[e].node[j] =        Void
-                    :: !voidL &&  voidR -> attackerKnowledge[e].node[j] = UnknownRefs
-                    ::  voidL && !voidR -> attackerKnowledge[e].node[j] = UnknownRefs
-                    :: !voidL && !voidR -> attackerKnowledge[e].node[j] = UnknownNode
+                    ::  voidL &&  voidR -> attackerKnowledge[e].node[v] =        Void
+                    :: !voidL &&  voidR -> attackerKnowledge[e].node[v] = UnknownRefs
+                    ::  voidL && !voidR -> attackerKnowledge[e].node[v] = UnknownRefs
+                    :: !voidL && !voidR -> attackerKnowledge[e].node[v] = UnknownNode
                     fi
                 fi
             };
@@ -937,16 +1041,17 @@ inline attacker_copy_epoch_knowledge( e )
     :: width != 0 -> d_step
         {
             width = width / 2;
-            for ( i : 0 .. width - 1 )
+            unsigned n : X_BITS;
+            for ( n : 0 .. width - 1 )
             {
-                j = offset + i;
+                unsigned v : X_BITS = offset + n;
                 bool knowledgeOfSubtree;
-                knowledge_of_subtree( e, j);
+                knowledge_of_subtree( e, v);
                 if
-                ::  attackerKnowledge[e+1].node[j] == UnknownNode && knowledgeOfSubtree ->
-                    attackerKnowledge[e+1].node[j] = KnownNode
-                ::  attackerKnowledge[e+1].node[j] == UnknownRefs && knowledgeOfSubtree ->
-                    attackerKnowledge[e+1].node[j] = KnownRefs
+                ::  attackerKnowledge[e+1].node[v] == UnknownNode && knowledgeOfSubtree ->
+                    attackerKnowledge[e+1].node[v] = KnownNode
+                ::  attackerKnowledge[e+1].node[v] == UnknownRefs && knowledgeOfSubtree ->
+                    attackerKnowledge[e+1].node[v] = KnownRefs
                 :: else
                 fi
             };
@@ -966,14 +1071,14 @@ inline attacker_wipe_sender_knowledge( sender, e )
     :: width != 0 -> d_step
         {
             width = width / 2;
-            j = offset + sender;
+            unsigned v : X_BITS = offset + sender;
             if
-            ::  attackerKnowledge[e].node[j] == UnknownNode ||
-                attackerKnowledge[e].node[j] ==   KnownNode ->
-                attackerKnowledge[e].node[j] =  UnknownNode
-            ::  attackerKnowledge[e].node[j] == UnknownRefs ||
-                attackerKnowledge[e].node[j] ==   KnownRefs ->
-                attackerKnowledge[e].node[j] =  UnknownRefs
+            ::  attackerKnowledge[e].node[v] == UnknownNode ||
+                attackerKnowledge[e].node[v] ==   KnownNode ->
+                attackerKnowledge[e].node[v] =  UnknownNode
+            ::  attackerKnowledge[e].node[v] == UnknownRefs ||
+                attackerKnowledge[e].node[v] ==   KnownRefs ->
+                attackerKnowledge[e].node[v] =  UnknownRefs
             :: else
             fi
             offset = offset / 2;
@@ -993,37 +1098,43 @@ inline attacker_updates_knowledge( e )
     :: width != 0 -> d_step
         {
             width = width / 2;
-            for ( i : 0 .. width - 1 )
+            unsigned n : X_BITS;
+            for ( n : 0 .. width - 1 )
             {
-                j = offset + i;
+                unsigned v : X_BITS = offset + n;
                 if
                 :: leaves -> skip
                 :: else ->
-                    unsigned childL : X_BITS = j * 2 + 1;
-                    unsigned childR : X_BITS = j * 2 + 2;
-                    // Check current epoch for existance of subtrees
-                    bool existanceOfSubtree;
-                    existance_of_subtree( e, childL);
-                    bool voidL = !existanceOfSubtree;
-                    existance_of_subtree( e, childR);
-                    bool voidR = !existanceOfSubtree;
-                    // Check previous epoch for knowledge of subtrees
-                    bool knowledgeOfSubtree;
-                    knowledge_of_subtree( e, childL);
-                    bool knowsL = knowledgeOfSubtree;
-                    knowledge_of_subtree( e, childR);
-                    bool knowsR = knowledgeOfSubtree;
-                    
+                    bool knowsL, knowsR, voidL, voidR;
+                    d_step
+                    {
+                        unsigned childL : X_BITS = v * 2 + 1;
+                        unsigned childR : X_BITS = v * 2 + 2;
+
+                        // Check current epoch for existance of subtrees
+                        bool existanceOfSubtree;
+                        existance_of_subtree( e, childL);
+                        voidL = !existanceOfSubtree;
+                        existance_of_subtree( e, childR);
+                        voidR = !existanceOfSubtree;
+                        
+                        // Check previous epoch for knowledge of subtrees
+                        bool knowledgeOfSubtree;
+                        knowledge_of_subtree( e, childL);
+                        knowsL = knowledgeOfSubtree;
+                        knowledge_of_subtree( e, childR);
+                        knowsR = knowledgeOfSubtree;
+                    }
                     if
-                    ::  voidL &&  voidR                       -> attackerKnowledge[e].node[j] =        Void
-                    :: !voidL &&  voidR &&             knowsR -> attackerKnowledge[e].node[j] =   KnownRefs
-                    :: !voidL &&  voidR &&            !knowsR -> attackerKnowledge[e].node[j] = UnknownRefs
-                    ::  voidL && !voidR &&  knowsL            -> attackerKnowledge[e].node[j] =   KnownRefs
-                    ::  voidL && !voidR && !knowsL            -> attackerKnowledge[e].node[j] = UnknownRefs
-                    :: !voidL && !voidR &&  knowsL &&  knowsR -> attackerKnowledge[e].node[j] =   KnownNode
-                    :: !voidL && !voidR && !knowsL &&  knowsR -> attackerKnowledge[e].node[j] =   KnownNode
-                    :: !voidL && !voidR &&  knowsL && !knowsR -> attackerKnowledge[e].node[j] =   KnownNode
-                    :: !voidL && !voidR && !knowsL && !knowsR -> attackerKnowledge[e].node[j] = UnknownNode
+                    ::  voidL &&  voidR                       -> attackerKnowledge[e].node[v] =        Void
+                    :: !voidL &&  voidR &&             knowsR -> attackerKnowledge[e].node[v] =   KnownRefs
+                    :: !voidL &&  voidR &&            !knowsR -> attackerKnowledge[e].node[v] = UnknownRefs
+                    ::  voidL && !voidR &&  knowsL            -> attackerKnowledge[e].node[v] =   KnownRefs
+                    ::  voidL && !voidR && !knowsL            -> attackerKnowledge[e].node[v] = UnknownRefs
+                    :: !voidL && !voidR &&  knowsL &&  knowsR -> attackerKnowledge[e].node[v] =   KnownNode
+                    :: !voidL && !voidR && !knowsL &&  knowsR -> attackerKnowledge[e].node[v] =   KnownNode
+                    :: !voidL && !voidR &&  knowsL && !knowsR -> attackerKnowledge[e].node[v] =   KnownNode
+                    :: !voidL && !voidR && !knowsL && !knowsR -> attackerKnowledge[e].node[v] = UnknownNode
                     fi
                 fi
             };
@@ -1035,15 +1146,15 @@ inline attacker_updates_knowledge( e )
 }
 
 
-inline existance_of_subtree( i, j )
+inline existance_of_subtree( t, v )
 {
-    existanceOfSubtree = attackerKnowledge[i].node[j] != Void
+    existanceOfSubtree = attackerKnowledge[t].node[v] != Void
 }
 
 
-inline knowledge_of_subtree( i, j )
+inline knowledge_of_subtree( t, v )
 {
-    knowledgeOfSubtree = attackerKnowledge[i].node[j] == KnownNode || attackerKnowledge[i].node[j] == KnownRefs
+    knowledgeOfSubtree = attackerKnowledge[t].node[v] == KnownNode || attackerKnowledge[t].node[v] == KnownRefs
 }
 
 
@@ -1091,21 +1202,22 @@ inline corrupt( memberID )
             unsigned level : X_BITS = TREE + 1;
             do
             :: level == 0 -> break
-            :: level != 0 -> d_step
+            :: level != 0 ->
+                d_step
                 {
                     level = level / 2;
-                    k = off+memberID;
-                    printf("tree level: %d @ %d\n", level, j);
+                    unsigned v : X_BITS = off+memberID;
+                    printf("tree level: %d @ %d\n", level, v);
                     if
-                    :: attackerKnowledge[peek].node[k] == UnknownNode -> attackerKnowledge[peek].node[k] = KnownNode
-                    :: attackerKnowledge[peek].node[k] == UnknownRefs -> attackerKnowledge[peek].node[k] = KnownRefs
+                    :: attackerKnowledge[peek].node[v] == UnknownNode -> attackerKnowledge[peek].node[v] = KnownNode
+                    :: attackerKnowledge[peek].node[v] == UnknownRefs -> attackerKnowledge[peek].node[v] = KnownRefs
                     :: else
                     fi
                     off = off / 2;
                 }
                 printf("Check Index Post: %d\n", peek);
                 if
-                :: i == upperBound ->
+                :: peek == upperBound ->
                     printf("UPPER BOUNDed %d\n", peek);
                     attacker_updates_knowledge( peek );
                 :: else ->
@@ -1162,7 +1274,7 @@ inline insert_member( sender, joiner )
         assert(joiner < N);
         propogate( sender, joiner, NONE );
     }
-    broadcast( epoch, sender, joiner );
+    broadcast( epoch + 1, sender, joiner );
 }
 
 
@@ -1176,7 +1288,7 @@ inline remove_member( sender, exiled )
         unsafe[exiled] = false;
         propogate( sender, NONE, exiled);
     }
-    broadcast( epoch, sender, exiled );
+    broadcast( epoch + 1, sender, exiled );
 }
 
 
@@ -1188,7 +1300,7 @@ inline oblige_update( sender )
         unsafe[sender] = false;
         propogate( sender, NONE, NONE );
     }
-    broadcast( epoch, sender, NONE );
+    broadcast( epoch + 1, sender, NONE );
 }
 
 
@@ -1242,7 +1354,7 @@ inline play_move_with_commitment()
         }; break
     od
 
-    after_move_refresh( epoch + 1);
+    post_move_poll( epoch + 1);
 }
 
 
@@ -1282,7 +1394,7 @@ inline play_move_without_commitment()
         :: revealRoot                         -> reveal(              ); break
         od
     
-        after_move_refresh( epoch );
+        post_move_poll( epoch );
     }
 }
 
@@ -1305,16 +1417,22 @@ inline CGKA_initialize()
     {
         printf("\n***********************\n* CGKA: Initialize!   *\n***********************\n");
 
-        unsigned n : N_BITS;
-        for( n : 0 .. N - 1 )
+        d_step
         {
-            hoarding[n]  = NONE;
+            unsigned n : N_BITS;
+            for( n : 0 .. N - 1 )
+            {
+                hoarding[n]  = NEVER;
+            };
         };
-    
-        unsigned t : T_BITS;
-        for( t : 0 .. T - 1 )
+        
+        d_step
         {
-            challenge[t] = false;
+            unsigned t : T_BITS;
+            for( t : 0 .. T - 1 )
+            {
+                challenge[t] = false;
+            };
         };
 
         epoch     = 0;
@@ -1331,26 +1449,26 @@ inline CGKA_initialize()
 
 inline CGKA_create_group()
 {
-    d_step
-    {
-        // Number of members to add
-        unsigned sample : N_BITS;
+    // Number of members to add
+    unsigned sample : N_BITS;
+    d_step {
         select ( sample : 2 .. N );
         unsigned n      : N_BITS;
         for( n : 0 .. N - 1 )
         {
-            membership[i] = n < sample;
+            membership[n] = n < sample;
         };
-
-        printf("\n***********************\n* CGKA: Create Group! *\n***********************\n");
-
-        // Set the "lead" byte to be the first member in the group.
-        unsigned id0 : N_BITS = 0;
-        unsigned t   : T_BITS = 0;
-        print_membership();
-        propogate ( id0, NONE, NONE );
-        broadcast ( t,    id0, NONE );
     }
+    printf("\n***********************\n* CGKA: Create Group! *\n***********************\n");
+
+    // Set the "lead" byte to be the first member in the group.
+    d_step {
+        unsigned id0 : N_BITS = 0;
+        unsigned ep0 : T_BITS = 0;
+        propogate ( id0, NONE, NONE );
+        broadcast ( ep0,  id0, NONE );
+    }
+    print_membership();
 }
 
 
@@ -1396,6 +1514,8 @@ inline CGKA_security_game()
         printf("\nLOOP broken: %d", epoch);
         printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", LAST_EPOCH - epoch, unsafeIDs);
     }
+    epoch = LAST_EPOCH;
+    print_global_state();
 }
 
 
@@ -1407,7 +1527,8 @@ init
     concludedCGKA = true;
 }
 
-//ltl trivial_safety { [](triviality <-> attackerKnowsRootKey) }
-ltl finished_loop  { <>concludedCGKA }
+ltl challenge      { []( (concludedCGKA && !triviality) -> attackerKnowledge[epoch].node[ROOT] != KnownNode) }
+//ltl trivial_safety { []( (triviality && epoch <= LAST_EPOCH) -> attackerKnowledge[epoch].node[ROOT] != KnownNode) }
+//ltl game_totality  { <>concludedCGKA }
 //ltl attendees_more_than_one { [](attendees > 1) }
 //ltl attendees_absentees_sum { [](attendees + absentees == N) }
