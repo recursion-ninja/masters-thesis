@@ -2,8 +2,8 @@
 #define IMPORT_SPEC_ATTACKER
 
 
-#include "parameterized-constants.pml"
-#include "global-state.pml"
+#include "Parameterized-Constants.pml"
+#include "State-Global.pml"
 
 
 /****
@@ -51,13 +51,13 @@
   * Each node in the LBBT can be in one of *five* mutually exclusive states.
   *
   * Vertex states:
-  *   -        Void: This node does not exist  and there exists 0 leaves in the subtree
-  *   - UnknownRefs: This node does not exist  and there exists 1 leaf   in the subtree
-  *   -   KnownRefs: This node does not exist  and there exists 1 leaf   in the subtree
-  *   - UnknownNode: This node          exists and there exists 1 or more leaves in the subtree
-  *   -   KnownNode: This node          exists and there exists 1 or more leaves in the subtree
+  *   - Uninhabited: This node does not exist  and there exists 0 leaves in the subtree
+  *   - MockUnknown: This node does not exist  and there exists 1 leaf   in the subtree
+  *   - MockIsKnown: This node does not exist  and there exists 1 leaf   in the subtree
+  *   - NodeUnknown: This node          exists and there exists 1 or more leaves in the subtree
+  *   - NodeIsKnown: This node          exists and there exists 1 or more leaves in the subtree
 ****/
-mtype:Secret = { Void, UnknownRefs, KnownRefs, UnknownNode, KnownNode };
+mtype:VertexInfo = { Uninhabited, MockUnknown, MockIsKnown, NodeUnknown, NodeIsKnown };
 
 
 /****
@@ -83,7 +83,7 @@ mtype:Secret = { Void, UnknownRefs, KnownRefs, UnknownNode, KnownNode };
   *       Nodes:  14  12  13   8   9  10  11   0   1   2   3   4   5   6   7
   *
 ****/
-typedef TreeKeys { mtype:Secret node[ TREE_ORDER ]  };
+typedef TreeKeys { mtype:VertexInfo node[ TREE_ORDER ]  };
 
 
 /****
@@ -157,7 +157,7 @@ inline attacker_initialize()
                 unsigned v : BITS_VERTEX;
                 for ( v : FIRST_VERTEX .. FINAL_VERTEX )
                 {
-                    attackerKnowledge[t].node[v] = Void
+                    attackerKnowledge[t].node[v] = Uninhabited
                 }
             }
         }
@@ -168,7 +168,7 @@ inline attacker_initialize()
 
 inline attacker_learn_root( named_epoch )
 {
-    attackerKnowledge[named_epoch].node[ROOT] -> KnownNode;
+    attackerKnowledge[named_epoch].node[ROOT] -> NodeIsKnown;
 }
 
 
@@ -177,12 +177,12 @@ inline attacker_study_message( e, sender, subject )
     atomic
     {
         // If the attacker has know knowledge of the epoch,
-        // meaning that all cell values are "Void,"
+        // meaning that all cell values are "Uninhabited,"
         // then it is the first time we have entered the epoch
         // and the cell values should be initialized as either:
-        //   * UnknownNode
-        //   * UnknownRefs
-        //   *        Void
+        //   * NodeUnknown
+        //   * MockUnknown
+        //   * Uninhabited
         bool noEpochKnowledge;
         attacker_has_no_epoch_knowledge( e );
         if
@@ -220,11 +220,11 @@ inline print_attacker_knowledge()
                 for ( v : FIRST_VERTEX .. FINAL_VERTEX )
                 {
                     if
-                    :: attackerKnowledge[t].node[v] == UnknownRefs -> printf("\n\t%d [ x ]", v)
-                    :: attackerKnowledge[t].node[v] == UnknownNode -> printf("\n\t%d [ X ]", v)
-                    :: attackerKnowledge[t].node[v] ==   KnownRefs -> printf("\n\t%d [ o ]", v)
-                    :: attackerKnowledge[t].node[v] ==   KnownNode -> printf("\n\t%d [ O ]", v)
-                    :: attackerKnowledge[t].node[v] ==        Void -> printf("\n\t%d [   ]", v)
+                    :: attackerKnowledge[t].node[v] == MockUnknown -> printf("\n\t%d [ x ]", v)
+                    :: attackerKnowledge[t].node[v] == NodeUnknown -> printf("\n\t%d [ X ]", v)
+                    :: attackerKnowledge[t].node[v] ==   MockIsKnown -> printf("\n\t%d [ o ]", v)
+                    :: attackerKnowledge[t].node[v] ==   NodeIsKnown -> printf("\n\t%d [ O ]", v)
+                    :: attackerKnowledge[t].node[v] == Uninhabited -> printf("\n\t%d [   ]", v)
                     :: else                                        -> printf("\n\t%d [ ? ]", v)
                     fi
                 }
@@ -253,13 +253,13 @@ inline attacker_has_no_epoch_knowledge ( e )
 {
     d_step
     {
-        bool allVoid = true;
+        bool allUninhabited = true;
         unsigned v : BITS_VERTEX;
         for ( v : FIRST_VERTEX .. FINAL_VERTEX )
         {
-            allVoid = allVoid && (attackerKnowledge[e].node[v] == Void)
+            allUninhabited = allUninhabited && (attackerKnowledge[e].node[v] == Uninhabited)
         }
-        noEpochKnowledge = allVoid;
+        noEpochKnowledge = allUninhabited;
     }
 }
 
@@ -284,8 +284,8 @@ inline attacker_init_epoch_knowledge ( e )
                 :: leaves ->
                     if
                     // No knowledge from excluded group members
-                    :: !(membership[n]) -> attackerKnowledge[e].node[v] = Void
-                    :: else             -> attackerKnowledge[e].node[v] = UnknownNode
+                    :: !(membership[n]) -> attackerKnowledge[e].node[v] = Uninhabited
+                    :: else             -> attackerKnowledge[e].node[v] = NodeUnknown
                     fi
                 // Internal node case(s)
                 :: else ->
@@ -302,10 +302,10 @@ inline attacker_init_epoch_knowledge ( e )
                         voidR = !existanceOfSubtree;
                     }
                     if
-                    ::  voidL &&  voidR -> attackerKnowledge[e].node[v] =        Void
-                    :: !voidL &&  voidR -> attackerKnowledge[e].node[v] = UnknownRefs
-                    ::  voidL && !voidR -> attackerKnowledge[e].node[v] = UnknownRefs
-                    :: !voidL && !voidR -> attackerKnowledge[e].node[v] = UnknownNode
+                    ::  voidL &&  voidR -> attackerKnowledge[e].node[v] = Uninhabited
+                    :: !voidL &&  voidR -> attackerKnowledge[e].node[v] = MockUnknown
+                    ::  voidL && !voidR -> attackerKnowledge[e].node[v] = MockUnknown
+                    :: !voidL && !voidR -> attackerKnowledge[e].node[v] = NodeUnknown
                     fi
                 fi
             };
@@ -333,10 +333,10 @@ inline attacker_copy_epoch_knowledge( e )
                 bool knowledgeOfSubtree;
                 knowledge_of_subtree( e, v);
                 if
-                ::  attackerKnowledge[e+1].node[v] == UnknownNode && knowledgeOfSubtree ->
-                    attackerKnowledge[e+1].node[v] = KnownNode
-                ::  attackerKnowledge[e+1].node[v] == UnknownRefs && knowledgeOfSubtree ->
-                    attackerKnowledge[e+1].node[v] = KnownRefs
+                ::  attackerKnowledge[e+1].node[v] == NodeUnknown && knowledgeOfSubtree ->
+                    attackerKnowledge[e+1].node[v] = NodeIsKnown
+                ::  attackerKnowledge[e+1].node[v] == MockUnknown && knowledgeOfSubtree ->
+                    attackerKnowledge[e+1].node[v] = MockIsKnown
                 :: else
                 fi
             };
@@ -358,12 +358,12 @@ inline attacker_wipe_sender_knowledge( sender, e )
             width = width / 2;
             unsigned v : BITS_VERTEX = offset + sender;
             if
-            ::  attackerKnowledge[e].node[v] == UnknownNode ||
-                attackerKnowledge[e].node[v] ==   KnownNode ->
-                attackerKnowledge[e].node[v] =  UnknownNode
-            ::  attackerKnowledge[e].node[v] == UnknownRefs ||
-                attackerKnowledge[e].node[v] ==   KnownRefs ->
-                attackerKnowledge[e].node[v] =  UnknownRefs
+            ::  attackerKnowledge[e].node[v] == NodeUnknown ||
+                attackerKnowledge[e].node[v] ==   NodeIsKnown ->
+                attackerKnowledge[e].node[v] =  NodeUnknown
+            ::  attackerKnowledge[e].node[v] == MockUnknown ||
+                attackerKnowledge[e].node[v] ==   MockIsKnown ->
+                attackerKnowledge[e].node[v] =  MockUnknown
             :: else
             fi
             offset = offset / 2;
@@ -411,15 +411,15 @@ inline attacker_updates_knowledge( e )
                         knowsR = knowledgeOfSubtree;
                     }
                     if
-                    ::  voidL &&  voidR                       -> attackerKnowledge[e].node[v] =        Void
-                    :: !voidL &&  voidR &&             knowsR -> attackerKnowledge[e].node[v] =   KnownRefs
-                    :: !voidL &&  voidR &&            !knowsR -> attackerKnowledge[e].node[v] = UnknownRefs
-                    ::  voidL && !voidR &&  knowsL            -> attackerKnowledge[e].node[v] =   KnownRefs
-                    ::  voidL && !voidR && !knowsL            -> attackerKnowledge[e].node[v] = UnknownRefs
-                    :: !voidL && !voidR &&  knowsL &&  knowsR -> attackerKnowledge[e].node[v] =   KnownNode
-                    :: !voidL && !voidR && !knowsL &&  knowsR -> attackerKnowledge[e].node[v] =   KnownNode
-                    :: !voidL && !voidR &&  knowsL && !knowsR -> attackerKnowledge[e].node[v] =   KnownNode
-                    :: !voidL && !voidR && !knowsL && !knowsR -> attackerKnowledge[e].node[v] = UnknownNode
+                    ::  voidL &&  voidR                       -> attackerKnowledge[e].node[v] = Uninhabited
+                    :: !voidL &&  voidR &&             knowsR -> attackerKnowledge[e].node[v] = MockIsKnown
+                    :: !voidL &&  voidR &&            !knowsR -> attackerKnowledge[e].node[v] = MockUnknown
+                    ::  voidL && !voidR &&  knowsL            -> attackerKnowledge[e].node[v] = MockIsKnown
+                    ::  voidL && !voidR && !knowsL            -> attackerKnowledge[e].node[v] = MockUnknown
+                    :: !voidL && !voidR &&  knowsL &&  knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
+                    :: !voidL && !voidR && !knowsL &&  knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
+                    :: !voidL && !voidR &&  knowsL && !knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
+                    :: !voidL && !voidR && !knowsL && !knowsR -> attackerKnowledge[e].node[v] = NodeUnknown
                     fi
                 fi
             };
@@ -433,13 +433,13 @@ inline attacker_updates_knowledge( e )
 
 inline existance_of_subtree( t, v )
 {
-    existanceOfSubtree = attackerKnowledge[t].node[v] != Void
+    existanceOfSubtree = attackerKnowledge[t].node[v] != Uninhabited
 }
 
 
 inline knowledge_of_subtree( t, v )
 {
-    knowledgeOfSubtree = attackerKnowledge[t].node[v] == KnownNode || attackerKnowledge[t].node[v] == KnownRefs
+    knowledgeOfSubtree = attackerKnowledge[t].node[v] == NodeIsKnown || attackerKnowledge[t].node[v] == MockIsKnown
 }
 
 

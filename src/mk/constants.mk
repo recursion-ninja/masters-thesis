@@ -8,7 +8,9 @@ IMPORT_MAKE_CONSTANTS ::= 1
 ###
 #######
 
-filename-constants ::= parameterized-constants
+dir-protocol-model ?= .
+
+filename-constants ::= Parameterized-Constants
 filepath-constants ::= $(abspath $(addprefix $(dir-protocol-model)/,$(addsuffix .$(extension-promela),$(filename-constants))))
 
 def-pref ::= const-
@@ -52,7 +54,6 @@ all:;
 
 amend-constants: assign-constants
 ifndef AMENDED_CONSTANTS
-	@echo "$(filepath-constants)"
 	$(call amend_definitions_within,$(filepath-constants))
 	@$(eval AMENDED_CONSTANTS ::= 1)
 endif

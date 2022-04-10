@@ -22,7 +22,9 @@ extension-promela   ?= pml
 dir-protocol-model  ?= .
 dir-output-encoding ?= .
 
-filename-modeling-spec ::= model-specification.$(extension-promela)
+model-specification ::= Model-Specification
+
+filename-modeling-spec ::= $(model-specification).$(extension-promela)
 filename-modeling-code ::= $(wildcard $(dir-protocol-model)/*$(extension-promela))
 filepath-modeling-spec ::= $(abspath $(addprefix $(dir-protocol-model)/,$(filename-modeling-spec)))
 filepath-modeling-code ::= $(abspath $(filename-modeling-code))
