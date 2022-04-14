@@ -12,9 +12,9 @@
   * Parameters (`t`, `c` `n`) defined as constants below:
   *
 ********/
-#define T 32
+#define T 13
 #define C 12
-#define N 16
+#define N 9
 
 
 /********
@@ -25,7 +25,7 @@
   *   - N - 1
   *
 ********/
-#define BITS_T 5
+#define BITS_T 4
 #define BITS_C 4
 #define BITS_N 4
 
@@ -45,8 +45,8 @@
   *   - 2 * (2 ^ (BITS_N - 1))
   *
 ********/
-#define BITS_EPOCH  6
-#define BITS_USERID 5
+#define BITS_EPOCH  4
+#define BITS_USERID 4
 #define BITS_VERTEX 5
 
 
@@ -60,8 +60,8 @@
   *   - NONE  = (2 ^ BITS_N) - 1
   *
 ********/
-#define NEVER 63
-#define NONE  31
+#define NEVER 15
+#define NONE  15
 
 
 /********
@@ -130,10 +130,10 @@
   *
 ********/
 #define FIRST_EPOCH  0
-#define FINAL_EPOCH  31
+#define FINAL_EPOCH  12
 
 #define FIRST_USERID 0
-#define FINAL_USERID 15
+#define FINAL_USERID 8
 
 #define FIRST_VERTEX 0
 #define FINAL_VERTEX 30

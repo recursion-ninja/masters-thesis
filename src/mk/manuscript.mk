@@ -1,5 +1,5 @@
-ifndef IMPORT_MAKE_MANUSCRIPT
-IMPORT_MAKE_MANUSCRIPT ::= 1
+ifndef IMPORT_MAKE_ENVIRONMENT
+IMPORT_MAKE_ENVIRONMENT ::= 1
 
 #######
 ###
@@ -10,8 +10,14 @@ IMPORT_MAKE_MANUSCRIPT ::= 1
 .ONESHELL:
 .DEFAULT:;
 SHELL ::= /bin/sh
+COMMA ::= ,
 EMPTY ::=
 SPACE ::= $(EMPTY) $(EMPTY)
+
+endif # IMPORT_MAKE_ENVIRONMENT
+
+ifndef IMPORT_MAKE_MANUSCRIPT
+IMPORT_MAKE_MANUSCRIPT ::= 1
 
 #######
 ###
@@ -56,12 +62,12 @@ all-manuscript: install-manuscript
 
 clean-manuscript:
 	-rm -f $(filepath-manuscript)
-	-rm -f $(wildcard $(addprefix *.,$(artifact-manuscript)))
+	@$(eval artifact-manuscript-found ::= $(wildcard $(addprefix *.,$(artifact-manuscript))))
+	@$(if $(strip $(artifact-manuscript-found)),rm -f $(artifact-manuscript-found),)
 
 install-manuscript: installdirs-manuscript $(filepath-manuscript)
 
-installdirs-manuscript:
-	@mkdir -p $(dir $(filepath-manuscript))
+installdirs-manuscript: $(dir $(filepath-manuscript))
 
 pdf-manuscript: install-manuscript
 
@@ -71,12 +77,14 @@ pdf-manuscript: install-manuscript
 ###
 #######
 
+$(dir $(filepath-manuscript)):
+	@mkdir -p $@
+
 $(filepath-manuscript): $(filepath-schema) $(filepath-chapters)
 	@pandoc --table-of-contents \
 	-V title:"$(title-of-manuscript)" \
 	-o $@ $^
 	@$(eval location-of-manuscript:=$(shell realpath --relative-to=. $@))
 	@echo "Manuscript created at location:\n\t$(location-of-manuscript)"
-
 
 endif # IMPORT_MAKE_MANUSCRIPT

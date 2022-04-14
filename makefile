@@ -1,7 +1,19 @@
-.ONESHELL:
+ifndef IMPORT_MAKE_ENVIRONMENT
+IMPORT_MAKE_ENVIRONMENT ::= 1
 
+#######
+###
+#   Environmental Constants
+###
+#######
+
+.ONESHELL:
+.DEFAULT:;
 SHELL ::= /bin/sh
 EMPTY ::=
+SPACE ::= $(EMPTY) $(EMPTY)
+
+endif # IMPORT_MAKE_ENVIRONMENT
 
 encoding-basename     ::= pan
 extension-makefile    ::= mk
@@ -23,5 +35,5 @@ filepath-make-definitions ::= $(wildcard $(dir-make-definitions)*.$(extension-ma
 
 -include $(filepath-make-definitions)
 
-all: transpile
+all:: all-transpile
 	@echo "Finished at top"
