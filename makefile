@@ -1,21 +1,27 @@
 .ONESHELL:
 
-SHELL ::= /bin/bash
+SHELL ::= /bin/sh
 EMPTY ::=
 
-encoding-basename    ::= pan
-extension-makefile   ::= mk
-extension-promela    ::= pml
+encoding-basename     ::= pan
+extension-makefile    ::= mk
+extension-markdown    ::= md
+extension-promela     ::= pml
+extension-portabledoc ::= pdf
 
-dir-binaries         ::= ./bin
-dir-source-code      ::= ./src
-dir-output-encoding  ::= $(dir-source-code)/$(encoding-basename)
-dir-make-definitions ::= $(dir-source-code)/$(extension-makefile)
-dir-protocol-model   ::= $(dir-source-code)/$(extension-promela)
+dir-binaries          ::= ./bin/
+dir-documents         ::= ./doc/
+dir-source-code       ::= ./src/
+dir-output-encoding   ::= $(abspath $(addprefix $(dir-source-code),$(addsuffix ,$(encoding-basename))))/
+dir-make-definitions  ::= $(abspath $(addprefix $(dir-source-code),$(addsuffix ,$(extension-makefile))))/
+dir-protocol-model    ::= $(abspath $(addprefix $(dir-source-code),$(addsuffix ,$(extension-promela))))/
+dir-thesis-relative   ::= ./thesis/
+dir-thesis-chapters   ::= $(abspath $(addprefix $(dir-source-code),$(addsuffix /$(dir-thesis-relative),$(extension-markdown))))/
+dir-thesis-manuscript ::= $(abspath $(addprefix $(dir-documents),$(dir-thesis-relative)))/
 
-dir-add-these ::= $(wildcard $(dir-make-definitions)/*.$(extension-makefile))
+filepath-make-definitions ::= $(wildcard $(dir-make-definitions)*.$(extension-makefile))
 
--include $(wildcard $(dir-make-definitions)/*.$(extension-makefile))
+-include $(filepath-make-definitions)
 
 all: transpile
 	@echo "Finished at top"
