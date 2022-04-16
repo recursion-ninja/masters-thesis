@@ -106,7 +106,7 @@ directives ::= \
 
 .PHONY: all backup clean install installdirs verification
 
-all:: install
+all:: $(filepath-verifier)
 
 backup: $(dir-trail-backup)
 	mv  --backup=numbered \
