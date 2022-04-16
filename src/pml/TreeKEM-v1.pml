@@ -269,12 +269,11 @@ inline attacker_init_epoch_knowledge ( e )
 
     bool leaves = true;
     unsigned offset : BITS_VERTEX = LEAF;
-    unsigned width  : BITS_VERTEX = N + N;
+    unsigned width  : BITS_VERTEX = N;
     do
     :: width == 0 -> break
     :: width != 0 -> d_step
         {
-            width = width / 2;
             unsigned n : BITS_VERTEX;
             for ( n : 0 .. width - 1 )
             {
@@ -309,8 +308,9 @@ inline attacker_init_epoch_knowledge ( e )
                     fi
                 fi
             };
-            offset = offset / 2;
             leaves = false;
+            offset = offset / 2;
+            width  = width  / 2;
         }
     od
 }   }
@@ -320,12 +320,11 @@ inline attacker_copy_epoch_knowledge( e )
 {   atomic {
 
     unsigned offset : BITS_VERTEX = LEAF;
-    unsigned width  : BITS_VERTEX = TREE_ORDER + 1;
+    unsigned width  : BITS_VERTEX = N;
     do
     :: width == 0 -> break
     :: width != 0 -> d_step
         {
-            width = width / 2;
             unsigned n : BITS_VERTEX;
             for ( n : 0 .. width - 1 )
             {
@@ -341,6 +340,7 @@ inline attacker_copy_epoch_knowledge( e )
                 fi
             };
             offset = offset / 2;
+            width  = width  / 2;
         }
     od
 }   }
@@ -350,12 +350,11 @@ inline attacker_wipe_sender_knowledge( sender, e )
 {   atomic {
 
     unsigned offset : BITS_VERTEX = LEAF;
-    unsigned width  : BITS_VERTEX = TREE_ORDER + 1;
+    unsigned width  : BITS_VERTEX = N;
     do
     :: width == 0 -> break
     :: width != 0 -> d_step
         {
-            width = width / 2;
             unsigned v : BITS_VERTEX = offset + sender;
             if
             ::  attackerKnowledge[e].node[v] == NodeUnknown ||
@@ -367,6 +366,7 @@ inline attacker_wipe_sender_knowledge( sender, e )
             :: else
             fi
             offset = offset / 2;
+            width  = width  / 2;
         }
     od
 }   }
@@ -377,12 +377,11 @@ inline attacker_updates_knowledge( e )
 
     bool     leaves = true;
     unsigned offset : BITS_VERTEX = LEAF;
-    unsigned width  : BITS_VERTEX = TREE_ORDER + 1;
+    unsigned width  : BITS_VERTEX = N;
     do
     :: width == 0 -> break
     :: width != 0 -> d_step
         {
-            width = width / 2;
             unsigned n : BITS_VERTEX;
             for ( n : 0 .. width - 1 )
             {
@@ -423,8 +422,9 @@ inline attacker_updates_knowledge( e )
                     fi
                 fi
             };
-            offset = offset / 2;
             leaves = false;
+            offset = offset / 2;
+            width  = width  / 2;
         }
     od
     }

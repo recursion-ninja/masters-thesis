@@ -50,13 +50,12 @@ inline corrupt ( memberID )
         :: else ->
             printf("Passed membership guard!\n");
             unsigned off   : BITS_VERTEX = LEAF;
-            unsigned level : BITS_VERTEX = TREE_ORDER + 1;
+            unsigned level : BITS_VERTEX = N;
             do
             :: level == 0 -> break
             :: level != 0 ->
                 d_step
                 {
-                    level = level / 2;
                     unsigned v : BITS_VERTEX = off+memberID;
                     printf("tree level: %d @ %d\n", level, v);
                     if
@@ -64,7 +63,8 @@ inline corrupt ( memberID )
                     :: attackerKnowledge[peek].node[v] == MockUnknown -> attackerKnowledge[peek].node[v] = MockIsKnown
                     :: else
                     fi
-                    off = off / 2;
+                    level = level / 2;
+                    off   = off   / 2;
                 }
                 printf("Check Index Post: %d\n", peek);
                 if
