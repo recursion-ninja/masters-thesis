@@ -99,17 +99,17 @@ $(sec-pref)N ::= $(call security_parameter,N)
 # Compute the constants values which are derivative of the supplied security parameter(s).
 
 # Security parameter: (T)
-$(con-pref)T           ::= $($(sec-pref)T)
-$(con-pref)BITS_T      ::= $(call bits_required,$(shell expr $($(con-pref)T) - 1))
-$(con-pref)BITS_EPOCH  ::= $(call bits_required,$($(con-pref)T))
-$(con-pref)FIRST_EPOCH ::= 0
-$(con-pref)FINAL_EPOCH ::= $(shell expr $($(con-pref)T) - 1)
-$(con-pref)NEVER       ::= $(shell expr $$(( ( 1 << $($(con-pref)BITS_EPOCH) ) - 1 )) )
+$(con-pref)T            ::= $($(sec-pref)T)
+$(con-pref)BITS_T       ::= $(call bits_required,$(shell expr $($(con-pref)T) - 1))
+$(con-pref)BITS_EPOCH   ::= $(call bits_required,$($(con-pref)T))
+$(con-pref)FIRST_EPOCH  ::= 0
+$(con-pref)FINAL_EPOCH  ::= $(shell expr $($(con-pref)T) - 1)
+$(con-pref)NEVER        ::= $(shell expr $$(( ( 1 << $($(con-pref)BITS_EPOCH) ) - 1 )) )
 
 # Security parameter: (C)
-$(con-pref)C          ::= $($(sec-pref)C)
-$(con-pref)BITS_C     ::= $(call bits_required,$(shell expr $($(con-pref)C) - 1))
-$(con-pref)MAX_REVEAL ::= $(shell expr $($(con-pref)C) - 1)
+$(con-pref)C            ::= $($(sec-pref)C)
+$(con-pref)BITS_C       ::= $(call bits_required,$(shell expr $($(con-pref)C) - 1))
+$(con-pref)MAX_REVEAL   ::= $(shell expr $($(con-pref)C) - 1)
 
 # Security parameter: (N)
 $(con-pref)N            ::= $($(sec-pref)N)
