@@ -117,30 +117,30 @@ inline reveal ()
 ********/
 
 
-// Precondition: joiner is not in the group!
-inline insert_member( memberID, joinerID )
+// Precondition: invitee is not in the group!
+inline insert_member( memberID, inviteeID )
 {
     d_step {
-        printf("\n> > >\n> CGKA: Game Move = ADD %d %d\n> > >\n", memberID, joinerID);
-        assert( memberID < N );
-        assert( joinerID < N );
-        assert( !(membership[exiledID]) );
+        printf("\n> > >\n> CGKA: Game Move = ADD %d %d\n> > >\n", memberID, inviteeID);
+        assert(  memberID < N );
+        assert( inviteeID < N );
+        assert( !(membership[inviteeID]) );
     }
-    messaging_move( epoch + 1, memberID, joinerID, NONE )
+    messaging_move( epoch + 1, memberID, inviteeID, NONE )
 }
 
 
-// Precondition: exiledID is in the group!
-inline remove_member( memberID, exiledID )
+// Precondition: evicteeID is in the group!
+inline remove_member( memberID, evicteeID )
 {
     d_step {
-        printf("\n> > >\n> CGKA: Game Move = RMV %d %d\n> > >\n", memberID, exiledID);
-        assert( memberID < N );
-        assert( exiledID < N );
-        assert( membership[exiledID] );
-        unsafe[exiledID] = false;
+        printf("\n> > >\n> CGKA: Game Move = RMV %d %d\n> > >\n", memberID, evicteeID);
+        assert(  memberID < N );
+        assert( evicteeID < N );
+        assert( membership[evicteeID] );
+        unsafe[evicteeID] = false;
     }
-    messaging_move( epoch + 1, memberID, NONE, exiledID )
+    messaging_move( epoch + 1, memberID, NONE, evicteeID )
 }
 
 

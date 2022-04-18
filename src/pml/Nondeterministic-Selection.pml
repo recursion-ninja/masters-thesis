@@ -11,11 +11,11 @@
     *
     * User ID selection inlines:
     *   - select_corrupted
-    *   - select_banisher
-    *   - select_exiled
+    *   - select_evictor
+    *   - select_evictee
     *   - select_hoarder
-    *   - select_joiner
-    *   - select_sender
+    *   - select_invitee
+    *   - select_inviter
     *   - select_updater
     *
 ********/
@@ -25,7 +25,7 @@
   * External result variable(s):
   *   - corruptedID
 ****/
-inline select_corrupted()
+inline select_corrupted ( )
 {   atomic {
 
     unsigned candidateCorruptibles : BITS_USERID;
@@ -67,25 +67,25 @@ inline select_corrupted()
 
 /****
   * External result variable(s):
-  *   - banisherID
+  *   - evictorID
 ****/
-inline select_banisher( banned )
+inline select_evictor ( banned )
 {
     unsigned selectedID : BITS_USERID;
-    select_sender_constrained( banned, false );
-    banisherID = selectedID;
+    select_member_constrained( banned, false );
+    evictorID = selectedID;
 }
 
 
 /****
   * External result variable(s):
-  *   - exiledID
+  *   - evicteeID
 ****/
-inline select_exiled( forced )
+inline select_evictee ( forced )
 {
     unsigned selectedID : BITS_USERID;
-    select_sender_constrained( NONE, forced );
-    exiledID = selectedID;
+    select_member_constrained( NONE, forced );
+    evicteeID = selectedID;
 }
 
 
@@ -93,11 +93,11 @@ inline select_exiled( forced )
   * External result variable(s):
   *   - hoarderID
 ****/
-inline select_hoarder()
+inline select_hoarder ( )
 {   atomic {
 
     unsigned candidateHoarders : BITS_USERID;
-    candidates_for_hoarding();
+    candidates_for_hoarding ( );
 
     if
     :: candidateHoarders == 0 -> hoarderID = NONE
@@ -136,20 +136,20 @@ inline select_hoarder()
 
 /****
   * External result variable(s):
-  *   - joinerID
+  *   - inviteeID
 ****/
-inline select_joiner()
+inline select_invitee ( )
 {   atomic {
 
-    unsigned candidateJoiners : BITS_USERID;
-    candidates_for_joiner();
+    unsigned candidateInvitees : BITS_USERID;
+    candidates_for_invitee();
 
     unsigned selection : BITS_USERID = NONE;
     d_step
     {
         unsigned n      : BITS_USERID;
         unsigned sample : BITS_USERID;
-        select(  sample : 0 .. candidateJoiners - 1 );
+        select(  sample : 0 .. candidateInvitees - 1 );
         for ( n : FIRST_USERID .. FINAL_USERID ) {
             if
             :: selection != NONE || membership[n] -> skip
@@ -162,19 +162,19 @@ inline select_joiner()
         }
     }
     
-    joinerID = selection;
+    inviteeID = selection;
 }   }
 
 
 /****
   * External result variable(s):
-  *   - senderID
+  *   - inviterID
 ****/
-inline select_sender()
+inline select_inviter ( )
 {
     unsigned selectedID : BITS_USERID;
-    select_sender_constrained ( NONE, false );
-    senderID = selectedID;
+    select_member_constrained ( NONE, false );
+    inviterID = selectedID;
 }
 
 
@@ -182,10 +182,10 @@ inline select_sender()
   * External result variable(s):
   *   - updaterID
 ****/
-inline select_updater( forced )
+inline select_updater ( forced )
 {
     unsigned selectedID : BITS_USERID;
-    select_sender_constrained ( NONE, forced );
+    select_member_constrained ( NONE, forced );
     updaterID = selectedID;
 }
 
@@ -194,29 +194,29 @@ inline select_updater( forced )
   * External result variable(s):
   *   - selectedID
 ****/
-inline select_sender_constrained ( banned, forced )
+inline select_member_constrained ( banned, forced )
 {   atomic {
-    unsigned candidateSenders : BITS_USERID = 0;
-    candidates_for_sender ( banned, forced )
+    unsigned candidateMembers : BITS_USERID = 0;
+    candidates_from_members ( banned, forced )
 
     if
-    :: candidateSenders == 0 -> selectedID = NONE
+    :: candidateMembers == 0 -> selectedID = NONE
     :: else ->
         unsigned selection : BITS_USERID = NONE;
         d_step
         {
             unsigned n      : BITS_USERID;
             unsigned sample : BITS_USERID;
-            select(  sample : 0 .. candidateSenders - 1 );
+            select(  sample : 0 .. candidateMembers - 1 );
             for ( n : FIRST_USERID .. FINAL_USERID ) {
                 d_step
                 {
                     if
                     :: selection == NONE ->
-                        bool candidateSender;
-                        candidate_sender ( banned, forced, n );
+                        bool candidateMember;
+                        candidate_member ( banned, forced, n );
                         if
-                        :: candidateSender ->
+                        :: candidateMember ->
                             if
                             :: sample == 0 -> selection = n
                             :: sample != 0 -> sample--
@@ -235,9 +235,9 @@ inline select_sender_constrained ( banned, forced )
 
 /****
   * External result variable(s):
-  *   - candidateJoiners
+  *   - candidateInvitees
 ****/
-inline candidates_for_joiner ()
+inline candidates_for_invitee ( )
 {
     unsigned candidates : BITS_USERID = 0;
     d_step
@@ -261,15 +261,15 @@ inline candidates_for_joiner ()
         :: else -> candidates++
         fi
     }
-    candidateJoiners = candidates
+    candidateInvitees = candidates
 }
 
 
 /****
   * External result variable(s):
-  *   - candidateSenders
+  *   - candidateMembers
 ****/
-inline candidates_for_sender ( banned, forced )
+inline candidates_from_members ( banned, forced )
 {
     unsigned candidates : BITS_USERID = 0;
     d_step
@@ -279,28 +279,28 @@ inline candidates_for_sender ( banned, forced )
         {
             d_step
             {
-                bool candidateSender;
-                candidate_sender ( banned, forced, n )
+                bool candidateMember;
+                candidate_member ( banned, forced, n )
                 if
-                :: candidateSender -> candidates++
+                :: candidateMember -> candidates++
                 :: else
                 fi
             }
         }
     }
-    candidateSenders = candidates
+    candidateMembers = candidates
 }
 
 
 /****
   * External result variable(s):
-  *   - candidateSender
+  *   - candidateMember
 ****/
-inline candidate_sender ( banned, forced, id )
+inline candidate_member ( banned, forced, id )
 {
     bool forcesSafe = !(forced) || unsafe[id];
     bool isAnOption = membership[id] && (id != banned);
-    candidateSender = isAnOption && forcesSafe
+    candidateMember = isAnOption && forcesSafe
 }
 
 

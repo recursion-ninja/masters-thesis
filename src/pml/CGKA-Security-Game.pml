@@ -82,21 +82,24 @@ inline play_move_with_commitment()
         bool canInsert, 
              canRemove,
              canUpdate;
-        unsigned banisherID : BITS_USERID, 
-                   exiledID : BITS_USERID, 
-                   joinerID : BITS_USERID, 
-                   senderID : BITS_USERID,
-                  updaterID : BITS_USERID;
+
+        unsigned evictorID : BITS_USERID, 
+                 evicteeID : BITS_USERID, 
+                 inviteeID : BITS_USERID, 
+                 inviterID : BITS_USERID,
+                 updaterID : BITS_USERID;
         atomic
         {
-            select_updater(  forcedPlay );
-            select_exiled(   forcedPlay );
-            select_banisher( exiledID   );
+            select_evictee ( forcedPlay );
+            select_evictor ( evicteeID   );
+            select_invitee ( );
+            select_inviter ( );
+            select_updater ( forcedPlay );
             d_step
             {
-                canInsert = updaterID != NONE;
-                canRemove = !groupDyad && exiledID != NONE && banisherID != NONE;
-                canUpdate = !groupFull && !forcedPlay;
+                canInsert = !groupFull && !forcedPlay;
+                canRemove = !groupDyad && evicteeID != NONE && evictorID != NONE;
+                canUpdate = updaterID != NONE;
             }
         };
     
@@ -105,15 +108,17 @@ inline play_move_with_commitment()
             print_entire_state()
             printf("\n.,.,.,.,.,.\nMove Class:\tCommitment\n`'`'`'`'`'`\n");
             printf("\nCommitment values:");
-            printf("\n\tbanisherID  \t%d", banisherID );
-            printf("\n\texiledID    \t%d",   exiledID );
-            printf("\n\tupdaterID   \t%d",  updaterID );
+            printf("\n\tevictorID \t%d", evictorID );
+            printf("\n\tevicteeID \t%d", evicteeID );
+            printf("\n\tinviterID \t%d", inviterID );
+            printf("\n\tinviteeID \t%d", inviteeID );
+            printf("\n\tupdaterID \t%d", updaterID );
             printf("\n");
         }
 
         do
-        :: canInsert -> insert_member( senderID, joinerID );   break
-        :: canRemove -> remove_member( banisherID, exiledID ); break
+        :: canInsert -> insert_member( inviterID, inviteeID ); break
+        :: canRemove -> remove_member( evictorID, evicteeID ); break
         :: canUpdate -> oblige_update( updaterID );            break
         od
 
@@ -279,15 +284,6 @@ inline CGKA_security_game()
     }
     epoch = FINAL_EPOCH;
     print_entire_state();
-}
-
-
-init
-{
-    CGKA_initialize();
-    CGKA_create_group();
-    CGKA_security_game();
-    concludedCGKA = true;
 }
 
 

@@ -55,7 +55,7 @@ local bool revealRoot = C > 1;
   *   - groupMost
   *
 ****/
-inline messaging_move ( e, sender, insert, remove )
+inline messaging_move ( e, inviter, insert, remove )
 {
     d_step
     {
@@ -68,7 +68,7 @@ inline messaging_move ( e, sender, insert, remove )
             fi
             take_attendance ();
         }
-        attacker_study_message( e, sender, subject );
+        attacker_study_message( e, inviter, subject );
     }
 }
 

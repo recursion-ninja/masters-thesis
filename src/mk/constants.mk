@@ -158,13 +158,19 @@ infostr ::= \
 
 #######
 ###
-#   Phony targets
+#   Standard targets
 ###
 #######
 
 .PHONY: all amend-constants
 
 all::;
+
+#######
+###
+#   Phony targets
+###
+#######
 
 amend-constants: $(filepath-constants)
 	$(call amend_definitions_within,$<)

@@ -25,7 +25,7 @@ IMPORT_MAKE_COMPILATION ::= 1
 ###
 #######
 
-encoding-basename    ?= pan
+basename-encoding    ?= pan
 extension-makefile   ?= mk
 extension-promela    ?= pml
 dir-backup           ?= ./trails
@@ -44,8 +44,6 @@ basename-dependancies ::= constants transpile
 filename-dependancies ::= $(addsuffix .$(extension-makefile),$(basename-dependancies))
 filepath-dependancies ::= $(abspath $(addprefix $(dir-make-definitions),$(filename-dependancies)))
 
-$(info $(filepath-dependancies))
-
 -include $(filepath-dependancies)
 
 #######
@@ -58,6 +56,7 @@ extension-verifier ::= analysis
 basename-verifier  ::= $(infostr)
 filename-verifier  ::= $(basename-verifier).$(extension-verifier)
 filepath-verifier  ::= $(abspath $(addprefix $(dir-binaries),$(filename-verifier)))
+sources-verifier   ::= $(filepath-modeling-code) $(filepath-encoding-code)
 
 extension-trail ::= trail
 basename-trail  ::= $(infostr)
@@ -93,25 +92,20 @@ directives ::= \
 #extensions-encoding-in-C ::= c h
 #extensions-encoding-code ::= $(sort b m p t $(extensions-encoding-in-C))
 #
-#filename-encoding-in-C   ::= $(addprefix $(encoding-basename).,$(extensions-encoding-in-C))
-#filename-encoding-code   ::= $(addprefix $(encoding-basename).,$(extensions-encoding-code))
+#filename-encoding-in-C   ::= $(addprefix $(basename-encoding).,$(extensions-encoding-in-C))
+#filename-encoding-code   ::= $(addprefix $(basename-encoding).,$(extensions-encoding-code))
 #filepath-encoding-in-C   ::= $(sort $(abspath $(addprefix $(dir-output-encoding),$(filename-encoding-in-C))))
 #filepath-encoding-code   ::= $(sort $(abspath $(addprefix $(dir-output-encoding),$(filename-encoding-code))))
 
 #######
 ###
-#   Phony targets
+#   Standard targets
 ###
 #######
 
-.PHONY: all backup clean install installdirs verification
+.PHONY: all clean install installdirs
 
 all:: $(filepath-verifier)
-
-backup: $(dir-trail-backup)
-	mv  --backup=numbered \
-	    --suffix='backup-' \
-	    $(trail-file) $(backup-dir)/$(trail-file) 2>/dev/null || true
 
 clean::
 	rm -f $(filepath-verifier) $(log-to-out) $(log-to-err)
@@ -119,6 +113,19 @@ clean::
 install:: $(filepath-verifier)
 
 installdirs:: $(dir-binaries) $(dir-trail-backup)
+
+#######
+###
+#   Phony targets
+###
+#######
+
+.PHONY: backup verification
+
+backup: $(dir-trail-backup)
+	mv  --backup=numbered \
+	    --suffix='backup-' \
+	    $(trail-file) $(backup-dir)/$(trail-file) 2>/dev/null || true
 
 verification: $(filepath-verifier) backup
 	time $(filepath-verifier) -a -i
@@ -136,7 +143,7 @@ $(dir-binaries):
 $(dir-trail-backup):
 	mkdir -p $@
 
-$(filepath-verifier): $(dir-binaries) $(filepath-modeling-spec) $(filepath-encoding-code)
+$(filepath-verifier): $(dir-binaries) $(sources-verifier)
 	gcc -O3 $(directives) -o $@ $(filepath-encoding-in-C)
 
 endif # IMPORT_MAKE_COMPILATION

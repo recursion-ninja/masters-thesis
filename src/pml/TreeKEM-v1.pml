@@ -172,7 +172,7 @@ inline attacker_learn_root( named_epoch )
 }
 
 
-inline attacker_study_message( e, sender, subject )
+inline attacker_study_message( e, inviter, subject )
 {
     atomic
     {
@@ -198,7 +198,7 @@ inline attacker_study_message( e, sender, subject )
         fi
 
         attacker_copy_epoch_knowledge( referenceEpoch );
-        attacker_wipe_sender_knowledge( sender, e );
+        attacker_wipe_inviter_knowledge( inviter, e );
         attacker_updates_knowledge ( e );
         attacker_check_knowledge( e );
     }
@@ -242,7 +242,7 @@ inline print_attacker_knowledge()
   *   - attacker_has_no_epoch_knowledge
   *   - attacker_init_epoch_knowledge
   *   - attacker_updates_knowledge
-  *   - attacker_wipe_sender_knowledge
+  *   - attacker_wipe_inviter_knowledge
   *   - existance_of_subtree
   *   - knowledge_of_subtree
   *
@@ -346,7 +346,7 @@ inline attacker_copy_epoch_knowledge( e )
 }   }
 
 
-inline attacker_wipe_sender_knowledge( sender, e )
+inline attacker_wipe_inviter_knowledge( inviter, e )
 {   atomic {
 
     unsigned offset : BITS_VERTEX = LEAF;
@@ -355,7 +355,7 @@ inline attacker_wipe_sender_knowledge( sender, e )
     :: width == 0 -> break
     :: width != 0 -> d_step
         {
-            unsigned v : BITS_VERTEX = offset + sender;
+            unsigned v : BITS_VERTEX = offset + inviter;
             if
             ::  attackerKnowledge[e].node[v] == NodeUnknown ||
                 attackerKnowledge[e].node[v] ==   NodeIsKnown ->

@@ -52,24 +52,24 @@ artifact-manuscript ::= bbl blg synctex.gz toc
 
 #######
 ###
-#   Phony Targets
+#   Standard Targets
 ###
 #######
 
-.PHONY: all-manuscript clean-manuscript install-manuscript installdirs-manuscript pdf-manuscript
+.PHONY: all clean install installdirs pdf
 
-all-manuscript: install-manuscript
+all:: $(filepath-manuscript)
 
-clean-manuscript:
+clean::
 	-rm -f $(filepath-manuscript)
 	@$(eval artifact-manuscript-found ::= $(wildcard $(addprefix *.,$(artifact-manuscript))))
 	@$(if $(strip $(artifact-manuscript-found)),rm -f $(artifact-manuscript-found),)
 
-install-manuscript: installdirs-manuscript $(filepath-manuscript)
+install:: $(filepath-manuscript)
 
-installdirs-manuscript: $(dir $(filepath-manuscript))
+installdirs:: $(dir $(filepath-manuscript))
 
-pdf-manuscript: install-manuscript
+pdf:: $(filepath-manuscript)
 
 #######
 ###
@@ -80,7 +80,7 @@ pdf-manuscript: install-manuscript
 $(dir $(filepath-manuscript)):
 	@mkdir -p $@
 
-$(filepath-manuscript): $(filepath-schema) $(filepath-chapters)
+$(filepath-manuscript): $(dir $(filepath-manuscript)) $(filepath-schema) $(filepath-chapters)
 	@pandoc --table-of-contents \
 	-V title:"$(title-of-manuscript)" \
 	-o $@ $^
