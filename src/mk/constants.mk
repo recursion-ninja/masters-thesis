@@ -30,7 +30,7 @@ extension-promela  ?= pml
 
 #######
 ###
-#   Variables for TRANSPILE
+#   Variables for CONSTANTS
 ###
 #######
 
@@ -141,17 +141,22 @@ else
 infostr-protocol-version ::= $(version)
 endif
 
-infostr-glue            ::= _
+infostr-glue            ::= -
 infostr-model-name      ::= $(subst $(SPACE),$(infostr-glue),CGKA Model)
 infostr-protocol-name   ::= $(subst $(SPACE),$(infostr-glue),TreeKEM v)
-infostr-security-keys   ::= $(subst $(SPACE),$(infostr-glue),$(security-parameters))
 infostr-security-values ::= \
     $(subst $(SPACE),$(infostr-glue),$(foreach param,$(security-parameters),$($(sec-pref)$(param))))
-infostr ::= \
-    $(subst $(SPACE),-,$(infostr-model-name) \
-        $(infostr-protocol-name)$(infostr-protocol-version) \
-        $(infostr-security-keys) \
-        $(infostr-security-values))
+
+infostr-prefix-fixed    ::= \
+    $(subst $(SPACE),$(infostr-glue),$(infostr-model-name) $(infostr-protocol-name))
+infostr-suffix-variable ::= \
+    $(subst $(SPACE),$(infostr-glue),$(infostr-protocol-version) $(infostr-security-values))
+
+infostr                 ::= $(infostr-prefix-fixed)$(infostr-suffix-variable)
+infostr-pattern         ::= $(infostr-prefix-fixed)*
+
+#infostr-security-keys   ::= \
+    $(subst $(SPACE),$(infostr-glue),$(security-parameters))
 
 #$(info ( T, C, N ) = ( '$($(sec-pref)T)', '$($(sec-pref)C)', '$($(sec-pref)N)' ))
 #$(info $(infostr))

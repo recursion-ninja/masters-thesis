@@ -43,7 +43,7 @@ dir-trail-backup      ::= $(abspath $(addprefix $(dir-logging),trails))
 
 filepath-make-definitions ::= $(wildcard $(dir-make-definitions)*.$(extension-makefile))
 
-$(info Including the following:\
+#$(info Including the following:\
   $(NEWLINE)$(TAB)$(subst $(SPACE),$(NEWLINE)$(TAB),$(notdir $(filepath-make-definitions))))
 
 -include $(filepath-make-definitions)
