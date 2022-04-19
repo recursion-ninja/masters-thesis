@@ -59,13 +59,17 @@ filepath-dependancies ::= $(abspath $(addprefix $(dir-make-definitions),$(filena
 filename-bundle ::= $(infostr)
 filepath-bundle ::= $(abspath $(addprefix $(dir-source-code),$(filename-bundle)))
 
+# Pattern for matching any distribution
+filename-bundle-pattern  ::= $(infostr-pattern)
+filepath-bundle-pattern  ::= $(abspath $(addprefix $(dir-source-code),$(filename-bundle-pattern)))
+
 # Distribution's PBS script file
-prefname-pbs          ::= pbs.
-prefpath-pbs          ::= $(abspath $(dir-pbs-script-parts)/$(prefname-pbs))
-filepath-pbs-body     ::= $(prefpath-pbs)script
-filepath-pbs-config   ::= $(abspath $(shell mktemp -d -t $(prefname-pbs)-XXXXXXXXXX)/config)
-filepath-pbs-defaults ::= $(prefpath-pbs)defaults
-filepath-pbs-template ::= $(prefpath-pbs)template
+prefname-pbs             ::= pbs.
+prefpath-pbs             ::= $(abspath $(dir-pbs-script-parts)/$(prefname-pbs))
+filepath-pbs-body        ::= $(prefpath-pbs)script
+filepath-pbs-config      ::= $(abspath $(shell mktemp -d -t $(prefname-pbs)-XXXXXXXXXX)/config)
+filepath-pbs-defaults    ::= $(prefpath-pbs)defaults
+filepath-pbs-template    ::= $(prefpath-pbs)template
 
 basename-makefile-parts  ::= compile constants transpile
 filename-makefile-parts  ::= $(addsuffix .$(extension-makefile),$(basename-dependancies))
@@ -84,24 +88,11 @@ filepath-bundle-complete ::=    \
     $(filepath-bundle-mkparts)  \
     $(filepath-bundle-pbs)
 
-local-code   := $(local-dir)/$(cluster-dir-remote)
-local-pbs    := $(local-dir)/$(cluster-pbs)
-
-
-
-cluster-dir-prefix := spin-src-v
-cluster-dir-format := $(cluster-dir-prefix)*
-cluster-dir-remote := $(cluster-dir-prefix)$(version)
-
-cluster-pbs-suffix := -
-cluster-pbs-format := *$(cluster-pbs-suffix).*
-
 cluster-host := ${CLUSTER_HOST}
 cluster-user := ${CLUSTER_USER}
 cluster-pass := ${CLUSTER_PASS}
 cluster-auth := $(cluster-user)@$(cluster-host)
 cluster-pbs  := $(process)$(cluster-pbs-suffix)
-
 cluster-log-pattern ::= $(infostr-pattern)
 
 #######
@@ -129,7 +120,7 @@ endef
 all::;
 
 clean::
-	rm -fr $(filepath-bundle)
+	rm -fr $(filepath-bundle-pattern)
 
 installdirs:: $(filepath-bundle)
 
@@ -198,69 +189,4 @@ $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	  --variable=version:$(infostr-suffix-variable) \
 	  --write=plain
 
-
 endif # IMPORT_MAKE_CLUSTER
-
-
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# default-param-C := 4
-# default-param-N := 4
-# default-param-T := 4
-# default-process := CGKA-TreeKEM
-# default-version := 1.0
-# 
-# ifndef C
-# C := $(default-param-C)
-# endif
-# ifndef N
-# N := $(default-param-N)
-# endif
-# ifndef T
-# T := $(default-param-T)
-# endif
-# ifndef process
-# process := $(default-process)
-# endif
-# ifndef version
-# version := $(default-version)
-# endif
-# 
-# #model-name  = TreeKEM
-# model-name := Oracles
-# model-in-C := pan.c pan.h
-# model-code := pan.b $(model-in-C) pan.m pan.p pan.t
-# model-pans := $(shell tr ' ' ',' <<<"./{$(model-code)}")
-# model-file := ../$(model-name).promela
-# 
-# example-dir  := trails
-# logging-des  := ../../log
-# logging-dir  := $(cluster-dir-format)/$(cluster-pbs-format)
-# 
-# bits_required = calculate_bits_required() { \
-#   bits_floored=$$(echo "scale=3; l($$1)/l(2)" | bc -l | cut -f1 -d"."); \
-#   echo "$$bits_floored"; \
-#   bits_result=$$((bits_floored+1)); \
-#   $(eval $$2 := $$(shell echo $$bits_result)); \
-# }
-# 
-# ifneq (,$(findstring n,$(MAKEFLAGS)))
-# bits_required =: bits_required
-# endif

@@ -2,22 +2,22 @@
 #include "State-Global.pml"
 #include "State-Networking.pml"
 
-ltl challenge
-{
-  []( (concludedCGKA && !triviality) -> attackerKnowledge[epoch].node[ROOT] != NodeIsKnown)
+ltl game_totality
+{ 
+  <>concludedCGKA
 }
 
 
 /*
 ltl trivial_safety
 { 
-  []( (triviality && epoch <= FINAL_EPOCH) -> attackerKnowledge[epoch].node[ROOT] != NodeIsKnown)
+  []( attackerKnowledge[epoch].node[ROOT] == NodeIsKnown -> ( triviality && epoch <= FINAL_EPOCH ) )
 }
 
 
-ltl game_totality
-{ 
-  <>concludedCGKA
+ltl challenge
+{
+  []( { concludedCGKA && !(triviality) } -> { attackerKnowledge[FINAL_EPOCH].node[ROOT] != NodeIsKnown } )
 }
 
 
@@ -29,6 +29,6 @@ ltl attendees_more_than_one
 
 ltl attendees_absentees_sum
 {
-  [](attendees + absentees == N)
+  []( { attendees + absentees == N } )
 }
 */

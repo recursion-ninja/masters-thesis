@@ -192,7 +192,7 @@ inline CGKA_initialize()
             unsigned n : BITS_USERID;
             for ( n : FIRST_USERID .. FINAL_USERID )
             {
-                hoarding[n]  = NEVER;
+                hoarding[n] = NEVER;
             };
         };
         
@@ -201,7 +201,8 @@ inline CGKA_initialize()
             unsigned t : BITS_EPOCH;
             for ( t : FIRST_EPOCH .. FINAL_EPOCH )
             {
-                challenge[t] = false;
+                challenge[t]  = false;
+                leadership[t] = NONE;
             };
         };
 
@@ -266,7 +267,8 @@ inline CGKA_security_game()
         //     The attacker ending the game is implicitly the last move of the model
         //     so it always happens in the last epoch.
         :: epoch == FINAL_EPOCH -> break
-        
+
+progressEpoch:
         // 2. Play a Commitment Move
         //     The attacker *may* play a move which commits to a new epoch...
         //     unless it is the last epoch.
@@ -282,8 +284,13 @@ inline CGKA_security_game()
         printf("\nLOOP broken: %d", epoch);
         printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", FINAL_EPOCH - epoch, unsafeIDs);
     }
-    epoch = FINAL_EPOCH;
-    print_entire_state();
+endCGKA:
+    d_step
+    {
+        concludedCGKA = true;
+        epoch = FINAL_EPOCH;
+        print_entire_state();
+    }
 }
 
 

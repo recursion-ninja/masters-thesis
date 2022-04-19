@@ -25,14 +25,13 @@ inline corrupt ( memberID )
         assert( memberID < N );
     }
 
-    // Learn the secret material of the user in their current epoch
+    // Learn the secret material of the user in their current epoch...
+    // plus any additional epochs they have hoarded secrets from.
+    unsigned lowerBound : BITS_EPOCH = epoch
     unsigned upperBound : BITS_EPOCH = epoch;
-    unsigned lowerBound : BITS_EPOCH = upperBound;
-
-    // Learn any additional secrets they have hoarded!
-    unsigned epochSavedFrom : BITS_EPOCH = hoarding[memberID];
+    unsigned savedSince : BITS_EPOCH = hoarding[memberID];
     if
-    :: epochSavedFrom < upperBound -> lowerBound = epochSavedFrom
+    :: savedSince != NEVER -> lowerBound = savedSince
     :: else
     fi
 
@@ -47,38 +46,11 @@ inline corrupt ( memberID )
     {
         if
         :: !(membership[memberID]) -> skip
-        :: else ->
-            printf("Passed membership guard!\n");
-            unsigned off   : BITS_VERTEX = LEAF;
-            unsigned level : BITS_VERTEX = N;
-            do
-            :: level == 0 -> break
-            :: level != 0 ->
-                d_step
-                {
-                    unsigned v : BITS_VERTEX = off+memberID;
-                    printf("tree level: %d @ %d\n", level, v);
-                    if
-                    :: attackerKnowledge[peek].node[v] == NodeUnknown -> attackerKnowledge[peek].node[v] = NodeIsKnown
-                    :: attackerKnowledge[peek].node[v] == MockUnknown -> attackerKnowledge[peek].node[v] = MockIsKnown
-                    :: else
-                    fi
-                    level = level / 2;
-                    off   = off   / 2;
-                }
-                printf("Check Index Post: %d\n", peek);
-                if
-                :: peek == upperBound ->
-                    printf("UPPER BOUNDed %d\n", peek);
-                    attacker_updates_knowledge( peek );
-                :: else ->
-                    printf("Lower Pre %d\n", peek);
-                    attacker_copy_epoch_knowledge( peek  );
-                    printf("Lower Post %d\n", peek);
-                    attacker_updates_knowledge(   peek+1 );
-                fi
-                printf("Before hand off: %d\n", peek);
-            od
+        :: else -> d_step
+            {
+                attacker_learn_leaf ( peek, memberID );
+                attacker_amend_knowledge ( peek );
+            }
         fi
     }
     attacker_check_knowledge ( epoch );

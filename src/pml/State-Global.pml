@@ -29,10 +29,11 @@ local unsigned epoch     : BITS_EPOCH;  // The current epoch
 local unsigned unsafeIDs : BITS_USERID; // Number of unsafeIDs
 
 local bool  challenge[T]; // Has the attacker challenged in an epoch?
+local byte leadership[T]; // Which member initiated the epoch?
+
 local bool membership[N]; // Group membership of current epoch
 local bool     unsafe[N]; // Members which require a change to update
 local byte   hoarding[N]; // Epoch from which the user saves secrets
-
 
 /****
   *

@@ -6,8 +6,7 @@
 
 init
 {
-    CGKA_initialize    ();
-    CGKA_create_group  ();
-    CGKA_security_game ();
-    concludedCGKA = true;
+    CGKA_initialize    ( );
+    CGKA_create_group  ( );
+    CGKA_security_game ( );
 }

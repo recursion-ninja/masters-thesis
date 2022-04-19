@@ -59,6 +59,7 @@ inline messaging_move ( e, inviter, insert, remove )
 {
     d_step
     {
+        leadership[e] = inviter;
         unsigned subject : BITS_USERID = NONE;
         d_step {
             if
@@ -232,7 +233,7 @@ inline candidate_corruption ( id )
 {
     // The corrupted user must not previously been instructed to hoard!
     // Violates the "Safety Predicate SAFE" described in Alwen 2020.
-    candidateCorruption = hoarding[id] == NONE && membership[id] && attackerKnowledge[epoch].node[LEAF+id] == NodeUnknown
+    candidateCorruption = hoarding[id] == NEVER && membership[id] && attackerKnowledge[epoch].node[LEAF+id] == NodeUnknown
 }
 
 
@@ -266,7 +267,7 @@ inline candidates_for_hoarding ()
 ****/
 inline candidate_hoarder ( id )
 {
-    candidateHoarder = hoarding[id] == NONE && membership[id]
+    candidateHoarder = hoarding[id] == NEVER && membership[id]
 }
 
 
