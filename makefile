@@ -39,7 +39,7 @@ dir-protocol-model    ::= $(abspath $(addprefix $(dir-source-code),$(extension-p
 dir-thesis-relative   ::= ./thesis/
 dir-thesis-chapters   ::= $(abspath $(addprefix $(dir-source-code),$(addsuffix /$(dir-thesis-relative),$(extension-markdown))))/
 dir-thesis-manuscript ::= $(abspath $(addprefix $(dir-documents),$(dir-thesis-relative)))/
-dir-trail-backup      ::= $(abspath $(addprefix $(dir-logging),trails))
+dir-trail-backup      ::= $(abspath $(addprefix $(dir-logging),trails))/
 
 filepath-make-definitions ::= $(wildcard $(dir-make-definitions)*.$(extension-makefile))
 
