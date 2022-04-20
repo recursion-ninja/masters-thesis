@@ -1,5 +1,5 @@
 ifndef IMPORT_MAKE_ENVIRONMENT
-IMPORT_MAKE_ENVIRONMENT ::= 1
+IMPORT_MAKE_ENVIRONMENT := 1
 
 #######
 ###
@@ -9,15 +9,15 @@ IMPORT_MAKE_ENVIRONMENT ::= 1
 
 .ONESHELL:
 .DEFAULT:;
-SHELL ::= /bin/sh
-COMMA ::= ,
-EMPTY ::=
-SPACE ::= $(EMPTY) $(EMPTY)
+SHELL := /bin/sh
+COMMA := ,
+EMPTY :=
+SPACE := $(EMPTY) $(EMPTY)
 
 endif # IMPORT_MAKE_ENVIRONMENT
 
 ifndef IMPORT_MAKE_TRANSPILE
-IMPORT_MAKE_TRANSPILE ::= 1
+IMPORT_MAKE_TRANSPILE := 1
 
 #######
 ###
@@ -38,31 +38,11 @@ dir-protocol-model   ?= ./
 ###
 #######
 
-basename-dependancies ::= constants
-filename-dependancies ::= $(addsuffix .$(extension-makefile),$(basename-dependancies))
-filepath-dependancies ::= $(abspath $(addprefix $(dir-make-definitions),$(filename-dependancies)))
+basename-dependancies := constants sources
+filename-dependancies := $(addsuffix .$(extension-makefile),$(basename-dependancies))
+filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filename-dependancies)))
 
 -include $(filepath-dependancies)
-
-#######
-###
-#   Variables for TRANSPILE
-###
-#######
-
-model-specification      ::= Model-Specification
-filename-modeling-spec   ::= $(model-specification).$(extension-promela)
-filename-modeling-code   ::= $(wildcard $(dir-protocol-model)*$(extension-promela))
-filepath-modeling-spec   ::= $(abspath $(addprefix $(dir-protocol-model),$(filename-modeling-spec)))
-filepath-modeling-code   ::= $(abspath $(filename-modeling-code))
-
-extensions-encoding-in-C ::= c h
-extensions-encoding-code ::= $(sort b m p t $(extensions-encoding-in-C))
-
-filename-encoding-in-C   ::= $(addprefix $(basename-encoding).,$(extensions-encoding-in-C))
-filename-encoding-code   ::= $(addprefix $(basename-encoding).,$(extensions-encoding-code))
-filepath-encoding-in-C   ::= $(sort $(abspath $(addprefix $(dir-output-encoding),$(filename-encoding-in-C))))
-filepath-encoding-code   ::= $(sort $(abspath $(addprefix $(dir-output-encoding),$(filename-encoding-code))))
 
 #######
 ###
@@ -90,16 +70,16 @@ installdirs:: $(dir-output-encoding)
 .INTERMEDIATE: token-encoding-code
 token-encoding-code: amend-constants $(dir-output-encoding) $(filepath-modeling-code)
 #	Setup the temporary compilation environment
-	@$(eval dir-transpile ::= $(shell mktemp -d -t transpile-XXXXXXXXXX))
-	@$(eval dir-beginning ::= $(shell pwd))
+	@$(eval dir-transpile := $(shell mktemp -d -t transpile-XXXXXXXXXX))
+	@$(eval dir-beginning := $(shell pwd))
 #	Transfer requisite source files and working location
 	@cp $(filter %.$(extension-promela),$^) $(dir-transpile)
 	@cd $(dir-transpile)
 #	Transpile specification to C code encoding
 	spin -a $(filename-modeling-spec)
 #	Add requisite yet missing include to C header file
-	@$(eval tmp-transpile ::= $(shell mktemp -t transpile-HEADER-XXX))
-	@$(eval mod-transpile ::= $(filter %.h,$(filename-encoding-code)))
+	@$(eval tmp-transpile := $(shell mktemp -t transpile-HEADER-XXX))
+	@$(eval mod-transpile := $(filter %.h,$(filename-encoding-code)))
 	@echo "#include <stdio.h>" > $(tmp-transpile)
 	@cat $(mod-transpile)     >> $(tmp-transpile)
 	@mv  $(tmp-transpile) $(mod-transpile)

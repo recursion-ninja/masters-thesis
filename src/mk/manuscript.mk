@@ -1,5 +1,5 @@
 ifndef IMPORT_MAKE_ENVIRONMENT
-IMPORT_MAKE_ENVIRONMENT ::= 1
+IMPORT_MAKE_ENVIRONMENT := 1
 
 #######
 ###
@@ -9,15 +9,15 @@ IMPORT_MAKE_ENVIRONMENT ::= 1
 
 .ONESHELL:
 .DEFAULT:;
-SHELL ::= /bin/sh
-COMMA ::= ,
-EMPTY ::=
-SPACE ::= $(EMPTY) $(EMPTY)
+SHELL := /bin/sh
+COMMA := ,
+EMPTY :=
+SPACE := $(EMPTY) $(EMPTY)
 
 endif # IMPORT_MAKE_ENVIRONMENT
 
 ifndef IMPORT_MAKE_MANUSCRIPT
-IMPORT_MAKE_MANUSCRIPT ::= 1
+IMPORT_MAKE_MANUSCRIPT := 1
 
 #######
 ###
@@ -37,18 +37,18 @@ dir-thesis-manuscript ?= ./
 #######
 
 # Input `pandoc` variables for manuscript compilation
-filename-schema     ::= schema
-filepath-schema     ::= $(abspath $(addprefix $(dir-thesis-chapters),$(addsuffix .$(extension-markdown),$(filename-schema))))
+filename-schema     := schema
+filepath-schema     := $(abspath $(addprefix $(dir-thesis-chapters),$(addsuffix .$(extension-markdown),$(filename-schema))))
 # Input content of manuscript
-formatof-chapters   ::= $(addprefix chapter[0-9][0-9].,$(extension-markdown))
-filepath-chapters   ::= $(abspath $(sort $(wildcard $(addprefix $(dir-thesis-chapters),$(formatof-chapters)))))
+formatof-chapters   := $(addprefix chapter[0-9][0-9].,$(extension-markdown))
+filepath-chapters   := $(abspath $(sort $(wildcard $(addprefix $(dir-thesis-chapters),$(formatof-chapters)))))
 # Title of manuscript used in file name and inside the manuscript
-title-of-manuscript ::= Formal Verification of TreeKEM
+title-of-manuscript := Formal Verification of TreeKEM
 # Output of manuscript
-filename-manuscript ::= $(subst $(SPACE),-,$(title-of-manuscript)).$(extension-portabledoc)
-filepath-manuscript ::= $(abspath $(dir-thesis-manuscript)$(filename-manuscript))
+filename-manuscript := $(subst $(SPACE),-,$(title-of-manuscript)).$(extension-portabledoc)
+filepath-manuscript := $(abspath $(dir-thesis-manuscript)$(filename-manuscript))
 # Temporary files created during manuscript compilation
-artifact-manuscript ::= bbl blg synctex.gz toc
+artifact-manuscript := bbl blg synctex.gz toc
 
 #######
 ###
@@ -62,7 +62,7 @@ all:: $(filepath-manuscript)
 
 clean::
 	-rm -f $(filepath-manuscript)
-	@$(eval artifact-manuscript-found ::= $(wildcard $(addprefix *.,$(artifact-manuscript))))
+	@$(eval artifact-manuscript-found := $(wildcard $(addprefix *.,$(artifact-manuscript))))
 	@$(if $(strip $(artifact-manuscript-found)),rm -f $(artifact-manuscript-found),)
 
 install:: $(filepath-manuscript)

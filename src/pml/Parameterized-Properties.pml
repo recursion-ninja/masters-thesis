@@ -2,6 +2,7 @@
 #include "State-Global.pml"
 #include "State-Networking.pml"
 
+
 ltl game_totality
 { 
   <>concludedCGKA

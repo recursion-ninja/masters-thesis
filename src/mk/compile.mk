@@ -1,5 +1,5 @@
 ifndef IMPORT_MAKE_ENVIRONMENT
-IMPORT_MAKE_ENVIRONMENT ::= 1
+IMPORT_MAKE_ENVIRONMENT := 1
 
 #######
 ###
@@ -9,15 +9,15 @@ IMPORT_MAKE_ENVIRONMENT ::= 1
 
 .ONESHELL:
 .DEFAULT:;
-SHELL ::= /bin/sh
-COMMA ::= ,
-EMPTY ::=
-SPACE ::= $(EMPTY) $(EMPTY)
+SHELL := /bin/sh
+COMMA := ,
+EMPTY :=
+SPACE := $(EMPTY) $(EMPTY)
 
 endif # IMPORT_MAKE_ENVIRONMENT
 
 ifndef IMPORT_MAKE_COMPILATION
-IMPORT_MAKE_COMPILATION ::= 1
+IMPORT_MAKE_COMPILATION := 1
 
 #######
 ###
@@ -40,9 +40,9 @@ dir-protocol-model   ?= ./
 ###
 #######
 
-basename-dependancies ::= constants transpile
-filename-dependancies ::= $(addsuffix .$(extension-makefile),$(basename-dependancies))
-filepath-dependancies ::= $(abspath $(addprefix $(dir-make-definitions),$(filename-dependancies)))
+basename-dependancies := infostr sources
+filename-dependancies := $(addsuffix .$(extension-makefile),$(basename-dependancies))
+filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filename-dependancies)))
 
 -include $(filepath-dependancies)
 
@@ -52,50 +52,51 @@ filepath-dependancies ::= $(abspath $(addprefix $(dir-make-definitions),$(filena
 ###
 #######
 
-extension-verifier ::= analysis
-basename-verifier  ::= $(infostr)
-filename-verifier  ::= $(basename-verifier).$(extension-verifier)
-filepath-verifier  ::= $(abspath $(addprefix $(dir-binaries),$(filename-verifier)))
-sources-verifier   ::= $(filepath-modeling-code) $(filepath-encoding-code)
+extension-verifier := analysis
+basename-verifier  := $(infostr)
+filename-verifier  := $(basename-verifier).$(extension-verifier)
+filepath-verifier  := $(abspath $(addprefix $(dir-binaries),$(filename-verifier)))
+pattern-verifier   := $(abspath $(addprefix $(dir-binaries),$(infostr-pattern).$(extension-verifier)))
+sources-verifier   := $(filepath-modeling-code) $(filepath-encoding-code)
 
-extension-trail ::= trail
-basename-trail  ::= $(infostr)
-filename-trail  ::= $(basename-trail).$(extension-trail)
-filepath-trail  ::= $(abspath $(filename-trail))
+extension-trail := trail
+basename-trail  := $(infostr)
+filename-trail  := $(basename-trail).$(extension-trail)
+filepath-trail  := $(abspath $(filename-trail))
 
-opt-memory ::= \
+opt-memory := \
     -DCOLLAPSE \
     -DVECTORSZ=65536 #\
     -DMA=256
 
 # 256 GB RAM
 # 32 Cores
-opt-thread ::= #\
+opt-thread := #\
     -DMEMLIM=262144 \
     -DNCORE=16
 
-opt-timing ::= #\
+opt-timing := #\
     -DNOBOUNDCHECK \
     -DSAFETY
 
-directives ::= \
+directives := \
     $(opt-memory) \
     $(opt-thread) \
     $(opt-timing) \
 
-#model-specification      ::= Model-Specification
-#filename-modeling-spec   ::= $(model-specification).$(extension-promela)
-#filename-modeling-code   ::= $(wildcard $(dir-protocol-model)*$(extension-promela))
-#filepath-modeling-spec   ::= $(abspath $(addprefix $(dir-protocol-model),$(filename-modeling-spec)))
-#filepath-modeling-code   ::= $(abspath $(filename-modeling-code))
+#model-specification      := Model-Specification
+#filename-modeling-spec   := $(model-specification).$(extension-promela)
+#filename-modeling-code   := $(wildcard $(dir-protocol-model)*$(extension-promela))
+#filepath-modeling-spec   := $(abspath $(addprefix $(dir-protocol-model),$(filename-modeling-spec)))
+#filepath-modeling-code   := $(abspath $(filename-modeling-code))
 #
-#extensions-encoding-in-C ::= c h
-#extensions-encoding-code ::= $(sort b m p t $(extensions-encoding-in-C))
+#extensions-encoding-in-C := c h
+#extensions-encoding-code := $(sort b m p t $(extensions-encoding-in-C))
 #
-#filename-encoding-in-C   ::= $(addprefix $(basename-encoding).,$(extensions-encoding-in-C))
-#filename-encoding-code   ::= $(addprefix $(basename-encoding).,$(extensions-encoding-code))
-#filepath-encoding-in-C   ::= $(sort $(abspath $(addprefix $(dir-output-encoding),$(filename-encoding-in-C))))
-#filepath-encoding-code   ::= $(sort $(abspath $(addprefix $(dir-output-encoding),$(filename-encoding-code))))
+#filename-encoding-in-C   := $(addprefix $(basename-encoding).,$(extensions-encoding-in-C))
+#filename-encoding-code   := $(addprefix $(basename-encoding).,$(extensions-encoding-code))
+#filepath-encoding-in-C   := $(sort $(abspath $(addprefix $(dir-output-encoding),$(filename-encoding-in-C))))
+#filepath-encoding-code   := $(sort $(abspath $(addprefix $(dir-output-encoding),$(filename-encoding-code))))
 
 #######
 ###
@@ -108,7 +109,7 @@ directives ::= \
 all:: $(filepath-verifier)
 
 clean::
-	rm -f $(filepath-verifier) $(log-to-out) $(log-to-err)
+	rm -f  $(pattern-verifier) $(log-to-out) $(log-to-err)
 
 install:: $(filepath-verifier)
 
@@ -128,7 +129,7 @@ backup: $(dir-trail-backup)
 	    $(trail-file) $(backup-dir)/$(trail-file) 2>/dev/null || true
 
 verification: $(filepath-verifier) backup
-	time $(filepath-verifier) -a -i
+	$(filepath-verifier) -a -i
 	@$(MAKE) --no-print-directory backup
 
 #######

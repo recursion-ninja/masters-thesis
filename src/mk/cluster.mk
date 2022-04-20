@@ -1,5 +1,5 @@
 ifndef IMPORT_MAKE_ENVIRONMENT
-IMPORT_MAKE_ENVIRONMENT ::= 1
+IMPORT_MAKE_ENVIRONMENT := 1
 
 #######
 ###
@@ -9,15 +9,15 @@ IMPORT_MAKE_ENVIRONMENT ::= 1
 
 .ONESHELL:
 .DEFAULT:;
-SHELL ::= /bin/sh
-COMMA ::= ,
-EMPTY ::=
-SPACE ::= $(EMPTY) $(EMPTY)
+SHELL := /bin/sh
+COMMA := ,
+EMPTY :=
+SPACE := $(EMPTY) $(EMPTY)
 
 endif # IMPORT_MAKE_ENVIRONMENT
 
 ifndef IMPORT_MAKE_CLUSTER
-IMPORT_MAKE_CLUSTER ::= 1
+IMPORT_MAKE_CLUSTER := 1
 
 #######
 ###
@@ -43,9 +43,9 @@ dir-source-code      ?= ./
 ###
 #######
 
-basename-dependancies ::= compile constants transpile
-filename-dependancies ::= $(addsuffix .$(extension-makefile),$(basename-dependancies))
-filepath-dependancies ::= $(abspath $(addprefix $(dir-make-definitions),$(filename-dependancies)))
+basename-dependancies := compile transpile
+filename-dependancies := $(addsuffix .$(extension-makefile),$(basename-dependancies))
+filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filename-dependancies)))
 
 -include $(filepath-dependancies)
 
@@ -56,33 +56,33 @@ filepath-dependancies ::= $(abspath $(addprefix $(dir-make-definitions),$(filena
 #######
 
 # Distribution to be moved to cluster
-filename-bundle ::= $(infostr)
-filepath-bundle ::= $(abspath $(addprefix $(dir-source-code),$(filename-bundle)))
+filename-bundle := $(infostr)
+filepath-bundle := $(abspath $(addprefix $(dir-source-code),$(filename-bundle)))
 
 # Pattern for matching any distribution
-filename-bundle-pattern  ::= $(infostr-pattern)
-filepath-bundle-pattern  ::= $(abspath $(addprefix $(dir-source-code),$(filename-bundle-pattern)))
+filename-bundle-pattern  := $(infostr-pattern)
+filepath-bundle-pattern  := $(abspath $(addprefix $(dir-source-code),$(filename-bundle-pattern)))
 
 # Distribution's PBS script file
-prefname-pbs             ::= pbs.
-prefpath-pbs             ::= $(abspath $(dir-pbs-script-parts)/$(prefname-pbs))
-filepath-pbs-body        ::= $(prefpath-pbs)script
-filepath-pbs-config      ::= $(abspath $(shell mktemp -d -t $(prefname-pbs)-XXXXXXXXXX)/config)
-filepath-pbs-defaults    ::= $(prefpath-pbs)defaults
-filepath-pbs-template    ::= $(prefpath-pbs)template
+prefname-pbs             := pbs.
+prefpath-pbs             := $(abspath $(dir-pbs-script-parts)/$(prefname-pbs))
+filepath-pbs-body        := $(prefpath-pbs)script
+filepath-pbs-config      := $(abspath $(shell mktemp -d -t $(prefname-pbs)-XXXXXXXXXX)/config)
+filepath-pbs-defaults    := $(prefpath-pbs)defaults
+filepath-pbs-template    := $(prefpath-pbs)template
 
-basename-makefile-parts  ::= compile constants transpile
-filename-makefile-parts  ::= $(addsuffix .$(extension-makefile),$(basename-dependancies))
-filepath-makefile-parts  ::= $(abspath $(addprefix $(dir-make-definitions),$(filename-makefile-parts)))
+basename-makefile-parts  := compile infostr parameters sources
+filename-makefile-parts  := $(addsuffix .$(extension-makefile),$(basename-makefile-parts))
+filepath-makefile-parts  := $(abspath $(addprefix $(dir-make-definitions),$(filename-makefile-parts)))
 
-filename-bundle-code     ::= $(notdir $(sources-verifier))
-filepath-bundle-code     ::= $(abspath $(addprefix $(filepath-bundle)/,$(filename-bundle-code)))
-filename-bundle-pbs      ::= $(filename-bundle)-pbs.sh
-filepath-bundle-pbs      ::= $(abspath $(filepath-bundle)/$(filename-bundle-pbs))
-filepath-bundle-makefile ::= $(abspath $(filepath-bundle)/makefile)
-filepath-bundle-mkparts  ::= $(abspath $(addprefix $(filepath-bundle),$(filename-makefile-parts)))
+filename-bundle-code     := $(notdir $(sources-verifier))
+filepath-bundle-code     := $(abspath $(addprefix $(filepath-bundle)/,$(filename-bundle-code)))
+filename-bundle-pbs      := $(filename-bundle)-pbs.sh
+filepath-bundle-pbs      := $(abspath $(filepath-bundle)/$(filename-bundle-pbs))
+filepath-bundle-makefile := $(abspath $(filepath-bundle)/makefile)
+filepath-bundle-mkparts  := $(abspath $(addprefix $(filepath-bundle)/,$(filename-makefile-parts)))
 
-filepath-bundle-complete ::=    \
+filepath-bundle-complete :=    \
     $(filepath-bundle-code)     \
     $(filepath-bundle-makefile) \
     $(filepath-bundle-mkparts)  \
@@ -93,7 +93,7 @@ cluster-user := ${CLUSTER_USER}
 cluster-pass := ${CLUSTER_PASS}
 cluster-auth := $(cluster-user)@$(cluster-host)
 cluster-pbs  := $(process)$(cluster-pbs-suffix)
-cluster-log-pattern ::= $(infostr-pattern)
+cluster-log-pattern := $(infostr-pattern)
 
 #######
 ###
@@ -150,9 +150,9 @@ cluster-push: $(filepath-bundle-complete) ask-password
 	@echo "Transfering:"
 	@$(call scp-with,"$(filepath-bundle)","$(cluster-auth):./")
 
-cluster-verify:
-	$(eval cluster-working-directory ::= '$$$${HOME}/$(filename-bundle)')
-	$(eval cluster-filepath-script   ::= '$$$${HOME}/$(filename-bundle)/$(filename-bundle-pbs)')
+cluster-verify: cluster-push
+	$(eval cluster-working-directory := '$$$${HOME}/$(filename-bundle)')
+	$(eval cluster-filepath-script   := '$$$${HOME}/$(filename-bundle)/$(filename-bundle-pbs)')
 	$(call ssh-with,'qsub -wd $(cluster-working-directory) $(cluster-filepath-script)')
 
 #######
