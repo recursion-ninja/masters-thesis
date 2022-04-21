@@ -5,8 +5,11 @@
 ### Script Configuration
 ##### # # # # # # # # # #
 
-# > Job name:
-#PBS -N $name$-v$version$
+# > Join STDOUT and STDERR to a single output stream
+#PBS -j oe
+#
+# > Retain the job output
+#PBS -k o
 #
 # > Nodes & CPUs:
 #PBS -l nodes=1:ppn=$cpus$
@@ -21,6 +24,9 @@
 #PBS -m abe
 #PBS -M $email$
 #
+# > Job name:
+#PBS -N $name$
+#
 # > Queue:
 #PBS -q batch-intel-v4
 #
@@ -29,6 +35,5 @@
 #
 # > Inherit environment variables
 #PBS -V
-
 
 $body$

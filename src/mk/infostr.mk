@@ -12,7 +12,12 @@ IMPORT_MAKE_ENVIRONMENT := 1
 SHELL := /bin/sh
 COMMA := ,
 EMPTY :=
+define NEWLINE
+
+$(EMPTY)
+endef
 SPACE := $(EMPTY) $(EMPTY)
+TAB   := $(shell printf '\011')
 
 endif # IMPORT_MAKE_ENVIRONMENT
 
@@ -46,31 +51,27 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 ###
 #######
 
+protocol-version-pref := v
+
 ifndef version
-infostr-protocol-version := $($(def-pref)protocol-version)
+protocol-version := $(protocol-version-pref)$($(def-pref)protocol-version)
 else
-infostr-protocol-version := $(version)
+protocol-version := $(protocol-version-pref)$(version)
 endif
 
-infostr-glue            := -
-infostr-model-name      := $(subst $(SPACE),$(infostr-glue),CGKA Model)
-infostr-protocol-name   := $(subst $(SPACE),$(infostr-glue),TreeKEM v)
-infostr-security-values := \
-    $(subst $(SPACE),$(infostr-glue),$(foreach param,$(security-parameters),$($(sec-pref)$(param))))
+infostr-glue    := -
+infostr-prefix  := $(subst $(SPACE),$(infostr-glue),CGKA TreeKEM)
+infostr-suffix  := \
+    $(subst $(SPACE),$(infostr-glue),$(protocol-version) $(foreach param,$(security-parameters),$(shell printf "$(param)%03d" $($(sec-pref)$(param)))))
+infostr-suffix-pattern := \
+    $(subst $(SPACE),$(infostr-glue),$(protocol-version-pref)[0-9] $(foreach param,$(security-parameters),$(param)[0-9][0-9][0-9]))
 
-infostr-prefix-fixed    := \
-    $(subst $(SPACE),$(infostr-glue),$(infostr-model-name) $(infostr-protocol-name))
-infostr-suffix-variable := \
-    $(subst $(SPACE),$(infostr-glue),$(infostr-protocol-version) $(infostr-security-values))
+infostr         := $(infostr-prefix)$(infostr-glue)$(infostr-suffix)
+infostr-pattern := $(infostr-prefix)$(infostr-glue)$(protocol-version-pref)*
 
-infostr                 := $(infostr-prefix-fixed)$(infostr-suffix-variable)
-infostr-pattern         := $(infostr-prefix-fixed)*
 
-#infostr-security-keys   := \
-    $(subst $(SPACE),$(infostr-glue),$(security-parameters))
-
-#$(info ( T, C, N ) = ( '$($(sec-pref)T)', '$($(sec-pref)C)', '$($(sec-pref)N)' ))
-#$(info $(infostr))
+#$(info $(NEWLINE)CGKA Security Parameters:$(NEWLINE)$(TAB)( T, C, N ) = ( '$($(sec-pref)T)', '$($(sec-pref)C)', '$($(sec-pref)N)' ))
+#$(info $(NEWLINE)Unique Model Name:$(NEWLINE)$(TAB)$(infostr))
 
 #######
 ###

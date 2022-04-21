@@ -31,6 +31,7 @@ extension-makefile   ?= mk
 extension-promela    ?= pml
 dir-backup           ?= ./trails
 dir-binaries         ?= ./
+dir-distribution     ?= ./
 dir-make-definitions ?= ./
 dir-output-encoding  ?= ./
 dir-pbs-script-parts ?= ./
@@ -57,7 +58,7 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 
 # Distribution to be moved to cluster
 filename-bundle := $(infostr)
-filepath-bundle := $(abspath $(addprefix $(dir-source-code),$(filename-bundle)))
+filepath-bundle := $(abspath $(addprefix $(dir-distribution),$(filename-bundle)))
 
 # Pattern for matching any distribution
 filename-bundle-pattern  := $(infostr-pattern)
@@ -77,15 +78,15 @@ filepath-makefile-parts  := $(abspath $(addprefix $(dir-make-definitions),$(file
 
 filename-bundle-code     := $(notdir $(sources-verifier))
 filepath-bundle-code     := $(abspath $(addprefix $(filepath-bundle)/,$(filename-bundle-code)))
-filename-bundle-pbs      := $(filename-bundle)-pbs.sh
+filename-bundle-pbs      := pbs.sh
 filepath-bundle-pbs      := $(abspath $(filepath-bundle)/$(filename-bundle-pbs))
 filepath-bundle-makefile := $(abspath $(filepath-bundle)/makefile)
 filepath-bundle-mkparts  := $(abspath $(addprefix $(filepath-bundle)/,$(filename-makefile-parts)))
 
-filepath-bundle-complete :=    \
-    $(filepath-bundle-code)     \
+filepath-bundle-complete := \
+    $(filepath-bundle-code) \
     $(filepath-bundle-makefile) \
-    $(filepath-bundle-mkparts)  \
+    $(filepath-bundle-mkparts) \
     $(filepath-bundle-pbs)
 
 cluster-host := ${CLUSTER_HOST}
@@ -102,11 +103,11 @@ cluster-log-pattern := $(infostr-pattern)
 #######
 
 define scp-with
-	@sshpass -p $(cluster-pass) scp -r $(1) $(2) && echo "\tFROM: $(1)\n\tTO:   $(2)\n"
+@sshpass -p $(cluster-pass) scp -r $(1) $(2) && echo "\tFROM: $(1)\n\tTO:   $(2)\n"
 endef
 
 define ssh-with
-	@sshpass -p $(cluster-pass) ssh $(cluster-auth) '$(1)'
+@sshpass -p $(cluster-pass) ssh $(cluster-auth) "$(1)"
 endef
 
 #######
@@ -120,9 +121,9 @@ endef
 all::;
 
 clean::
-	rm -fr $(filepath-bundle-pattern)
+	rm -fr $(dir-distribution)*
 
-installdirs:: $(filepath-bundle)
+installdirs:: $(dir-distribution)
 
 #######
 ###
@@ -139,9 +140,10 @@ ifeq ($(cluster-pass),)
 endif
 
 cluster-bundle: $(filepath-bundle-complete)
+	@echo "\nBundle created at:\n\t$(filepath-bundle)"
 
 cluster-connect: ask-password
-	$(call ssh-with)
+	@$(call ssh-with)
 
 cluster-pull: ask-password
 	@$(call scp-with,'$(cluster-auth):./{$(example-dir),$(logging-dir)}',$(dir-logging))
@@ -153,7 +155,7 @@ cluster-push: $(filepath-bundle-complete) ask-password
 cluster-verify: cluster-push
 	$(eval cluster-working-directory := '$$$${HOME}/$(filename-bundle)')
 	$(eval cluster-filepath-script   := '$$$${HOME}/$(filename-bundle)/$(filename-bundle-pbs)')
-	$(call ssh-with,'qsub -wd $(cluster-working-directory) $(cluster-filepath-script)')
+	@$(call ssh-with,'qsub -wd $(cluster-working-directory) $(cluster-filepath-script)')
 
 #######
 ###
@@ -178,6 +180,7 @@ $(filepath-bundle-mkparts): $(filepath-makefile-parts)
 $(filepath-bundle-pbs): $(filepath-pbs-config) $(filepath-pbs-body)
 	@mkdir -p $(dir $@)
 	@cat $^ > $@
+	@chmod +x $@
 
 $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	@echo "" | pandoc \
@@ -185,8 +188,7 @@ $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	  --output=$@ \
 	  --read=markdown \
 	  --template=$(filepath-pbs-template) \
-	  --variable=name:CGKA \
-	  --variable=version:$(infostr-suffix-variable) \
+	  --variable=name:$(infostr-suffix) \
 	  --write=plain
 
 endif # IMPORT_MAKE_CLUSTER

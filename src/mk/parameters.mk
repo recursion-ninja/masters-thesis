@@ -12,7 +12,12 @@ IMPORT_MAKE_ENVIRONMENT := 1
 SHELL := /bin/sh
 COMMA := ,
 EMPTY :=
+define NEWLINE
+
+$(EMPTY)
+endef
 SPACE := $(EMPTY) $(EMPTY)
+TAB   := $(shell printf '\011')
 
 endif # IMPORT_MAKE_ENVIRONMENT
 
@@ -37,7 +42,7 @@ extension-promela  ?= pml
 def-pref := default-
 sec-pref := security-parameter-
 
-$(def-pref)protocol-version := 1.0
+$(def-pref)protocol-version := 1
 $(def-pref)$(sec-pref)T     := 12
 $(def-pref)$(sec-pref)C     := 12
 $(def-pref)$(sec-pref)N     := 8
@@ -62,10 +67,10 @@ endef
 ###
 #######
 
-security-parameters := T C N
+security-parameters := T N
 $(sec-pref)T := $(call security_parameter,T)
-$(sec-pref)C := $(call security_parameter,C)
 $(sec-pref)N := $(call security_parameter,N)
+$(sec-pref)C := $($(sec-pref)T)
 
 #######
 ###
