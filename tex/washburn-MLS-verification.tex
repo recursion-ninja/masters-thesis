@@ -109,6 +109,9 @@
 	By verifying the protocol before widespread adoption, we have the opportunity to prevent potential future lapses in security, in the likely event that attacks are found later yet security corrections cannot be rapidly and uniformly applied.
 	Either outcome of the verification project will advance the field of cryptography and improve secure communication channels for everyone.
 	
+	\section*{Justification}
+	
+	Why the model is accurate representation of CGKA game.
 	
 	\section*{Methodology}
 	
@@ -130,6 +133,12 @@
 	Once PROMELA is used to produce all possible states and transitions of TreeKEM, we must supply that representation to a model checker which will verify LTL specifications. Among the many options of model checkers, we will use the SPIN model checker \cite{holzmann1997model}. SPIN provides several important features for our verification goals. The main difficulty with model checking is the size of the number of states and transitions \cite{burch1992symbolic}. Since model checking works by checking every possible combination of states and transitions, the size of sets of states directly impacts the feasibility. SPIN provides some solutions to making this problem tractable. First, SPIN supports ``on-the-fly'' verification \cite{couvreur1999fly}, which means that SPIN does not need to consider the entire set of states and transitions at the same time, but instead can work on just subsets until the whole set is verified. Second, SPIN uses a ``partial ordering'' of the states and transitions \cite{godefroid1990using} to reduce the number of subsets it needs to verify before being certain that a property holds for the whole set of states and transitions. Because of these (and many more) techniques, SPIN allows us to efficiently work with a large ``state-space'' that the novel portions of TreeKEM are likely to produce when specified with PROMELA.
 	
 	There is one last important detail the verification. Recall that what differentiates SM from SGM is that SGM involves two or more parties. There is no theoretical limit to the number of parties the protocol supports. However we also stated that model checking represents all possible states of protocol as a finite diagram of transitions. Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while our model checker requires a finite number of states. The IETF states that MLS in practice should support approximately 50,000 participants \cite{Omara2020}, which is a finite, yet very large number that is problematic for model checking. To rectify this, we will use the mathematical principle of induction. Induction allows us to show that if the security guarantees hold for $n$ parties participating in the communication channel, that the security guarantees will also hold for $n+1$ parties, where $n$ has small and tractable lower bound. By applying induction, we only need to verify that the security guarantees hold up to the lower bound of $n$ parties (perhaps $n=5$), and that the inductive step also holds. By using the principle of induction, we can verify that the security guarantees hold for any number of participating parties.
+	
+	\section*{CGKA}
+	
+	Describe the oracle based security game
+	
+	Describe impotency of queries. Describe totality and terminate of game.
 	
 	\section*{Conclusion}
 	

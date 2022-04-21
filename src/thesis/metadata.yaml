@@ -1,0 +1,31 @@
+---
+## mandatory (subtitle and header-left are optional)
+author: "Alex Washburn"
+keywords: [Formal Verification, Model Checking, Promela, Spin, TreeKEM]
+
+### really long titles may require (multiple) line break(s) in page headers when using Eisvogel
+### activate (i.e. uncomment the next line) "header-left" to define a shortened single-line version of your long title to be used in page headers
+#header-left: "Shortened version of title for running page headers ..."
+### (note to myself: "header-left" is a meta-data variable in the Eisvogel template)
+
+### activate (i.e. uncomment the next line) "headeralternative" to use chapter/section in header instead of title
+headeralternative: true
+
+#studentnumber: "12345678"
+date: "2022 - 04 - 20"
+
+reviewer1:  "Subash Shankar"
+reviewer2:  "Sven Dietrich"
+reviewer3:  "Saptarshi Debroy"
+
+## optional (mandatory, if english abstract enabled)
+abstract-en: |
+  The features of Secure Group Messaging, the security guarantees of Message Layer Security, and the TreeKEM protocol designed to satisfy these guarantees and features are explored.
+  A motivation and methodology for verification via explicit model checking is presented.
+  Subsequently, a translation of the TreeKEM protocol into a Promela reference model is describe, examining the nuances explicit model checking brings.
+  Finally the results of the formal verifcation methods are discussed.
+
+## optional
+acknowledgements: |
+  I need to acknowledge many people, TODO.
+---
