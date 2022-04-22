@@ -69,25 +69,32 @@ basename-trail  := $(infostr)
 filename-trail  := $(basename-trail).$(extension-trail)
 filepath-trail  := $(abspath $(filename-trail))
 
+# Default multi-core clustering values
+param-cores  := 4
+param-memory := 20480
+
+ifdef cores
+param-cores := $(cores) 
+endif
+
+ifdef memory
+param-memory := $(memory)
+endif
+
 opt-memory := \
     -DCOLLAPSE \
-    -DVECTORSZ=65536 #\
-    -DMA=256
+    -DVECTORSZ=65536
 
-# 256 GB RAM
-# 32 Cores
-opt-thread := #\
-    -DMEMLIM=262144 \
-    -DNCORE=16
+opt-thread := \
+    -DVMAX=256 \
+    -DMEMLIM=$(param-memory) \
+    -DNCORE=$(param-cores)
 
-opt-timing := #\
+opt-timing := \
     -DNOBOUNDCHECK \
-    -DSAFETY
+    -DSEP_STATE
 
-directives := \
-    $(opt-memory) \
-    $(opt-thread) \
-    $(opt-timing) \
+directives := $(subst $(SPACE),$(SPACE)\$(NEWLINE)$(TAB),$(opt-memory) $(opt-thread) $(opt-timing))
 
 #######
 ###
@@ -112,7 +119,7 @@ installdirs:: $(dir-binaries) $(dir-trail-backup)
 ###
 #######
 
-.PHONY: backup compile verification
+.PHONY: backup compile find-verifier verification
 
 backup: $(dir-trail-backup)
 	mv  --backup=numbered \
@@ -122,11 +129,11 @@ backup: $(dir-trail-backup)
 compile: $(filepath-verifier)
 	@printf "\nCompiled model analysis binary located at:\n\t%s\n" "$(filepath-verifier)"
 
-verifier: $(filepath-verifier)
+find-verifier:
 	@printf "%s\n" "$(filepath-verifier)"
 
 verification: $(filepath-verifier) backup
-	$(filepath-verifier) -a
+	$(filepath-verifier) -a -v
 
 #######
 ###

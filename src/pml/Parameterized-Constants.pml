@@ -12,9 +12,9 @@
   * Parameters (`t`, `c` `n`) defined as constants below:
   *
 ********/
-#define T 8
-#define C 8
-#define N 7
+#define T 10
+#define C 10
+#define N 8
 
 
 /********
@@ -25,8 +25,8 @@
   *   - N - 1
   *
 ********/
-#define BITS_T 3
-#define BITS_C 3
+#define BITS_T 4
+#define BITS_C 4
 #define BITS_N 3
 
 
@@ -46,7 +46,7 @@
   *
 ********/
 #define BITS_EPOCH  4
-#define BITS_USERID 3
+#define BITS_USERID 4
 #define BITS_VERTEX 4
 
 
@@ -61,7 +61,7 @@
   *
 ********/
 #define NEVER 15
-#define NONE  7
+#define NONE  15
 
 
 /********
@@ -112,7 +112,7 @@
   *   - MAX_REVEAL = C - 1
   *
 ********/
-#define MAX_REVEAL 7
+#define MAX_REVEAL 9
 
 
 /********
@@ -130,10 +130,10 @@
   *
 ********/
 #define FIRST_EPOCH  0
-#define FINAL_EPOCH  7
+#define FINAL_EPOCH  9
 
 #define FIRST_USERID 0
-#define FINAL_USERID 6
+#define FINAL_USERID 7
 
 #define FIRST_VERTEX 0
 #define FINAL_VERTEX 14

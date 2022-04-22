@@ -51,8 +51,6 @@ filepath-encoding-in-C    := $(sort $(abspath $(addprefix $(dir-output-encoding)
 filepath-encoding-code    := $(sort $(abspath $(addprefix $(dir-output-encoding),$(filename-encoding-code))))
 filepath-encoding-pattern := $(dir-output-encoding)$(basename-encoding).*
 
-$(info $(filepath-encoding-pattern))
-
 #######
 ###
 #   Standard targets

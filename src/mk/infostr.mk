@@ -67,10 +67,8 @@ infostr-suffix-pattern := \
     $(subst $(SPACE),$(infostr-glue),$(protocol-version-pref)[0-9] $(foreach param,$(security-parameters),$(param)[0-9][0-9][0-9]))
 
 infostr         := $(infostr-prefix)$(infostr-glue)$(infostr-suffix)
-infostr-pattern := $(infostr-prefix)$(infostr-glue)$(protocol-version-pref)*
+infostr-pattern := $(infostr-prefix)$(infostr-glue)$(infostr-suffix-pattern)
 
-
-#$(info $(NEWLINE)CGKA Security Parameters:$(NEWLINE)$(TAB)( T, C, N ) = ( '$($(sec-pref)T)', '$($(sec-pref)C)', '$($(sec-pref)N)' ))
 #$(info $(NEWLINE)Unique Model Name:$(NEWLINE)$(TAB)$(infostr))
 
 #######

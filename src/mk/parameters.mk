@@ -78,8 +78,25 @@ $(sec-pref)C := $($(sec-pref)T)
 ###
 #######
 
-.PHONY: all
+.PHONY: all 
 
 all::;
+
+#######
+###
+#   Phony targets
+###
+#######
+
+.PHONY: security-parameters
+
+security-parameters:
+	@printf "%s = %s\n" $(security-parameter-keys) $(security-parameter-vals)
+
+security-parameter-keys:
+	@printf "( %03s, %03s, %03s )\n" T C N
+
+security-parameter-vals:
+	@printf "( %03s, %03s, %03s )\n" "$($(sec-pref)T)" "$($(sec-pref)C)" "$($(sec-pref)N)"
 
 endif # IMPORT_MAKE_PARAMETERS

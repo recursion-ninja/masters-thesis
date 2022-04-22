@@ -94,7 +94,16 @@ cluster-user := ${CLUSTER_USER}
 cluster-pass := ${CLUSTER_PASS}
 cluster-auth := $(cluster-user)@$(cluster-host)
 cluster-pbs  := $(process)$(cluster-pbs-suffix)
-cluster-log-pattern := $(infostr-pattern)
+cluster-log-pattern := $(infostr-pattern)/$(infostr-suffix-pattern).*.log
+
+
+cluster-working-directory := '$${HOME}/$(filename-bundle)'
+cluster-filepath-script   := '$${HOME}/$(filename-bundle)/$(filename-bundle-pbs)'
+cluster-options :=\
+    -e $(infostr-suffix).err.log \
+    -o $(infostr-suffix).out.log \
+    -wd $(cluster-working-directory)
+
 
 #######
 ###
@@ -107,7 +116,7 @@ define scp-with
 endef
 
 define ssh-with
-@sshpass -p $(cluster-pass) ssh $(cluster-auth) "$(1)"
+@sshpass -p $(cluster-pass) ssh $(cluster-auth) '$(1)'
 endef
 
 #######
@@ -145,17 +154,17 @@ cluster-bundle: $(filepath-bundle-complete)
 cluster-connect: ask-password
 	@$(call ssh-with)
 
+
 cluster-pull: ask-password
-	@$(call scp-with,'$(cluster-auth):./{$(example-dir),$(logging-dir)}',$(dir-logging))
+	@$(call scp-with,'$(cluster-auth):./$(cluster-log-pattern)',$(dir-logging))
 
 cluster-push: $(filepath-bundle-complete) ask-password
 	@echo "Transfering:"
 	@$(call scp-with,"$(filepath-bundle)","$(cluster-auth):./")
 
+
 cluster-verify: cluster-push
-	$(eval cluster-working-directory := '$$$${HOME}/$(filename-bundle)')
-	$(eval cluster-filepath-script   := '$$$${HOME}/$(filename-bundle)/$(filename-bundle-pbs)')
-	@$(call ssh-with,'qsub -wd $(cluster-working-directory) $(cluster-filepath-script)')
+	@$(call ssh-with,'qsub $(cluster-options) $(cluster-filepath-script)')
 
 #######
 ###
@@ -188,6 +197,8 @@ $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	  --output=$@ \
 	  --read=markdown \
 	  --template=$(filepath-pbs-template) \
+	  --variable=cores:$(param-cores) \
+	  --variable=memory:$(param-memory) \
 	  --variable=name:$(infostr-suffix) \
 	  --write=plain
 

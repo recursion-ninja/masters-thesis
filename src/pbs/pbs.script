@@ -2,29 +2,28 @@
 ### Script Preamble
 ##### # # # # # # # # # #
 
-### Collect job metadata
-PBS_NODEFILE=$(/usr/bin/generate_pbs_nodefile)
-NPROCS=`wc -l < $PBS_NODEFILE`
-NNODES=`uniq $PBS_NODEFILE | wc -l`
+printenv
 
 ### Display the job context
-echo Running on host `hostname`
-echo In the directory `pwd`
-echo At the time of `date`
-echo Using ${NPROCS} processors across ${NNODES} nodes
-echo ''
 
-### Funtion to display time in a standardized format.
-timespanned() {
-    local B=$1
-    local E=$2
-    local T=$(( E-B ))
-    local D=$(( T/60/60/24 ))
-    local H=$(( T/60/60%24 ))
-    local M=$(( T/60%60    ))
-    local S=$(( T%60       ))
-    printf '%02dd %02dh %02dm %02ds\n' $D $H $M $S
-}
+printf \
+"### ### ### ### ### ### ### ###\n\
+### ### ### ###\n\
+### ###\n\
+###\n\
+         %s\n\
+###\n\
+### ###\n\
+### ### ### ###\n\
+### ### ### ### ### ### ### ###\n\n" "${SLURM_JOB_NAME}"
+
+printf "Initialized \t%s\n" "`date`"
+printf "Hosted on   \t%s\n" `hostname`
+printf "Working in  \t%s\n" `pwd`
+printf "CGKA params \t%s\n" "`make security-parameter-keys`"
+printf "CGKA values \t%s\n" "`make security-parameter-vals`"
+printf "Allocating  \t%6s MiB RAM\n" "${SLURM_MEM_PER_NODE}"
+printf "Utilizing   \t%6s CPU cores\n\n" "${SLURM_NPROCS}"
 
 
 ##### # # # # # # # # # #
@@ -33,43 +32,27 @@ timespanned() {
 
 make clean
 
-echo "Compiling encoded model from source..."
-make compile
+printf "Compiling encoded model from source...\n\t"
 
-verifier-path=$(make verifier)
-verifier-file=$(basename ${verifier-path})
-verifier-name="${s%.*}"
+make compile cores=${SLURM_NPROCS} memory=${SLURM_MEM_PER_NODE}
 
-echo "Running analysis of model ${verifier-name}..."
-initiation=$(date +%s)
-./${verifier-file} -a
-completion=$(date +%s)
+VERIFIER_PATH=$(make find-verifier)
+VERIFIER_FILE=$(basename ${VERIFIER_PATH})
+VERIFIER_NAME="${VERIFIER_FILE%.*}"
 
-printf "Start:\t%s\nEnd:\t%s\n" "${initiation}" "${completion}"
-runtime=$(timespanned "${initiation}" "${completion}")
-prinft "%s runtime:\t%s\n" "${verifier-name}" "${runtime}"
+printf "Running analysis of model %s...\n\n" "${VERIFIER_NAME}"
 
+TIME_INITIATION=$(date +%s)
+./${VERIFIER_FILE} -a -v
+TIME_COMPLETION=$(date +%s)
 
-##### # # # # # # # # # #
-### Script appendix
-##### # # # # # # # # # #
+printf "Start:\t%s\nEnd:\t%s\n" "${TIME_INITIATION}" "${TIME_COMPLETION}"
 
-# PBS environment variables available in every batch job:
-#
-# $PBS_ENVIRONMENT set to PBS_BATCH to indicate that the job is a batch job; otherwise,
-#                  set to PBS_INTERACTIVE to indicate that the job is a PBS interactive job
-# $PBS_JOBID       the job identifier assigned to the job by the batch system
-# $PBS_JOBNAME     the job name supplied by the user
-# $PBS_NODEFILE    the name of the file that contains the list of nodes assigned to the job
-# $PBS_QUEUE       the name of the queue from which the job is executed
-# $PBS_O_HOME      value of the HOME variable in the environment in which qsub was executed
-# $PBS_O_LANG      value of the LANG variable in the environment in which qsub was executed
-# $PBS_O_LOGNAME   value of the LOGNAME variable in the environment in which qsub was executed
-# $PBS_O_PATH      value of the PATH variable in the environment in which qsub was executed
-# $PBS_O_MAIL      value of the MAIL variable in the environment in which qsub was executed
-# $PBS_O_SHELL     value of the SHELL variable in the environment in which qsub was executed
-# $PBS_O_TZ        value of the TZ variable in the environment in which qsub was executed
-# $PBS_O_HOST      the name of the host upon which the qsub command is running
-# $PBS_O_QUEUE     the name of the original queue to which the job was submitted
-# $PBS_O_WORKDIR   the absolute path of the current working directory of the qsub command
-
+B=$TIME_INITIATION
+E=$TIME_COMPLETION
+T=$(( E-B ))
+D=$(( T/60/60/24 ))
+H=$(( T/60/60%24 ))
+M=$(( T/60%60    ))
+S=$(( T%60       ))
+printf '%s runtime:\t%02dd %02dh %02dm %02ds\n' "${VERIFIER_NAME}" $D $H $M $S
