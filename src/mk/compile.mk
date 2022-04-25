@@ -86,7 +86,6 @@ opt-memory := \
     -DVECTORSZ=65536
 
 opt-thread := \
-    -DVMAX=256 \
     -DMEMLIM=$(param-memory) \
     -DNCORE=$(param-cores)
 

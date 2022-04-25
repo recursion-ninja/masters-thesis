@@ -12,8 +12,8 @@
   * Parameters (`t`, `c` `n`) defined as constants below:
   *
 ********/
-#define T 10
-#define C 10
+#define T 12
+#define C 12
 #define N 8
 
 
@@ -112,7 +112,7 @@
   *   - MAX_REVEAL = C - 1
   *
 ********/
-#define MAX_REVEAL 9
+#define MAX_REVEAL 11
 
 
 /********
@@ -130,7 +130,7 @@
   *
 ********/
 #define FIRST_EPOCH  0
-#define FINAL_EPOCH  9
+#define FINAL_EPOCH  11
 
 #define FIRST_USERID 0
 #define FINAL_USERID 7

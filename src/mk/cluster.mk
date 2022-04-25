@@ -56,6 +56,9 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 ###
 #######
 
+dir-logged-trails := $(abspath $(dir-logging)$(dir-backup))/
+
+
 # Distribution to be moved to cluster
 filename-bundle := $(infostr)
 filepath-bundle := $(abspath $(addprefix $(dir-distribution),$(filename-bundle)))
@@ -94,7 +97,9 @@ cluster-user := ${CLUSTER_USER}
 cluster-pass := ${CLUSTER_PASS}
 cluster-auth := $(cluster-user)@$(cluster-host)
 cluster-pbs  := $(process)$(cluster-pbs-suffix)
-cluster-log-pattern := $(infostr-pattern)/$(infostr-suffix-pattern).*.log
+
+cluster-output-pattern   := $(infostr-pattern)/$(infostr-suffix-pattern).*.log
+cluster-trails-pattern := $(infostr-pattern)/*.$(infostr-suffix-pattern).trail
 
 
 cluster-working-directory := '$${HOME}/$(filename-bundle)'
@@ -156,15 +161,16 @@ cluster-connect: ask-password
 
 
 cluster-pull: ask-password
-	@$(call scp-with,'$(cluster-auth):./$(cluster-log-pattern)',$(dir-logging))
+	@$(call scp-with,'$(cluster-auth):./$(cluster-output-pattern)',$(dir-logging))
+	@$(call scp-with,'$(cluster-auth):./$(cluster-trails-pattern)',$(dir-logged-trails))
 
 cluster-push: $(filepath-bundle-complete) ask-password
 	@echo "Transfering:"
 	@$(call scp-with,"$(filepath-bundle)","$(cluster-auth):./")
 
-
 cluster-verify: cluster-push
 	@$(call ssh-with,'qsub $(cluster-options) $(cluster-filepath-script)')
+
 
 #######
 ###

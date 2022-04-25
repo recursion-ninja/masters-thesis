@@ -32,7 +32,7 @@ printf "Utilizing   \t%6s CPU cores\n\n" "${SLURM_NPROCS}"
 
 make clean
 
-printf "Compiling encoded model from source...\n\t"
+printf "Compiling encoded model from source...\n"
 
 make compile cores=${SLURM_NPROCS} memory=${SLURM_MEM_PER_NODE}
 
@@ -43,7 +43,7 @@ VERIFIER_NAME="${VERIFIER_FILE%.*}"
 printf "Running analysis of model %s...\n\n" "${VERIFIER_NAME}"
 
 TIME_INITIATION=$(date +%s)
-./${VERIFIER_FILE} -a -v
+./${VERIFIER_FILE} -a -v -t${VERIFIER_NAME}.trail
 TIME_COMPLETION=$(date +%s)
 
 printf "Start:\t%s\nEnd:\t%s\n" "${TIME_INITIATION}" "${TIME_COMPLETION}"
