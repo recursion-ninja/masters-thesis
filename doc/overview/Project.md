@@ -6,7 +6,7 @@
 The root directory of the project contains a few files which serve as very important resources (listed below).
 Additionally, there are a number of directories and subdirectories which store the bulk of the project's code and resources.
 Aside from the [`doc`][REPO-URI-doc] directory, which contains *very informative* project documentation, other subdirectories can be ignored by users wish to simply read or replicate the results of the project but not extend of modify it.
-For those who are interested in extensiona and modifaction to the project, fully exploring the documentation directory ([`doc`][REPO-URI-doc]) will greatly inform and direct thier understanding and manipulation of the other subdirectories included in the project.
+For those who are interested in extensiona and modification to the project, fully exploring the documentation directory ([`doc`][REPO-URI-doc]) will greatly inform and direct their understanding and manipulation of the other subdirectories included in the project.
 
 
 ### Important resources
@@ -15,19 +15,19 @@ For those who are interested in extensiona and modifaction to the project, fully
 | :-------------------------------- | :--------------------------- |
 | [`LICENSE`  ][REPO-URI-LICENSE]   | [MIT License][SPDX-MIT]      |
 | [`Makefile` ][REPO-URI-Makefile]  | Build project components     |
-| [`README.md`][REPO-URI-README.md] | Breif description of project |
+| [`README.md`][REPO-URI-README.md] | Brief description of project |
 
 
 #### [`LICENSE`][REPO-URI-LICENSE]:  
 > The contents of this project are distributed under the open source [MIT License][SPDX-MIT].
-> This license choice is based on the author's intent to broadly allow usage and extention while retaining a requirement of attribution.
+> This license choice is based on the author's intent to broadly allow usage and extension while retaining a requirement of attribution.
 
 
 #### [`Makefile`][REPO-URI-Makefile]:  
 > The `Makefile` contains a number of commands for building the project.
 > Functionality for building the project is decomposed into many make definition files located in [`src/mk`][REPO-URI-src-mk].
 > This top-level `Makefile` contains the totality of make definitions within the project.
-> Decomposition allows strategically constructing a smaller `Makefile` from a subset of the make definiton files; a technique which is used by the author for constructing simple source bundles to be compiled and executed via [GNU Make][GNU-Make] on a remote computing cluster.
+> Decomposition allows strategically constructing a smaller `Makefile` from a subset of the make definition files; a technique which is used by the author for constructing simple source bundles to be compiled and executed via [GNU Make][GNU-Make] on a remote computing cluster.
 > 
 > Verification is based on the CGKA security game played by an attacker parametwerized by `(T, C, N)` described in [Alwen et al][DOI-00].
 > Without loss of generality the project assumes `T = C`, and hence the model verification must be parameterized by `(T, N)`.
@@ -37,7 +37,7 @@ For those who are interested in extensiona and modifaction to the project, fully
 > | :------- | :----------------------------------------------------------------|
 > | `T`      | CGKA security parameter `T` (and implicitly `C`)                 |
 > | `N`      | CGKA security parameter `N                                       |
-> | `cores`  | Number of cores to use in multi-core environemnt                 |
+> | `cores`  | Number of cores to use in multi-core environment                 |
 > | `memory` | Pre-allocated and total RAM (in [Mebibytes][URI-WIKI-Binary-SI]) |
 >
 > **Example:**
@@ -60,7 +60,7 @@ For those who are interested in extensiona and modifaction to the project, fully
 
 
 #### [`README.md`][REPO-URI-README.md]:  
-> Describes a breif description and motivation of the project.
+> Describes a brief description and motivation of the project.
 > Directs the reader to documentation (including here) for more detailed project information.
 
 
