@@ -18,12 +18,12 @@ For those who are interested in extensiona and modification to the project, full
 | [`README.md`][REPO-URI-README.md] | Brief description of project |
 
 
-#### [`LICENSE`][REPO-URI-LICENSE]:  
+#### [` LICENSE `][REPO-URI-LICENSE]:  
 > The contents of this project are distributed under the open source [MIT License][SPDX-MIT].
 > This license choice is based on the author's intent to broadly allow usage and extension while retaining a requirement of attribution.
 
 
-#### [`Makefile`][REPO-URI-Makefile]:  
+#### [` Makefile `][REPO-URI-Makefile]:  
 > The `Makefile` contains a number of commands for building the project.
 > Functionality for building the project is decomposed into many make definition files located in [`src/mk`][REPO-URI-src-mk].
 > This top-level `Makefile` contains the totality of make definitions within the project.
@@ -59,7 +59,7 @@ For those who are interested in extensiona and modification to the project, full
 > - `pdf`
 
 
-#### [`README.md`][REPO-URI-README.md]:  
+#### [` README.md `][REPO-URI-README.md]:  
 > Describes a brief description and motivation of the project.
 > Directs the reader to documentation (including here) for more detailed project information.
 
@@ -71,20 +71,36 @@ The project has been arranged into multiple directories delineating different re
 | Directory               | Contents                               |
 | :---------------------- | :------------------------------------- |
 | [`bin` ][REPO-URI-bin ] | Compiled binary for model analysis     |
-| [`dist`][REPO-URI-dist] | Bundleds of parameterized source code  |
+| [`dist`][REPO-URI]      | Bundleds of parameterized source code  |
 | [`doc` ][REPO-URI-doc ] | Plethora of useful project information |
 | [`log` ][REPO-URI-log ] | Output logs of model verification      |
 | [`src` ][REPO-URI-src ] | Source code for project components     |
 
 
-### Project Components
+### [`doc`][REPO-URI-doc] Project Components
 
-Within the [`src`][REPO-URI-src] directory there is a single subdirectory for each project component.
+| Sub-directory                             | Component                             |
+| :---------------------------------------- | :------------------------------------ |
+| [`doc/community`][REPO-URI-doc-community] | Community resources for contributions |
+| [`doc/overview` ][REPO-URI-doc-overview ] | Documentation for project components  |
+
+
+### [`log`][REPO-URI-log] Project Components
+
+| Sub-directory                 | Component                                |
+| :---------------------------- | :--------------------------------------- |
+| [`log/records`][REPO-URI-log] | Recorded output of verifcation(s)        |
+| [`log/trails` ][REPO-URI-log] | Counterexample(s) produced as Spin trail |
+
+
+### [`src`][REPO-URI-src] Project Components
+
+Within the [`src`][REPO-URI-src] directory there is a single sub-directory for each buildable project component.
 
 | Sub-directory                       | Component                               |
 | :---------------------------------- | :-------------------------------------- |
 | [`src/mk`    ][REPO-URI-src-mk    ] | Decomposed `Make` definition files      |
-| [`src/pan`   ][REPO-URI-src-pan   ] | Transpiled model encoding as C source   |
+| [`src/pan`   ][REPO-URI-src       ] | Transpiled model encoding as C source   |
 | [`src/pbs`   ][REPO-URI-src-pbs   ] | PBS template for cluster execution      |
 | [`src/pml`   ][REPO-URI-src-pml   ] | CGKA model definition as Promela source |
 | [`src/thesis`][REPO-URI-src-thesis] | These text as Markdown and LaTex source |
@@ -96,16 +112,18 @@ Within the [`src`][REPO-URI-src] directory there is a single subdirectory for ea
 [SPDX-MIT]:       https://spdx.org/licenses/MIT.html
 [WIKI-Binary-SI]: https://en.wikipedia.org/wiki/Binary_prefix
 
-[REPO-URI-LICENSE   ]: https://github.com/recursion-ninja/masters-thesis/blob/master/doc/LICENSE
-[REPO-URI-Makefile  ]: https://github.com/recursion-ninja/masters-thesis/blob/master/Makefile
-[REPO-URI-README.md ]: https://github.com/recursion-ninja/masters-thesis#readme
-[REPO-URI-bin       ]: https://github.com/recursion-ninja/masters-thesis/tree/master/bin
-[REPO-URI-dist      ]: https://github.com/recursion-ninja/masters-thesis/tree/master/dist
-[REPO-URI-doc       ]: https://github.com/recursion-ninja/masters-thesis/tree/master/doc
-[REPO-URI-log       ]: https://github.com/recursion-ninja/masters-thesis/tree/master/log
-[REPO-URI-src       ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src
-[REPO-URI-src-mk    ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/mk
-[REPO-URI-src-pan   ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/pan
-[REPO-URI-src-pbs   ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/pbs
-[REPO-URI-src-pml   ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/pml
-[REPO-URI-src-thesis]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/thesis
+[REPO-URI              ]: https://github.com/recursion-ninja/masters-thesis
+[REPO-URI-LICENSE      ]: https://github.com/recursion-ninja/masters-thesis/blob/master/doc/LICENSE
+[REPO-URI-Makefile     ]: https://github.com/recursion-ninja/masters-thesis/blob/master/Makefile
+[REPO-URI-README.md    ]: https://github.com/recursion-ninja/masters-thesis#readme
+[REPO-URI-bin          ]: https://github.com/recursion-ninja/masters-thesis/tree/master/bin
+[REPO-URI-dist         ]: https://github.com/recursion-ninja/masters-thesis/tree/master/dist
+[REPO-URI-doc          ]: https://github.com/recursion-ninja/masters-thesis/tree/master/doc
+[REPO-URI-doc-community]: https://github.com/recursion-ninja/masters-thesis/tree/master/doc/community
+[REPO-URI-doc-overview ]: https://github.com/recursion-ninja/masters-thesis/tree/master/doc/overview
+[REPO-URI-log          ]: https://github.com/recursion-ninja/masters-thesis/tree/master/log
+[REPO-URI-src          ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src
+[REPO-URI-src-mk       ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/mk
+[REPO-URI-src-pbs      ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/pbs
+[REPO-URI-src-pml      ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/pml
+[REPO-URI-src-thesis   ]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/thesis

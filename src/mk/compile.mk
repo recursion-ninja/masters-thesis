@@ -37,7 +37,8 @@ dir-binaries         ?= ./
 dir-make-definitions ?= ./
 dir-output-encoding  ?= ./
 dir-protocol-model   ?= ./
-dir-trail-backup     ?= ./trails/
+dir-backup-record    ?= ./records/
+dir-backup-trail     ?= ./trails/
 
 #######
 ###
@@ -64,10 +65,15 @@ filepath-verifier  := $(abspath $(addprefix $(dir-binaries),$(filename-verifier)
 pattern-verifier   := $(dir-binaries)$(infostr-suffix-pattern).$(extension-verifier)
 sources-verifier   := $(filepath-modeling-code) $(filepath-encoding-code)
 
-extension-trail := trail
-basename-trail  := $(infostr)
-filename-trail  := $(basename-trail).$(extension-trail)
-filepath-trail  := $(abspath $(filename-trail))
+extension-trail  := trail
+basename-trail   := $(infostr)
+filename-trail   := $(basename-trail).$(extension-trail)
+filepath-trail   := $(abspath $(filename-trail))
+
+extension-record := log
+basename-record  := $(infostr)
+filename-record  := $(basename-record).$(extension-record)
+filepath-record  := $(abspath $(filename-record))
 
 # Default multi-core clustering values
 param-cores  := 4
@@ -114,7 +120,7 @@ install:: $(filepath-verifier)
 
 installcheck:: verification
 
-installdirs:: $(dir-binaries) $(dir-trail-backup)
+installdirs:: $(dir-binaries) $(dir-backup-record) $(dir-backup-trail)
 
 #######
 ###
@@ -124,10 +130,13 @@ installdirs:: $(dir-binaries) $(dir-trail-backup)
 
 .PHONY: backup compile find-verifier verification
 
-backup: $(dir-trail-backup)
-	mv  --backup=numbered \
+backup: $(dir-backup-record) $(dir-backup-trail)
+	@mv  --backup=numbered \
 	    --suffix='backup-' \
-	    $(filepath-trail) $(dir-trail-backup) 2>/dev/null || true
+	    $(filepath-record) $(dir-backup-record) 2>/dev/null || true
+	@mv  --backup=numbered \
+	    --suffix='backup-' \
+	    $(filepath-trail) $(dir-backup-trail) 2>/dev/null || true
 
 compile: $(filepath-verifier)
 	@printf "\nCompiled model analysis binary located at:\n\t%s\n" "$(filepath-verifier)"
@@ -136,7 +145,7 @@ find-verifier:
 	@printf "%s\n" "$(filepath-verifier)"
 
 verification: $(filepath-verifier) backup
-	$(filepath-verifier) -a -v
+	$(filepath-verifier) -a -v > log_file 2>&1
 
 #######
 ###
@@ -147,7 +156,10 @@ verification: $(filepath-verifier) backup
 $(dir-binaries):
 	mkdir -p $@
 
-$(dir-trail-backup):
+$(dir-backup-record):
+	mkdir -p $@
+
+$(dir-backup-trail):
 	mkdir -p $@
 
 $(filepath-verifier): $(dir-binaries) $(sources-verifier)

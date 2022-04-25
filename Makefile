@@ -41,7 +41,8 @@ dir-thesis-relative   := ./thesis/
 dir-thesis-source     := $(abspath $(dir-source-code)$(dir-thesis-relative))/
 dir-thesis-chapters   := $(abspath $(dir-thesis-source)$(extension-markdown))/
 dir-thesis-manuscript := $(dir-documents)$(dir-thesis-relative)
-dir-trail-backup      := $(abspath $(addprefix $(dir-logging),trails))/
+dir-backup-record     := $(abspath $(addprefix $(dir-logging),records))/
+dir-backup-trail      := $(abspath $(addprefix $(dir-logging),trails))/
 
 filepath-make-definitions := $(wildcard $(dir-make-definitions)*.$(extension-makefile))
 
