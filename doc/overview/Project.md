@@ -45,7 +45,7 @@ For those who are interested in extensiona and modification to the project, full
 > make installcheck T=6 N=8 cores=32 memory=262144
 > ```
 >
-> The `Makefile` defines the following [GNU Make standard targets][URI-GNU-Targets]:
+> The `Makefile` defines the following [GNU Make standard targets][GNU-Targets]:
 >
 > - `all`
 > - `check`
