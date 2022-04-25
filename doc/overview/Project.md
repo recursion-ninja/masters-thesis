@@ -18,11 +18,11 @@ For those who are interested in extensiona and modifaction to the project, fully
 | [`README.md`][URI-README.md] | Breif description of project |
 
 
-  - [**`LICENSE`  **][URI-LICENSE]:  
+  - **[`LICENSE`][URI-LICENSE]:**  
       The contents of this project are distributed under the open source [MIT License][SPDX-MIT].
       This license choice is based on the author's intent to broadly allow usage and extention while retaining a requirement of attribution.
 
-  - [**`Makefile` **][URI-Makefile]:  
+  - **[`Makefile`][URI-Makefile]:**  
       The `Makefile` contains a number of commands for building the project.
       Functionality for building the project is decomposed into many make definition files located in [`src/mk`][URI-dir-src-mk].
       This top-level `Makefile` contains the totality of make definitions within the project.
@@ -32,12 +32,12 @@ For those who are interested in extensiona and modifaction to the project, fully
       Without loss of generality the project assumes `T = C`, and hence the model verification must be parameterized by `(T, N)`.
       The `Makefile` is designed to accept these, along with other useful parameters.
 
-      | Key      | Value                                            |
-      | :------- | :----------------------------------------------- |
-      | `T`      | CGKA security parameter `T` (and implicitly `C`) |
-      | `N`      | CGKA security parameter `N                       |
-      | `cores`  | Number of cores to use in multi-core environemnt |
-      | `memory` | Pre-allocated and total RAM (in Mebibytes)       |
+      | Key      | Value                                                            |
+      | :------- | :----------------------------------------------------------------|
+      | `T`      | CGKA security parameter `T` (and implicitly `C`)                 |
+      | `N`      | CGKA security parameter `N                                       |
+      | `cores`  | Number of cores to use in multi-core environemnt                 |
+      | `memory` | Pre-allocated and total RAM (in [Mebibytes][URI-WIKI-Binary-SI]) |
 
       **Example:**
       ```
@@ -58,7 +58,7 @@ For those who are interested in extensiona and modifaction to the project, fully
         - `pdf`
 
 
-  - [**`README.md`**][URI-README.md]:  
+  - **[`README.md`][URI-README.md]:**  
     Describes a breif description and motivation of the project.
     Directs the reader to documentation (including here) for more detailed project information.
 
@@ -85,9 +85,11 @@ The project has been arranged into multiple subdirectories delineating different
 [URI-GNU-Make]:    https://www.gnu.org/software/make/
 [URI-GNU-Targets]: https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html#Standard-Targets
 
+[URI-WIKI-Binary-SI]: https://en.wikipedia.org/wiki/Binary_prefix
+
 [URI-LICENSE]:   https://github.com/recursion-ninja/masters-thesis/blob/master/doc/LICENSE
 [URI-Makefile]:  https://github.com/recursion-ninja/masters-thesis/blob/master/Makefile
 [URI-README.md]: https://github.com/recursion-ninja/masters-thesis#readme 
 
-[URI-dir-doc]: 
-[URI-dir-src-mk]:
+[URI-dir-doc]:    https://github.com/recursion-ninja/masters-thesis/tree/master/doc
+[URI-dir-src-mk]: https://github.com/recursion-ninja/masters-thesis/tree/master/src/mk
