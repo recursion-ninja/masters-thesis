@@ -18,12 +18,12 @@ For those who are interested in extensiona and modifaction to the project, fully
 | [`README.md`][REPO-URI-README.md] | Breif description of project |
 
 
-#### [`LICENSE`][REPO-URI-LICENSE]:
+#### [`LICENSE`][REPO-URI-LICENSE]:  
   The contents of this project are distributed under the open source [MIT License][SPDX-MIT].
   This license choice is based on the author's intent to broadly allow usage and extention while retaining a requirement of attribution.
 
 
-#### [`Makefile`][REPO-URI-Makefile]
+#### [`Makefile`][REPO-URI-Makefile]:  
   The `Makefile` contains a number of commands for building the project.
   Functionality for building the project is decomposed into many make definition files located in [`src/mk`][REPO-URI-src-mk].
   This top-level `Makefile` contains the totality of make definitions within the project.
@@ -59,9 +59,9 @@ For those who are interested in extensiona and modifaction to the project, fully
   - `pdf`
 
 
-#### [`README.md`][REPO-URI-README.md]:
-    Describes a breif description and motivation of the project.
-    Directs the reader to documentation (including here) for more detailed project information.
+#### [`README.md`][REPO-URI-README.md]:  
+  Describes a breif description and motivation of the project.
+  Directs the reader to documentation (including here) for more detailed project information.
 
 
 ### Project Subdivisions
