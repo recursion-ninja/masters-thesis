@@ -46,16 +46,17 @@ For those who are interested in extensiona and modifaction to the project, fully
   ```
 
   The `Makefile` defines the following [GNU Make standard targets][URI-GNU-Targets]:
-    - `all`
-    - `check`
-    - `clean`
-    - `distclean`
-    - `dist`
-    - `install`
-    - `installcheck`
-    - `installdirs`
-    - `install-pdf`
-    - `pdf`
+
+  - `all`
+  - `check`
+  - `clean`
+  - `distclean`
+  - `dist`
+  - `install`
+  - `installcheck`
+  - `installdirs`
+  - `install-pdf`
+  - `pdf`
 
 
 #### [`README.md`][REPO-URI-README.md]:
