@@ -101,14 +101,18 @@ directives := $(subst $(SPACE),$(SPACE)\$(NEWLINE)$(TAB),$(opt-memory) $(opt-thr
 ###
 #######
 
-.PHONY: all clean install installdirs
+.PHONY: all check clean install installcheck installdirs
 
 all:: $(filepath-verifier)
+
+check:: verification
 
 clean::
 	-rm -f  $(pattern-verifier)
 
 install:: $(filepath-verifier)
+
+installcheck:: verification
 
 installdirs:: $(dir-binaries) $(dir-trail-backup)
 
