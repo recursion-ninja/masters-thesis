@@ -27,7 +27,7 @@ For those who are interested in extensiona and modifaction to the project, fully
   The `Makefile` contains a number of commands for building the project.
   Functionality for building the project is decomposed into many make definition files located in [`src/mk`][REPO-URI-src-mk].
   This top-level `Makefile` contains the totality of make definitions within the project.
-  Decomposition allows strategically constructing a smaller `Makefile` from a subset of the make definiton files; a technique which is used by the author for constructing simple source bundles to be compiled and executed via [GNU Make][URI-GNU-Make] on a remote computing cluster.
+  Decomposition allows strategically constructing a smaller `Makefile` from a subset of the make definiton files; a technique which is used by the author for constructing simple source bundles to be compiled and executed via [GNU Make][GNU-Make] on a remote computing cluster.
   
   Verification is based on the CGKA security game played by an attacker parametwerized by `(T, C, N)` described in [Alwen et al][DOI-00].
   Without loss of generality the project assumes `T = C`, and hence the model verification must be parameterized by `(T, N)`.
@@ -90,10 +90,10 @@ Within the [`src`][REPO-URI-src] directory there is a single subdirectory for ea
 | [`src/thesis`][REPO-URI-src-thesis] | These text as Markdown and LaTex source |
 
 
-[DOI-00]: https://doi.org/10.1007/978-3-030-56784-2_9
-[GNU-Make]:    https://www.gnu.org/software/make/
-[GNU-Targets]: https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html#Standard-Targets
-[SPDX-MIT]: https://spdx.org/licenses/MIT.html
+[DOI-00]:         https://doi.org/10.1007/978-3-030-56784-2_9
+[GNU-Make]:       https://www.gnu.org/software/make/
+[GNU-Targets]:    https://www.gnu.org/software/make/manual/html_node/Standard-Targets.html#Standard-Targets
+[SPDX-MIT]:       https://spdx.org/licenses/MIT.html
 [WIKI-Binary-SI]: https://en.wikipedia.org/wiki/Binary_prefix
 
 [REPO-URI-LICENSE   ]: https://github.com/recursion-ninja/masters-thesis/blob/master/doc/LICENSE
