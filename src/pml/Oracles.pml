@@ -23,11 +23,12 @@ inline corrupt ( memberID )
     d_step {
         printf("\n> > >\n> CGKA: Game Move = COR %d\n> > >\n", memberID);
         assert( memberID < N );
+        activeID = memberID;
     }
 
     // Learn the secret material of the user in their current epoch...
     // plus any additional epochs they have hoarded secrets from.
-    unsigned lowerBound : BITS_EPOCH = epoch
+    unsigned lowerBound : BITS_EPOCH = epoch;
     unsigned upperBound : BITS_EPOCH = epoch;
     unsigned savedSince : BITS_EPOCH = hoarding[memberID];
     if
@@ -63,6 +64,7 @@ inline hoard( memberID )
     d_step {
         assert( memberID < N );
         printf("\n> > >\n> CGKA: Game Move = HRD %d\n> > >\n", memberID);
+        activeID = memberID;
         hoarding[memberID] = epoch
     }
 }
@@ -98,6 +100,7 @@ inline insert_member( memberID, inviteeID )
         assert( inviteeID < N );
         assert( !(membership[inviteeID]) );
     }
+move_insert:
     messaging_move( epoch + 1, memberID, inviteeID, NONE )
 }
 
@@ -112,6 +115,7 @@ inline remove_member( memberID, evicteeID )
         assert( membership[evicteeID] );
         unsafe[evicteeID] = false;
     }
+move_remove:
     messaging_move( epoch + 1, memberID, NONE, evicteeID )
 }
 
@@ -123,6 +127,7 @@ inline oblige_update( memberID )
         assert( memberID < N );
         unsafe[memberID] = false;
     }
+move_update:
     messaging_move( epoch + 1, memberID, NONE, NONE )
 }
 

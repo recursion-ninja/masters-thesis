@@ -27,6 +27,7 @@
 
 local unsigned epoch     : BITS_EPOCH;  // The current epoch
 local unsigned unsafeIDs : BITS_USERID; // Number of unsafeIDs
+local unsigned activeID  : BITS_USERID; // ID of the querried member
 
 local bool  challenge[T]; // Has the attacker challenged in an epoch?
 local byte leadership[T]; // Which member initiated the epoch?

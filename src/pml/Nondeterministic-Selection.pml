@@ -72,7 +72,7 @@ inline select_corrupted ( )
 inline select_evictor ( banned )
 {
     unsigned selectedID : BITS_USERID;
-    select_member_constrained( banned, false );
+    select_member_constrained( banned );
     evictorID = selectedID;
 }
 
@@ -81,10 +81,10 @@ inline select_evictor ( banned )
   * External result variable(s):
   *   - evicteeID
 ****/
-inline select_evictee ( forced )
+inline select_evictee ( )
 {
     unsigned selectedID : BITS_USERID;
-    select_member_constrained( NONE, forced );
+    select_member_constrained( NONE );
     evicteeID = selectedID;
 }
 
@@ -173,7 +173,7 @@ inline select_invitee ( )
 inline select_inviter ( )
 {
     unsigned selectedID : BITS_USERID;
-    select_member_constrained ( NONE, false );
+    select_member_constrained ( NONE );
     inviterID = selectedID;
 }
 
@@ -182,10 +182,10 @@ inline select_inviter ( )
   * External result variable(s):
   *   - updaterID
 ****/
-inline select_updater ( forced )
+inline select_updater ( )
 {
     unsigned selectedID : BITS_USERID;
-    select_member_constrained ( NONE, forced );
+    select_member_constrained ( NONE );
     updaterID = selectedID;
 }
 
@@ -194,10 +194,10 @@ inline select_updater ( forced )
   * External result variable(s):
   *   - selectedID
 ****/
-inline select_member_constrained ( banned, forced )
+inline select_member_constrained ( banned )
 {   atomic {
     unsigned candidateMembers : BITS_USERID = 0;
-    candidates_from_members ( banned, forced )
+    candidates_from_members ( banned )
 
     if
     :: candidateMembers == 0 -> selectedID = NONE
@@ -214,7 +214,7 @@ inline select_member_constrained ( banned, forced )
                     if
                     :: selection == NONE ->
                         bool candidateMember;
-                        candidate_member ( banned, forced, n );
+                        candidate_member ( banned, n );
                         if
                         :: candidateMember ->
                             if
@@ -269,7 +269,7 @@ inline candidates_for_invitee ( )
   * External result variable(s):
   *   - candidateMembers
 ****/
-inline candidates_from_members ( banned, forced )
+inline candidates_from_members ( banned )
 {
     unsigned candidates : BITS_USERID = 0;
     d_step
@@ -280,7 +280,7 @@ inline candidates_from_members ( banned, forced )
             d_step
             {
                 bool candidateMember;
-                candidate_member ( banned, forced, n )
+                candidate_member ( banned, n )
                 if
                 :: candidateMember -> candidates++
                 :: else
@@ -296,11 +296,11 @@ inline candidates_from_members ( banned, forced )
   * External result variable(s):
   *   - candidateMember
 ****/
-inline candidate_member ( banned, forced, id )
+inline candidate_member ( banned, id )
 {
-    bool forcesSafe = !(forced) || unsafe[id];
+//    bool forcesSafe = !(forced) || unsafe[id];
     bool isAnOption = membership[id] && (id != banned);
-    candidateMember = isAnOption && forcesSafe
+    candidateMember = isAnOption // && forcesSafe
 }
 
 

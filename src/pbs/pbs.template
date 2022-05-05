@@ -22,12 +22,13 @@
 #PBS -N $name$
 #
 # > Queue:
-#PBS -q batch-intel-v4
+#PBS -q batch-AMD
 #
 # > Shell:
 #PBS -S /bin/bash
 #
 # > Inherit environment variables
 #PBS -V
+
 
 $body$

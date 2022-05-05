@@ -90,14 +90,14 @@ inline play_move_with_commitment()
                  updaterID : BITS_USERID;
         atomic
         {
-            select_evictee ( forcedPlay );
+            select_evictee ( );
             select_evictor ( evicteeID   );
             select_invitee ( );
             select_inviter ( );
-            select_updater ( forcedPlay );
+            select_updater ( );
             d_step
             {
-                canInsert = !groupFull && !forcedPlay;
+                canInsert = !groupFull;
                 canRemove = !groupDyad && evicteeID != NONE && evictorID != NONE;
                 canUpdate = updaterID != NONE;
             }
@@ -119,7 +119,7 @@ inline play_move_with_commitment()
         do
         :: canInsert -> insert_member( inviterID, inviteeID ); break
         :: canRemove -> remove_member( evictorID, evicteeID ); break
-        :: canUpdate -> oblige_update( updaterID );            break
+        :: canUpdate -> oblige_update( updaterID            ); break
         od
 
         post_play_poll( epoch + 1);
@@ -138,8 +138,6 @@ inline play_move_with_commitment()
 ****/
 inline play_move_without_commitment()
 {
-    atomic
-    {
         unsigned corruptedID : BITS_USERID, hoarderID : BITS_USERID;
         atomic
         {
@@ -159,13 +157,12 @@ inline play_move_without_commitment()
         }
 
         do
-        :: corruptedID != NONE && !forcedPlay -> corrupt( corruptedID ); break
-        :: hoarderID   != NONE                -> hoard(     hoarderID ); break
-        :: revealRoot                         -> reveal(              ); break
+        :: corruptedID != NONE -> move_corrupt: { corrupt( corruptedID ); break }
+        :: hoarderID   != NONE -> move_hoard:   { hoard(     hoarderID ); break }
+        :: revealRoot          -> move_reveal:  { reveal(              ); break }
         od
     
         post_play_poll( epoch );
-    }
 }
 
 
@@ -256,19 +253,20 @@ inline CGKA_security_game()
     //
     // NOTE: option (1), is implicitly the last move in the model
 
+start_of_game:
     commitmentRequired = false;
 
     // Loop through all epochs
     for ( epoch : 0 .. FINAL_EPOCH)
     {
-
+start_of_epoch:
         do
         // 1. Play the Challenge Move
         //     The attacker ending the game is implicitly the last move of the model
         //     so it always happens in the last epoch.
         :: epoch == FINAL_EPOCH -> break
 
-progressEpoch:
+progress_epoch:
         // 2. Play a Commitment Move
         //     The attacker *may* play a move which commits to a new epoch...
         //     unless it is the last epoch.
@@ -284,13 +282,22 @@ progressEpoch:
         printf("\nLOOP broken: %d", epoch);
         printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", FINAL_EPOCH - epoch, unsafeIDs);
     }
-endCGKA:
+
+end_of_game:
     d_step
     {
         concludedCGKA = true;
         epoch = FINAL_EPOCH;
         print_entire_state();
     }
+}
+
+
+active proctype CGKA ()
+{
+    CGKA_initialize    ( );
+    CGKA_create_group  ( );
+    CGKA_security_game ( );
 }
 
 

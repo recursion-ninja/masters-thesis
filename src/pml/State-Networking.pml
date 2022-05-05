@@ -233,7 +233,8 @@ inline candidate_corruption ( id )
 {
     // The corrupted user must not previously been instructed to hoard!
     // Violates the "Safety Predicate SAFE" described in Alwen 2020.
-    candidateCorruption = hoarding[id] == NEVER && membership[id] && attackerKnowledge[epoch].node[LEAF+id] == NodeUnknown
+//    candidateCorruption = hoarding[id] == NEVER && membership[id] && attackerKnowledge[epoch].node[LEAF+id] == NodeUnknown
+    candidateCorruption = membership[id] && attackerKnowledge[epoch].node[LEAF+id] == NodeUnknown
 }
 
 

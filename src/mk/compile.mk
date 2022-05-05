@@ -91,6 +91,9 @@ opt-memory := \
     -DCOLLAPSE \
     -DVECTORSZ=65536
 
+opt-properties := \
+    -DREACH
+
 opt-thread := \
     -DMEMLIM=$(param-memory) \
     -DNCORE=$(param-cores)
@@ -99,7 +102,7 @@ opt-timing := \
     -DNOBOUNDCHECK \
     -DSEP_STATE
 
-directives := $(subst $(SPACE),$(SPACE)\$(NEWLINE)$(TAB),$(opt-memory) $(opt-thread) $(opt-timing))
+directives := $(subst $(SPACE),$(SPACE)\$(NEWLINE)$(TAB),$(opt-properties) $(opt-memory) $(opt-timing) $(opt-timing))
 
 #######
 ###
@@ -145,7 +148,7 @@ find-verifier:
 	@printf "%s\n" "$(filepath-verifier)"
 
 verification: $(filepath-verifier) backup
-	$(filepath-verifier) -a -v > log_file 2>&1
+	$(filepath-verifier) -a -i -v -x > $(filepath-record)
 
 #######
 ###

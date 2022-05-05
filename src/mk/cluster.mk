@@ -117,7 +117,7 @@ cluster-options :=\
 #######
 
 define scp-with
-@sshpass -p $(cluster-pass) scp -r $(1) $(2) && echo "\tFROM: $(1)\n\tTO:   $(2)\n"
+@sshpass -p $(cluster-pass) scp -pr $(1) $(2) && echo "\tFROM: $(1)\n\tTO:   $(2)\n"
 endef
 
 define ssh-with

@@ -82,6 +82,24 @@ mtype:VertexInfo = { Uninhabited, MockUnknown, MockIsKnown, NodeUnknown, NodeIsK
   *       Array: [  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ][  ]
   *       Nodes:  14  12  13   8   9  10  11   0   1   2   3   4   5   6   7
   *
+  *
+  * Similarly for (N = 4):
+  *
+  *     Left-balanced Binary Tree Topology:
+  *    
+  *             (6)
+  *            /    \
+  *         (4)     (5)
+  *        /   \   /   \
+  *       0     1 2     3
+  *     
+  *     Binary Heap Layout:
+  *     
+  *       Index:   0   1   2   3   4   5   6
+  *       Array: [  ][  ][  ][  ][  ][  ][  ]
+  *       Nodes:   6   4   5   0   1   2   3
+  *
+  *
 ****/
 typedef TreeKeys { mtype:VertexInfo node[ TREE_ORDER ]  };
 
@@ -201,14 +219,14 @@ inline attacker_learn_leaf ( named_epoch, memberID )
                 :: attackerKnowledge[named_epoch].node[spine] == MockUnknown -> attackerKnowledge[named_epoch].node[spine] = MockIsKnown
                 :: else
                 fi
-                spine = spine /  2;
+                spine = (spine - 1) / 2;
             }
         }
     }
 }
 
 
-inline attacker_study_message( e, inviter, subject )
+inline attacker_study_message ( e, inviter, subject )
 {
     atomic
     {
@@ -240,27 +258,27 @@ inline attacker_study_message( e, inviter, subject )
 }
 
 
-inline print_attacker_knowledge()
+inline print_attacker_knowledge ()
 {
     d_step
     {
         printf("\n\tAttacker Knowledge:");
-        unsigned t : BITS_EPOCH;
-        for ( t : FIRST_EPOCH .. FINAL_EPOCH )
+        unsigned pt : BITS_EPOCH;
+        for ( pt : FIRST_EPOCH .. FINAL_EPOCH )
         {
-            printf("\n>>> %d vvv", t);
+            printf("\n>>> %d vvv", pt);
             d_step
             {
                 unsigned v : BITS_VERTEX;
                 for ( v : FIRST_VERTEX .. FINAL_VERTEX )
                 {
                     if
-                    :: attackerKnowledge[t].node[v] == MockUnknown -> printf("\n\t%d [ x ]", v)
-                    :: attackerKnowledge[t].node[v] == NodeUnknown -> printf("\n\t%d [ X ]", v)
-                    :: attackerKnowledge[t].node[v] == MockIsKnown -> printf("\n\t%d [ o ]", v)
-                    :: attackerKnowledge[t].node[v] == NodeIsKnown -> printf("\n\t%d [ O ]", v)
-                    :: attackerKnowledge[t].node[v] == Uninhabited -> printf("\n\t%d [   ]", v)
-                    :: else                                        -> printf("\n\t%d [ ? ]", v)
+                    :: attackerKnowledge[pt].node[v] == MockUnknown -> printf("\n\t%d [ x ]", v)
+                    :: attackerKnowledge[pt].node[v] == NodeUnknown -> printf("\n\t%d [ X ]", v)
+                    :: attackerKnowledge[pt].node[v] == MockIsKnown -> printf("\n\t%d [ o ]", v)
+                    :: attackerKnowledge[pt].node[v] == NodeIsKnown -> printf("\n\t%d [ O ]", v)
+                    :: attackerKnowledge[pt].node[v] == Uninhabited -> printf("\n\t%d [   ]", v)
+                    :: else                                         -> printf("\n\t%d [ ? ]", v)
                     fi
                 }
             }
@@ -302,46 +320,54 @@ inline attacker_has_no_epoch_knowledge ( e )
 inline attacker_init_epoch_knowledge ( e )
 {   atomic {
 
-    unsigned height : BITS_VERTEX;
-    unsigned offset : BITS_VERTEX = LEAF;
-    unsigned width  : BITS_VERTEX = (TREE_ORDER / 2) + 1;
-    for ( height : 0 .. BITS_VERTEX - 1 )
+    unsigned height  : BITS_VERTEX;
+    unsigned offset  : BITS_VERTEX = LEAF;
+    unsigned width   : BITS_VERTEX = (TREE_ORDER / 2) + 1;
+    unsigned treetop : BITS_VERTEX = BITS_VERTEX - 1;    
+    for ( height : 0 .. treetop )
     {
         d_step
         {
             unsigned n : BITS_VERTEX;
             for ( n : 0 .. width - 1 )
             {
-                unsigned v : BITS_VERTEX = offset + n;
-                // Leaf node case(s)
-                if
-                :: height == 0 ->
+                d_step
+                {
+                    unsigned v : BITS_VERTEX = offset + n;
+                    mtype:VertexInfo info = Uninhabited;
                     if
-                    // No knowledge from excluded group members
-                    :: n >= N || !(membership[n]) -> attackerKnowledge[e].node[v] = Uninhabited
-                    :: else                       -> attackerKnowledge[e].node[v] = NodeUnknown
+                    // Root node case(s)
+                    :: height == treetop -> info = NodeUnknown
+                    // Leaf node case(s)
+                    :: height == 0 ->
+                        if
+                        // No knowledge from excluded group members
+                        :: n >= N || !(membership[n]) -> info = Uninhabited
+                        :: else                       -> info = NodeUnknown
+                        fi
+                    // Internal node case(s)
+                    :: else ->
+                        bool voidL, voidR;
+                        d_step
+                        {
+                            unsigned childL : BITS_VERTEX = v * 2 + 1;
+                            unsigned childR : BITS_VERTEX = v * 2 + 2;
+                            // Check current epoch for existance of subtrees
+                            bool existanceOfSubtree;
+                            existance_of_subtree( e, childL);
+                            voidL = !existanceOfSubtree;
+                            existance_of_subtree( e, childR);
+                            voidR = !existanceOfSubtree;
+                        }
+                        if
+                        ::  voidL &&  voidR -> info = Uninhabited
+                        :: !voidL &&  voidR -> info = MockUnknown
+                        ::  voidL && !voidR -> info = MockUnknown
+                        :: !voidL && !voidR -> info = NodeUnknown
+                        fi
                     fi
-                // Internal node case(s)
-                :: else ->
-                    bool voidL, voidR;
-                    d_step
-                    {
-                        unsigned childL : BITS_VERTEX = v * 2 + 1;
-                        unsigned childR : BITS_VERTEX = v * 2 + 2;
-                        // Check current epoch for existance of subtrees
-                        bool existanceOfSubtree;
-                        existance_of_subtree( e, childL);
-                        voidL = !existanceOfSubtree;
-                        existance_of_subtree( e, childR);
-                        voidR = !existanceOfSubtree;
-                    }
-                    if
-                    ::  voidL &&  voidR -> attackerKnowledge[e].node[v] = Uninhabited
-                    :: !voidL &&  voidR -> attackerKnowledge[e].node[v] = MockUnknown
-                    ::  voidL && !voidR -> attackerKnowledge[e].node[v] = MockUnknown
-                    :: !voidL && !voidR -> attackerKnowledge[e].node[v] = NodeUnknown
-                    fi
-                fi
+                    attackerKnowledge[e].node[v] = info;
+                }
             };
             offset = offset / 2;
             width  = width  / 2;
@@ -366,7 +392,7 @@ inline attacker_copy_epoch_knowledge( e )
             {
                 unsigned v : BITS_VERTEX = offset + n;
                 bool knowledgeOfSubtree;
-                knowledge_of_subtree( e, v);
+                knowledge_of_subtree( e, v );
                 if
                 :: v == spine -> skip
                 :: v != spine ->
@@ -377,20 +403,23 @@ inline attacker_copy_epoch_knowledge( e )
                     fi
                 fi
             };
-            offset = offset / 2;
-            width  = width  / 2;
+            offset = offset      / 2;
+            spine  = (spine - 1) / 2;
+            width  = width       / 2;
         }
     }
+    print_attacker_knowledge ();
 }   }
 
 
 inline attacker_updates_knowledge( e )
 {   atomic {
 
-    unsigned height : BITS_VERTEX;
-    unsigned offset : BITS_VERTEX = LEAF;
-    unsigned width  : BITS_VERTEX = (TREE_ORDER / 2) + 1;
-    for ( height : 0 .. BITS_VERTEX - 1 )
+    unsigned height  : BITS_VERTEX;
+    unsigned offset  : BITS_VERTEX = LEAF;
+    unsigned width   : BITS_VERTEX = (TREE_ORDER / 2) + 1;
+    unsigned treetop : BITS_VERTEX = BITS_VERTEX - 1;    
+    for ( height : 0 .. treetop )
     {
         d_step
         {
@@ -399,7 +428,7 @@ inline attacker_updates_knowledge( e )
             {
                 unsigned v : BITS_VERTEX = offset + n;
                 if
-                :: height == 0 -> skip
+                :: height == 0 -> skip // Leaf node case
                 :: else ->
                     bool knowsL, knowsR, voidL, voidR;
                     atomic
@@ -422,15 +451,25 @@ inline attacker_updates_knowledge( e )
                         knowsR = knowledgeOfSubtree;
                     }
                     if
-                    ::  voidL &&  voidR                       -> attackerKnowledge[e].node[v] = Uninhabited
-                    :: !voidL &&  voidR &&             knowsR -> attackerKnowledge[e].node[v] = MockIsKnown
-                    :: !voidL &&  voidR &&            !knowsR -> attackerKnowledge[e].node[v] = MockUnknown
-                    ::  voidL && !voidR &&  knowsL            -> attackerKnowledge[e].node[v] = MockIsKnown
-                    ::  voidL && !voidR && !knowsL            -> attackerKnowledge[e].node[v] = MockUnknown
-                    :: !voidL && !voidR &&  knowsL &&  knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
-                    :: !voidL && !voidR && !knowsL &&  knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
-                    :: !voidL && !voidR &&  knowsL && !knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
-                    :: !voidL && !voidR && !knowsL && !knowsR -> attackerKnowledge[e].node[v] = NodeUnknown
+                    // Root node case(s)
+                    :: height == treetop ->
+                        if 
+                        :: knowsL || knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
+                        :: else             -> attackerKnowledge[e].node[v] = NodeUnknown
+                        fi
+                    // Internal node case(s)
+                    :: else ->
+                        if
+                        ::  voidL &&  voidR                       -> attackerKnowledge[e].node[v] = Uninhabited
+                        :: !voidL &&  voidR &&             knowsR -> attackerKnowledge[e].node[v] = MockIsKnown
+                        :: !voidL &&  voidR &&            !knowsR -> attackerKnowledge[e].node[v] = MockUnknown
+                        ::  voidL && !voidR &&  knowsL            -> attackerKnowledge[e].node[v] = MockIsKnown
+                        ::  voidL && !voidR && !knowsL            -> attackerKnowledge[e].node[v] = MockUnknown
+                        :: !voidL && !voidR &&  knowsL &&  knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
+                        :: !voidL && !voidR && !knowsL &&  knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
+                        :: !voidL && !voidR &&  knowsL && !knowsR -> attackerKnowledge[e].node[v] = NodeIsKnown
+                        :: !voidL && !voidR && !knowsL && !knowsR -> attackerKnowledge[e].node[v] = NodeUnknown
+                        fi
                     fi
                 fi
             };
