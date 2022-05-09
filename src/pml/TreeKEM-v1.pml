@@ -117,15 +117,6 @@ TreeKeys attackerKnowledge[T];
 
 /****
   *
-  * This global variable is used as a "return buffer" for the inline definition
-  * 'attacker_check_knowledge'.
-  *
-****/
-bool attackerKnowsRootKey = false;
-
-
-/****
-  *
   * Export inline definitions for:
   *   - attacker_amend_knowledge
   *   - attacker_check_knowledge
@@ -145,15 +136,15 @@ inline attacker_amend_knowledge ( named_epoch )
     // Assumes that some knowledge within 'named_epoch' has changed.
     if
     :: named_epoch >= epoch -> skip
-    :: else -> d_step
+    :: else -> atomic
         {
             unsigned t : BITS_EPOCH;
             for ( t : named_epoch + 1 .. epoch )
             {
-                attacker_copy_epoch_knowledge( t - 1 );
-                attacker_updates_knowledge ( t );
+                attacker_copy_epoch_knowledge ( t - 1 );
+                attacker_updates_knowledge    ( t     );
             }
-            attacker_check_knowledge( epoch );
+            attacker_check_knowledge ( epoch );
         }
     fi
 }
@@ -161,20 +152,18 @@ inline attacker_amend_knowledge ( named_epoch )
 
 inline attacker_check_knowledge ( named_epoch )
 {
-    bool anyRootKnown = false;
     d_step
     {
         unsigned e : BITS_EPOCH;
         for ( e : FIRST_EPOCH .. named_epoch )
         {
-            anyRootKnown = anyRootKnown || attackerKnowledge[e].node[ROOT]
+            learnedKey[named_epoch] = attackerKnowledge[e].node[ROOT] == NodeIsKnown;
         }
     }
-    attackerKnowsRootKey = anyRootKnown;
 }
 
 
-inline attacker_initialize()
+inline attacker_initialize ( )
 {
     d_step
     {
@@ -189,8 +178,8 @@ inline attacker_initialize()
                     attackerKnowledge[t].node[v] = Uninhabited
                 }
             }
+            learnedKey[t] = false;
         }
-        attackerKnowsRootKey = false;
     }
 }
 
@@ -198,6 +187,7 @@ inline attacker_initialize()
 inline attacker_learn_root ( named_epoch )
 {
     attackerKnowledge[named_epoch].node[ROOT] -> NodeIsKnown;
+    learnedKey[named_epoch] = true;
 }
 
 
@@ -238,9 +228,9 @@ inline attacker_study_message ( e, inviter, subject )
         //   * MockUnknown
         //   * Uninhabited
         bool noEpochKnowledge;
-        attacker_has_no_epoch_knowledge( e );
+        attacker_has_no_epoch_knowledge ( e );
         if
-        :: noEpochKnowledge -> attacker_init_epoch_knowledge( e );
+        :: noEpochKnowledge -> attacker_init_epoch_knowledge ( e );
         :: else
         fi
         
@@ -251,39 +241,53 @@ inline attacker_study_message ( e, inviter, subject )
         :: else
         fi
 
-        attacker_copy_epoch_knowledge( referenceEpoch );
-        attacker_updates_knowledge ( e );
-        attacker_check_knowledge( e );
+        attacker_copy_epoch_knowledge ( referenceEpoch );
+        attacker_updates_knowledge    ( e );
+        attacker_check_knowledge      ( e );
     }
 }
 
 
-inline print_attacker_knowledge ()
+inline print_attacker_knowledge ( )
 {
     d_step
     {
-        printf("\n\tAttacker Knowledge:");
+        printf ( "\n\tAttacker Knowledge:" );
         unsigned pt : BITS_EPOCH;
         for ( pt : FIRST_EPOCH .. FINAL_EPOCH )
         {
-            printf("\n>>> %d vvv", pt);
+            printf ( "\n\t  >>>\t@ %d\t<<<", pt );
             d_step
             {
+                printf ( "\n\t  ---\t-----\t---" );
+                unsigned d : BITS_VERTEX = 2;
                 unsigned v : BITS_VERTEX;
                 for ( v : FIRST_VERTEX .. FINAL_VERTEX )
                 {
                     if
-                    :: attackerKnowledge[pt].node[v] == MockUnknown -> printf("\n\t%d [ x ]", v)
-                    :: attackerKnowledge[pt].node[v] == NodeUnknown -> printf("\n\t%d [ X ]", v)
-                    :: attackerKnowledge[pt].node[v] == MockIsKnown -> printf("\n\t%d [ o ]", v)
-                    :: attackerKnowledge[pt].node[v] == NodeIsKnown -> printf("\n\t%d [ O ]", v)
-                    :: attackerKnowledge[pt].node[v] == Uninhabited -> printf("\n\t%d [   ]", v)
-                    :: else                                         -> printf("\n\t%d [ ? ]", v)
+                    :: ( v + 1 ) == d ->
+                        printf ( "\n\t  ---\t-----\t---" );
+                        if
+                        :: d < N -> d = d * 2;
+                        :: else
+                        fi
+                    :: else
+                    fi
+
+                    if
+                    :: attackerKnowledge[pt].node[v] == MockUnknown -> printf ( "\n\t  %d [\tx\t]", v )
+                    :: attackerKnowledge[pt].node[v] == NodeUnknown -> printf ( "\n\t  %d [\tX\t]", v )
+                    :: attackerKnowledge[pt].node[v] == MockIsKnown -> printf ( "\n\t  %d [\to\t]", v )
+                    :: attackerKnowledge[pt].node[v] == NodeIsKnown -> printf ( "\n\t  %d [\tO\t]", v )
+                    :: attackerKnowledge[pt].node[v] == Uninhabited -> printf ( "\n\t  %d [\t \t]", v)
+                    :: else                                         -> printf ( "\n\t  %d [\t?\t]", v )
                     fi
                 }
+            printf ( "\n\t  ---\t-----\t---" );
+            printf ( "\n" );
             }
         };
-        printf("\n");
+        printf ( "\n" );
     }
 }
 
@@ -354,9 +358,9 @@ inline attacker_init_epoch_knowledge ( e )
                             unsigned childR : BITS_VERTEX = v * 2 + 2;
                             // Check current epoch for existance of subtrees
                             bool existanceOfSubtree;
-                            existance_of_subtree( e, childL);
+                            existance_of_subtree ( e, childL);
                             voidL = !existanceOfSubtree;
-                            existance_of_subtree( e, childR);
+                            existance_of_subtree ( e, childR);
                             voidR = !existanceOfSubtree;
                         }
                         if
@@ -392,7 +396,7 @@ inline attacker_copy_epoch_knowledge( e )
             {
                 unsigned v : BITS_VERTEX = offset + n;
                 bool knowledgeOfSubtree;
-                knowledge_of_subtree( e, v );
+                knowledge_of_subtree ( e, v );
                 if
                 :: v == spine -> skip
                 :: v != spine ->
@@ -408,11 +412,11 @@ inline attacker_copy_epoch_knowledge( e )
             width  = width       / 2;
         }
     }
-    print_attacker_knowledge ();
+    print_attacker_knowledge ( );
 }   }
 
 
-inline attacker_updates_knowledge( e )
+inline attacker_updates_knowledge ( e )
 {   atomic {
 
     unsigned height  : BITS_VERTEX;
@@ -438,16 +442,16 @@ inline attacker_updates_knowledge( e )
 
                         // Check current epoch for existance of subtrees
                         bool existanceOfSubtree;
-                        existance_of_subtree( e, childL);
+                        existance_of_subtree ( e, childL);
                         voidL = !existanceOfSubtree;
-                        existance_of_subtree( e, childR);
+                        existance_of_subtree ( e, childR);
                         voidR = !existanceOfSubtree;
                         
                         // Check previous epoch for knowledge of subtrees
                         bool knowledgeOfSubtree;
-                        knowledge_of_subtree( e, childL);
+                        knowledge_of_subtree ( e, childL);
                         knowsL = knowledgeOfSubtree;
-                        knowledge_of_subtree( e, childR);
+                        knowledge_of_subtree ( e, childR);
                         knowsR = knowledgeOfSubtree;
                     }
                     if
@@ -480,13 +484,13 @@ inline attacker_updates_knowledge( e )
 }   }
 
 
-inline existance_of_subtree( t, v )
+inline existance_of_subtree ( t, v )
 {
     existanceOfSubtree = attackerKnowledge[t].node[v] != Uninhabited
 }
 
 
-inline knowledge_of_subtree( t, v )
+inline knowledge_of_subtree ( t, v )
 {
     knowledgeOfSubtree = attackerKnowledge[t].node[v] == NodeIsKnown || attackerKnowledge[t].node[v] == MockIsKnown
 }

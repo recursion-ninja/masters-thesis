@@ -2,117 +2,162 @@
 #include "State-Global.pml"
 #include "State-Networking.pml"
 
+
+/********
+    *
+    * Important LTL Properties:
+    *
+    *   - Totality
+    *   - FSU (Future Secrecy with Updates)
+    *   - PCS (Post-Compromise Security)
+    *
+********/
+
+
+/****
+  *
+  * LTL: Totality
+  *
+  * The CGKA game always halts
+  *
+****/
+/**
+ltl Totality
+{
+  <> CGKA@end_of_game
+}
+**/
+
+
+/****
+  *
+  * LTL: FSU (Future Secrecy with Updates)
+  *
+****/
+/**
 #define future_secrecy_of_epoch( t ) \
 (  \
-    (   <> \
+    (  \
+        <> \
         (  \
             ( CGKA@start_of_epoch ) \
         && \
-            ( epoch == (t + 1)) \
+            ( epoch == (t + 1) ) \
         && \
-            ( attackerKnowledge[t].node[ROOT] != NodeIsKnown ) \
+            ( !(learnedKey[t]) ) \
         )  \
     ) \
 -> \
     (  \
-        ( attackerKnowledge[t].node[ROOT] != NodeIsKnown ) \
+        ( !(learnedKey[t]) ) \
     U  \
         ( CGKA@end_of_game ) \
     )  \
 )
 
 
-#define trivial_hoard_then_corrupt( id ) \
-(  \
-    (  \
-        ( CGKA@move_hoard ) \
-    && \
-        ( activeID == id  ) \
-    )  \
--> \
-    (   <> \
-        (  \
-           ( CGKA@move_corrupt ) \
-        && \
-           ( activeID == id    ) \
-        )  \
-    )  \
-)
-
-
-#define no_trivial_hoard_then_corrupt( id ) \
+#define never_trivially_hoard_then_corrupt \
 ( \
+    [] \
     (  \
-        ( CGKA@move_hoard ) \
-    && \
-        ( activeID == id  ) \
-    ) \
--> \
-    ( \
-        (  \
-            !( CGKA@move_corrupt ) \
-        && \
-             ( activeID == id    ) \
-        )  \
-    U  \
-        ( CGKA@end_of_game ) \
-    ) \
+       ( CGKA@move_corrupt ) \
+    -> \
+        ( ( hoarding[targetID] == NEVER ) ) \
+    )  \
 )
 
-
-/*
-( ( t < epoch && attackerKnowledge[t].node[ROOT] != NodeIsKnown) -> ( ( attackerKnowledge[t].node[ROOT] != NodeIsKnown ) U concludedCGKA ) )
-*/
-
-
-ltl future_secrecy
+ltl FSU
 { 
-    ( [] (    no_trivial_hoard_then_corrupt( 0 )
-          &&  no_trivial_hoard_then_corrupt( 1 )
-          &&  no_trivial_hoard_then_corrupt( 2 )
-          &&  no_trivial_hoard_then_corrupt( 3 )
-         )
-    )
+    never_trivially_hoard_then_corrupt
     ->
     (   future_secrecy_of_epoch( 0 )
     &&  future_secrecy_of_epoch( 1 )
     &&  future_secrecy_of_epoch( 2 )
     )
 }
+**/
 
 
-/*
-ltl game_totality
+/****
+  *
+  * LTL: PCS (Post-Compromise Security)
+  *
+****/
+/**/
+ltl PCS
 { 
-  <> ( CGKA@end_of_game )
+    [] ( ( CGKA@start_of_epoch && ( unsafeIDs == 0 ) ) -> ( !( learnedKey[epoch] ) ) )
 }
+/**/
+/*
+#define corrupt_then_recover( id ) \
+(  \
+   ( \
+      ( CGKA@move_corrupt ) \
+   && \
+      ( targetID == id    ) \
+   ) \
+-> \
+    (  \
+        <> \
+        ( \
+            (  \
+                ( CGKA@move_remove ) \
+            && \
+                ( targetID == id ) \
+            )  \
+        || \
+            (  \
+                ( CGKA@move_update ) \
+            && \
+                ( originID == id ) \
+            )  \
+        ) \
+    ) \
+)
+
+
+ltl PCS
+{ 
+    (
+        []
+        (  corrupt_then_recover ( 0 )
+        && corrupt_then_recover ( 1 )
+        && corrupt_then_recover ( 2 )
+        && corrupt_then_recover ( 3 )
+        )
+        && CGKA@end_of_game
+    )
+    ->
+    ( !(learnedKey[FINAL_EPOCH]) )
+}
+
+
+#define post_compromise_security_of_epoch( id ) \
+(  \
+    [] \
+    (  \
+        (   CGKA@start_of_epoch \
+        && ( targetID == id ) \
+        ) \
+    -> \
+        ( attackerKnowledge[epoch].node[ROOT] != NodeIsKnown ) \
+    )  \
+)
+
 */
 
+
+
+
+
+
+
+
+
+
+
 /*
-ltl future_secrecy
-{ 
-    []
-    (   (   ( CGKA@start_of_epoch && epoch == 1 && attackerKnowledge[0].node[ROOT] != NodeIsKnown)
-        ->  ( ( attackerKnowledge[0].node[ROOT] != NodeIsKnown ) U CGKA@end_of_game )
-        )
-    &&  (  ( 1 < epoch && attackerKnowledge[1].node[ROOT] != NodeIsKnown) -> ( ( attackerKnowledge[1].node[ROOT] != NodeIsKnown ) U concludedCGKA ) )
-    &&  (  ( 2 < epoch && attackerKnowledge[2].node[ROOT] != NodeIsKnown) -> ( ( attackerKnowledge[2].node[ROOT] != NodeIsKnown ) U concludedCGKA ) )
-    )
-}
-
-
-ltl trivial_safety
-{ 
-  []( attackerKnowledge[epoch].node[ROOT] == NodeIsKnown -> ( triviality && epoch <= FINAL_EPOCH ) )
-}
-
-
-ltl challenge
-{
-  []( { concludedCGKA && !(triviality) } -> { attackerKnowledge[FINAL_EPOCH].node[ROOT] != NodeIsKnown } )
-}
-
-
 ltl attendees_more_than_one
 {
   [](attendees > 1)

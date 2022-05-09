@@ -29,7 +29,7 @@ inline select_corrupted ( )
 {   atomic {
 
     unsigned candidateCorruptibles : BITS_USERID;
-    candidates_for_corruption();
+    candidates_for_corruption ( );
     if
     :: candidateCorruptibles == 0 -> corruptedID = NONE
     :: else ->
@@ -46,7 +46,7 @@ inline select_corrupted ( )
                     if
                     :: selection == NONE ->
                         bool candidateCorruption;
-                        candidate_corruption( n );
+                        candidate_corruption ( n );
                         if
                         :: candidateCorruption ->
                             if
@@ -71,9 +71,13 @@ inline select_corrupted ( )
 ****/
 inline select_evictor ( banned )
 {
-    unsigned selectedID : BITS_USERID;
-    select_member_constrained( banned );
-    evictorID = selectedID;
+    if
+    :: attendees <= 2 -> evictorID = NONE;
+    :: else ->
+        unsigned selectedID : BITS_USERID;
+        select_member_constrained ( banned );
+        evictorID = selectedID;
+    fi
 }
 
 
@@ -83,9 +87,13 @@ inline select_evictor ( banned )
 ****/
 inline select_evictee ( )
 {
-    unsigned selectedID : BITS_USERID;
-    select_member_constrained( NONE );
-    evicteeID = selectedID;
+    if
+    :: attendees <= 2 -> evicteeID = NONE;
+    :: else ->
+        unsigned selectedID : BITS_USERID;
+        select_member_constrained ( NONE );
+        evicteeID = selectedID;
+    fi
 }
 
 
@@ -116,7 +124,7 @@ inline select_hoarder ( )
                     :: selection != NONE -> skip
                     :: else ->
                         bool candidateHoarder
-                        candidate_hoarder( n );
+                        candidate_hoarder ( n );
                         if
                         :: !(candidateHoarder) -> skip
                         :: else ->
@@ -140,29 +148,34 @@ inline select_hoarder ( )
 ****/
 inline select_invitee ( )
 {   atomic {
-
-    unsigned candidateInvitees : BITS_USERID;
-    candidates_for_invitee();
-
-    unsigned selection : BITS_USERID = NONE;
-    d_step
-    {
-        unsigned n      : BITS_USERID;
-        unsigned sample : BITS_USERID;
-        select(  sample : 0 .. candidateInvitees - 1 );
-        for ( n : FIRST_USERID .. FINAL_USERID ) {
-            if
-            :: selection != NONE || membership[n] -> skip
-            :: else ->
-                if
-                :: sample != 0 -> sample--
-                :: sample == 0 -> selection = n
-                fi
-            fi
-        }
-    }
-    
-    inviteeID = selection;
+    if
+    :: attendees == N -> inviteeID = NONE;
+    :: else ->
+        unsigned candidateInvitees : BITS_USERID;
+        candidates_for_invitee ( );
+        if
+        :: candidateInvitees == 0 -> inviteeID = NONE;
+        :: else ->
+            unsigned selection : BITS_USERID = NONE;
+            d_step
+            {
+                unsigned n      : BITS_USERID;
+                unsigned sample : BITS_USERID;
+                select ( sample : 0 .. candidateInvitees - 1 );
+                for ( n : FIRST_USERID .. FINAL_USERID ) {
+                    if
+                    :: selection != NONE || membership[n] -> skip
+                    :: else ->
+                        if
+                        :: sample != 0 -> sample--
+                        :: sample == 0 -> selection = n
+                        fi
+                    fi
+                }
+            }
+            inviteeID = selection;
+        fi
+    fi
 }   }
 
 
@@ -172,9 +185,13 @@ inline select_invitee ( )
 ****/
 inline select_inviter ( )
 {
-    unsigned selectedID : BITS_USERID;
-    select_member_constrained ( NONE );
-    inviterID = selectedID;
+    if
+    :: attendees == N -> inviterID = NONE;
+    :: else ->
+        unsigned selectedID : BITS_USERID;
+        select_member_constrained ( NONE );
+        inviterID = selectedID;
+    fi
 }
 
 
@@ -207,7 +224,7 @@ inline select_member_constrained ( banned )
         {
             unsigned n      : BITS_USERID;
             unsigned sample : BITS_USERID;
-            select(  sample : 0 .. candidateMembers - 1 );
+            select ( sample : 0 .. candidateMembers - 1 );
             for ( n : FIRST_USERID .. FINAL_USERID ) {
                 d_step
                 {
@@ -298,9 +315,7 @@ inline candidates_from_members ( banned )
 ****/
 inline candidate_member ( banned, id )
 {
-//    bool forcesSafe = !(forced) || unsafe[id];
-    bool isAnOption = membership[id] && (id != banned);
-    candidateMember = isAnOption // && forcesSafe
+    candidateMember = membership[id] && ( banned != id );
 }
 
 

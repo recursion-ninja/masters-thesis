@@ -6,37 +6,44 @@
 #include "State-Networking.pml"
 #include "TreeKEM-v1.pml"
 
+
 /********
     *
     * Oracles available to the attacker used by "non-commital" moves:
     *
-    *   - Corrupt (COR)
-    *   - Hoard   (HRD)
-    *   - Reveal  (RVL)
+    *   - Corrupt ( COR )
+    *   - Hoard   ( HRD )
+    *   - Reveal  ( RVL )
     *
 ********/
 
 
 inline corrupt ( memberID )
-{   atomic {
-
-    d_step {
-        printf("\n> > >\n> CGKA: Game Move = COR %d\n> > >\n", memberID);
-        assert( memberID < N );
-        activeID = memberID;
-    }
+{
+    d_step
+    {
+        printf ( "\n> > >\n> CGKA: Move Name\t( COR : @ %d <- _ )\n> > >\n", memberID );
+        assert ( memberID < N );
+        targetID = memberID;
+    };
 
     // Learn the secret material of the user in their current epoch...
     // plus any additional epochs they have hoarded secrets from.
-    unsigned lowerBound : BITS_EPOCH = epoch;
-    unsigned upperBound : BITS_EPOCH = epoch;
-    unsigned savedSince : BITS_EPOCH = hoarding[memberID];
-    if
-    :: savedSince != NEVER -> lowerBound = savedSince
-    :: else
-    fi
+    unsigned lowerBound : BITS_EPOCH,
+             upperBound : BITS_EPOCH;
+    d_step
+    {
+        lowerBound = epoch;
+        upperBound = epoch;
+        unsigned savedSince : BITS_EPOCH = hoarding[memberID];
+        if
+        :: savedSince != NEVER -> lowerBound = savedSince
+        :: else
+        fi
+    };
 
-    printf("Corrupting from: %d -- %d\n", lowerBound, upperBound);
+move_corrupt: skip;
+    printf ( "Corrupting from: %d -- %d\n", lowerBound, upperBound );
 
     // For each epoch which the member has secrets
     // (this implies that the user was a member)
@@ -47,35 +54,41 @@ inline corrupt ( memberID )
     {
         if
         :: !(membership[memberID]) -> skip
-        :: else -> d_step
+        :: else -> atomic
             {
-                attacker_learn_leaf ( peek, memberID );
+                attacker_learn_leaf      ( peek, memberID );
                 attacker_amend_knowledge ( peek );
             }
         fi
-    }
-    attacker_check_knowledge ( epoch );
+    };
     unsafe[memberID] = true;
-}   }
-
-
-inline hoard( memberID )
-{
-    d_step {
-        assert( memberID < N );
-        printf("\n> > >\n> CGKA: Game Move = HRD %d\n> > >\n", memberID);
-        activeID = memberID;
-        hoarding[memberID] = epoch
-    }
+    unsafe[memberID] = true;
+    attacker_check_knowledge ( epoch );
 }
 
 
-inline reveal ()
+inline hoard ( memberID )
 {
+    d_step
+    {
+        printf ( "\n> > >\n> CGKA: Move Name\t( HRD : @ %d <- _ )\n> > >\n", memberID );
+        assert ( memberID < N );
+        targetID = memberID;
+    };
+
+move_hoard: skip;
+    hoarding[memberID] = epoch;
+}
+
+
+inline reveal ( )
+{
+    printf ( "\n> > >\n> CGKA: Move Name\t( RVL : * _ -- _ ) @ %d\n> > >\n", epoch );
+
+move_reveal: skip;
     d_step {
-        printf("\n> > >\n> CGKA: Game Move = RVL %d\n> > >\n", epoch);
         challenge[epoch] = true;
-        attacker_learn_root( epoch );
+        attacker_learn_root ( epoch );
     }
 }
 
@@ -92,43 +105,72 @@ inline reveal ()
 
 
 // Precondition: invitee is not in the group!
-inline insert_member( memberID, inviteeID )
+inline insert_member ( memberID, inviteeID )
 {
-    d_step {
-        printf("\n> > >\n> CGKA: Game Move = ADD %d %d\n> > >\n", memberID, inviteeID);
-        assert(  memberID < N );
-        assert( inviteeID < N );
-        assert( !(membership[inviteeID]) );
-    }
-move_insert:
-    messaging_move( epoch + 1, memberID, inviteeID, NONE )
+    d_step
+    {
+        printf ( "\n> > >\n> CGKA: Move Name\t( ADD : + %d <- %d )\n> > >\n", inviteeID, memberID );
+        assert (  memberID < N );
+        assert ( inviteeID < N );
+        assert ( !(membership[inviteeID]) );
+
+        originID =  memberID;
+        targetID = inviteeID;
+    };
+
+move_insert: skip;
+    messaging_move ( epoch + 1, memberID, inviteeID, NONE )
 }
 
 
 // Precondition: evicteeID is in the group!
-inline remove_member( memberID, evicteeID )
+inline remove_member ( memberID, evicteeID )
 {
-    d_step {
-        printf("\n> > >\n> CGKA: Game Move = RMV %d %d\n> > >\n", memberID, evicteeID);
-        assert(  memberID < N );
-        assert( evicteeID < N );
-        assert( membership[evicteeID] );
+    d_step
+    {
+        printf ( "\n> > >\n> CGKA: Move Name\t( RMV : - %d <- %d )\n> > >\n", evicteeID, memberID );
+        assert (  memberID < N );
+        assert ( evicteeID < N );
+        assert ( membership[evicteeID] );
+
+        originID =  memberID;
+        targetID = evicteeID;
+    };
+
+move_remove: skip;
+    d_step
+    {
+        if
+        :: unsafe[evicteeID] -> unsafeIDs--
+        :: else
+        fi
         unsafe[evicteeID] = false;
-    }
-move_remove:
-    messaging_move( epoch + 1, memberID, NONE, evicteeID )
+    };
+    messaging_move ( epoch + 1, memberID, NONE, evicteeID )
 }
 
 
-inline oblige_update( memberID )
+inline oblige_update ( memberID )
 {
-    d_step {
-        printf("\n> > >\n> CGKA: Game Move = UPD %d\n> > >\n", memberID);
-        assert( memberID < N );
+    d_step
+    {
+        printf ( "\n> > >\n> CGKA: Move Name\t( UPD : @ _ <- %d )\n> > >\n", memberID );
+        assert ( memberID < N );
+
+        originID = memberID;
+        targetID = NONE;
+    };
+
+move_update: skip;
+    d_step
+    {
+        if
+        :: unsafe[memberID] -> unsafeIDs--
+        :: else
+        fi
         unsafe[memberID] = false;
-    }
-move_update:
-    messaging_move( epoch + 1, memberID, NONE, NONE )
+    };
+    messaging_move ( epoch + 1, memberID, NONE, NONE )
 }
 
 

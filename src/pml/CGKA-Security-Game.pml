@@ -49,22 +49,6 @@
     *   
 ********/
 
-/****
-  * Does a trivial attack exist? i.e, does the SAFE predicate hold?
-  *
-  * SYNC: Updated by `post_play_poll`
-****/
-local bool triviality = false; 
-
-
-/****
-  * Has the CGKA game end?
-  *
-  * SYNC: Bit flipped IFF at the end of `init`
-****/
-local bool concludedCGKA = false;
-
-
 /********
     *
     * Attacker moves interacting with oracles:
@@ -75,56 +59,43 @@ local bool concludedCGKA = false;
 ********/
 
 
-inline play_move_with_commitment()
+inline play_move_with_commitment ( )
 {
+    unsigned evictorID : BITS_USERID, 
+             evicteeID : BITS_USERID, 
+             inviteeID : BITS_USERID, 
+             inviterID : BITS_USERID,
+             updaterID : BITS_USERID;
     atomic
     {
-        bool canInsert, 
-             canRemove,
-             canUpdate;
+        select_evictee ( );
+        select_evictor ( evicteeID );
+        select_invitee ( );
+        select_inviter ( );
+        select_updater ( );
+    };
 
-        unsigned evictorID : BITS_USERID, 
-                 evicteeID : BITS_USERID, 
-                 inviteeID : BITS_USERID, 
-                 inviterID : BITS_USERID,
-                 updaterID : BITS_USERID;
-        atomic
-        {
-            select_evictee ( );
-            select_evictor ( evicteeID   );
-            select_invitee ( );
-            select_inviter ( );
-            select_updater ( );
-            d_step
-            {
-                canInsert = !groupFull;
-                canRemove = !groupDyad && evicteeID != NONE && evictorID != NONE;
-                canUpdate = updaterID != NONE;
-            }
-        };
-    
-        d_step
-        {
-            print_entire_state()
-            printf("\n.,.,.,.,.,.\nMove Class:\tCommitment\n`'`'`'`'`'`\n");
-            printf("\nCommitment values:");
-            printf("\n\tevictorID \t%d", evictorID );
-            printf("\n\tevicteeID \t%d", evicteeID );
-            printf("\n\tinviterID \t%d", inviterID );
-            printf("\n\tinviteeID \t%d", inviteeID );
-            printf("\n\tupdaterID \t%d", updaterID );
-            printf("\n");
-        }
+    d_step
+    {
+        print_entire_state ( );
+        printf( "\n> > >\n> CGKA: Move Type\tCommitment\n> > >\n" );
+        printf( "\n\tCommitment values:" );
+        printf( "\n\t   - evictorID \t=   %d", evictorID );
+        printf( "\n\t   - evicteeID \t=   %d", evicteeID );
+        printf( "\n\t   - inviterID \t=   %d", inviterID );
+        printf( "\n\t   - inviteeID \t=   %d", inviteeID );
+        printf( "\n\t   - updaterID \t=   %d", updaterID );
+        printf( "\n");
+    };
 
-        do
-        :: canInsert -> insert_member( inviterID, inviteeID ); break
-        :: canRemove -> remove_member( evictorID, evicteeID ); break
-        :: canUpdate -> oblige_update( updaterID            ); break
-        od
+    if
+    :: inviterID != NONE && inviteeID != NONE -> insert_member ( inviterID, inviteeID )
+    :: evictorID != NONE && evicteeID != NONE -> remove_member ( evictorID, evicteeID )
+    :: else                                   -> oblige_update ( updaterID            )
+    fi
 
-        post_play_poll( epoch + 1);
-    }
-}
+    post_play_poll ( epoch + 1 );
+} 
 
 
 /****
@@ -136,33 +107,36 @@ inline play_move_with_commitment()
   *   - Reveal
   *
 ****/
-inline play_move_without_commitment()
+inline play_move_without_commitment ( )
 {
-        unsigned corruptedID : BITS_USERID, hoarderID : BITS_USERID;
-        atomic
-        {
-            select_corrupted();
-            select_hoarder();
-        };
-    
-        d_step
-        {
-            print_entire_state()
-            printf("\n.,.,.,.,.,.\nMove Class:\tNON-Commital\n`'`'`'`'`'`\n");
-            printf("\nNon-commital values:");
-            printf("\n\tcanRevealKey\t%d",  revealRoot );
-            printf("\n\tcorruptedID \t%d", corruptedID );
-            printf("\n\thoarderID   \t%d",   hoarderID );
-            printf("\n");
-        }
+    unsigned corruptedID : BITS_USERID, 
+               hoarderID : BITS_USERID;
+    atomic
+    {
+        select_corrupted ( );
+        select_hoarder   ( );
+    };
 
-        do
-        :: corruptedID != NONE -> move_corrupt: { corrupt( corruptedID ); break }
-        :: hoarderID   != NONE -> move_hoard:   { hoard(     hoarderID ); break }
-        :: revealRoot          -> move_reveal:  { reveal(              ); break }
-        od
-    
-        post_play_poll( epoch );
+    bool canReveal = epoch != FINAL_EPOCH && !(learnedKey[epoch]);
+
+    d_step
+    {
+        print_entire_state ( )
+        printf( "\n> > >\n> CGKA: Move Type\tNON-Commital\n> > >\n" );
+        printf( "\n\tNon-commital values:" );
+        printf( "\n\t   - corruptedID  \t=   %d", corruptedID );
+        printf( "\n\t   - hoarderID    \t=   %d",   hoarderID );
+        printf( "\n\t   - canRevealKey \t=   %d",  canReveal  );
+        printf( "\n");
+    };
+
+    if
+    :: corruptedID != NONE -> corrupt ( corruptedID )
+    :: hoarderID   != NONE -> hoard   (   hoarderID )
+    :: canReveal           -> reveal  (             )
+    fi
+
+    post_play_poll ( epoch );
 }
 
 
@@ -182,7 +156,7 @@ inline CGKA_initialize()
 {   atomic {
     d_step
     {
-        printf("\n***********************\n* CGKA: Initialize!   *\n***********************\n");
+        printf( "\n***********************\n* CGKA: Initialize!   *\n***********************\n");
 
         d_step
         {
@@ -205,21 +179,19 @@ inline CGKA_initialize()
 
         epoch     = 0;
         unsafeIDs = 0;
-        
-        concludedCGKA = false;
-        triviality    = false; 
 
-        attacker_initialize()
+        attacker_initialize ( )
     };
 
 }   }
 
 
-inline CGKA_create_group()
+inline CGKA_create_group ( )
 {
     // Number of members to add
     unsigned sample : BITS_USERID;
-    d_step {
+    d_step 
+    {
         select ( sample : 2 .. N );
         unsigned n      : BITS_USERID;
         for ( n : FIRST_USERID .. FINAL_USERID )
@@ -227,20 +199,22 @@ inline CGKA_create_group()
             membership[n] = n < sample;
         };
     }
-    printf("\n***********************\n* CGKA: Create Group! *\n***********************\n");
+    printf( "\n***********************\n* CGKA: Create Group! *\n***********************\n" );
 
-    d_step {
+    d_step
+    {
         unsigned id0 : BITS_USERID = 0;
         unsigned ep0 : BITS_EPOCH  = 0;
-        messaging_move( ep0, id0, NONE, NONE );
+        messaging_move ( ep0, id0, NONE, NONE );
     }
-    print_membership();
+    print_membership ( );
 }
 
 
 inline CGKA_security_game()
 {
-    printf("\n***********************\n* CGKA: Begin Play!   *\n***********************\n");
+    printf( "\n***********************\n* CGKA: Begin Play!   *\n***********************\n" );
+    printf( "\nEpoch: %d\n", epoch );
 
 
     // Each time the attacker takes a turn, they must decide whether or not to:
@@ -257,9 +231,9 @@ start_of_game:
     commitmentRequired = false;
 
     // Loop through all epochs
-    for ( epoch : 0 .. FINAL_EPOCH)
+    for ( epoch : 0 .. FINAL_EPOCH )
     {
-start_of_epoch:
+start_of_epoch: skip
         do
         // 1. Play the Challenge Move
         //     The attacker ending the game is implicitly the last move of the model
@@ -270,25 +244,24 @@ progress_epoch:
         // 2. Play a Commitment Move
         //     The attacker *may* play a move which commits to a new epoch...
         //     unless it is the last epoch.
-        :: epoch != FINAL_EPOCH -> play_move_with_commitment(); break
-        
+        :: epoch != FINAL_EPOCH -> play_move_with_commitment ( ); break
+
         // 3. Play a Non-commital Move
         //     The attacker *may* play a move and remain in the same epoch...
         //     unless the attacker has exhausted all indempotent non-comittal moves!
-        :: !(commitmentRequired) -> play_move_without_commitment()
+        :: !(commitmentRequired) -> play_move_without_commitment ( )
         od;
 
         // After the operation is complete, check to see if the an endgame condition has been reached.
-        printf("\nLOOP broken: %d", epoch);
-        printf ("\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", FINAL_EPOCH - epoch, unsafeIDs);
+        printf( "\nLOOP broken: %d", epoch );
+        printf( "\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", FINAL_EPOCH - epoch, unsafeIDs );
     }
 
 end_of_game:
     d_step
     {
-        concludedCGKA = true;
         epoch = FINAL_EPOCH;
-        print_entire_state();
+        print_entire_state ( );
     }
 }
 

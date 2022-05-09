@@ -18,70 +18,70 @@
 ********/
 
 
-inline print_challenges ()
+inline print_challenges ( )
 {
     d_step {
-        printf("\n\tChallenges:");
-        unsigned t : BITS_EPOCH;
-        for ( t : FIRST_EPOCH .. FINAL_EPOCH )
+        printf ( "\n\tChallenges:" );
+        unsigned p : BITS_EPOCH;
+        for ( p : FIRST_EPOCH .. FINAL_EPOCH )
         {
             if
-            :: challenge[t] -> printf("\n\t    [\tTrue\t]");
-            :: else         -> printf("\n\t    [\tFalse\t]");
+            :: challenge[p] -> printf ( "\n\t  %d [\tTrue\t]" , p );
+            :: else         -> printf ( "\n\t  %d [\tFalse\t]", p );
             fi
         }
-        printf("\n");
+        printf ( "\n" );
     }
 }
 
 
-inline print_membership ()
+inline print_membership ( )
 {
     d_step {
-        printf("\n\tMembership:");
+        printf ( "\n\tMembership:" );
         unsigned p : BITS_USERID;
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: membership[p] -> printf("\n\t    [\tTrue\t]");
-            :: else          -> printf("\n\t    [\tFalse\t]");
+            :: membership[p] -> printf ( "\n\t  %d [\tTrue\t]",  p );
+            :: else          -> printf ( "\n\t  %d [\tFalse\t]", p );
             fi
         };
-        printf("\n");
+        printf ( "\n" );
     }
 }
 
 
-inline print_user_hoarding ()
+inline print_user_hoarding ( )
 {
     d_step {
-        printf("\n\tHoarding since:");
+        printf ( "\n\tHoarding since:" );
         unsigned p : BITS_USERID;
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: hoarding[p] == NONE -> printf("\n\t    [\tNONE\t]")
-            :: else                -> printf("\n\t    [\t%d\t]", hoarding[p])
+            :: hoarding[p] == NONE -> printf ( "\n\t  %d [\tNONE\t]", p )
+            :: else                -> printf ( "\n\t  %d [\t%d\t]"  , p, hoarding[p])
             fi
         }
-        printf("\n");
+        printf ( "\n" );
     }
 }
 
 
-inline print_user_unsafe ()
+inline print_user_unsafe ( )
 {
     d_step {
-        printf("\n\tRequired healing:");
+        printf ( "\n\tRequired healing:" );
         unsigned p : BITS_USERID;
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: unsafe[p] -> printf("\n\t    [\tTrue\t]");
-            :: else      -> printf("\n\t    [\tFalse\t]");
+            :: unsafe[p] -> printf ( "\n\t  %d [\tTrue\t]" , p );
+            :: else      -> printf ( "\n\t  %d [\tFalse\t]", p );
             fi
         }
-        printf("\n");
+        printf ( "\n" );
     }
 }
 
@@ -95,26 +95,26 @@ inline print_user_unsafe ()
 ********/
 
 
-inline print_group_composition ()
+inline print_group_composition ( )
 {
     d_step
     {
-        printf("\n\tattendees \t%d", attendees );
-        printf("\n\tabsentees \t%d", absentees );
-        printf("\n\tgroupDyad \t%d", groupDyad );
-        printf("\n\tgroupFull \t%d", groupFull );
-        printf("\n\tgroupMost \t%d", groupMost );
+        printf ( "\n\tGroup Composition:" );
+        printf ( "\n\t  - attendees \t=  %d", attendees );
+        printf ( "\n\t  - absentees \t=  %d", absentees );
+        printf ( "\n\t  - groupMost \t=  %d", groupMost );
+        printf ( "\n" );
     }
 }
 
 
-inline print_protocol_state ()
+inline print_protocol_state ( )
 {
     d_step
     {
-        printf("\n\trevealRoot \t%d", revealRoot );
-        printf("\n\tforcedPlay \t%d", forcedPlay );
-        printf("\n\tunsafeIDs  \t%d", unsafeIDs  );
+        printf ( "\n\tProtocol State:" );
+        printf ( "\n\t  - unsafeIDs  \t=  %d", unsafeIDs  );
+        printf ( "\n" );
     }
 }
 
@@ -127,19 +127,19 @@ inline print_protocol_state ()
 ********/
 
 
-inline print_entire_state ()
+inline print_entire_state ( )
 {
     d_step
     {
-        printf("\n-=-=-=-=-=-=-=-=-=-=-=-\n-=-  GLOBAL  STATE  -=-\n-=-=-=-=-=-=-=-=-=-=-=-\n");
-        printf("\nCurrent Epoch \t%d\n", epoch );
-        print_challenges ();
-        print_membership ();
-        print_user_hoarding ();
-        print_user_unsafe ();
-        print_group_composition ();
-        print_protocol_state ();
-        print_attacker_knowledge ()
+        printf ( "\n-=-=-=-=-=-=-=-=-=-=-=-\n-=-  GLOBAL  STATE  -=-\n-=-=-=-=-=-=-=-=-=-=-=-\n" );
+        printf ( "\n\tCurrent Epoch \t%d\n", epoch );
+        print_challenges         ( );
+        print_membership         ( );
+        print_user_hoarding      ( );
+        print_user_unsafe        ( );
+        print_group_composition  ( );
+        print_protocol_state     ( );
+        print_attacker_knowledge ( );
     }
 }
 
