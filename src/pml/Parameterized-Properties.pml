@@ -35,6 +35,10 @@ ltl Totality
   *
 ****/
 /**
+#define never_trivially_hoard_then_corrupt \
+( []( CGKA@move_corrupt -> hoarding[targetID] == NEVER ) )
+
+
 #define future_secrecy_of_epoch( t ) \
 (  \
     (  \
@@ -56,23 +60,12 @@ ltl Totality
 )
 
 
-#define never_trivially_hoard_then_corrupt \
-( \
-    [] \
-    (  \
-       ( CGKA@move_corrupt ) \
-    -> \
-        ( ( hoarding[targetID] == NEVER ) ) \
-    )  \
-)
-
 ltl FSU
 { 
-    never_trivially_hoard_then_corrupt
-    ->
-    (   future_secrecy_of_epoch( 0 )
-    &&  future_secrecy_of_epoch( 1 )
-    &&  future_secrecy_of_epoch( 2 )
+    never_trivially_hoard_then_corrupt -> (
+    future_secrecy_of_epoch( 0 ) &&
+    future_secrecy_of_epoch( 1 ) &&
+    future_secrecy_of_epoch( 2 )
     )
 }
 **/
