@@ -61,11 +61,11 @@ ltl Totality
 
 
 ltl FSU
-{ 
+{
     never_trivially_hoard_then_corrupt ->
-    (   future_secrecy_of_epoch( 0 )
-    &&  future_secrecy_of_epoch( 1 )
-    &&  future_secrecy_of_epoch( 2 )
+    (   future_secrecy_of_epoch(  0 )
+    &&  future_secrecy_of_epoch(  1 )
+    &&  future_secrecy_of_epoch(  2 )
     )
 }
 **/

@@ -38,7 +38,7 @@ dir-protocol-model   ?= ./
 ###
 #######
 
-basename-dependancies := constants sources
+basename-dependancies := constants properties sources
 filename-dependancies := $(addsuffix .$(extension-makefile),$(basename-dependancies))
 filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filename-dependancies)))
 
@@ -68,7 +68,7 @@ installdirs:: $(dir-output-encoding)
 #######
 
 .INTERMEDIATE: token-encoding-code
-token-encoding-code: amend-constants $(dir-output-encoding) $(filepath-modeling-code)
+token-encoding-code: amend-constants amend-properties $(dir-output-encoding) $(filepath-modeling-code)
 #	Setup the temporary compilation environment
 	@$(eval dir-transpile := $(shell mktemp -d -t transpile-XXXXXXXXXX))
 	@$(eval dir-beginning := $(shell pwd))
