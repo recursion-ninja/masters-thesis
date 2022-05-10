@@ -21,12 +21,10 @@
   * The CGKA game always halts
   *
 ****/
-/**
 ltl Totality
 {
   <> CGKA@end_of_game
 }
-**/
 
 
 /****
@@ -34,7 +32,6 @@ ltl Totality
   * LTL: FSU (Future Secrecy with Updates)
   *
 ****/
-/**
 #define never_trivially_hoard_then_corrupt \
 ( []( CGKA@move_corrupt -> hoarding[targetID] == NEVER ) )
 
@@ -68,7 +65,6 @@ ltl FSU
     &&  future_secrecy_of_epoch(  2 )
     )
 }
-**/
 
 
 /****
@@ -76,12 +72,22 @@ ltl FSU
   * LTL: PCS (Post-Compromise Security)
   *
 ****/
-/**/
 ltl PCS
 { 
     [] ( ( CGKA@start_of_epoch && ( unsafeIDs == 0 ) ) -> ( !( learnedKey[epoch] ) ) )
 }
-/**/
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 #define corrupt_then_recover( id ) \
 (  \
@@ -138,19 +144,6 @@ ltl PCS
     )  \
 )
 
-*/
-
-
-
-
-
-
-
-
-
-
-
-/*
 ltl attendees_more_than_one
 {
   [](attendees > 1)

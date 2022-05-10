@@ -42,13 +42,19 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 
 -include $(filepath-dependancies)
 
+#######
+###
+#   Variables for PROPERTIES
+###
+#######
+
 basename-properties := Parameterized-Properties
 filename-properties := $(basename-properties).$(extension-promela)
 filepath-properties := $(abspath $(addprefix $(dir-protocol-model),$(filename-properties)))
 
 #######
 ###
-#   Custom function definitions for CONSTANTS
+#   Custom function definitions for PROPERTIES
 ###
 #######
 
