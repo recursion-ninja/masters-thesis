@@ -43,7 +43,7 @@ VERIFIER_NAME="${VERIFIER_FILE%.*}"
 printf "Running analysis of model %s...\n\n" "${VERIFIER_NAME}"
 
 TIME_INITIATION=$(date +%s)
-./${VERIFIER_FILE} -a -v -t${VERIFIER_NAME}.trail
+./${VERIFIER_FILE} -a -N ${LTL_PROPERTY} -v -t${VERIFIER_NAME}.trail
 TIME_COMPLETION=$(date +%s)
 
 printf "Start:\t%s\nEnd:\t%s\n" "${TIME_INITIATION}" "${TIME_COMPLETION}"

@@ -22,13 +22,16 @@
 #PBS -N $name$
 #
 # > Queue:
-#PBS -q batch-AMD
+#PBS -q batch-amd
 #
 # > Shell:
 #PBS -S /bin/bash
 #
 # > Inherit environment variables
 #PBS -V
+#
+# > Set key variables
+#PBS -v LTL_PROPERTY=$property$
 
 
 $body$

@@ -110,6 +110,13 @@ cluster-options :=\
     -wd $(cluster-working-directory)
 
 
+ifndef LTL
+ltl-property := Totality
+else
+ltl-property := $(LTL)
+endif
+
+
 #######
 ###
 #   Custom function definitions for CLUSTER
@@ -206,6 +213,7 @@ $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	  --variable=cores:$(param-cores) \
 	  --variable=memory:$(param-memory) \
 	  --variable=name:$(infostr-suffix) \
+	  --variable=property:$(ltl-property) \
 	  --write=plain
 
 endif # IMPORT_MAKE_CLUSTER
