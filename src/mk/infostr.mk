@@ -51,23 +51,18 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 ###
 #######
 
-protocol-version-pref := v
-
-ifndef version
-protocol-version := $(protocol-version-pref)$($(def-pref)protocol-version)
-else
-protocol-version := $(protocol-version-pref)$(version)
-endif
-
 infostr-glue    := -
-infostr-prefix  := $(subst $(SPACE),$(infostr-glue),CGKA TreeKEM)
-infostr-suffix  := \
-    $(subst $(SPACE),$(infostr-glue),$(protocol-version) $(foreach param,$(security-parameters),$(shell printf "$(param)%03d" $($(sec-pref)$(param)))))
-infostr-suffix-pattern := \
-    $(subst $(SPACE),$(infostr-glue),$(protocol-version-pref)[0-9] $(foreach param,$(security-parameters),$(param)[0-9][0-9][0-9]))
+infostr-prefix  := CGKA
 
-infostr         := $(infostr-prefix)$(infostr-glue)$(infostr-suffix)
-infostr-pattern := $(infostr-prefix)$(infostr-glue)$(infostr-suffix-pattern)
+infostr :=$(subst $(SPACE),$(infostr-glue),$(infostr-prefix)\
+$(protocol-version)\
+$(ltl-property)\
+$(foreach param,$(security-parameters),$(shell printf "$(param)%03d" $($(sec-pref)$(param)))))
+
+infostr-pattern := $(subst $(SPACE),$(infostr-glue),$(infostr-prefix)\
+$(protocol-version-pref)[0-9]\
+$(ltl-property)\
+$(foreach param,$(security-parameters),$(param)[0-9][0-9][0-9]))
 
 #$(info $(NEWLINE)Unique Model Name:$(NEWLINE)$(TAB)$(infostr))
 

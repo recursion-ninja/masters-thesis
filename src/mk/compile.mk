@@ -59,10 +59,10 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 #######
 
 extension-verifier := model
-basename-verifier  := $(infostr-suffix)
+basename-verifier  := $(infostr)
 filename-verifier  := $(basename-verifier).$(extension-verifier)
 filepath-verifier  := $(abspath $(addprefix $(dir-binaries),$(filename-verifier)))
-pattern-verifier   := $(dir-binaries)$(infostr-suffix-pattern).$(extension-verifier)
+pattern-verifier   := $(dir-binaries)$(infostr-pattern).$(extension-verifier)
 sources-verifier   := $(filepath-modeling-code) $(filepath-encoding-code)
 
 extension-trail  := trail

@@ -42,6 +42,7 @@ extension-promela  ?= pml
 def-pref := default-
 sec-pref := security-parameter-
 
+$(def-pref)ltl-property     := HLT
 $(def-pref)protocol-version := 1
 $(def-pref)$(sec-pref)T     := 12
 $(def-pref)$(sec-pref)C     := 12
@@ -60,6 +61,32 @@ filepath-constants := $(abspath $(addprefix $(dir-protocol-model),$(filename-con
 define security_parameter
 $(if $(strip $($(1))),$($(1)),$(if $(strip $(wildcard $(filepath-constants))),$(shell sed -n 's/^#define \+$(1) \+\([^ ]\+\) *$$/\1/p' $(filepath-constants)),$($(def-pref)$(sec-pref)$(1))))
 endef
+
+#######
+###
+#   Assign the LTL property
+###
+#######
+
+ifndef LTL
+ltl-property := $($(def-pref)ltl-property)
+else
+ltl-property := $(LTL)
+endif
+
+#######
+###
+#   Assign the protocol version
+###
+#######
+
+protocol-version-pref := TreeKEMv
+
+ifndef version
+protocol-version := $(protocol-version-pref)$($(def-pref)protocol-version)
+else
+protocol-version := $(protocol-version-pref)$(version)
+endif
 
 #######
 ###
@@ -88,7 +115,13 @@ all::;
 ###
 #######
 
-.PHONY: security-parameters
+.PHONY: ltl-property protocol-version security-parameters security-parameter-keys security-parameter-vals
+
+ltl-property:
+	@printf "LTL property = ( %s )" $(ltl-property)
+
+protocol-version:
+	@printf "CGKA version = ( %s )" $(protocol-version)
 
 security-parameters:
 	@printf "%s = %s\n" $(security-parameter-keys) $(security-parameter-vals)

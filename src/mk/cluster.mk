@@ -98,15 +98,15 @@ cluster-pass := ${CLUSTER_PASS}
 cluster-auth := $(cluster-user)@$(cluster-host)
 cluster-pbs  := $(process)$(cluster-pbs-suffix)
 
-cluster-output-pattern   := $(infostr-pattern)/$(infostr-suffix-pattern).*.log
-cluster-trails-pattern := $(infostr-pattern)/*.$(infostr-suffix-pattern).trail
+cluster-output-pattern   := $(infostr-pattern)/$(infostr-pattern).*.log
+cluster-trails-pattern := $(infostr-pattern)/*.$(infostr-pattern).trail
 
 
 cluster-working-directory := '$${HOME}/$(filename-bundle)'
 cluster-filepath-script   := '$${HOME}/$(filename-bundle)/$(filename-bundle-pbs)'
 cluster-options :=\
-    -e $(infostr-suffix).err.log \
-    -o $(infostr-suffix).out.log \
+    -e $(infostr).err.log \
+    -o $(infostr).out.log \
     -wd $(cluster-working-directory)
 
 
@@ -212,7 +212,7 @@ $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	  --template=$(filepath-pbs-template) \
 	  --variable=cores:$(param-cores) \
 	  --variable=memory:$(param-memory) \
-	  --variable=name:$(infostr-suffix) \
+	  --variable=name:$(infostr) \
 	  --variable=property:$(ltl-property) \
 	  --write=plain
 
