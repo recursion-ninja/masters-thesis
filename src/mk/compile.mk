@@ -102,7 +102,9 @@ opt-timing := \
     -DNOBOUNDCHECK \
     -DSEP_STATE
 
-directives := $(subst $(SPACE),$(SPACE)\$(NEWLINE)$(TAB),$(opt-properties) $(opt-memory) $(opt-timing) $(opt-timing))
+directives-list := $(opt-properties) $(opt-memory) $(opt-timing) $(opt-timing)
+
+directives-rows := $(subst $(SPACE),$(SPACE)\$(NEWLINE)$(TAB),$(directives-list))
 
 #######
 ###
@@ -131,7 +133,7 @@ installdirs:: $(dir-binaries) $(dir-backup-record) $(dir-backup-trail)
 ###
 #######
 
-.PHONY: backup compile find-verifier verification
+.PHONY: backup compile find-verifier show-directives verification
 
 backup: $(dir-backup-record) $(dir-backup-trail)
 	@mv  --backup=numbered \
@@ -146,6 +148,9 @@ compile: $(filepath-verifier)
 
 find-verifier:
 	@printf "%s\n" "$(filepath-verifier)"
+
+show-directives:
+	@printf "%s" "$(directives-list)"
 
 verification: $(filepath-verifier) backup
 	$(filepath-verifier) -a -i -v -x > $(filepath-record)
@@ -167,7 +172,7 @@ $(dir-backup-trail):
 
 $(filepath-verifier): $(dir-binaries) $(sources-verifier)
 	gcc -O3 \
-	$(directives) \
+	$(directives-rows) \
 	-o $@ \
 	$(filepath-encoding-in-C)
 

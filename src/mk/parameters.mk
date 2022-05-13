@@ -115,21 +115,21 @@ all::;
 ###
 #######
 
-.PHONY: ltl-property protocol-version security-parameters security-parameter-keys security-parameter-vals
+.PHONY: show-ltl-property show-protocol-version show-security-parameters show-security-parameter-keys show-security-parameter-vals
 
-ltl-property:
+show-ltl-property:
 	@printf "LTL property = ( %s )" $(ltl-property)
 
-protocol-version:
-	@printf "CGKA version = ( %s )" $(protocol-version)
+show-protocol-version:
+	@printf "$(protocol-version)"
 
-security-parameters:
+show-security-parameters:
 	@printf "%s = %s\n" $(security-parameter-keys) $(security-parameter-vals)
 
-security-parameter-keys:
+show-security-parameter-keys:
 	@printf "( %03s, %03s, %03s )\n" T C N
 
-security-parameter-vals:
+show-security-parameter-vals:
 	@printf "( %03s, %03s, %03s )\n" "$($(sec-pref)T)" "$($(sec-pref)C)" "$($(sec-pref)N)"
 
 endif # IMPORT_MAKE_PARAMETERS

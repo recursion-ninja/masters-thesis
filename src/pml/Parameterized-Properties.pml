@@ -7,7 +7,7 @@
     *
     * Important LTL Properties:
     *
-    *   - Totality
+    *   - HLT (Decidability / Totality )
     *   - FSU (Future Secrecy with Updates)
     *   - PCS (Post-Compromise Security)
     *
@@ -16,12 +16,12 @@
 
 /****
   *
-  * LTL: Totality
+  * LTL: HLT
   *
   * The CGKA game always halts
   *
 ****/
-ltl Totality
+ltl HLT
 {
   <> CGKA@end_of_game
 }
