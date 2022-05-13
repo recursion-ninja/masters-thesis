@@ -4,5 +4,5 @@ email:    cluster-notifications@recursion.ninja
 time:     30-00:00:00
 cores:    10
 memory:   160
-property: Totality
+property: HLT
 ---
