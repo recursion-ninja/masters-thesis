@@ -1,0 +1,48 @@
+Cabal-Version:      3.0
+Name:               parse-table-row
+Version:            1.0.0
+Stability:          Stable
+Build-Type:         Simple
+Tested-With:
+  GHC == 9.2.2
+
+Author:             Alex Washburn
+Copyright:          (c) Alex Washburn 2022
+License:            BSD-3-Clause
+License-File:       LICENSE
+
+Synopsis:           Parse a table row from Spin log file
+Category:           Parsers
+Description:        Same as Synopsis
+
+Common language
+
+Executable parse-table-row
+
+  main-is:
+    parse-table-row.hs
+           
+  build-depends:
+    base >=4.16 && <5,
+    bytestring,
+    cassava,
+    megaparsec,
+    scientific,
+    time,
+
+  default-extensions:
+    NoGeneralizedNewtypeDeriving
+    
+  default-language:
+    GHC2021
+
+  exposed-modules:
+    Data.BitVector.LittleEndian
+
+  hs-source-dirs:
+    .
+
+  other-modules:
+    BinaryUnit
+    ExtractedRow
+    Parser

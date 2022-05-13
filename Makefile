@@ -23,6 +23,7 @@ endif # IMPORT_MAKE_ENVIRONMENT
 
 basename-encoding     := pan
 basename-pbs-script   := pbs
+extension-haskell     := hs
 extension-makefile    := mk
 extension-markdown    := md
 extension-promela     := pml
@@ -35,6 +36,7 @@ dir-logging           := ./log/
 dir-source-code       := ./src/
 dir-make-definitions  := $(abspath $(addprefix $(dir-source-code),$(extension-makefile)))/
 dir-output-encoding   := $(abspath $(addprefix $(dir-source-code),$(basename-encoding)))/
+dir-parser-for-logs   := $(abspath $(addprefix $(dir-source-code),$(extension-haskell)))/
 dir-pbs-script-parts  := $(abspath $(addprefix $(dir-source-code),$(basename-pbs-script)))/
 dir-protocol-model    := $(abspath $(addprefix $(dir-source-code),$(extension-promela)))/
 dir-thesis-relative   := ./thesis/
