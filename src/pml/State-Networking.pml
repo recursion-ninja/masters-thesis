@@ -122,7 +122,7 @@ inline post_play_poll ( e )
 ****/
 inline take_attendance ( )
 {
-    unsigned largestID : BITS_USERID;
+    unsigned largestID : BITS_USERID = 0;
     d_step {
         unsigned included : BITS_USERID = 0;
         d_step {
@@ -149,7 +149,7 @@ inline take_attendance ( )
   * External result variable(s):
   *   - candidateCorruptibles
 ****/
-inline candidates_for_corruption ()
+inline candidates_for_corruption ( )
 {
     unsigned candidates : BITS_USERID = 0;
     d_step
@@ -186,7 +186,7 @@ inline candidate_corruption ( id )
   * External result variable(s):
   *   - candidateHoarders
 ****/
-inline candidates_for_hoarding ()
+inline candidates_for_hoarding ( )
 {
     unsigned candidates : BITS_USERID = 0;
     d_step

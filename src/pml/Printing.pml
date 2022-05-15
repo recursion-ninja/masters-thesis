@@ -60,8 +60,8 @@ inline print_user_hoarding ( )
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: hoarding[p] == NONE -> printf ( "\n\t  %d [\tNONE\t]", p )
-            :: else                -> printf ( "\n\t  %d [\t%d\t]"  , p, hoarding[p])
+            :: hoarding[p] == NEVER -> printf ( "\n\t  %d [\tNEVER\t]", p )
+            :: else                 -> printf ( "\n\t  %d [\t%d\t]"  , p, hoarding[p])
             fi
         }
         printf ( "\n" );
