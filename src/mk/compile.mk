@@ -59,19 +59,19 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 #######
 
 extension-verifier := model
-basename-verifier  := $(infostr)
+basename-verifier  := $(info-string)
 filename-verifier  := $(basename-verifier).$(extension-verifier)
 filepath-verifier  := $(abspath $(addprefix $(dir-binaries),$(filename-verifier)))
-pattern-verifier   := $(dir-binaries)$(infostr-pattern).$(extension-verifier)
+pattern-verifier   := $(dir-binaries)$(info-string-pattern).$(extension-verifier)
 sources-verifier   := $(filepath-modeling-code) $(filepath-encoding-code)
 
 extension-trail  := trail
-basename-trail   := $(infostr)
+basename-trail   := $(info-symbol)
 filename-trail   := $(basename-trail).$(extension-trail)
 filepath-trail   := $(abspath $(filename-trail))
 
 extension-record := log
-basename-record  := $(infostr)
+basename-record  := $(info-symbol)
 filename-record  := $(basename-record).$(extension-record)
 filepath-record  := $(abspath $(filename-record))
 
@@ -119,7 +119,7 @@ all:: $(filepath-verifier)
 check:: verification
 
 clean::
-	-rm -f  $(pattern-verifier)
+	@-rm -f $(pattern-verifier)
 
 install:: $(filepath-verifier)
 

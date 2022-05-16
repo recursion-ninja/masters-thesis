@@ -110,7 +110,6 @@ ifeq ($(ltl-property),$(word 2,$(ltl-property-labels)))
 endif
 
 amend-properties: $(filepath-model-spec) $(filepath-property) alter-properties
-	$(info $(NEWLINE)Objects:$(NEWLINE)$(TAB)$(filepath-model-spec) $(filepath-property))
 	$(call amend_property_within,$<)
 
 endif # IMPORT_MAKE_PROPERTIES

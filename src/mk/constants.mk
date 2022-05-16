@@ -51,6 +51,8 @@ con-pair := $(COMMA)
 con-pref := const-
 con-temp := breif-
 
+$(con-pref)debug := $(EMPTY)
+
 #######
 ###
 #   Custom function definitions for CONSTANTS
@@ -59,13 +61,13 @@ con-temp := breif-
 
 define amend_definitions_within
 	@if [ -n "$(amendment-mapping)" ]; then \
-	printf "\nAmending constants within:\n\t%s\n\nAmendments:\n" "$(1)"; \
+	    printf $(if $($(con-pref)debug),"\nAmending constants within:\n\t%s\n\nAmendments:\n" "$(1)",""); \
 	fi
 	@for kvp in $(amendment-mapping); do \
 	    key=$${kvp%,*}; \
 	    val=$${kvp#*,}; \
 	    rep="/^#define/s/\\s+$${key}(\\s+)[[:digit:]]+\\s*$$/ $${key}\\1$${val}/"; \
-	    printf "\t%-13s-->%4s\n" "$${key}" "$${val}"; \
+	    printf $(if $($(con-pref)debug),"\t%-13s-->%4s\n" "$${key}" "$${val}",""); \
 	    sed -E -i "$${rep}" $(1); \
 	done
 	@if [ -n "$(amendment-mapping)" ]; then echo ""; fi

@@ -51,20 +51,29 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 ###
 #######
 
-infostr-glue    := -
-infostr-prefix  := CGKA
+info-string-glue   := -
+info-string-prefix := CGKA
 
-infostr :=$(subst $(SPACE),$(infostr-glue),$(infostr-prefix)\
+info-string-substrings := \
+$(info-string-prefix)\
+$(protocol-name)\
 $(protocol-version)\
 $(ltl-property)\
-$(foreach param,$(security-parameters),$(shell printf "$(param)%03d" $($(sec-pref)$(param)))))
+$(foreach param,$(security-parameters),$(shell printf "$(param)%03d" $($(sec-pref)$(param))))
 
-infostr-pattern := $(subst $(SPACE),$(infostr-glue),$(infostr-prefix)\
+info-string-subpatterns := \
+$(info-string-prefix)\
+$(protocol-name)\
 $(protocol-version-pref)[0-9]\
 $(ltl-property)\
-$(foreach param,$(security-parameters),$(param)[0-9][0-9][0-9]))
+$(foreach param,$(security-parameters),$(param)[0-9][0-9][0-9])
 
-#$(info $(NEWLINE)Unique Model Name:$(NEWLINE)$(TAB)$(infostr))
+info-string         := $(subst $(SPACE),$(info-string-glue),$(info-string-substrings))
+info-string-pattern := $(subst $(SPACE),$(info-string-glue),$(info-string-subpatterns))
+info-symbol         := $(subst $(SPACE),$(info-string-glue),$(wordlist 3,64,$(info-string-substrings)))
+info-symbol-pattern := $(subst $(SPACE),$(info-string-glue),$(wordlist 3,64,$(info-string-subpatterns)))
+
+#$(info $(NEWLINE)Unique Model Name:$(NEWLINE)$(TAB)$(info-string)$(NEWLINE)Unique Model Name:$(NEWLINE)$(TAB)$(info-symbol))
 
 #######
 ###

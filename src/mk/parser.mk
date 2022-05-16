@@ -49,8 +49,8 @@ filepath-parser  := $(abspath $(addprefix $(dir-binaries),$(filename-parser)))
 all:: $(filepath-parser)
 
 clean::
-	-rm -f $(filepath-parser)
-	( cd $(dir-parser-for-logs) ; cabal clean )
+	@-rm -f $(filepath-parser)
+	@( cd $(dir-parser-for-logs) ; cabal clean )
 
 install:: $(filepath-parser)
 

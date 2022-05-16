@@ -86,7 +86,8 @@ endif
 ###
 #######
 
-protocol-version-pref := TreeKEMv
+protocol-name         := TreeKEM
+protocol-version-pref := v
 
 ifndef version
 protocol-version := $(protocol-version-pref)$($(def-pref)protocol-version)

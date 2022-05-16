@@ -55,7 +55,7 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 all:: $(filepath-encoding-code)
 
 clean::
-	-rm -f  $(filepath-encoding-pattern)
+	@-rm -f  $(filepath-encoding-pattern)
 
 install:: $(filepath-encoding-code)
 

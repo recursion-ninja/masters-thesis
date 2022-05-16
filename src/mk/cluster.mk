@@ -60,11 +60,11 @@ dir-logged-trails := $(abspath $(dir-logging)$(dir-backup))/
 
 
 # Distribution to be moved to cluster
-filename-bundle := $(infostr)
+filename-bundle := $(info-string)
 filepath-bundle := $(abspath $(addprefix $(dir-distribution),$(filename-bundle)))
 
 # Pattern for matching any distribution
-filename-bundle-pattern  := $(infostr-pattern)
+filename-bundle-pattern  := $(info-string-pattern)
 filepath-bundle-pattern  := $(abspath $(addprefix $(dir-source-code),$(filename-bundle-pattern)))
 
 # Distribution's PBS script file
@@ -98,15 +98,14 @@ cluster-pass := ${CLUSTER_PASS}
 cluster-auth := $(cluster-user)@$(cluster-host)
 cluster-pbs  := $(process)$(cluster-pbs-suffix)
 
-cluster-output-pattern   := $(infostr-pattern)/$(infostr-pattern).*.log
-cluster-trails-pattern := $(infostr-pattern)/*.$(infostr-pattern).trail
+cluster-output-pattern := $(info-string-pattern)/$(info-symbol-pattern).*.log
+cluster-trails-pattern := $(info-string-pattern)/*.$(info-symbol-pattern).trail
 
 
 cluster-working-directory := '$${HOME}/$(filename-bundle)'
 cluster-filepath-script   := '$${HOME}/$(filename-bundle)/$(filename-bundle-pbs)'
 cluster-options :=\
-    -e $(infostr).err.log \
-    -o $(infostr).out.log \
+    -o $(info-symbol).out.log \
     -wd $(cluster-working-directory)
 
 
@@ -142,7 +141,7 @@ endef
 all::;
 
 clean::
-	rm -fr $(dir-distribution)*
+	@-rm -fr $(dir-distribution)*
 
 installdirs:: $(dir-distribution)
 
@@ -212,7 +211,7 @@ $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	  --template=$(filepath-pbs-template) \
 	  --variable=cores:$(param-cores) \
 	  --variable=memory:$(param-memory) \
-	  --variable=name:$(infostr) \
+	  --variable=name:$(info-symbol) \
 	  --variable=property:$(ltl-property) \
 	  --write=plain
 

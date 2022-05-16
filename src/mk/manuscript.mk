@@ -149,10 +149,10 @@ pandoc-options += -V colorlinks=true
 all:: thesis
 
 clean::
-	rm -rf $(TMP) $(TEMPLATE_DL_DIR)
+	@-rm -rf $(TMP) $(TEMPLATE_DL_DIR)
 
 distclean:: clean
-	rm -f $(manuscript-target) $(TEMPLATE_FILES)
+	@-rm -f $(manuscript-target) $(TEMPLATE_FILES)
 
 install:: $(manuscript-target)
 
