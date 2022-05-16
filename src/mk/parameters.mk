@@ -42,7 +42,9 @@ extension-promela  ?= pml
 def-pref := default-
 sec-pref := security-parameter-
 
-$(def-pref)ltl-property     := HLT
+ltl-property-labels := HLT FSU PCS
+
+$(def-pref)ltl-property     := $(firstword $(ltl-property-labels))
 $(def-pref)protocol-version := 1
 $(def-pref)$(sec-pref)T     := 12
 $(def-pref)$(sec-pref)C     := 12
@@ -68,10 +70,14 @@ endef
 ###
 #######
 
-ifndef LTL
-ltl-property := $($(def-pref)ltl-property)
-else
+ifdef LTL
+ifneq (,$(findstring $(LTL),$(ltl-property-labels)))
 ltl-property := $(LTL)
+else
+ltl-property := $($(def-pref)ltl-property)
+endif
+else
+ltl-property := $($(def-pref)ltl-property)
 endif
 
 #######

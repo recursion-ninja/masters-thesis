@@ -21,10 +21,10 @@ printf "Initialized \t%s\n" "`date`"
 printf "Hosted on   \t%s\n" `hostname`
 printf "Working in  \t%s\n" `pwd`
 printf "Working in  \t%s\n" `pwd`
+printf "LTL property\t%s\n" "${LTL_PROPERTY}"
 printf "CGKA version\t%s\n" "`make show-protocol-version`"
 printf "CGKA params \t%s\n" "`make show-security-parameter-keys`"
 printf "CGKA values \t%s\n" "`make show-security-parameter-vals`"
-printf "LTL property\t( %s )\n" "${LTL_PROPERTY}"
 printf "Allocating  \t%6s MiB RAM\n" "${SLURM_MEM_PER_NODE}"
 printf "Utilizing   \t%6s CPU cores\n\n" "${SLURM_NPROCS}"
 printf "Directives  \t%s\n" "`make show-directives`"

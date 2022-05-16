@@ -47,10 +47,14 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 #   Variables for PROPERTIES
 ###
 #######
+prop-prefix := LTL-
 
-basename-properties := Parameterized-Properties
-filename-properties := $(basename-properties).$(extension-promela)
-filepath-properties := $(abspath $(addprefix $(dir-protocol-model),$(filename-properties)))
+filename-property   := $(addprefix $(prop-prefix),$(addsuffix .$(extension-promela),$(ltl-property)))
+filepath-property   := $(abspath $(addprefix $(dir-protocol-model),$(filename-property)))
+
+basename-model-spec := Model-Specification
+filename-model-spec := $(addsuffix .$(extension-promela),$(basename-model-spec))
+filepath-model-spec := $(abspath $(addprefix $(dir-protocol-model),$(filename-model-spec)))
 
 #######
 ###
@@ -58,7 +62,7 @@ filepath-properties := $(abspath $(addprefix $(dir-protocol-model),$(filename-pr
 ###
 #######
 
-define amend_property_within
+define alter_property_FSU
 	@END_NUM=$(shell expr $($(sec-pref)T) - 2)
 	@LTL_FSU=$$(mktemp -t LTL_FSU-XXXXXXXX)
 	@echo "{" >> "$$LTL_FSU"
@@ -78,13 +82,19 @@ define amend_property_within
 	rm "$$LTL_FSU"
 endef
 
+define amend_property_within
+	@pattern="/^\\s*#include\\s\\+\"$(prop-prefix)\\(.*\\)\"/d"
+	sed -i -e "$${pattern}" $(1)
+	@echo '#include "$(filename-property)"' >> $(filepath-model-spec)
+endef
+
 #######
 ###
 #   Standard targets
 ###
 #######
 
-.PHONY: all amend-properties
+.PHONY: all alter-properties amend-properties
 
 all::;
 
@@ -94,7 +104,13 @@ all::;
 ###
 #######
 
-amend-properties: $(filepath-properties)
+alter-properties: $(filepath-property)
+ifeq ($(ltl-property),$(word 2,$(ltl-property-labels)))
+	$(call alter_property_FSU,$<)
+endif
+
+amend-properties: $(filepath-model-spec) $(filepath-property) alter-properties
+	$(info $(NEWLINE)Objects:$(NEWLINE)$(TAB)$(filepath-model-spec) $(filepath-property))
 	$(call amend_property_within,$<)
 
 endif # IMPORT_MAKE_PROPERTIES
