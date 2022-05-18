@@ -105,6 +105,7 @@ cluster-trails-pattern := $(info-string-pattern)/*.$(info-symbol-pattern).trail
 cluster-working-directory := '$${HOME}/$(filename-bundle)'
 cluster-filepath-script   := '$${HOME}/$(filename-bundle)/$(filename-bundle-pbs)'
 cluster-options :=\
+    -e $(info-symbol).out.log \
     -o $(info-symbol).out.log \
     -wd $(cluster-working-directory)
 

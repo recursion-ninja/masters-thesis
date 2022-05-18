@@ -104,7 +104,7 @@ opt-timing := \
 
 directives-list := $(opt-properties) $(opt-memory) $(opt-timing) $(opt-timing)
 
-directives-rows := $(subst $(SPACE),$(SPACE)\$(NEWLINE)$(TAB),$(directives-list))
+directives-rows := $(subst $(SPACE),$(SPACE)\$(NEWLINE),$(directives-list))
 
 #######
 ###
@@ -171,8 +171,9 @@ $(dir-backup-trail):
 	mkdir -p $@
 
 $(filepath-verifier): $(dir-binaries) $(sources-verifier)
-	gcc -O3 \
+	gcc \
 	$(directives-rows) \
+	-O3 \
 	-o $@ \
 	$(filepath-encoding-in-C)
 
