@@ -76,8 +76,10 @@ filepath-pbs-defaults    := $(prefpath-pbs)defaults
 filepath-pbs-template    := $(prefpath-pbs)template
 
 basename-makefile-parts  := compile infostr parameters sources
-filename-makefile-parts  := $(addsuffix .$(extension-makefile),$(basename-makefile-parts))
+filename-makefile-parts  := gmsl $(addsuffix .$(extension-makefile),$(basename-makefile-parts))
 filepath-makefile-parts  := $(abspath $(addprefix $(dir-make-definitions),$(filename-makefile-parts)))
+filepath-makefile-gmsl   := $(abspath $(addprefix $(dir-make-definitions),__gmsl))
+
 
 filename-bundle-code     := $(notdir $(sources-verifier))
 filepath-bundle-code     := $(abspath $(addprefix $(filepath-bundle)/,$(filename-bundle-code)))
@@ -105,7 +107,7 @@ cluster-trails-pattern := $(info-string-pattern)/*.$(info-symbol-pattern).trail
 cluster-working-directory := '$${HOME}/$(filename-bundle)'
 cluster-filepath-script   := '$${HOME}/$(filename-bundle)/$(filename-bundle-pbs)'
 cluster-options :=\
-    -e $(info-symbol).out.log \
+    -j oe \
     -o $(info-symbol).out.log \
     -wd $(cluster-working-directory)
 
@@ -195,7 +197,7 @@ $(filepath-bundle-code): $(sources-verifier)
 $(filepath-bundle-makefile): $(filepath-bundle-mkparts)
 	@echo '-include $(notdir $^)\n\nall:: verification' > $@
 
-$(filepath-bundle-mkparts): $(filepath-makefile-parts)
+$(filepath-bundle-mkparts): $(filepath-makefile-parts) $(filepath-makefile-gmsl)
 	@mkdir -p $(dir $@)
 	@cp    $^ $(dir $@)
 
@@ -210,8 +212,9 @@ $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	  --output=$@ \
 	  --read=markdown \
 	  --template=$(filepath-pbs-template) \
+	  --variable=allocs:$(param-memory) \
 	  --variable=cores:$(param-cores) \
-	  --variable=memory:$(param-memory) \
+	  --variable=memory:$(usage-memory) \
 	  --variable=name:$(info-symbol) \
 	  --variable=property:$(ltl-property) \
 	  --write=plain

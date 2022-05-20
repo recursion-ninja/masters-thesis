@@ -42,9 +42,5 @@ ltl FSU
     &&  future_secrecy_of_epoch(  4 )
     &&  future_secrecy_of_epoch(  5 )
     &&  future_secrecy_of_epoch(  6 )
-    &&  future_secrecy_of_epoch(  7 )
-    &&  future_secrecy_of_epoch(  8 )
-    &&  future_secrecy_of_epoch(  9 )
-    &&  future_secrecy_of_epoch( 10 )
     )
 }

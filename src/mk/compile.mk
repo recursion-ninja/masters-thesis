@@ -47,7 +47,7 @@ dir-backup-trail     ?= ./trails/
 #######
 
 basename-dependancies := infostr sources
-filename-dependancies := $(addsuffix .$(extension-makefile),$(basename-dependancies))
+filename-dependancies := gmsl $(addsuffix .$(extension-makefile),$(basename-dependancies))
 filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filename-dependancies)))
 
 -include $(filepath-dependancies)
@@ -75,34 +75,69 @@ basename-record  := $(info-symbol)
 filename-record  := $(basename-record).$(extension-record)
 filepath-record  := $(abspath $(filename-record))
 
-# Default multi-core clustering values
-param-cores  := 4
-param-memory := 20480
+#######
+###
+#   Multi-core computation parameter
+###
+#######
 
+param-cores := 4
 ifdef cores
 param-cores := $(cores) 
 endif
 
+#######
+###
+#   Memory allocation parameter(s)
+###
+#######
+
+# NOTE:
+# Memory is specified by users in GiB, but accepted by SPIN in MiB.
+basis-memory-encoded := $(call int_encode,1024) # Binary base
+extra-memory-encoded := $(call int_encode,1)    # Gibibyte(s)
+param-memory-encoded := $(call int_encode,20)   # Gibibyte(s)
 ifdef memory
-param-memory := $(memory)
+param-memory-encoded := $(call int_encode,$(memory))
 endif
+added-memory-encoded := $(call     int_plus,$(param-memory-encoded),$(extra-memory-encoded))
+alloc-memory-encoded := $(call int_multiply,$(basis-memory-encoded),$(param-memory-encoded))
+usage-memory-encoded := $(call int_multiply,$(basis-memory-encoded),$(added-memory-encoded))
+
+# Max RAM allocation of program in MiB
+alloc-memory := $(call int_decode,$(alloc-memory-encoded))
+
+# Max RAM allocation of program in GiB
+param-memory := $(call int_decode,$(param-memory-encoded))
+
+# Max RAM Usage of PBS script in MiB
+usage-memory := $(call int_decode,$(usage-memory-encoded))
+
+#######
+###
+#   Compilation directives
+###
+#######
 
 opt-memory := \
     -DCOLLAPSE \
+    -DMA=768\
+    -DSPACE \
     -DVECTORSZ=65536
 
-opt-properties := \
+opt-properties := #\
     -DREACH
 
 opt-thread := \
-    -DMEMLIM=$(param-memory) \
+    -DMEMLIM=$(alloc-memory) \
     -DNCORE=$(param-cores)
 
 opt-timing := \
     -DNOBOUNDCHECK \
+    -DNOFAIR \
     -DSEP_STATE
 
-directives-list := $(opt-properties) $(opt-memory) $(opt-timing) $(opt-timing)
+directives-list := $(strip $(opt-properties) $(opt-memory) $(opt-timing) $(opt-thread))
 
 directives-rows := $(subst $(SPACE),$(SPACE)\$(NEWLINE),$(directives-list))
 

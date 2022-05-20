@@ -4,6 +4,8 @@
 
 printenv
 
+VERIFIER_OPTS="cores=${SLURM_NPROCS} memory=${PAN_MEMORY}"
+
 ### Display the job context
 
 printf \
@@ -25,9 +27,10 @@ printf "LTL property\t%s\n" "${LTL_PROPERTY}"
 printf "CGKA version\t%s\n" "`make show-protocol-version`"
 printf "CGKA params \t%s\n" "`make show-security-parameter-keys`"
 printf "CGKA values \t%s\n" "`make show-security-parameter-vals`"
-printf "Allocating  \t%6s MiB RAM\n" "${SLURM_MEM_PER_NODE}"
+printf "Limited by  \t%6s MiB RAM\n" "${SLURM_MEM_PER_NODE}"
+printf "Allocating  \t%6s GiB RAM\n" "${PAN_MEMORY}"
 printf "Utilizing   \t%6s CPU cores\n\n" "${SLURM_NPROCS}"
-printf "Directives  \t%s\n" "`make show-directives`"
+printf "Directives  \t%s\n" "`make show-directives ${VERIFIER_OPTS}`"
 
 
 ##### # # # # # # # # # #
@@ -38,7 +41,7 @@ make clean
 
 printf "Compiling encoded model from source...\n"
 
-make compile cores=${SLURM_NPROCS} memory=${SLURM_MEM_PER_NODE}
+make compile ${VERIFIER_OPTS}
 
 VERIFIER_PATH=$(make find-verifier)
 VERIFIER_FILE=$(basename ${VERIFIER_PATH})
