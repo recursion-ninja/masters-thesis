@@ -9,7 +9,7 @@
 #PBS -l nodes=1:ppn=$cores$
 #
 # > Memory:
-#PBS -l mem=$memory$mb
+#PBS -l mem=$memory$gb
 #
 # > Estimated runtime:
 #PBS -l walltime=$time$

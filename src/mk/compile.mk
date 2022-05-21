@@ -100,9 +100,9 @@ param-memory-encoded := $(call int_encode,20)   # Gibibyte(s)
 ifdef memory
 param-memory-encoded := $(call int_encode,$(memory))
 endif
-added-memory-encoded := $(call     int_plus,$(param-memory-encoded),$(extra-memory-encoded))
 alloc-memory-encoded := $(call int_multiply,$(basis-memory-encoded),$(param-memory-encoded))
-usage-memory-encoded := $(call int_multiply,$(basis-memory-encoded),$(added-memory-encoded))
+usage-memory-encoded := $(call     int_plus,$(param-memory-encoded),$(extra-memory-encoded))
+
 
 # Max RAM allocation of program in MiB
 alloc-memory := $(call int_decode,$(alloc-memory-encoded))

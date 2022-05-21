@@ -6,6 +6,7 @@ module Parser
     ) where
 
 import BinaryUnit
+import Control.Applicative ((<|>))
 import Control.Monad
 import Data.Bifunctor (first)
 import Data.ByteString.Lazy (ByteString, readFile, toStrict)
@@ -24,9 +25,33 @@ import Text.Megaparsec (ParsecT, optional, runParser, sepBy, takeWhile1P, takeWh
 import Text.Megaparsec.Byte
 import Text.Megaparsec.Byte.Lexer
 import Text.Megaparsec.Error (errorBundlePretty)
+import Text.Megaparsec.Debug
 
 
 type RowParser = ParsecT Void ByteString Identity
+
+
+debugging :: Bool
+debugging = False
+
+
+check :: Show a => String -> RowParser a -> RowParser a
+check
+    | debugging = dbg
+    | otherwise = const id
+
+
+checkScope :: Show a => String -> RowParser a -> RowParser a
+checkScope label = check ("Scope:\t( " <> label <> " )\n\t")
+
+
+checkLines :: Show a => String -> RowParser a -> RowParser a
+checkLines label = check ("Line: \t( " <> label <> " )\n\t")
+
+
+checkParseUntil :: Show a => String -> RowParser a -> RowParser a
+checkParseUntil label =
+    checkScope label . parseUntil . checkLines label
 
 
 extractRowFromFile :: FilePath -> IO (Either String ExtractedRow)
@@ -35,15 +60,15 @@ extractRowFromFile path = first errorBundlePretty . runParser rowExtractor path 
 
 rowExtractor :: RowParser ExtractedRow
 rowExtractor = do
-    foundVersion     <- parseUntil lineContainingVersion
-    (foundT, foundN) <- parseUntil lineContainingSecurityParams
-    foundDirectives  <- parseUntil lineContainingDirectives
-    foundProperty    <- parseUntil lineContainingProperty
-    foundVectorLen   <- parseUntil lineContainingVectorLen
-    foundStates      <- parseUntil lineContainingStates
-    foundTransitions <- parseUntil lineContainingTransitions
-    foundMemory      <- parseUntil lineContainingMemory
-    foundRuntime     <- parseUntil lineContainingRuntime
+    foundVersion     <- checkParseUntil "Version"     lineContainingVersion
+    (foundT, foundN) <- checkParseUntil "Security"    lineContainingSecurityParams
+    foundDirectives  <- checkParseUntil "Directives"  lineContainingDirectives
+    foundProperty    <- checkParseUntil "Property"    lineContainingProperty
+    foundVectorLen   <- checkParseUntil "VectorLen"   lineContainingVectorLen
+    foundStates      <- checkParseUntil "States"      lineContainingStates
+    foundTransitions <- checkParseUntil "Transitions" lineContainingTransitions
+    foundMemory      <- checkParseUntil "Memory"      lineContainingMemory
+    foundRuntime     <- checkParseUntil "Runtime"     lineContainingRuntime
     pure ExtractedRow
         { rowVersion     = foundVersion
         , rowProperty    = foundProperty & toStrict
@@ -143,12 +168,18 @@ lineContainingStates :: RowParser Word
 lineContainingStates =
     let prefix = hspace
         states = scientific >>= maybe (fail "Could not parse States") pure . toBoundedInteger
-        suffix = sequenceA_
-            [ hspace
-            , void $ string "states, stored ("
+        visits = sequenceA_
+            [ void $ string "("
             , void $ scientific
             , hspace
             , void $ string "visited)"
+            ]
+
+        suffix = sequenceA_
+            [ hspace
+            , void $ string "states, stored"
+            , hspace
+            , void $ optional visits
             , hspace
             , void eol
             ]
@@ -159,7 +190,15 @@ lineContainingTransitions :: RowParser Word
 lineContainingTransitions =
     let prefix = hspace
         shifts = scientific >>= maybe (fail "Could not parse Transitions") pure . toBoundedInteger
-        suffix = sequenceA_ [hspace, void $ string "transitions (= visited+matched)", hspace, void eol]
+        suffix = sequenceA_
+            [ hspace
+            , void $ string "transitions (="
+            , hspace
+            , void $ string "stored" <|> string "visited"
+            , void $ string "+matched)"
+            , hspace
+            , void eol
+            ]
     in  prefix *> shifts <* suffix
 
 
