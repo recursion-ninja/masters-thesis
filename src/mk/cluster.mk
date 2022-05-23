@@ -100,8 +100,12 @@ cluster-pass := ${CLUSTER_PASS}
 cluster-auth := $(cluster-user)@$(cluster-host)
 cluster-pbs  := $(process)$(cluster-pbs-suffix)
 
-cluster-output-pattern := $(info-string-pattern)/$(info-symbol-pattern).*.log
-cluster-trails-pattern := $(info-string-pattern)/*.$(info-symbol-pattern).trail
+logging-output-pattern := $(info-symbol-pattern).*.log
+
+cluster-output-pattern := $(info-string-pattern)/$(logging-output-pattern)
+cluster-trails-pattern := *.$(info-symbol-pattern).trail
+cluster-detail-pattern := $(subst $(SPACE),$(info-string-glue),$(info-string-prefix) $(protocol-name) *)
+cluster-finish-pattern := $(info-string-pattern) runtime:
 
 
 cluster-working-directory := '$${HOME}/$(filename-bundle)'
@@ -126,11 +130,11 @@ endif
 #######
 
 define scp-with
-@sshpass -p $(cluster-pass) scp -pr $(1) $(2) && echo "\tFROM: $(1)\n\tTO:   $(2)\n"
+sshpass -p $(cluster-pass) scp -Cpr $(1) $(2) && echo "    FROM: $(1)\n    TO:   $(2)\n"
 endef
 
 define ssh-with
-@sshpass -p $(cluster-pass) ssh $(cluster-auth) '$(1)'
+sshpass -p $(cluster-pass) ssh $(cluster-auth) '$(1)'
 endef
 
 #######
@@ -169,9 +173,18 @@ cluster-connect: ask-password
 	@$(call ssh-with)
 
 
-cluster-pull: ask-password
-	@$(call scp-with,'$(cluster-auth):./$(cluster-output-pattern)',$(dir-logging))
-	@$(call scp-with,'$(cluster-auth):./$(cluster-trails-pattern)',$(dir-logged-trails))
+cluster-pull: ask-password cluster-pull-logs cluster-pull-trails
+#	@$(call scp-with,'$(cluster-auth):./$(cluster-trails-pattern)',$(dir-logged-trails))
+
+cluster-pull-logs:
+	@$(eval final-logs=$(strip $(shell $(call ssh-with,find $(cluster-detail-pattern) -type f -name "$(logging-output-pattern)" -exec grep -l "$(cluster-finish-pattern)" {} +))))
+	@printf "  Complete verification logs: %3d found\n\n" "$(words $(final-logs))"
+	@$(foreach log-file,$(final-logs),$(call scp-with,'$(cluster-auth):./$(log-file)',$(dir-logging));)
+
+cluster-pull-trails:
+	@$(eval found-trails=$(strip $(shell $(call ssh-with,find $(cluster-detail-pattern) -type f -name "$(cluster-trails-pattern)"))))
+	@printf "  Counterexample trail files: %3d found\n\n" "$(words $(found-trails))"
+	@$(foreach trail-file,$(found-trails),$(call scp-with,'$(cluster-auth):./$(trail-file)',$(dir-logged-trails));)
 
 cluster-push: $(filepath-bundle-complete) ask-password
 	@echo "Transfering:"

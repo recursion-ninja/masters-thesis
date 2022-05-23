@@ -65,7 +65,7 @@ info-string-subpatterns := \
 $(info-string-prefix)\
 $(protocol-name)\
 $(protocol-version-pref)[0-9]\
-$(ltl-property)\
+[A-Z][A-Z][A-Z]\
 $(foreach param,$(security-parameters),$(param)[0-9][0-9][0-9])
 
 info-string         := $(subst $(SPACE),$(info-string-glue),$(info-string-substrings))
