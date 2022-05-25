@@ -18,7 +18,6 @@ reviewer1:  "Subash Shankar"
 reviewer2:  "Sven Dietrich"
 reviewer3:  "Saptarshi Debroy"
 
-## optional (mandatory, if english abstract enabled)
 abstract-en: |
   The features of Secure Group Messaging, the security guarantees of Message Layer Security, and the TreeKEM protocol designed to satisfy these guarantees and features are explored.
   A motivation and methodology for verification via explicit model checking is presented.

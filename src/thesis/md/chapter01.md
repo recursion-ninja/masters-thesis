@@ -81,7 +81,7 @@ Forward Secrecy and Post Compromise Secrecy are delineated in epochs, ensuring m
 
 The construction of scalable MSL protocols is an area of open and active research.
 There currently exist two proposed protocols which meet the definition of MLS with various levels of security proofs as well as efficiency with respect to group size.
-The first is Asynchronous Ratcheting Tree (ART) \cite{cohn2018ends} described in 2018.
+The first is Asynchronous Ratcheting Tree (ART) [@cohn2018ends] described in 2018.
 The second is TreeKEM \cite{bhargavan:hal-02425247} similarly conceived in 2018, but formally described in 2019.
 The Internet Enginnering Task Force has put it's support behind the TreeKEM protocol along with many other corporate and government sponsors.
 Consequently, research directed towards ART has stalled while developments for TreeKEM and it's derivatives have progressed rapidly.

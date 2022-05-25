@@ -177,12 +177,12 @@ cluster-pull: ask-password cluster-pull-logs cluster-pull-trails
 #	@$(call scp-with,'$(cluster-auth):./$(cluster-trails-pattern)',$(dir-logged-trails))
 
 cluster-pull-logs:
-	@$(eval final-logs=$(strip $(shell $(call ssh-with,find $(cluster-detail-pattern) -type f -name "$(logging-output-pattern)" -exec grep -l "$(cluster-finish-pattern)" {} +))))
+	@$(eval final-logs=$(sort $(strip $(shell $(call ssh-with,find $(cluster-detail-pattern) -type f -name "$(logging-output-pattern)" -exec grep -l "$(cluster-finish-pattern)" {} +)))))
 	@printf "  Complete verification logs: %3d found\n\n" "$(words $(final-logs))"
 	@$(foreach log-file,$(final-logs),$(call scp-with,'$(cluster-auth):./$(log-file)',$(dir-logging));)
 
 cluster-pull-trails:
-	@$(eval found-trails=$(strip $(shell $(call ssh-with,find $(cluster-detail-pattern) -type f -name "$(cluster-trails-pattern)"))))
+	@$(eval found-trails=$(sort $(strip $(shell $(call ssh-with,find $(cluster-detail-pattern) -type f -name "$(cluster-trails-pattern)")))))
 	@printf "  Counterexample trail files: %3d found\n\n" "$(words $(found-trails))"
 	@$(foreach trail-file,$(found-trails),$(call scp-with,'$(cluster-auth):./$(trail-file)',$(dir-logged-trails));)
 

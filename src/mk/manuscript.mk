@@ -68,7 +68,7 @@ thesis-references   := $(call thesis_source,references.md)
 thesis-titlepage    := $(call thesis_source,titlepage.tex)
 
 manuscript-target   := \
-    $(dir-thesis-manuscript)$(subst $(SPACE),-,$(title-of-manuscript)).$(extension-portabledoc)
+    $(abspath $(dir-thesis-manuscript)$(subst $(SPACE),-,$(title-of-manuscript)).$(extension-portabledoc))
 
 #######
 ###
@@ -101,6 +101,7 @@ TMP  := $(TMP1) $(TMP2) $(TMP3)
 
 AUX_OPTS       := --wrap=preserve
 AUX_OPTS       += -V title:"$(title-of-manuscript)"
+AUX_OPTS       += -M cleanthesis=true -M cleanthesisbibfile=$(thesis-bibliography:%.bib=%)
 
 pandoc-options := -f markdown
 pandoc-options += --pdf-engine=pdflatex
@@ -170,7 +171,7 @@ installdirs:: $(dir $(manuscript-target))
 thesis: TEMPLATE_FILE    += $(CLEANTHESIS_TEMPLATE)
 thesis: TEMPLATE_REPO    += $(CLEANTHESIS_REPO)
 thesis: TEMPLATE_VERSION += $(CLEANTHESIS_VERSION)
-thesis: AUX_OPTS         += -M cleanthesis=true -M cleanthesisbibfile=$(thesis-bibliography:%.bib=%)
+#thesis: AUX_OPTS         += -M cleanthesis=true -M cleanthesisbibfile=$(thesis-bibliography:%.bib=%)
 thesis: pandoc-options   += --include-in-header=$(thesis-header) $(AUX_OPTS)
 thesis: $(CLEANTHESIS_TEMPLATE) $(manuscript-target)
 
@@ -185,11 +186,11 @@ $(dir $(manuscript-target)):
 
 ## Download template files
 $(TEMPLATE_FILES):
-	rm -rf $(TEMPLATE_DL_DIR)
-	git clone --quiet --single-branch --branch master --depth 100 $(TEMPLATE_REPO) $(TEMPLATE_DL_DIR)
-	cd $(TEMPLATE_DL_DIR) && git checkout --quiet $(TEMPLATE_VERSION)
-	cp $(TEMPLATE_DL_DIR)/$(TEMPLATE_FILE) ./$(TEMPLATE_FILE)
-	rm -rf $(TEMPLATE_DL_DIR)
+	@rm -rf $(TEMPLATE_DL_DIR)
+	@git clone --quiet --single-branch --branch master --depth 100 $(TEMPLATE_REPO) $(TEMPLATE_DL_DIR)
+	@( cd $(TEMPLATE_DL_DIR) && git checkout --quiet $(TEMPLATE_VERSION) )
+	@cp $(TEMPLATE_DL_DIR)/$(TEMPLATE_FILE) ./$(TEMPLATE_FILE)
+	@rm -rf $(TEMPLATE_DL_DIR)
 
 ## Build thesis
 $(manuscript-target): $(thesis-chapters) $(thesis-references) $(APPENDIX) $(thesis-metadata) $(thesis-bibliography) $(TMP)
