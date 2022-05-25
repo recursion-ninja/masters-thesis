@@ -88,6 +88,17 @@ endif
 
 #######
 ###
+#   Multi-core computation parameter
+###
+#######
+
+param-vector := 768
+ifdef vector
+param-vector := $(vector) 
+endif
+
+#######
+###
 #   Memory allocation parameter(s)
 ###
 #######
@@ -121,9 +132,7 @@ usage-memory := $(call int_decode,$(usage-memory-encoded))
 
 opt-memory := \
     -DCOLLAPSE \
-    -DMA=768\
-    -DSPACE \
-    -DVECTORSZ=65536
+    -DSPACE
 
 opt-properties := #\
     -DREACH
@@ -137,9 +146,16 @@ opt-timing := \
     -DNOFAIR \
     -DSEP_STATE
 
-directives-list := $(strip $(opt-properties) $(opt-memory) $(opt-timing) $(opt-thread))
+opt-vector := \
+    -DMA=$(param-vector) \
+    -DVECTORSZ=$(param-vector)
 
-directives-rows := $(subst $(SPACE),$(SPACE)\$(NEWLINE),$(directives-list))
+
+directives-glue := $(SPACE)\$(NEWLINE)$(SPACE)$(SPACE)
+
+directives-list := $(strip $(opt-properties) $(opt-memory) $(opt-timing) $(opt-thread) $(opt-vector))
+
+directives-rows := $(subst $(SPACE),$(directives-glue),$(directives-list))
 
 #######
 ###
@@ -206,8 +222,7 @@ $(dir-backup-trail):
 	mkdir -p $@
 
 $(filepath-verifier): $(dir-binaries) $(sources-verifier)
-	gcc \
-	$(directives-rows) \
+	gcc $(directives-glue) $(directives-rows) \
 	-O3 \
 	-o $@ \
 	$(filepath-encoding-in-C)

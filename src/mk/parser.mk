@@ -35,7 +35,7 @@ dir-parser-for-logs   ?= .
 ###
 #######
 
-filename-parser  := cluster-log-parser
+filename-parser  := parse-table-row
 filepath-parser  := $(abspath $(addprefix $(dir-binaries),$(filename-parser))) 
 
 #######
@@ -77,6 +77,6 @@ $(dir $(filepath-parser)):
 
 ## Build thesis
 $(filepath-parser): $(dir-parser-for-logs)
-	( cd $(dir-parser-for-logs); cabal install --installdir=$(dir $@) --install-method=copy )
+	( cd $(dir-parser-for-logs); cabal install --installdir=$(dir $@) --install-method=copy; )
 
 endif # IMPORT_MAKE_PARSER
