@@ -25,10 +25,14 @@ IMPORT_MAKE_MANUSCRIPT := 1
 ###
 #######
 
+extension-figure      ?= png
+extension-latex       ?= tex
 extension-markdown    ?= md
 extension-portabledoc ?= pdf
+extension-postscript  ?= ps
 dir-thesis-source     ?= ./
 dir-thesis-chapters   ?= ./$(extension-markdown)/
+dir-thesis-figures    ?= ./$(extension-figure)/
 dir-thesis-manuscript ?= ./
 
 #######
@@ -41,9 +45,25 @@ define markdown
 $(addprefix $(dir-thesis-chapters),$(addsuffix .$(extension-markdown),$(1)))
 endef
 
+define figure-output
+$(call figure-with-extension,$(extension-figure),$(1))
+endef
+
+define figure-source
+$(call figure-with-extension,$(extension-latex),$(1))
+endef
+
+define figure-with-extension
+$(call thesis_source,$(addprefix $(dir-thesis-figures),$(addsuffix .$(1),$(2))))
+endef
+
 define thesis_source
 $(abspath $(addprefix $(dir-thesis-source),$(1)))
 endef
+
+tikz-figures := $(patsubst $(call figure-source,%),$(call figure-output,%),$(wildcard $(call figure-source,*)))
+
+$(info tikz-figures:$(NEWLINE)$(tikz-figures))
 
 #######
 ###
@@ -138,6 +158,7 @@ pandoc-options += --toc
 pandoc-options += --toc-depth=3
 pandoc-options += --number-sections
 pandoc-options += -V colorlinks=true
+pandoc-options += --resource-path=$(call thesis_source,.)
 
 #######
 ###
@@ -153,7 +174,7 @@ clean::
 	@-rm -rf $(TMP) $(TEMPLATE_DL_DIR)
 
 distclean:: clean
-	@-rm -f $(manuscript-target) $(TEMPLATE_FILES)
+	@-rm -f $(manuscript-target) $(tikz-figures) $(TEMPLATE_FILES)
 
 install:: $(manuscript-target)
 
@@ -192,8 +213,13 @@ $(TEMPLATE_FILES):
 	@cp $(TEMPLATE_DL_DIR)/$(TEMPLATE_FILE) ./$(TEMPLATE_FILE)
 	@rm -rf $(TEMPLATE_DL_DIR)
 
+## Build image files
+$(call figure-output,%): $(call figure-source,%)
+	latexmk $< -cd -output-directory=$(dir $@) -shell-escape
+	latexmk $< -cd -C
+
 ## Build thesis
-$(manuscript-target): $(thesis-chapters) $(thesis-references) $(APPENDIX) $(thesis-metadata) $(thesis-bibliography) $(TMP)
+$(manuscript-target): $(thesis-chapters) $(thesis-references) $(APPENDIX) $(thesis-metadata) $(thesis-bibliography) $(TMP) $(tikz-figures)
 	pandoc $(pandoc-options) -o $@ $(thesis-chapters) $(thesis-references) $(APPENDIX)
 
 ## Build auxiliary files (title page, frontmatter, backmatter, references)

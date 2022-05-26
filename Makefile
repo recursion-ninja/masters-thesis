@@ -23,11 +23,14 @@ endif # IMPORT_MAKE_ENVIRONMENT
 
 basename-encoding     := pan
 basename-pbs-script   := pbs
+extension-figure      := png
 extension-haskell     := hs
+extension-latex       := tex
 extension-makefile    := mk
 extension-markdown    := md
 extension-promela     := pml
 extension-portabledoc := pdf
+extension-postscript  := ps
 
 dir-binaries          := ./bin/
 dir-distribution      := ./dist/

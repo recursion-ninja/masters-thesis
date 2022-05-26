@@ -1,0 +1,29 @@
+\documentclass[crop,convert={density=600,outext=.png}]{standalone}
+
+% Required packages
+\usepackage{tikz}
+ 
+\begin{document}
+ 
+\begin{tikzpicture}[thick]
+ 
+% Set A
+\node[label={$SGM$}] (A) at (0,0.85) {};
+ 
+% Set B
+\node[label={$MLS$}] (B) at (0,-0.25) {};
+ 
+% Set C
+\node[label=$ART$] (C) at (1.1, -2.35) {};
+
+% Set D
+\node[label=$TreeKEM$] (D) at (-1.1,-2.35) {};
+
+\draw (0,-1) circle(2.8cm);
+\draw (0,-1.5) circle(2.3cm);
+\draw (1.1,-2) circle(1cm);
+\draw (-1.1,-2) circle(1cm);
+ 
+\end{tikzpicture}
+ 
+\end{document}
