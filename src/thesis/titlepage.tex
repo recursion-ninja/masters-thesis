@@ -39,14 +39,12 @@ $endif$
 \vspace{\baselineskip}\noindent
 \large
 \begin{tabular}{lp{\textwidth}}
-    Author Name: & \texttt{$for(author)$$author$$sep$ \and $endfor$}\\
-    Student Number: & \texttt{$studentnumber$} \\
-    &\\[12pt]
-    Date: & \texttt{$date$}\\
-    &\\[24pt]
-    Mentor:   & \texttt{$reviewer1$}\\
-    Reader:   & \texttt{$reviewer2$}\\
-    Director: & \texttt{$reviewer3$}
+    \texttt{Date:} & \texttt{$date$}\vspace{3mm}\\
+    \texttt{Author:} & $for(author)$$author$$sep$ \and $endfor$\\
+%    \texttt{Student Number:} & $studentnumber$ \\
+    \texttt{Mentor:}   & $reviewer1$\\
+    \texttt{Reader:}   & $reviewer2$\\
+    \texttt{Director:} & $reviewer3$
 \end{tabular}
 }
 %------------------------------------- Custom Title Page ---------------------------
@@ -58,12 +56,12 @@ $endif$
 \thispagestyle{empty}
 \hfill
 \vfill
-\textbf{$author$} ($studentnumber$) \\
+\textbf{$author$} \\
 \textit{$title$} \\
-$date$ \\[12pt]
-Mentor: \texttt{$reviewer1$}\\
-Reader: \texttt{$reviewer2$}\\
-Director: \texttt{$reviewer3$}
+\texttt{$date$} \\[12pt]
+\texttt{Mentor:  } $reviewer1$\\
+\texttt{Reader:  } $reviewer2$\\
+\texttt{Director:} $reviewer3$
 }
 %------------------------------------- Custom Title (Back) Page --------------------
 

@@ -21,36 +21,82 @@ The SGM requirement of adding and removing participants to the secure communicat
 
 ## Message Layer Security
 
-Message Layer Security (MLS) \cite{Omara2020} is a framework for providing secure messages in groups of size two or more parties.
-Implementations conforming to the definition of MLS are a subset of possible SGM implementations.
-The Internet Engineering Task Force (IETF) defines MLS as an SGM protocol which provides a set of security guarantees that participants in such a protocol can expect, the network/environmental resources participants can interact with, as well as protocol efficiency targets. The security guarantees of MLS include:
-	
-  - End-to-end encryption \cite{padlipsky1978limitations}
-  - Message confidentiality
-  - Message integrity \cite{voydock1983security}
-  - Message authentication \cite{jueneman1983message}
-  - Membership authentication \cite{chaum1985showing}
-  - Forward secrecy \cite{gunther1989identity}
-  - Post-compromise security \cite{cohn2016post}
+Message Layer Security (MLS) [@Omara2020] is a framework for providing secure messages in groups of size two or more parties.
+Originally produced in 2018 [@ietf-mls-architecture-02], MLS seeks to specify a standardization within which SGM protocols can be defined.
+Consequently, implementations conforming to the specification of MLS are a subset of possible SGM implementations.
+The stadardized specification of MLS is still an area of active develoment by The Internet Engineering Task Force (IETF).
+However, the core security aspects of MLS relevant to the work presented has remained constant since the initial draft of MLS.
 
-Furthermore MLS describes the protocol environment in which protocol agents interact.
+MLS describes the protocol environment in which protocol agents interact.
+The Internet threat model of RFC3552 [@rescorla2003rfc3552] is the context within which the MLS specifies it's security guarantees.
+Simply put, the Internet threat model assumes that the attacker has complete control of the network.
+There are only a two caveats to consider with regard to the attacker's netowrk control, and these are determined by two network agents with which MLS participants can interact.
 MLS specifies the existance of a key server from which a messager can request fresh public key for a specified contact which can be immediately used within the MLS protocol implementation.
 An advantage of using a key server as described in MLS is that it allows the contact to asyncronously query the key server for the corresponsing secret key at a later time, ameliorating potential protocol syncronization issues.
 In addition to the key server, MLS specifies the existance of a message server.
 The message server can receive messages addressed to any contact and the message server stores the messages until the contact querries it for new messages.
 Importantly, the message server will always deliver messages from all senders to a contact in the order that they were sent by the senders.
+The attacker is assumed to not be able to masquarade as the key server nor violate the message authentication codes within which the message ordering is encoded.
 
-Finally MLS also lays out efficiency goals for implementing protocols with respect to the size of the messaging group.
+The most scruitinized aspect of the MLS specification involves the provides a set of security guarantees that participants in a conforming a protocol can expect.
+The security guarantees of MLS includes many "solved problems" in the field of cryptography with respect to the Internet threat model; notably: end-to-end encryption [@padlipsky1978limitations], message confidentiality (CITE), message integrity [@voydock1983security], message authentication [@jueneman1983message], and membership authentication [@chaum1985showing].
+However, MLS also specifies interesting open problems of (perfect) forward secrecy (PFS) [@gunther1989identity] and post-compromise security (PCS) [@cohn2016post] as security guarantees of the key-agreement protocol.
+
+Both PFS and PCS have been researched with respect to bidirectional SM, producing provably secure as well as efficient constructions.
+A popular example is the double-ratchet-based AXOLOTL algorithm [@perrin2014axolotl] and it's derivatives which are used by most SM protocols.
+However, the requirement of PFS and PCS laid out by the MLS specificzation for a SGM protocol has introduced a novel area of research, as the double-ratchet-based algorithms do not directly map to multi-party communication.
+Indeed, these MLS security guarantees have been the cheif focus of reseach related to MLS and it's iterative develompent.
+A trival construction exists by utilizing a bidirectional SM protocol, and forming a fully connected graph of all SGM participants.
+However, it is obvious that this trivial construction's control mesaasges scale quadratically in the size of the communication group whenever the key argeement requires an update.
+Maintaining key agreement with the trival construction is not efficient.
+
+Considering the scope desired protocol constructions, MLS also lays out efficiency goals for implementing protocols with respect to the size of the messaging group.
 Three key efficiency distinctions which MLS requires are that the number of control messages should be linear in group size, the size of control messages should be sub-linear in group size, and that group sizes up to 50,000 should be supported.
 Taken in it's entirely, the framework provided by MLS is a foundational piece of acheiving SGM with well understood efficiency, security guarantees, and protocol design.
 
+## TreeKEM
+
+The construction of scalable MSL protocols remains an area of open and active research, though the "openness" of this area closes each year.
+There currently exist two proposed protocols which meet the definition of MLS with various levels of security proofs as well as efficiency with respect to group size.
+The first is Asynchronous Ratcheting Tree (ART) [@cohn2018ends] described in 2018.
+The second is TreeKEM [@bhargavan:hal-02425247] similarly conceived in 2018, but formally described in 2019.
+The Internet Enginnering Task Force has put it's support behind the TreeKEM protocol along with many other corporate and government sponsors.
+Consequently, research directed towards ART has stalled while developments for TreeKEM and it's derivatives have progressed rapidly.
+This work will mostly ignore ART and instead focus on the TreeKEM avenue of research.
+
+It is worth noting the relationship between the definitions exoplore thusfar.
+Secure Group Messaging (SGM) is a description of the high-level use case.
+The MLS specification is standardization which protocols may conform to and which satisfies the SGM use case.
+Both ART and TreeKEM are cryptographic protocols which conform to the MLS specification.
+There is a clear subsetting relationship between these abstract concepts illistrated in \ref{fig:venn-protocols}, and in future descriptions the layer of abstraction from which a definition was defined may be elided.
+
+![Relationship between Secure Group Messaging, Message Layer Security, and TreeKEM \label{fig:venn-protocols}](png/venn-protocols.png){width=80%}
+
+
+## Forward Secrecy
+
+Forward Secrecy (FS) is a desireable security guarantee which offers protection in the case that a protocol's long-term secret key(s) are compromised.
+PFS has been used in bidirectional key agreement communication protocols, including Transport Layer Security (TLS) (CITE) protocols such as OpenSSL (CITE), as well as SM protocols such as the Signal Protocol (CITE).
+While the definition of FS has been explored and made rigourously clear for bidirectional key agreement protocols, the notion of FS requires extension in the multi-directional MLS specification.
+The notion 
+
+> If the state of any group member is leaked at some point, all previous update secrets remain hidden from the attacker.
 
 ## Post Comprimise Security
 
 The specific definition of the last two security guarantees within a SGM context will be expanded upon in the following sections.
 
 
-## Forward Secrecy
+### Agent Environment
+
+A communication group is a set of two or more agents using multiple devices to engage in secure communication.
+The existence of an Authentication Service (AS) and a Delivery Service (DS) are required, though these do not need to be the same provider, nor do they need to be centralized.
+To initialize a group, members to connect a service provider(s) which transmits the requisite credentials and values to for authentication of and encryption between group members.
+
+Subsequently, group members exchange messages with a total ordering and maintain continuous group key agreement.
+Additionally, a group can add or remove members, or reset their encryption continuous key agreement; each of which begins a new encryption ``epoch.''
+Forward Secrecy and Post Compromise Secrecy are delineated in epochs, ensuring message ciphertexts sent before the current epoch are not recoverable if the current epoch's cryptographic material is compromised by one or more group members.
+
 
 ## Continuous Group Key Agreement
 
@@ -65,29 +111,7 @@ Groups exceeding $2^8$ strain this construction in practice, while MLS targets e
 There does not yet exists a cryptographic protocols for adding and removing participants while provably maintaining all the security guarantees of MLS that is simultaneously scalable.
 
 
-### Agent Environment
 
-A communication group is a set of two or more agents using multiple devices to engage in secure communication.
-The existence of an Authentication Service (AS) and a Delivery Service (DS) are required, though these do not need to be the same provider, nor do they need to be centralized.
-To initialize a group, members to connect a service provider(s) which transmits the requisite credentials and values to for authentication of and encryption between group members.
-
-
-
-Subsequently, group members exchange messages with a total ordering and maintain continuous group key agreement.
-Additionally, a group can add or remove members, or reset their encryption continuous key agreement; each of which begins a new encryption ``epoch.''
-Forward Secrecy and Post Compromise Secrecy are delineated in epochs, ensuring message ciphertexts sent before the current epoch are not recoverable if the current epoch's cryptographic material is compromised by one or more group members.
-
-## TreeKEM
-
-The construction of scalable MSL protocols is an area of open and active research.
-There currently exist two proposed protocols which meet the definition of MLS with various levels of security proofs as well as efficiency with respect to group size.
-The first is Asynchronous Ratcheting Tree (ART) [@cohn2018ends] described in 2018.
-The second is TreeKEM \cite{bhargavan:hal-02425247} similarly conceived in 2018, but formally described in 2019.
-The Internet Enginnering Task Force has put it's support behind the TreeKEM protocol along with many other corporate and government sponsors.
-Consequently, research directed towards ART has stalled while developments for TreeKEM and it's derivatives have progressed rapidly.
-During this survey, we will mostly ignore ART and instead focus on the TreeKEM avenue of research.
-
-TreeKEM \cite{bhargavan:hal-02425247} is an proposed protocol which meets the definition of MLS
 
 ### Public Key Infrastructure
 	
@@ -110,3 +134,6 @@ The AS acting as PKI should support:
 ## Security Games
 
 ## Related Work
+
+
+This work will predominantly forcus on verifying PFS and PCS

@@ -12,7 +12,7 @@ keywords: [Formal Verification, Model Checking, Promela, Spin, TreeKEM]
 headeralternative: true
 
 #studentnumber: "12345678"
-date: "2022 - 04 - 20"
+date: "2022-04-20"
 
 reviewer1:  "Subash Shankar"
 reviewer2:  "Sven Dietrich"
@@ -26,5 +26,10 @@ abstract-en: |
 
 ## optional
 acknowledgements: |
-  I need to acknowledge many people, TODO.
+    First and foremost, I would like to thank my advisor Subash Shankar for his dilligent guidance throughout my masters program.
+    His numerous insights, astute inquiries, and supportive direction were paramount in completing this work.
+    Similarly, I would like to thank Sven Dietrich and Saptarshi Debroy for their participation in my thesis defense and their contributions towards strengthing my final manuscript.
+    Additionally I would like to thank William Sakas for his leadering as department chair, making possible the masters program under which this work was conducted.
+    Finally, I want to acknowledge the support of my wife, Erilia Wu, which both remained an unwavering constant and manifested in a myriad of forms.
+
 ---
