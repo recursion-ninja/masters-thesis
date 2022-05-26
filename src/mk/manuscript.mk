@@ -63,8 +63,6 @@ endef
 
 tikz-figures := $(patsubst $(call figure-source,%),$(call figure-output,%),$(wildcard $(call figure-source,*)))
 
-$(info tikz-figures:$(NEWLINE)$(tikz-figures))
-
 #######
 ###
 #   Variables for MANUSCRIPT

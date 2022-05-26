@@ -70,7 +70,7 @@ The MLS specification is standardization which protocols may conform to and whic
 Both ART and TreeKEM are cryptographic protocols which conform to the MLS specification.
 There is a clear subsetting relationship between these abstract concepts illistrated in \ref{fig:venn-protocols}, and in future descriptions the layer of abstraction from which a definition was defined may be elided.
 
-![Relationship between Secure Group Messaging, Message Layer Security, and TreeKEM \label{fig:venn-protocols}](png/venn-protocols.png){width=80%}
+![Relationship between Secure Group Messaging, Message Layer Security, and TreeKEM \label{fig:venn-protocols}](png/venn-protocols.png){width=40%}
 
 
 ## Forward Secrecy
