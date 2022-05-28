@@ -1,0 +1,59 @@
+################################################################################
+### GitHub Actions curation providing quality assurance for thesis components.
+###
+name: 'Masters Thesis Quality Assurance'
+
+
+################################################################################
+### Actions Configuration
+###
+defaults:
+  run:
+    shell: bash
+
+on:
+
+  # Build every pull request, to check for regressions.
+  pull_request:
+
+  # Build when a PR is merged, to update the README's CI badge.
+  push:
+#    branches: [master]
+
+  # Build once a month, to detect missing upper bounds.
+  schedule:
+    - cron: '0 0 1 * *'
+
+
+################################################################################
+### Actions: Curation
+###
+jobs:
+
+
+################################################################################
+### Check for spelling errors
+###
+  spelling:
+    name: 'Check: Spelling'
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout-merge
+      if: "contains(github.event_name, 'pull_request')"
+      uses: actions/checkout@v2
+      with:
+        ref: refs/pull/${{github.event.pull_request.number}}/merge
+    - name: checkout
+      if: ${{ github.event_name == 'push' ||
+        (
+          contains(github.event.comment.body, '@check-spelling-bot apply')
+        ) }}
+      uses: actions/checkout@v2
+    - uses: check-spelling/check-spelling@main
+      id: spelling
+      with:
+        check_file_names: 1
+        experimental_apply_changes_via_bot: 0
+        post_comment: 0
+        suppress-comments: true
+        suppress_push_for_open_pull_request: 1
