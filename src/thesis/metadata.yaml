@@ -1,12 +1,7 @@
 ---
-## mandatory (subtitle and header-left are optional)
+## mandatory (subtitle is optional)
 author: "Alex Washburn"
 keywords: [Formal Verification, Model Checking, Promela, Spin, TreeKEM]
-
-### really long titles may require (multiple) line break(s) in page headers when using Eisvogel
-### activate (i.e. uncomment the next line) "header-left" to define a shortened single-line version of your long title to be used in page headers
-#header-left: "Shortened version of title for running page headers ..."
-### (note to myself: "header-left" is a meta-data variable in the Eisvogel template)
 
 ### activate (i.e. uncomment the next line) "headeralternative" to use chapter/section in header instead of title
 headeralternative: true
@@ -24,7 +19,6 @@ abstract-en: |
   Subsequently, a translation of the TreeKEM protocol into a Promela reference model is describe, examining the nuances explicit model checking brings.
   Finally the results of the formal verifcation methods are discussed.
 
-## optional
 acknowledgements: |
     First and foremost, I would like to thank my advisor Subash Shankar for his dilligent guidance throughout my masters program.
     His numerous insights, astute inquiries, and supportive direction were paramount in completing this work.

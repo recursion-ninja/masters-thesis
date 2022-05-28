@@ -1,7 +1,7 @@
-# Model Justification
+# Model Justification {#sec:justification}
 
 
-## CGKA game adaptations
+## CGKA game adaptations {#sec:game-adaptations}
 
 ### Exhaustiveness
 
@@ -12,7 +12,7 @@
 ### Attacker only (WLOG)
 
 
-## Oracles
+## Oracles {#sec:game-oracles}
 
 ### Corrupt
 
@@ -29,7 +29,7 @@
 ### Deliver
 
 
-## Security
+## Security {#sec:ltl-security}
 
 ### PCS as LTL
 

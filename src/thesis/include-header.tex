@@ -5,4 +5,11 @@
 %% We cannot put the `\usepackage{cleanthesis}` also in titlepage.tex since Pandoc
 %% tries to read the local cleanthesis.sty.
 \usepackage{cleanthesis}
+\usepackage{ntheorem}
+
+\theoremstyle{break}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
 %------------------------------------- Include Clean Thesis Style ------------------

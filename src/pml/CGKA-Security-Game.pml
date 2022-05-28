@@ -11,7 +11,7 @@
 
 /********
     *
-    * Saftey Predicate (Triviality):
+    * Safety Predicate (Triviality):
     *
     * Consider the following succession of attacker moves in the CKGA game.
     * We will call each move a "query," as to remain in line with the literature.
@@ -248,7 +248,7 @@ progress_epoch:
 
         // 3. Play a Non-commital Move
         //     The attacker *may* play a move and remain in the same epoch...
-        //     unless the attacker has exhausted all indempotent non-comittal moves!
+        //     unless the attacker has exhausted all idempotent non-comittal moves!
         :: !(commitmentRequired) -> play_move_without_commitment ( )
         od;
 

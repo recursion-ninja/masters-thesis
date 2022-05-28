@@ -1,7 +1,7 @@
 # Verification Results
 
 
-## Post Comprimise Security
+## Post Compromise Security
 
 ## Future Secrecy
 

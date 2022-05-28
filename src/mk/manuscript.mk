@@ -142,7 +142,7 @@ pandoc-options += --listings
 pandoc-options += -V title:"$(title-of-manuscript)"
 pandoc-options += -V documentclass=scrbook
 pandoc-options += -V papersize=a4
-pandoc-options += -V fontsize=11pt
+pandoc-options += -V fontsize=8pt
 pandoc-options += -V classoption:open=right
 pandoc-options += -V classoption:twoside=true
 pandoc-options += -V classoption:cleardoublepage=empty

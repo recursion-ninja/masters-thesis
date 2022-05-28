@@ -131,7 +131,6 @@ usage-memory := $(call int_decode,$(usage-memory-encoded))
 #######
 
 opt-memory := \
-    -DCOLLAPSE \
     -DSPACE
 
 opt-properties := #\
@@ -144,9 +143,11 @@ opt-thread := \
 opt-timing := \
     -DNOBOUNDCHECK \
     -DNOFAIR \
-    -DSEP_STATE
+    -DSEP_STATE \
+    -DXUSAFE
 
 opt-vector := \
+    -DCOLLAPSE \
     -DMA=$(param-vector) \
     -DVECTORSZ=$(param-vector)
 

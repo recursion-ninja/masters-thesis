@@ -21,7 +21,7 @@
 
 /****
   *
-  * Any TreeKEM "module" version must export the following "inline" defininitions:
+  * Any TreeKEM "module" version must export the following "inline" definitions:
   *
   * Exports:
   *   - attacker_amend_knowledge
@@ -34,7 +34,7 @@
   *
   * The exported definitions correspond to how the attacker observes, stores,
   * and updates knowledge about the TreeKEM protocol's LBBT of secret keys.
-  * The goal of the attacker is to know the value of the shared secret symetric
+  * The goal of the attacker is to know the value of the shared secret symmetric
   * key stored at the root node.
   *
   * The definitions are used by the:
@@ -46,7 +46,7 @@
 
 /****
   *
-  * The attacker knowledgebase keeps track of which verticies within the
+  * The attacker knowledgebase keeps track of which vertices within the
   * TreeKEM (version 1) LBBT for with the attacker knows the associated secret key.
   * Each node in the LBBT can be in one of *five* mutually exclusive states.
   *
@@ -356,7 +356,7 @@ inline attacker_init_epoch_knowledge ( e )
                         {
                             unsigned childL : BITS_VERTEX = v * 2 + 1;
                             unsigned childR : BITS_VERTEX = v * 2 + 2;
-                            // Check current epoch for existance of subtrees
+                            // Check current epoch for existence of subtrees
                             bool existanceOfSubtree;
                             existance_of_subtree ( e, childL);
                             voidL = !existanceOfSubtree;
@@ -440,7 +440,7 @@ inline attacker_updates_knowledge ( e )
                         unsigned childL : BITS_VERTEX = v * 2 + 1;
                         unsigned childR : BITS_VERTEX = v * 2 + 2;
 
-                        // Check current epoch for existance of subtrees
+                        // Check current epoch for existence of subtrees
                         bool existanceOfSubtree;
                         existance_of_subtree ( e, childL);
                         voidL = !existanceOfSubtree;

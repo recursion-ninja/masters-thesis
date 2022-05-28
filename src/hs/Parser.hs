@@ -215,7 +215,7 @@ contiguous = takeWhile1P (Just "contiguous inline word") (not . isSpace . chr . 
 
 
 identifier :: RowParser ByteString
-identifier = takeWhile1P (Just "alpha-numeric Identifier") (isAlphaNum . chr . fromIntegral)
+identifier = takeWhile1P (Just "alphanumeric Identifier") (isAlphaNum . chr . fromIntegral)
 
 
 constructRuntime :: Word -> Word -> Word -> Word -> DiffTime

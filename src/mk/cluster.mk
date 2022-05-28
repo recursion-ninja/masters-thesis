@@ -187,7 +187,7 @@ cluster-pull-trails:
 	@$(foreach trail-file,$(found-trails),$(call scp-with,'$(cluster-auth):./$(trail-file)',$(dir-logged-trails));)
 
 cluster-push: $(filepath-bundle-complete) ask-password
-	@echo "Transfering:"
+	@echo "Transferring:"
 	@$(call scp-with,"$(filepath-bundle)","$(cluster-auth):./")
 
 cluster-verify: cluster-push
