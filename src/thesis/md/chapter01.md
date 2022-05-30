@@ -190,11 +190,27 @@ Importantly, these oracles encapsulate from the attacker the stateful procudtion
 Control messages $w \in W$ and $t \in T$ are still broadcast across the network and assuemd to be intercepted by the attacker.
 The definition of control messages within the TreeKEM protocol dictates that messages are are authenticated by the group members, which justifies the absence of an oracle permitting the attacker to change or replay intercepted control messages in the CGKA game.
 
+Despite the encapsulation, querying the **add-user**, **remove-user**, and **send-update** oracles permit the attacker to guide the protocol execution by instructing group members to begin new epochs on whichever terms the attacker considers favorable.
+Likewise the **deliver** oracle permits the attacker to control when each user receives control messages and subsequently advances to the next epoch.
+Because the attacker has access to the **deliver** oracle, it does not matter who, attacker or group member, attempts to initiate a new epoch, ultimately the attacker decides via querying the **deliver** oracle which epoch-initiating control messages are processed by the group.
+Phrased differently, a multiple new epochs can be concurrently initiated either from a group member calling the **add**, **rmv**, or **upd** algorithm from **\texttt{CGKA}**, or from the attacker querying the **add-user**, **remove-user**, or **send-update** oracles, but regardless of the epoch initiation attempt's origin, the attacker chooses via querying the **deliver** oracle which of the possible initiation attempts is definatively processed by the group as the next epoch.
+Note that 
+
 The final four oracles exist to provide the attacker with means to gain undue knwoledge of secret aspects of the CGKA protocol.
 The **no-del** oracle forces the specified user to *not* delete old key material when advancing to a new epoch.
 The **corr** oracle "corrupts" the specified user, revealing the user's key material to the attacker. Note that if **no-del** is called before **corr** on the same user, the attacker can learn the key material from multiple epochs!
 The **reveal** oracle produces the group's shared symmetric key of the specified epoch for the attacker.
 The **chall** oracle allows the attacker to signal that they believe that they have succeeded in violating the CGKA protocol's security and the game should immediately cease so the attacker can provide proof of their successful attack by demonstrating *advantage*.
+
+
+By judiciously querying the **add-user**, **remove-user**, **send-update**, and **deliver** oracles attacker
+
+ The server connecting the parties is trusted to provide parties with a consistent view of which operation takes place in each epoch.
+That is, while multiple parties may initiate a new epoch, the attacker is forced to pick a single operation that defines the new epoch; the
+corresponding sender is referred to as the leader of the epoch. Observe that the parties may advance at various
+speeds and therefore be in epochs arbitrarily far apart
+
+
 
 Note that the requisite query to the **init** oracle flips a random bit $b$ uniformly at random is which remains constant for the entirety of the game and is used for the traditional "real-or-random" challenges in security games.
 If and only if $b=1$ will the real control messages be broadcast across the network for the attacker to intercept when querying **create-group**, **add-user**, **remove-user**, and **send-update** oracles.

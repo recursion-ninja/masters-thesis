@@ -148,7 +148,7 @@ The verification work presented permitted the usage all the partial order reduct
 No comparative verification(s) were made to observe the runtime difference between explicitly forbiding partial order reduction and permitting the "enabled by default" techniques available to SPIN.
 
 The verification work refrained from from both disabling partial order reduction via the \texttt{NOREDUCE} directive as well as experiment with potential performance gains or regressions introduced by the \texttt{NIBIS} directive.
-Instead this mok made use of a single partial order reduction directive:
+Instead this work made use of a single partial order reduction directive:
 
 - \texttt{XUSAFE}
 
@@ -164,17 +164,17 @@ The state vectors uniquely map to each state within the model.
 Given that the main memory requirements of model checking lies in exhaustive state-space search, it is unsurprising that specifying the encodign of the state-vectors has a pronounced impact on memory usage.
 There are to relevant directives used to influence the model checker's representation of state-vectors:
 
-- \texttt{VECTORSZ=}$N$
+- \texttt{VECTORSZ=}$X$
 
-- \texttt{MA=}$N$
+- \texttt{MA=}$X$
 
-- \texttt{COLLAPSE}$N$
+- \texttt{COLLAPSE}
 
-The \texttt{VECTORSZ} directive is used to specify the number of byte $N$ to allocate for each state-vector.
+The \texttt{VECTORSZ} directive is used to specify the number of byte $X$ to allocate for each state-vector.
 Spcifying a number of bytes which is insufficient to represent the state vector will cause the compilation of the model to fail with an approximate suggestion of the correct number of bytes to specify.
 The \texttt{VECTORSZ} directive is required when the state-vector length exceeds the SPIN default of $1024$ bytes.
-Likewise, the \texttt{MA} directive is used to specify the maximum number of bytes $N$ that a state vector can require.
-Using the information regarding the upper bound $N$ for state-vector bytes, the model checker then encodes the model as a minimized DFA [@holzmann1999minimized].
+Likewise, the \texttt{MA} directive is used to specify the maximum number of bytes $X$ that a state vector can require.
+Using the information regarding the upper bound $X$ for state-vector bytes, the model checker then encodes the model as a minimized DFA [@holzmann1999minimized].
 The model checker utilizes the smaller representation of the DFA state which corresponds to the original state-vector when processing the enormous statespace.
 The translation between DFA representation represents a stark time memory-tradeoff, reducing memory requirements while increasing verification run-time.
 Finally, the \texttt{COLLAPSE} directive applies compression the the state-vector representation.
@@ -190,15 +190,78 @@ This support brings with it non-trivial engineering considerations, such as how 
 There are two primary directives used my SPIN for approximating the optimal multicore verification stategy at compile-time.
 Both of these are used by this work while verifying TreeKEM.
 
-- \texttt{MEMLIM=}$M$
-- \texttt{NCORE=}$N$
+- \texttt{MEMLIM=}$X$
+- \texttt{NCORE=}$Y$
 
-The \texttt{MEMLIM} directive specifies the upper limit of memory usable by the model checker to be $M$ Mebibytes for the duration it's verication.
+The \texttt{MEMLIM} directive specifies the upper limit of memory usable by the model checker to be $X$ Mebibytes for the duration it's verication.
 Specifying this has the important effect of preventing the verifcation process from thrashing by utilizing more virtual memory than real memory exists on the verification machine(s).
-Moreover, the \texttt{NCORE} directive informs the model checker at compile-time the maximum number of usable processors is $N$, permitting the compiler to make informed approximations to minimize parallelism overhead and maximize multicore throughput.
+Moreover, the \texttt{NCORE} directive informs the model checker at compile-time the maximum number of usable processors is $Y$, permitting the compiler to make informed approximations to minimize parallelism overhead and maximize multicore throughput.
 The verification work's utilization of both \texttt{MEMLIM} and \texttt{NCORE} directives when utilizing a multicore computing cluster had notable impact on the overall "states per second" processing performance.
+
+
+### Memory Allocation
+
+A final memory related directive is utilized conditionally during the verification of TreeKEM.
+
+- \texttt{SPACE}
+
+The \texttt{SPACE} directive instructs the compiler to encode the state transition graph as well as select search algorithms with thegoal of reducing memory usage at the expense of verification time.
+For large values of $T$ and $N$, the \texttt{SPACE} is utilized in conjunction \texttt{MA} directive described above, to increase the tractable values of $T_{max}$ and $N_{max}$.
+During verification of TreeKEM, it is always the case that the \texttt{SPACE} directive is utilized if and only if the \texttt{MA} is also utilized.
+This conditional directive usage creates an "optimization partition" bifurcating verification runs into two sets of utilized directives.
+An important consequence of this partitioning relates to comparative analysis of the verificationruntime characteristics.
+Such comparisons can only soundly be with other verification runs within the same set, utilizing the same directives.
 
 
 ### Runtime Improvement
 
--DNOBOUNDCHECK -DNOFAIR -DSEP_STATE -DSPACE
+Without any special direction SPIN includes a number of runtime checks and overhead structures to support functionality which may or may not actually be required for verification.
+For each of these "safety rails" added to the verification by default, there exists a directive to remove the runtime feature.
+The verification of TreeKEM does not require all runtime features and the following directives are used to remove the associated runtime increases.
+
+- \texttt{NOBOUNDCHECK}
+- \texttt{NOFAIR}
+
+The \texttt{NOBOUNDCHECK} directive removes runtime bounds checking when indexing arrays.
+While enabled, the bound checking provides extremely useful dbugging information.
+Enabling bounds checking is useful while developing the model, but once confidence has been established that indexing errors do not exist in the model, such bounds checks are superfluous.
+Additionally, the \texttt{NOBOUNDCHECK} performs runtime checks when syncronously accessing message queues.
+The TreeKEM model does not use such message channels.
+Consequently, the finalized model does not require bounds checking and the diabling directive is used during verification.
+
+Siminlarly the \texttt{NOFAIR} removes the data structures and tracking subroutines required to reason about and verify fairness properties.
+The verification of TreeKEM does not include any fairness properties.
+Hence the \texttt{NOFAIR} directive is always enabled.
+
+
+### Reproducable Randomness
+
+Like many problems with arbitrary alternation or stochastic search strategies, SPIN provides the opportunity for specifying seeds to exactly reproduce the results of random selection.
+The benefits of reproduciblity are difficult to understate.
+Before the model is finalized, reproducibility is essential during the debugging process.
+On the other hand, once the model is finalized, reproducibility is required for certianty during peer review.
+Hence, directives for specify seed values are utilized throughout the verification work.
+
+- \texttt{P\_RAND=}$X$
+- \texttt{T\_RAND=}$Y$
+
+The first randomness directive, \texttt{P\_RAND}, is utilized to specify the random seed which determines process scheduling order for multi-process models.
+The second, \texttt{T\_RAND} is also utilized, and corresponding the seed value dictates the transition exploration order when traversing the state-space.
+Random seed values for \texttt{P\_RAND} and \texttt{T\_RAND} were set by manipulating the known numerical constants as defined below.
+The transparency of the random seed value selection exists as a "no tricks up my sleeve" technique for specifying arbitrary seed values.
+
+\begin{equation}
+\begin{split}
+  X = \texttt{1618033988} = & \left| \phi * 10^9 \right|\\
+  Y = \texttt{1155727349} = & \left| \frac{\pi}{e} * 10^9 \right|\\
+\end{split}
+\end{equation}
+
+
+### Other
+
+This directive is used, as it was suggested by SPIN, but documentation for it cannot be found.
+
+- \texttt{SEP\_STATE}
+
+TODO, fill in more later
