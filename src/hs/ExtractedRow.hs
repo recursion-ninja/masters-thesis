@@ -9,16 +9,18 @@ module ExtractedRow
 
 import BinaryUnit
 import Data.ByteString (ByteString, intercalate)
-import Data.Csv (DefaultOrdered(..), ToField(..), ToNamedRecord(..))
-import Data.Csv (namedRecord, (.=))
+import Data.Csv (DefaultOrdered(..), ToField(..), ToNamedRecord(..), namedRecord, (.=))
 import Data.Fixed (Fixed(MkFixed), Pico, resolution)
 import Data.Foldable
 import Data.List (sort)
 import Data.Ratio
 import Data.Scientific (FPFormat(Fixed), Scientific, formatScientific)
-import Data.Time.Clock (DiffTime, diffTimeToPicoseconds)
+import Data.Time.Clock (DiffTime, diffTimeToPicoseconds, nominalDay, secondsToDiffTime)
+import Data.Time.Format (defaultTimeLocale, formatTime)
+import Data.Time.LocalTime (timeToTimeOfDay)
 import GHC.Exts (IsList(fromList))
 import Prelude hiding (putStr, readFile)
+import Unsafe.Coerce (unsafeCoerce)
 
 
 data  ExtractedRow
@@ -51,7 +53,8 @@ instance DefaultOrdered ExtractedRow where
         , "T"
         , "N"
         , "Runtime (seconds)"
-        , "Memory (GiBs)"
+        , "Runtime (timestamp)"
+        , "Memory (MiBs)"
         , "State Vector (bytes)"
         , "States"
         , "Transitions"
@@ -67,15 +70,28 @@ instance ToNamedRecord ExtractedRow where
 
             fieldKeys = toList $ headerOrder row
 
+            diffToSecs :: DiffTime -> Integer
+            diffToSecs = (`div` resolution (1 :: Pico)) . diffTimeToPicoseconds
+
             rowRuntime' :: Integer
-            rowRuntime' = (`div` resolution (1 :: Pico)) $ diffTimeToPicoseconds rowRuntime
+            rowRuntime' = diffToSecs rowRuntime
+
+            rowWallClock :: String
+            rowWallClock =
+                let runInSeconds = diffToSecs rowRuntime
+                    dayInSeconds = diffToSecs $ unsafeCoerce nominalDay
+                    todInSeconds = timeToTimeOfDay . secondsToDiffTime
+                    printSeconds = formatTime defaultTimeLocale "%Hh %Mm %Ss" . todInSeconds
+                    (days, time) = runInSeconds `quotRem` dayInSeconds
+                in  fold [ show days, "d ", printSeconds time]
+
 
             rowMemory' :: String
             rowMemory' =
                 let (MkFixed bytes) = rowMemory
-                    gibi :: Scientific
-                    gibi = fromRational $ bytes % resolution (1 :: GiB)
-                in  formatScientific Fixed (Just 3) gibi
+                    mebi :: Scientific
+                    mebi = fromRational $ bytes % resolution (1 :: MiB)
+                in  formatScientific Fixed (Just 3) mebi
 
             rowDirectives' :: ByteString
             rowDirectives' = intercalate " " $ sort rowDirectives
@@ -87,6 +103,7 @@ instance ToNamedRecord ExtractedRow where
             , FieldValueOf rowSecurityT
             , FieldValueOf rowSecurityN
             , FieldValueOf rowRuntime'
+            , FieldValueOf rowWallClock
             , FieldValueOf rowMemory'
             , FieldValueOf rowVectorLen
             , FieldValueOf rowStates

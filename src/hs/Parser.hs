@@ -24,8 +24,8 @@ import Prelude hiding (readFile)
 import Text.Megaparsec (ParsecT, optional, runParser, sepBy, takeWhile1P, takeWhileP, try)
 import Text.Megaparsec.Byte
 import Text.Megaparsec.Byte.Lexer
-import Text.Megaparsec.Error (errorBundlePretty)
 import Text.Megaparsec.Debug
+import Text.Megaparsec.Error (errorBundlePretty)
 
 
 type RowParser = ParsecT Void ByteString Identity
@@ -50,8 +50,7 @@ checkLines label = check ("Line: \t( " <> label <> " )\n\t")
 
 
 checkParseUntil :: Show a => String -> RowParser a -> RowParser a
-checkParseUntil label =
-    checkScope label . parseUntil . checkLines label
+checkParseUntil label = checkScope label . parseUntil . checkLines label
 
 
 extractRowFromFile :: FilePath -> IO (Either String ExtractedRow)
@@ -60,15 +59,15 @@ extractRowFromFile path = first errorBundlePretty . runParser rowExtractor path 
 
 rowExtractor :: RowParser ExtractedRow
 rowExtractor = do
-    foundVersion     <- checkParseUntil "Version"     lineContainingVersion
-    (foundT, foundN) <- checkParseUntil "Security"    lineContainingSecurityParams
-    foundDirectives  <- checkParseUntil "Directives"  lineContainingDirectives
-    foundProperty    <- checkParseUntil "Property"    lineContainingProperty
-    foundVectorLen   <- checkParseUntil "VectorLen"   lineContainingVectorLen
-    foundStates      <- checkParseUntil "States"      lineContainingStates
+    foundVersion     <- checkParseUntil "Version" lineContainingVersion
+    (foundT, foundN) <- checkParseUntil "Security" lineContainingSecurityParams
+    foundDirectives  <- checkParseUntil "Directives" lineContainingDirectives
+    foundProperty    <- checkParseUntil "Property" lineContainingProperty
+    foundVectorLen   <- checkParseUntil "VectorLen" lineContainingVectorLen
+    foundStates      <- checkParseUntil "States" lineContainingStates
     foundTransitions <- checkParseUntil "Transitions" lineContainingTransitions
-    foundMemory      <- checkParseUntil "Memory"      lineContainingMemory
-    foundRuntime     <- checkParseUntil "Runtime"     lineContainingRuntime
+    foundMemory      <- checkParseUntil "Memory" lineContainingMemory
+    foundRuntime     <- checkParseUntil "Runtime" lineContainingRuntime
     pure ExtractedRow
         { rowVersion     = foundVersion
         , rowProperty    = foundProperty & toStrict
@@ -168,21 +167,10 @@ lineContainingStates :: RowParser Word
 lineContainingStates =
     let prefix = hspace
         states = scientific >>= maybe (fail "Could not parse States") pure . toBoundedInteger
-        visits = sequenceA_
-            [ void $ string "("
-            , void $ scientific
-            , hspace
-            , void $ string "visited)"
-            ]
+        visits = sequenceA_ [void $ string "(", void $ scientific, hspace, void $ string "visited)"]
 
         suffix = sequenceA_
-            [ hspace
-            , void $ string "states, stored"
-            , hspace
-            , void $ optional visits
-            , hspace
-            , void eol
-            ]
+            [hspace, void $ string "states, stored", hspace, void $ optional visits, hspace, void eol]
     in  prefix *> states <* suffix
 
 
