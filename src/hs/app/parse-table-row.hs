@@ -6,9 +6,9 @@ import Control.Monad (when)
 import Data.ByteString.Lazy (hPut)
 import Data.Csv (encodeDefaultOrderedByName)
 import Data.Either (partitionEithers)
-import Parser
 import System.Environment (getArgs)
 import System.IO (hPutStr, stderr, stdout)
+import Thesis.Parser.Row
 
 
 main :: IO ()

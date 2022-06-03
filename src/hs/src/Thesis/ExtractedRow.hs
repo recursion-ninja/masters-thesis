@@ -3,12 +3,12 @@
 {-# Language OverloadedStrings #-}
 {-# Language RecordWildCards #-}
 
-module ExtractedRow
+module Thesis.ExtractedRow
     ( ExtractedRow (..)
     ) where
 
-import BinaryUnit
-import Data.ByteString (ByteString, intercalate)
+import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (unwords)
 import Data.Csv (DefaultOrdered(..), ToField(..), ToNamedRecord(..), namedRecord, (.=))
 import Data.Fixed (Fixed(MkFixed), Pico, resolution)
 import Data.Foldable
@@ -19,7 +19,8 @@ import Data.Time.Clock (DiffTime, diffTimeToPicoseconds, nominalDay, secondsToDi
 import Data.Time.Format (defaultTimeLocale, formatTime)
 import Data.Time.LocalTime (timeToTimeOfDay)
 import GHC.Exts (IsList(fromList))
-import Prelude hiding (putStr, readFile)
+import Prelude hiding (putStr, readFile, unwords)
+import Thesis.BinaryUnit
 import Unsafe.Coerce (unsafeCoerce)
 
 
@@ -83,8 +84,7 @@ instance ToNamedRecord ExtractedRow where
                     todInSeconds = timeToTimeOfDay . secondsToDiffTime
                     printSeconds = formatTime defaultTimeLocale "%Hh %Mm %Ss" . todInSeconds
                     (days, time) = runInSeconds `quotRem` dayInSeconds
-                in  fold [ show days, "d ", printSeconds time]
-
+                in  fold [show days, "d ", printSeconds time]
 
             rowMemory' :: String
             rowMemory' =
@@ -94,7 +94,7 @@ instance ToNamedRecord ExtractedRow where
                 in  formatScientific Fixed (Just 3) mebi
 
             rowDirectives' :: ByteString
-            rowDirectives' = intercalate " " $ sort rowDirectives
+            rowDirectives' = unwords $ sort rowDirectives
         in  namedRecord $ zipWith
             encodeFieldValue
             fieldKeys

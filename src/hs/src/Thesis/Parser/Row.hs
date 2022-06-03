@@ -1,11 +1,10 @@
 {-# Language OverloadedStrings #-}
 
-module Parser
+module Thesis.Parser.Row
     ( extractRowFromFile
     , rowExtractor
     ) where
 
-import BinaryUnit
 import Control.Applicative ((<|>))
 import Control.Monad
 import Data.Bifunctor (first)
@@ -19,13 +18,14 @@ import Data.Scientific (toBoundedInteger)
 import Data.String (fromString)
 import Data.Time.Clock (DiffTime, secondsToDiffTime)
 import Data.Void (Void)
-import ExtractedRow
 import Prelude hiding (readFile)
 import Text.Megaparsec (ParsecT, optional, runParser, sepBy, takeWhile1P, takeWhileP, try)
 import Text.Megaparsec.Byte
 import Text.Megaparsec.Byte.Lexer
 import Text.Megaparsec.Debug
 import Text.Megaparsec.Error (errorBundlePretty)
+import Thesis.BinaryUnit
+import Thesis.ExtractedRow
 
 
 type RowParser = ParsecT Void ByteString Identity
@@ -97,7 +97,7 @@ consumeRow = takeWhileP (Just "ignored line content") (/= 10) *> void eol
 lineContainingVersion :: RowParser Word
 lineContainingVersion =
     let prefix = sequenceA_ [hspace, void $ string "CGKA version", hspace]
-        notNum = \x -> isPunctuation x || isAlpha x
+        notNum x = isPunctuation x || isAlpha x
         title  = takeWhile1P (Just "version prefix") $ notNum . chr . fromIntegral
         suffix = sequenceA_ [hspace, void eol]
     in  prefix *> title *> decimal <* suffix
@@ -121,7 +121,7 @@ lineContainingProperty =
 lineContainingSecurityParams :: RowParser (Word, Word)
 lineContainingSecurityParams =
     let prefix = sequenceA_ [hspace, void $ string' "CGKA values", hspace, void $ string "(", hspace]
-        demark = sequenceA_ [hspace, void $ string ",", hspace, void $ decimal, void $ string ",", hspace]
+        demark = sequenceA_ [hspace, void $ string ",", hspace, void decimal, void $ string ",", hspace]
         suffix = sequenceA_ [hspace, void $ string ")", hspace, void eol]
         values = (,) <$> (decimal <* demark) <*> decimal
     in  prefix *> values <* suffix
@@ -129,7 +129,7 @@ lineContainingSecurityParams =
 
 lineContainingRuntime :: RowParser DiffTime
 lineContainingRuntime =
-    let prefix = sequenceA_ [hspace, void $ contiguous, hspace, void $ string' "runtime:", hspace]
+    let prefix = sequenceA_ [hspace, void contiguous, hspace, void $ string' "runtime:", hspace]
         suffix = sequenceA_ [hspace, void eol]
         time :: Num a => Char -> RowParser a
         time c = decimal <* string (fromString [c]) <* hspace
@@ -167,7 +167,7 @@ lineContainingStates :: RowParser Word
 lineContainingStates =
     let prefix = hspace
         states = scientific >>= maybe (fail "Could not parse States") pure . toBoundedInteger
-        visits = sequenceA_ [void $ string "(", void $ scientific, hspace, void $ string "visited)"]
+        visits = sequenceA_ [void $ string "(", void scientific, hspace, void $ string "visited)"]
 
         suffix = sequenceA_
             [hspace, void $ string "states, stored", hspace, void $ optional visits, hspace, void eol]

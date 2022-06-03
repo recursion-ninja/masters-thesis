@@ -1,0 +1,132 @@
+Cabal-Version:      3.0
+Name:               thesis-utilities
+Version:            1.0.0
+Stability:          Stable
+Build-Type:         Simple
+Tested-With:
+  GHC == 9.2.2
+
+Author:             Alex Washburn
+Copyright:          (c) Alex Washburn 2022
+License:            BSD-3-Clause
+License-File:       LICENSE
+
+Synopsis:           Parse a table row from Spin log file
+Category:           Parsers
+Description:        Same as Synopsis
+
+Common language
+
+  default-extensions:
+    DerivingStrategies
+    LambdaCase
+    NoGeneralizedNewtypeDeriving
+    
+  default-language:
+    GHC2021
+
+
+Executable parse-mem-spec
+
+  import:
+    language
+
+  main-is:
+    parse-mem-spec.hs
+
+  build-depends:
+    base >=4.16 && <5,
+    cluster-batch,
+    mtl,
+    text,
+    text-builder-linear,
+    validation,
+
+  hs-source-dirs:
+    app,
+
+  other-modules:
+    Paths_thesis_utilities
+
+
+Library cluster-batch
+
+  import:
+    language
+
+  build-depends:
+    base >=4.16 && <5,
+    containers,
+    foldl,
+    indexed-traversable,
+    matrices,
+    megaparsec,
+    mmark,
+    mtl,
+    text,
+    text-builder-linear,
+    validation,
+    vector,
+
+  hs-source-dirs:
+    app,
+    src,
+
+  autogen-modules:
+    Paths_thesis_utilities
+
+  exposed-modules:
+    Thesis.Batch.Catalog
+--    Thesis.Batch.Invoker
+    Thesis.Batch.Mandate
+    Thesis.Batch.Printer
+    Thesis.Batch.Scanner
+    Thesis.Batch.Tabular
+
+  other-modules:
+    Paths_thesis_utilities
+    Thesis.Batch.Catalog.LTL
+    Thesis.Batch.Catalog.Option
+    Thesis.Batch.Catalog.Parameter
+    Thesis.Batch.Catalog.UseDFA
+    Thesis.Batch.Mandate.Type
+    Thesis.Batch.Printer.Class
+    Thesis.Batch.Scanner.Fault
+    Thesis.Batch.Tabular.Bounding
+    Thesis.Batch.Tabular.Cell
+    Thesis.Batch.Tabular.Class
+    Thesis.Batch.Tabular.Numeric
+    Thesis.BinaryUnit
+
+  visibility:
+    private
+
+  
+Executable parse-table-row
+
+  main-is:
+    parse-table-row.hs
+           
+  build-depends:
+    base >=4.16 && <5,
+    bytestring,
+    cassava,
+    megaparsec,
+    scientific,
+    time,
+
+  default-extensions:
+    NoGeneralizedNewtypeDeriving
+    
+  default-language:
+    GHC2021
+
+  hs-source-dirs:
+    app,
+    src,
+
+  other-modules:
+    Paths_thesis_utilities
+    Thesis.BinaryUnit
+    Thesis.ExtractedRow
+    Thesis.Parser.Row

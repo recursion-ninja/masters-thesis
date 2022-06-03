@@ -1,6 +1,6 @@
 {-# Language Safe #-}
 
-module BinaryUnit
+module Thesis.BinaryUnit
     ( Bin0
     , Bin1
     , Bin2
@@ -85,7 +85,7 @@ instance HasResolution Bin0 where
 
 instance HasResolution Bin1 where
 
-    resolution = const $ binaryMagitude
+    resolution = const binaryMagitude
 
 
 instance HasResolution Bin2 where
