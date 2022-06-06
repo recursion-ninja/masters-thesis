@@ -6,31 +6,45 @@
 
 module Thesis.Batch.Mandate.Type
     ( BatchMandate (..)
+    , Parameterized
     , Specification
+    -- * Queries
+    , cardinality
     , queryMandate
+    , codomain
+    , domain
+    , fulfills
     ) where
 
+import Data.Coerce
 import Data.Foldable
 import Data.List (intersperse)
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
-import Data.Matrix.Unboxed (Matrix, toLists, unsafeIndex)
+import Data.Matrix.Unboxed (Matrix, flatten, toLists, unsafeIndex)
 import Data.Maybe (fromMaybe)
-import Data.Set (fromDistinctAscList)
+import Data.Set (Set, fromDistinctAscList)
 import Data.Text.Builder.Linear (Builder)
-import Data.Vector.Unboxed qualified as V
+import Data.Vector (Vector)
+import Data.Vector qualified as V
+import Data.Vector.Unboxed qualified as VU
 import Thesis.Batch.Catalog
 import Thesis.Batch.Catalog.Option
 import Thesis.Batch.Printer
 import Thesis.Batch.Tabular
 import Thesis.Batch.Tabular.Cell
+import Thesis.Batch.Catalog.Size
+import Thesis.Batch.Catalog.Time
 
 
 newtype BatchMandate
-    = Batch { unMandate :: Bounding (Map LTL (Matrix Specification)) }
+    = Batch { unMandate :: WrappedBundle }
 
-                          -- Time ,  Size
---type Parameterized = (LTL, Parameter, Parameter)
+
+type WrappedBundle = Bounding (Map LTL (Matrix Specification))
+
+
+type Parameterized = (LTL, Time, Size)
 
 
 type Specification = (UseDFA, Cell, Cell)
@@ -42,7 +56,7 @@ deriving newtype instance Eq BatchMandate
 instance RenderableStream BatchMandate where
 
     renderMarkdown (Batch bounding) =
-        let mapping    = boundedTableCells bounding
+        let wrappedMap = boundedTableCells bounding
             otherToken = "T⨉N"
 
             toMarkdown :: RenderableCell c => LTL -> [[c]] -> Builder
@@ -57,29 +71,30 @@ instance RenderableStream BatchMandate where
                         capFinalMarkdown
                         seperatorMarkdownDefault
                         corner
-                        (V.toList $ boundedColIndices bounding)
-                        (V.toList $ boundedRowIndices bounding)
+                        (VU.toList $ boundedColIndices bounding)
+                        (VU.toList $ boundedRowIndices bounding)
 
             emitTable :: RenderableCell c => LTL -> [[c]] -> [Builder]
             emitTable k = pure . toMarkdown k
 
             emitHeader :: RenderableCell h => h -> Builder
             emitHeader c = fold ["### " <> renderCell c, "\n\n"]
+
         in  fold $ intersperse
             "\n\n\n"
             [ fold . (emitHeader UseMinimizedDFA :) . intersperse "\n\n" $ Map.foldMapWithKey
                 (\k -> emitTable k . fmap (fmap (\(x, _, _) -> x)) . toLists)
-                mapping
+                wrappedMap
             , fold . (emitHeader MaxMemoryAllocs :) . intersperse "\n\n" $ Map.foldMapWithKey
                 (\k -> emitTable k . fmap (fmap (\(_, x, _) -> x)) . toLists)
-                mapping
+                wrappedMap
             , fold
             . (emitHeader MaxVectorLength :)
             . emitTable otherToken
             . fmap (fmap (\(_, _, x) -> x))
             . toLists
             . snd
-            $ Map.findMin mapping
+            $ Map.findMin wrappedMap
             ]
 
     renderUnicode = mempty
@@ -90,30 +105,56 @@ deriving stock instance Show BatchMandate
 
 instance Tabular BatchMandate where
 
-    type Index BatchMandate = Parameter
+    type CellData BatchMandate = Map LTL Specification
 
-    type Value BatchMandate = Map LTL Specification
+    type ColIndex BatchMandate = Size
 
-    colIndices = fromDistinctAscList . V.toList . boundedColIndices . unMandate
+    type RowIndex BatchMandate = Time
 
-    rowIndices = fromDistinctAscList . V.toList . boundedRowIndices . unMandate
+    colIndices = fromDistinctAscList . VU.toList . boundedColIndices . unMandate
+
+    rowIndices = fromDistinctAscList . VU.toList . boundedRowIndices . unMandate
 
     getIndex m row col =
         let props = boundedTableCells $ unMandate m
             notes = fold ["Indexing error at ( ", show row, ",", show col, " )"]
         in  fromMaybe (error notes) $ do
-            i <- V.elemIndex row . boundedRowIndices $ unMandate m
-            j <- V.elemIndex col . boundedColIndices $ unMandate m
-            pure $ specifyVector . (`unsafeIndex` (i, j)) <$> props
+            i <- VU.elemIndex row . boundedRowIndices $ unMandate m
+            j <- VU.elemIndex col . boundedColIndices $ unMandate m
+            pure $ (`unsafeIndex` (i, j)) <$> props
 
 
-queryMandate :: BatchMandate -> LTL -> Parameter -> Parameter -> Maybe Specification
-queryMandate (Batch mandate) prop row col = do
-    i <- V.elemIndex row $ boundedRowIndices mandate
-    j <- V.elemIndex col $ boundedColIndices mandate
+queryMandate :: BatchMandate -> Parameterized -> Maybe Specification
+queryMandate (Batch mandate) (prop, row, col) = do
+    i <- VU.elemIndex row $ boundedRowIndices mandate
+    j <- VU.elemIndex col $ boundedColIndices mandate
     m <- Map.lookup prop $ boundedTableCells mandate
-    pure . specifyVector $ unsafeIndex m (i, j)
+    pure $ unsafeIndex m (i, j)
 
 
-specifyVector :: (UseDFA, Cell, Cell) -> Specification
-specifyVector = id
+cardinality :: BatchMandate -> Word
+cardinality (Batch bounding) = product $ fmap toEnum
+    [ length $ boundedTableCells bounding
+    , VU.length $ boundedRowIndices bounding
+    , VU.length $ boundedColIndices bounding
+    ]
+
+
+codomain :: BatchMandate -> VU.Vector Specification
+codomain = foldMap flatten . boundedTableCells . (coerce :: BatchMandate -> WrappedBundle)
+
+
+domain :: BatchMandate -> Set Parameterized
+domain (Batch bounding) = fromDistinctAscList $ (,,)
+    <$> Map.keys  (boundedTableCells bounding)
+    <*> VU.toList (boundedRowIndices bounding)
+    <*> VU.toList (boundedColIndices bounding)
+
+
+fulfills :: Applicative f => (Parameterized -> Specification -> f a) -> BatchMandate -> f (Vector a)
+fulfills f m =
+    let n = fromEnum $ cardinality m
+        p = V.fromListN n . toList $ domain m
+        s = codomain m
+        g = f <$> V.unsafeIndex p <*> VU.unsafeIndex s
+    in  sequenceA $ V.generate n g

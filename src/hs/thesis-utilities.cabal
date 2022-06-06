@@ -89,6 +89,8 @@ Library cluster-batch
     Thesis.Batch.Catalog.Option
     Thesis.Batch.Catalog.Parameter
     Thesis.Batch.Catalog.UseDFA
+    Thesis.Batch.Catalog.Size
+    Thesis.Batch.Catalog.Time
     Thesis.Batch.Mandate.Type
     Thesis.Batch.Printer.Class
     Thesis.Batch.Scanner.Fault

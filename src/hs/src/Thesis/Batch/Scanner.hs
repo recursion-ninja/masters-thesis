@@ -36,7 +36,11 @@ import Text.MMark (parse, runScannerM)
 import Text.MMark.Extension (Block(..), Bni, Inline(..), asPlainText, scannerM)
 import Text.Megaparsec.Error (errorBundlePretty)
 import Text.Read (readMaybe)
-import Thesis.Batch.Catalog
+import Thesis.Batch.Catalog.LTL
+import Thesis.Batch.Catalog.Option
+import Thesis.Batch.Catalog.Size
+import Thesis.Batch.Catalog.Time
+import Thesis.Batch.Catalog.UseDFA
 import Thesis.Batch.Mandate.Type
 import Thesis.Batch.Scanner.Fault
 import Thesis.Batch.Tabular.Bounding
@@ -304,7 +308,7 @@ tabularNumbers ((label :| colNums) :| rows) =
             let showIndex = maybe "*" show
             in  fromString $ unwords [errorPref, labelPref, "[", showIndex i, "]", "[", showIndex j, "]"]
 
-        readIndex :: String -> Bool -> Int -> NonEmpty Inline -> Validation ScanFault Parameter
+        readIndex :: Read a => String -> Bool -> Int -> NonEmpty Inline -> Validation ScanFault a
         readIndex pref isRowName i =
             let indexMay
                     | isRowName = (Just i, Nothing)
@@ -318,12 +322,15 @@ tabularNumbers ((label :| colNums) :| rows) =
         readGridCell i j =
             let errorNote = makeError numError "Cell" (Just i) (Just j) in validate errorNote wordParse
 
+
+        toListVector :: Unbox a => Validation ScanFault [a] -> Validation ScanFault (Vector a)
         toListVector = fmap (V.fromList . toList)
 
         toNameVector
-            :: (Int -> NonEmpty Inline -> Validation ScanFault Parameter)
+            :: Unbox a
+            => (Int -> NonEmpty Inline -> Validation ScanFault a)
             -> [NonEmpty Inline]
-            -> Validation ScanFault (Vector Parameter)
+            -> Validation ScanFault (Vector a)
         toNameVector = (toListVector .) . itraverse
 
         toGridMatrix :: [[NonEmpty Inline]] -> Validation ScanFault (Matrix Cell)
@@ -342,8 +349,8 @@ tabularNumbers ((label :| colNums) :| rows) =
             in  fmap M.fromRows . itraverse f
 
         tagName = textualLTL $ asPlainText label
-        valRows = toNameVector readRowIndex rowNums
-        valCols = toNameVector readColIndex colNums
+        valCols = toNameVector readColIndex colNums :: Validation ScanFault (Vector Size)
+        valRows = toNameVector readRowIndex rowNums :: Validation ScanFault (Vector Time)
         valGrid = toGridMatrix grid
         valMake = Bounding <$> valCols <*> valRows <*> valGrid
     in  NumTable . (tagName, ) <$> valMake

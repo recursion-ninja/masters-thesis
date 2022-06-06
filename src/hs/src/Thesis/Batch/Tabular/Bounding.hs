@@ -5,13 +5,14 @@ module Thesis.Batch.Tabular.Bounding
     ) where
 
 import Data.Vector.Unboxed (Vector)
-import Thesis.Batch.Catalog.Parameter
+import Thesis.Batch.Catalog.Size
+import Thesis.Batch.Catalog.Time
 
 
 data  Bounding a
     = Bounding
-    { boundedColIndices :: Vector Parameter
-    , boundedRowIndices :: Vector Parameter
+    { boundedColIndices :: Vector Size
+    , boundedRowIndices :: Vector Time
     , boundedTableCells :: a
     }
 

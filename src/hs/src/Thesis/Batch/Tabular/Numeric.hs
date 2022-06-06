@@ -23,7 +23,8 @@ import Data.Vector.Unboxed qualified as V
 
 import Text.MMark.Extension (Inline)
 import Thesis.Batch.Catalog.LTL
-import Thesis.Batch.Catalog.Parameter
+import Thesis.Batch.Catalog.Size
+import Thesis.Batch.Catalog.Time
 import Thesis.Batch.Tabular.Bounding
 import Thesis.Batch.Tabular.Cell
 import Thesis.Batch.Tabular.Class
@@ -67,9 +68,11 @@ deriving newtype instance Semigroup NumericTableSet
 
 instance Tabular NumericTable where
 
-    type Index NumericTable = Parameter
+    type CellData NumericTable = Cell
 
-    type Value NumericTable = Cell
+    type ColIndex NumericTable = Size
+
+    type RowIndex NumericTable = Time
 
     colIndices = Set.fromDistinctAscList . V.toList . boundedColIndices . snd . numTable
 

@@ -10,15 +10,17 @@ import Data.Set (Set, cartesianProduct)
 
 class Tabular a where
 
-    type Index a
+    type CellData a
 
-    type Value a
+    type ColIndex a
 
-    bagIndices :: a -> Set (Index a, Index a)
+    type RowIndex a
+
+    bagIndices :: a -> Set (RowIndex a, ColIndex a)
     bagIndices = cartesianProduct <$> rowIndices <*> colIndices
 
-    colIndices :: a -> Set (Index a)
+    colIndices :: a -> Set (ColIndex a)
 
-    rowIndices :: a -> Set (Index a)
+    rowIndices :: a -> Set (RowIndex a)
 
-    getIndex :: a -> Index a -> Index a -> Value a
+    getIndex :: a -> RowIndex a -> ColIndex a -> CellData a

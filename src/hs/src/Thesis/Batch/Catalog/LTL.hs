@@ -10,9 +10,10 @@ module Thesis.Batch.Catalog.LTL
     , textualLTL
     ) where
 
+import Data.Coerce (coerce)
 import Data.Set (Set)
 import Data.String (IsString(..))
-import Data.Text (Text)
+import Data.Text (Text, unpack)
 import Data.Text.Builder.Linear (fromText)
 import Thesis.Batch.Printer.Class
 
@@ -35,7 +36,9 @@ instance RenderableCell LTL where
     renderCell (LTL txt) = "  " <> fromText txt <> " "
 
 
-deriving newtype instance Show LTL
+instance Show LTL where
+
+    show = unpack . coerce
 
 
 completeSetOfLTLs :: Set LTL
