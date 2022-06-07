@@ -63,6 +63,7 @@ Library cluster-batch
     megaparsec,
     mmark,
     mtl,
+    process,
     text,
     text-builder-linear,
     validation,
@@ -77,7 +78,7 @@ Library cluster-batch
 
   exposed-modules:
     Thesis.Batch.Catalog
---    Thesis.Batch.Invoker
+    Thesis.Batch.Invoker
     Thesis.Batch.Mandate
     Thesis.Batch.Printer
     Thesis.Batch.Scanner
@@ -91,6 +92,7 @@ Library cluster-batch
     Thesis.Batch.Catalog.UseDFA
     Thesis.Batch.Catalog.Size
     Thesis.Batch.Catalog.Time
+    Thesis.Batch.Invoker.SubProcess
     Thesis.Batch.Mandate.Type
     Thesis.Batch.Printer.Class
     Thesis.Batch.Scanner.Fault

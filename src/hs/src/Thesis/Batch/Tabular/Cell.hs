@@ -65,7 +65,9 @@ instance RenderableChoice Cell where
     renderChoiceUnit = const " Byte "
 
 
-deriving newtype instance Show Cell
+instance Show Cell where
+
+    show (Cell w) = show w
 
 
 instance Read Cell where

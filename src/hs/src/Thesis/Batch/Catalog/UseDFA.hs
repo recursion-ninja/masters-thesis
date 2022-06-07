@@ -55,7 +55,11 @@ instance RenderableChoice UseDFA where
     renderChoiceUnit = const $ fromText "Binary"
 
 
-deriving newtype instance Show UseDFA
+instance Show UseDFA where
+
+    show bv
+        | useDFA bv = "Yes"
+        | otherwise = "No"
 
 
 deriving newtype instance Unbox UseDFA
