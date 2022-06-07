@@ -1,2 +1,2 @@
 #include "CGKA-Security-Game.pml"
-#include "LTL-PCS.pml"
+#include "LTL-HLT.pml"

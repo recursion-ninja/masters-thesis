@@ -4,7 +4,7 @@
 
 printenv
 
-VERIFIER_OPTS="cores=${SLURM_NPROCS} memory=${PAN_MEMORY}"
+VERIFIER_OPTS="cores=${SLURM_NPROCS} DFA=${PAN_MINDFA} memory=${PAN_MEMORY} vector=${PAN_VECTOR}"
 
 ### Display the job context
 
@@ -28,7 +28,7 @@ printf "CGKA version\t%s\n" "`make show-protocol-version`"
 printf "CGKA params \t%s\n" "`make show-security-parameter-keys`"
 printf "CGKA values \t%s\n" "`make show-security-parameter-vals`"
 printf "Limited by  \t%3s GiB RAM\n" "${SLURM_MEM_PER_NODE}"
-printf "Allocating  \t%3s GiB RAM\n" "${PAN_MEMORY}"
+printf "Allocating  \t%3s GiB RAM\n" "${PAN_MEM_GIBI}"
 printf "Utilizing   \t%3s CPU cores\n\n" "${SLURM_NPROCS}"
 printf "Directives  \t%s\n" "`make show-directives ${VERIFIER_OPTS}`"
 

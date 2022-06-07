@@ -228,8 +228,11 @@ $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	  --variable=allocs:$(param-memory) \
 	  --variable=cores:$(param-cores) \
 	  --variable=memory:$(usage-memory) \
+	  --variable=mem-gibi:$(param-memory) \
+	  --variable=min-dfa:$(param-min-dfa) \
 	  --variable=name:$(info-symbol) \
 	  --variable=property:$(ltl-property) \
+	  --variable=vector:$(param-vector) \
 	  --write=plain
 
 endif # IMPORT_MAKE_CLUSTER
