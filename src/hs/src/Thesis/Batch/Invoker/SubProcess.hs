@@ -1,20 +1,20 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# Language OverloadedStrings #-}
 --{-# LANGUAGE StrictData        #-}
 
-
 module Thesis.Batch.Invoker.SubProcess
-  ( -- * Process types
-    InvokedOutput(..)
-    -- * Process invokation
-  , makeClusterJob
-  ) where
+    ( -- * Process types
+      InvokedOutput (..)
+      -- * Process invokation
+    , makeClusterJob
+    ) where
+
 
 --import Control.Applicative (liftA3)
-import Data.Functor (($>))
 import Data.Foldable
+import Data.Functor (($>))
+import Data.String (IsString(fromString))
 import Data.Text.Builder.Linear (Builder, fromDec, fromText, runBuilder)
 import Data.Text.IO (hGetContents, putStrLn)
-import Data.String(IsString(fromString))
 import Prelude hiding (putStrLn)
 import System.Exit (ExitCode(..))
 import System.IO (Handle)
@@ -38,8 +38,8 @@ type ProcessStatus = (Maybe Handle, Maybe Handle, Maybe Handle, ProcessHandle)
 instance Semigroup InvokedOutput where
 
     lhs <> rhs = InvokedOutput
-        { exitErrs = exitErrs lhs   <>  exitErrs rhs
-        , exitOuts = exitOuts lhs   <>  exitOuts rhs
+        { exitErrs = exitErrs lhs <> exitErrs rhs
+        , exitOuts = exitOuts lhs <> exitOuts rhs
         , exitCode = exitCode lhs `max` exitCode rhs
         }
 
@@ -50,18 +50,15 @@ instance Semigroup InvokedOutput where
 --
 -- Call 'destructProcess' on the supplied 'ScriptContext' afterwards to clean up
 -- artifacts of the process.
-makeClusterJob
-    :: Parameterized
-    -> Specification
-    -> IO InvokedOutput
+makeClusterJob :: Parameterized -> Specification -> IO InvokedOutput
 makeClusterJob param specs =
     let debugBefore :: IO ()
-        debugBefore = putStrLn . runBuilder $ fold [ "  $ ", fromString makeCommand ]
+        debugBefore = putStrLn . runBuilder $ fold ["  $ ", fromString makeCommand]
 --        debugBefore = pure ()
 
         debugExitCode :: ExitCode -> Builder
-        debugExitCode ExitSuccess = "SUCCESS"
-        debugExitCode (ExitFailure i) = fold [ "FAILURE [", fromDec i, "]" ]
+        debugExitCode ExitSuccess     = "SUCCESS"
+        debugExitCode (ExitFailure i) = fold ["FAILURE [", fromDec i, "]"]
 
         debugAfter :: InvokedOutput -> IO InvokedOutput
         debugAfter r =
@@ -75,7 +72,7 @@ makeClusterJob param specs =
 
         makeCommand = case cmdspec clusterJob of
             ShellCommand x -> x
-            _ -> mempty
+            _              -> mempty
 
         clusterJob = constructClusterJob param specs
 
@@ -83,29 +80,25 @@ makeClusterJob param specs =
     in  (debugBefore *> sendOffJob) >>= debugAfter
 
 
-constructClusterJob
-    :: Parameterized
-    -> Specification
-    -> CreateProcess
+constructClusterJob :: Parameterized -> Specification -> CreateProcess
 constructClusterJob (ltl, time, size) (minDFA, limMEM, lenVEC) =
     let makeOpt :: Show a => String -> a -> String
         makeOpt k v = k <> "=" <> show v
-        
+
         makeCommand = unwords
             [ "make"
             , "clean"
             , "&&"
             , "make"
             , "cluster-verify"
-            , makeOpt  "cores" 12
+            , makeOpt "cores"  12
             , makeOpt "memory" limMEM
             , makeOpt "vector" lenVEC
-            , makeOpt    "DFA" minDFA
-            , makeOpt    "LTL" ltl
-            , makeOpt      "T" time
-            , makeOpt      "N" size
+            , makeOpt "DFA"    minDFA
+            , makeOpt "LTL"    ltl
+            , makeOpt "T"      time
+            , makeOpt "N"      size
             ]
-
     in  CreateProcess
         { cmdspec            = ShellCommand makeCommand
         , cwd                = Nothing

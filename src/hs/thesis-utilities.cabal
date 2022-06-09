@@ -19,6 +19,7 @@ Common language
 
   default-extensions:
     DerivingStrategies
+    ImportQualifiedPost
     LambdaCase
     NoGeneralizedNewtypeDeriving
     
@@ -56,12 +57,13 @@ Library cluster-batch
 
   build-depends:
     base >=4.16 && <5,
+    commonmark,
+    commonmark-extensions ,
+    commonmark-pandoc,
     containers,
-    foldl,
     indexed-traversable,
     matrices,
-    megaparsec,
-    mmark,
+    pandoc-types,
     mtl,
     process,
     text,
@@ -97,7 +99,7 @@ Library cluster-batch
     Thesis.Batch.Printer.Class
     Thesis.Batch.Scanner.Fault
     Thesis.Batch.Tabular.Bounding
-    Thesis.Batch.Tabular.Cell
+    Thesis.Batch.Tabular.CellEntry
     Thesis.Batch.Tabular.Class
     Thesis.Batch.Tabular.Numeric
     Thesis.BinaryUnit

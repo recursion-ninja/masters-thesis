@@ -37,9 +37,9 @@ deriving newtype instance Eq UseDFA
 deriving newtype instance Ord UseDFA
 
 
-instance RenderableCell UseDFA where
+instance RenderableCellEntry UseDFA where
 
-    renderCell bv
+    renderCellEntry bv
         | useDFA bv = "   ⊤  "
         | otherwise = "   ⊥  "
 

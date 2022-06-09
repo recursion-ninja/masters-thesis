@@ -31,9 +31,9 @@ deriving newtype instance Ord LTL
 deriving newtype instance IsString LTL
 
 
-instance RenderableCell LTL where
+instance RenderableCellEntry LTL where
 
-    renderCell (LTL txt) = "  " <> fromText txt <> " "
+    renderCellEntry (LTL txt) = "  " <> fromText txt <> " "
 
 
 instance Show LTL where

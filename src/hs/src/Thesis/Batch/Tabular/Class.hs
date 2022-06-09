@@ -10,7 +10,7 @@ import Data.Set (Set, cartesianProduct)
 
 class Tabular a where
 
-    type CellData a
+    type CellEntryData a
 
     type ColIndex a
 
@@ -23,4 +23,4 @@ class Tabular a where
 
     rowIndices :: a -> Set (RowIndex a)
 
-    getIndex :: a -> RowIndex a -> ColIndex a -> CellData a
+    getIndex :: a -> RowIndex a -> ColIndex a -> CellEntryData a

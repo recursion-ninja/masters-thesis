@@ -10,14 +10,14 @@ import Data.Foldable
 --import Data.List (intersperse)
 import Data.Bifunctor (bimap, first)
 import Data.String (IsString(..))
-import Data.Text.Builder.Linear (runBuilder)
 import Data.Text (unlines)
+import Data.Text.Builder.Linear (runBuilder)
 import Data.Text.IO (hGetContents, hPutStrLn, putStrLn)
 import Data.Validation
 import Prelude hiding (putStrLn, unlines)
-import Thesis.Batch.Mandate
 import System.Environment (getArgs)
 import System.IO (Handle, IOMode(ReadMode), hIsEOF, openFile, stderr, stdin)
+import Thesis.Batch.Mandate
 import Thesis.Batch.Invoker
 import Thesis.Batch.Printer
 import Thesis.Batch.Scanner
@@ -27,9 +27,10 @@ main :: IO ()
 main = finalize $ do
     (source, handle) <- parseArgs
     stream           <- lift $ hGetContents handle
-    config           <- liftEither . first show . toEither $ markdownScanner source stream
+    lift $ putStrLn stream
+    config <- liftEither . first show . toEither $ markdownScanner source stream
     lift . putStrLn . runBuilder $ renderMarkdown config
-    lift . putStrLn . unlines  . fmap (fromString . show) . toList $ domain config
+    lift . putStrLn . unlines . fmap (fromString . show) . toList $ domain config
     lift . void $ invokeCluster `fulfills` config
 
 

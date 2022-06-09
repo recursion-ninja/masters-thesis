@@ -3,7 +3,7 @@
 
 module Thesis.Batch.Printer
     ( -- * Type-class for tabular rendering
-      RenderableCell (..)
+      RenderableCellEntry (..)
     , renderTable
       -- * Rendering components
     , capFinalMarkdown
@@ -48,7 +48,7 @@ seperatorMarkdownRight = fromText "-----:"
 
 
 renderTable
-    :: (RenderableCell a, RenderableCell b, RenderableCell c, RenderableCell d)
+    :: (RenderableCellEntry a, RenderableCellEntry b, RenderableCellEntry c, RenderableCellEntry d)
     => Builder
     -> Builder
     -> Builder
@@ -57,7 +57,7 @@ renderTable
     -> a   -- ^ Corner
     -> [b] -- ^ Columns
     -> [c] -- ^ Rows
-    -> [[d]] -- ^ Cells
+    -> [[d]] -- ^ CellEntrys
     -> Builder
 renderTable delimiter capFirst conjoiner capFinal seperator corner columnTags rowTags cells =
     let lineBreak = fromChar '\n'
@@ -65,10 +65,10 @@ renderTable delimiter capFirst conjoiner capFinal seperator corner columnTags ro
         renderVec :: Monoid c => c -> c -> c -> [c] -> c
         renderVec x y z = fold . (<> [z]) . (x :) . intersperse y
 
-        renderRow :: (Functor f, RenderableCell e) => f e -> f Builder
-        renderRow = fmap renderCell
+        renderRow :: (Functor f, RenderableCellEntry e) => f e -> f Builder
+        renderRow = fmap renderCellEntry
 
-        headerRow = renderCell corner : renderRow columnTags
+        headerRow = renderCellEntry corner : renderRow columnTags
         barredRow = headerRow $> seperator
         tableRows = zipWith (:) (renderRow rowTags) $ renderRow <$> cells
 

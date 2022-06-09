@@ -23,7 +23,7 @@ import Text.Megaparsec (ParsecT, optional, runParser, sepBy, takeWhile1P, takeWh
 import Text.Megaparsec.Byte
 import Text.Megaparsec.Byte.Lexer
 import Text.Megaparsec.Debug
-import Text.Megaparsec.Error (errorBundlePretty)
+import Text.Megaparsec.Error (ParseErrorBundle, errorBundlePretty)
 import Thesis.BinaryUnit
 import Thesis.ExtractedRow
 
@@ -54,7 +54,10 @@ checkParseUntil label = checkScope label . parseUntil . checkLines label
 
 
 extractRowFromFile :: FilePath -> IO (Either String ExtractedRow)
-extractRowFromFile path = first errorBundlePretty . runParser rowExtractor path <$> readFile path
+extractRowFromFile path =
+    let convertErrors :: Either (ParseErrorBundle ByteString Void) ExtractedRow -> Either String ExtractedRow
+        convertErrors = first errorBundlePretty
+    in  convertErrors . runParser rowExtractor path <$> readFile path
 
 
 rowExtractor :: RowParser ExtractedRow

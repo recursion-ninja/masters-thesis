@@ -49,9 +49,9 @@ deriving newtype instance Eq Time
 deriving newtype instance Ord Time
 
 
-instance RenderableCell Time where
+instance RenderableCellEntry Time where
 
-    renderCell = renderPad 6
+    renderCellEntry = renderPad 6
 
 
 instance RenderableChoice Time where
@@ -72,7 +72,7 @@ instance Read Time where
 
     {-# INLINABLE readPrec #-}
     readPrec =
-        let (Time w) = maxBound
+        let (Time w)      = maxBound
             maximumNumber = fromIntegral w :: Natural
         in  do
             nat <- readPrec

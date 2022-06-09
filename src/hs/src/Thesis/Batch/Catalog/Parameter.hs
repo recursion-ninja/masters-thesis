@@ -49,9 +49,9 @@ deriving newtype instance Eq Parameter
 deriving newtype instance Ord Parameter
 
 
-instance RenderableCell Parameter where
+instance RenderableCellEntry Parameter where
 
-    renderCell = renderPad 6
+    renderCellEntry = renderPad 6
 
 
 instance RenderableChoice Parameter where

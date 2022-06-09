@@ -2,7 +2,7 @@
 
 module Thesis.Batch.Printer.Class
     ( -- * Type-class for tabular rendering
-      RenderableCell (..)
+      RenderableCellEntry (..)
       -- * Type-class for stream rendering
     , RenderableStream (..)
       -- * Type-class for choice rendering
@@ -19,9 +19,9 @@ class RenderableStream a where
     renderUnicode :: a -> Builder
 
 
-class RenderableCell a where
+class RenderableCellEntry a where
 
-    renderCell :: a -> Builder
+    renderCellEntry :: a -> Builder
 
 
 class RenderableChoice a where
