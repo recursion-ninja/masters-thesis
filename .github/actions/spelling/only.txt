@@ -1,0 +1,3 @@
+# Only spellcheck thesis markdown files:
+^src/thesis/md/.*\.md$
+

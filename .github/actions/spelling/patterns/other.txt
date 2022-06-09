@@ -1,0 +1,19 @@
+# LaTeX formatting
+\\left
+\\right
+\\textbf
+\\textnormal
+\\textrm
+\\texttt
+\\times
+\\normalfont
+versio
+
+# Citation references in markdown
+\[\@[\w\-\.\:]+\]
+
+# URL matcher
+(((ht|f)tp(s?))\://)?(www.|[a-zA-Z].)?[a-zA-Z0-9\-\.]+\.\w+(\:[0-9]+)*(/($|[a-zA-Z0-9\.\,\;\?\'\\\+&amp;%\$#\=~_\-]+))*
+
+
+# ((ht|f)tp(s?)\://)?([\w\-]+\.)+(\w\w+)(\:[0-9]+)?(/[a-zA-Z0-9\.\,\;\?\'\$#\=~_\-]+)*/? 

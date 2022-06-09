@@ -1,3 +1,0 @@
-# LaTeX-like formatting in Haddock documentation for nicely rendered asymptotics.
-\\left
-\\right
