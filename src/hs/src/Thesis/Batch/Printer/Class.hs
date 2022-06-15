@@ -2,14 +2,15 @@
 
 module Thesis.Batch.Printer.Class
     ( -- * Type-class for tabular rendering
-      RenderableCell (..)
+      RenderableCellEntry (..)
       -- * Type-class for stream rendering
     , RenderableStream (..)
       -- * Type-class for choice rendering
     , RenderableChoice (..)
     ) where
 
-import Data.Text.Builder.Linear (Builder)
+import Data.Text.Builder.Linear (Builder, fromText)
+import Data.Text (Text)
 
 
 class RenderableStream a where
@@ -19,9 +20,9 @@ class RenderableStream a where
     renderUnicode :: a -> Builder
 
 
-class RenderableCell a where
+class RenderableCellEntry a where
 
-    renderCell :: a -> Builder
+    renderCellEntry :: a -> Builder
 
 
 class RenderableChoice a where
@@ -31,3 +32,10 @@ class RenderableChoice a where
     renderChoiceNote :: a -> Builder
 
     renderChoiceUnit :: a -> Builder
+
+
+instance RenderableCellEntry Text where
+
+    renderCellEntry = fromText
+
+

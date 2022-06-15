@@ -49,9 +49,9 @@ deriving newtype instance Eq Size
 deriving newtype instance Ord Size
 
 
-instance RenderableCell Size where
+instance RenderableCellEntry Size where
 
-    renderCell = renderPad 6
+    renderCellEntry = renderPad 6
 
 
 instance RenderableChoice Size where
@@ -72,7 +72,7 @@ instance Read Size where
 
     {-# INLINABLE readPrec #-}
     readPrec =
-        let (Size w) = maxBound
+        let (Size w)      = maxBound
             maximumNumber = fromIntegral w :: Natural
         in  do
             nat <- readPrec

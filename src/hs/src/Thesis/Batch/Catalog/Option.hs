@@ -35,11 +35,11 @@ deriving stock instance Eq Option
 deriving stock instance Ord Option
 
 
-instance RenderableCell Option where
+instance RenderableCellEntry Option where
 
-    renderCell UseMinimizedDFA = "DFAMIN"
-    renderCell MaxMemoryAllocs = "MEMORY"
-    renderCell MaxVectorLength = "VECTOR"
+    renderCellEntry UseMinimizedDFA = "DFAMIN"
+    renderCellEntry MaxMemoryAllocs = "MEMORY"
+    renderCellEntry MaxVectorLength = "VECTOR"
 
 
 deriving stock instance Show Option

@@ -158,7 +158,7 @@ installdirs:: $(dir-distribution)
 ###
 #######
 
-.PHONY: ask-password cluster-bundle cluster-connect cluster-pull cluster-push scp-with
+.PHONY: ask-password cluster-bundle cluster-connect cluster-pull cluster-pull-logs cluster-pull-trails cluster-push scp-with
 
 ask-password:
 ifeq ($(cluster-pass),)
@@ -174,7 +174,6 @@ cluster-connect: ask-password
 
 
 cluster-pull: ask-password cluster-pull-logs cluster-pull-trails
-#	@$(call scp-with,'$(cluster-auth):./$(cluster-trails-pattern)',$(dir-logged-trails))
 
 cluster-pull-logs:
 	@$(eval final-logs=$(sort $(strip $(shell $(call ssh-with,find $(cluster-detail-pattern) -type f -name "$(logging-output-pattern)" -exec grep -l "$(cluster-finish-pattern)" {} +)))))

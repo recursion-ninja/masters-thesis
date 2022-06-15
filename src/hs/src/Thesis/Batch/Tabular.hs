@@ -1,7 +1,6 @@
 module Thesis.Batch.Tabular
     ( -- * Type-class for tabular indexing
       Bounding (..)
-    , MarkdownRows
     , NumericTable (..)
     , NumericTableSet (..)
       -- * Type-classes

@@ -27,7 +27,7 @@ IMPORT_MAKE_PARSER := 1
 
 extension-haskell     ?= hs
 dir-binaries          ?= .
-dir-parser-for-logs   ?= .
+dir-thesis-utilities   ?= .
 
 #######
 ###
@@ -50,7 +50,7 @@ all:: $(filepath-parser)
 
 clean::
 	@-rm -f $(filepath-parser)
-	@( cd $(dir-parser-for-logs) ; cabal clean )
+	@( cd $(dir-thesis-utilities) ; cabal clean )
 
 install:: $(filepath-parser)
 
@@ -76,7 +76,7 @@ $(dir $(filepath-parser)):
 	@mkdir -p $@
 
 ## Build thesis
-$(filepath-parser): $(dir-parser-for-logs)
-	( cd $(dir-parser-for-logs); cabal install --installdir=$(dir $@) --install-method=copy; )
+$(filepath-parser): $(dir-thesis-utilities)
+	( cd $(dir-thesis-utilities); cabal install $(notdir $@) --installdir=$(dir $@) --install-method=copy; )
 
 endif # IMPORT_MAKE_PARSER

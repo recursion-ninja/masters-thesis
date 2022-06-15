@@ -11,9 +11,9 @@ import Thesis.Batch.Catalog.Time
 
 data  Bounding a
     = Bounding
-    { boundedColIndices :: Vector Size
-    , boundedRowIndices :: Vector Time
-    , boundedTableCells :: a
+    { boundedColIndices      :: Vector Size
+    , boundedRowIndices      :: Vector Time
+    , boundedTableCellEntrys :: a
     }
 
 

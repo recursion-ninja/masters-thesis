@@ -1,49 +1,70 @@
 {-# Language DerivingStrategies #-}
-{-# Language ExistentialQuantification #-}
-{-# Language GeneralizedNewtypeDeriving #-}
 {-# Language OverloadedLists #-}
 {-# Language OverloadedStrings #-}
 
 module Thesis.Batch.Catalog.LTL
-    ( LTL ()
+    ( LTL (..)
     , completeSetOfLTLs
     , textualLTL
     ) where
 
-import Data.Coerce (coerce)
+import Data.Map (foldrWithKey, fromSet)
+import Data.Maybe (fromMaybe)
 import Data.Set (Set)
 import Data.String (IsString(..))
-import Data.Text (Text, unpack)
-import Data.Text.Builder.Linear (fromText)
+import Data.Validation
 import Thesis.Batch.Printer.Class
+import Thesis.Batch.Scanner.Fault
 
 
-newtype LTL
-    = LTL Text
+data  LTL
+    = HLT
+    | PCS
+    | FSU
+    | Anything
 
 
-deriving newtype instance Eq LTL
+deriving stock instance Bounded LTL
 
 
-deriving newtype instance Ord LTL
+deriving stock instance Enum LTL
 
 
-deriving newtype instance IsString LTL
+deriving stock instance Eq LTL
 
 
-instance RenderableCell LTL where
+deriving stock instance Ord LTL
 
-    renderCell (LTL txt) = "  " <> fromText txt <> " "
+
+instance RenderableCellEntry LTL where
+
+    renderCellEntry = t
 
 
 instance Show LTL where
 
-    show = unpack . coerce
+    show = t
+
+
+t :: IsString s => LTL -> s
+t = \case
+    HLT -> "HLT"
+    PCS -> "PCS"
+    FSU -> "FSU"
+    Anything -> "???"
 
 
 completeSetOfLTLs :: Set LTL
-completeSetOfLTLs = ["FSU", "HLT", "PCS"]
+completeSetOfLTLs = [HLT .. FSU]
 
 
-textualLTL :: Text -> LTL
-textualLTL = LTL
+textualLTL :: forall s . (Eq s, IsString s) => s -> Validation ScanFault LTL
+textualLTL txt =
+    let opts = fromSet t completeSetOfLTLs
+
+        seek :: a -> s -> Maybe a -> Maybe a
+        seek k v a
+            | v == txt  = Just k
+            | otherwise = a
+
+    in  pure . fromMaybe Anything $ foldrWithKey seek Nothing opts

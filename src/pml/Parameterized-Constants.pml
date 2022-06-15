@@ -12,9 +12,9 @@
   * Parameters (`t`, `c` `n`) defined as constants below:
   *
 ********/
-#define T 5
-#define C 5
-#define N 6
+#define T 6
+#define C 6
+#define N 4
 
 
 /********
@@ -27,7 +27,7 @@
 ********/
 #define BITS_T 3
 #define BITS_C 3
-#define BITS_N 3
+#define BITS_N 2
 
 
 /********
@@ -47,7 +47,7 @@
 ********/
 #define BITS_EPOCH  3
 #define BITS_USERID 3
-#define BITS_VERTEX 4
+#define BITS_VERTEX 3
 
 
 /********
@@ -95,9 +95,9 @@
   *   - LEAF       = TREE_ORDER / 2
   *
 ********/
-#define TREE_ORDER 15
+#define TREE_ORDER 7
 #define ROOT       0
-#define LEAF       7
+#define LEAF       3
 
 
 /********
@@ -112,7 +112,7 @@
   *   - MAX_REVEAL = C - 1
   *
 ********/
-#define MAX_REVEAL 4
+#define MAX_REVEAL 5
 
 
 /********
@@ -130,13 +130,13 @@
   *
 ********/
 #define FIRST_EPOCH  0
-#define FINAL_EPOCH  4
+#define FINAL_EPOCH  5
 
 #define FIRST_USERID 0
-#define FINAL_USERID 5
+#define FINAL_USERID 3
 
 #define FIRST_VERTEX 0
-#define FINAL_VERTEX 14
+#define FINAL_VERTEX 6
 
 
 #endif /* IMPORT_SPEC_CONSTANTS */

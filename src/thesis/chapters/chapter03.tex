@@ -1,0 +1,124 @@
+\hypertarget{sec:justification}{%
+\chapter{Model Justification}\label{sec:justification}}
+
+The verification results of a model have no bearing on TreeKEM unless the model is a faithful and equivalent translation of the protocol.
+To verify the TreeKEM protocol, the CGKA security game is used.
+Proof that the TreeKEM protocol is a CGKA protocol, as well as proof that results of the CGKA security game for any CGKA protocol are valid for FS and PCS, have already been produced \autocite{alwen2020security}.
+Justifying the equivalence of this works modeling of the CGKA security game is pivotal to the soundness of verifying FS and PCS for TreeKEM.
+
+\hypertarget{sec:game-adaptations}{%
+\section{CGKA game formalization}\label{sec:game-adaptations}}
+
+Many novel techniques were used when translating the abstractly defined CGKA security game to a rigorous and model suitable for explicit state model checking.
+The CGKA security game is originally defined as a massively concurrent, infinite game.
+An infinite game does not have a definite end (CITE).
+This is not always problematic for explicit state model checking, but regrettably it is with regards to CGKA security game.
+
+Within the CGKA game the attacker makes a series of queries to the available oracles.
+Queries to oracles drive the CGKA protocol's state over time, however, when playing the game as originally defined there are no guaranteed limits on total attacker queries to all oracles.
+Furthermore, while the attacker decides exactly which order to query which oracles, all group members of the CGKA protocol concurrently broadcast an unlimited number of messages, both informational and control.
+A direct modeling of the CGKA game with a \((T, C, N)\)-attacker would require \(N+1\) concurrent processes, accounting for the attacker and the maximum possible group members, along with \(N\) infinite queues of messages to be received by participants, and crucially monotonically increasing epoch and message counters representing the total ordering enforced by the delivery service.
+A single state in the state-space would constitute the unique combination of all actor processes' internal states, all message queue states, and the global protocol state.
+Unfortunately, because of the monotonically increasing counters, there can be no finite representation of the infinite game.
+
+To construct a finite model of an infinite game, the states of the model must not have depend on any monotonically increasing temporal information.
+Temporal information converges to a limit in finitely many steps or converges to a to a finite cycles in finitely many steps can all be finitely modeled.
+If a model's state depends on non-converging temporal information, it necessitates that the state-vector length and search-space are infinite.
+This follows from the following three facts.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Each state in the state-space must have a unique state-vector encoding.
+\item
+  The model's state and the equivalent state-vector's encoding must include monotonically increasing temporal information.
+\item
+  In an infinite game, there is no finite encoding of monotonically increasing temporal information.
+\end{enumerate}
+
+While explicit state model checking is sophisticated, it ultimate reduces to an exhaustive search which uses a myriad of techniques to cleverly reduce the search space.
+There does not exist an general technique for reducing an infinite search space to a finite one, as this would yield a solution to the halting problem.
+Considerable thought was given towards identifying a specific infinite-to-finite reduction for the CGKA security game, but the author is unable to present such a technique in this work.
+Instead, different techniques are presented to ``truncate'' an equivalent finite ``prefix'' of the CGKA security game.
+
+\hypertarget{exhaustiveness}{%
+\subsection{Exhaustiveness}\label{exhaustiveness}}
+
+Verification through explicit state model checking relies on exhaustiveness as it's proof method.
+However, the definition of the CGKA security game had no notion of considering every possible interleaving of actions when created.
+Instead, it was defined in a manner which made existential proofs easy to describe and reason about.
+Proofs and counterexamples from previous works \autocite{alwen2019double}, \autocite{alwen2020security} take the form of scrutinizing the existence of a sequence of queries made by the attacker.
+This existential focus permits leniency for redundancy within the CGKA security game definition.
+Conversely, modeling the CGKA security game such that it is amenable to explicit state model checking demands absolute parsimony within definition.
+Considering the CGKA games definition through the lens an exhaustive state-space search, both conveniently and surprisingly, leads to many possible game simplifications.
+Because all states are considered, equivalent or superfluous sequences can be reasoned about, identified, and collapsed.
+
+\hypertarget{elided-group-members}{%
+\subsection{Elided Group Members}\label{elided-group-members}}
+
+\hypertarget{idempotence}{%
+\subsection{Idempotence}\label{idempotence}}
+
+\hypertarget{decidability}{%
+\subsection{Decidability}\label{decidability}}
+
+\hypertarget{sec:game-oracles}{%
+\section{Oracles}\label{sec:game-oracles}}
+
+\hypertarget{corrupt}{%
+\subsection{Corrupt}\label{corrupt}}
+
+\hypertarget{hoard}{%
+\subsection{Hoard}\label{hoard}}
+
+\hypertarget{reveal}{%
+\subsection{Reveal}\label{reveal}}
+
+\hypertarget{insert}{%
+\subsection{Insert}\label{insert}}
+
+\hypertarget{remove}{%
+\subsection{Remove}\label{remove}}
+
+\hypertarget{update}{%
+\subsection{Update}\label{update}}
+
+\hypertarget{deliver}{%
+\subsection{Deliver}\label{deliver}}
+
+\hypertarget{sec:LTL-security}{%
+\section{Security}\label{sec:LTL-security}}
+
+\hypertarget{pcs-as-ltl}{%
+\subsection{PCS as LTL}\label{pcs-as-ltl}}
+
+\begin{LTL}[\,PCS\,]
+    $$
+    \Box \Big(\, ( \texttt{CGKA@start\_of\_epoch} \land \texttt{unsafeIDs} = 0 ) \implies \neg \texttt{learnedKey[epoch]} \Big)
+    $$
+\end{LTL}
+
+\hypertarget{fsu-as-ltl}{%
+\subsection{FSU as LTL}\label{fsu-as-ltl}}
+
+\begin{LTL}[\;Never-Trivial\;]
+    $$
+    \Box \left( \texttt{CGKA@move\_corrupt} \implies \texttt{hoarding[targetID]} = \texttt{NEVER} \right)
+    $$
+\end{LTL}
+
+\begin{LTL}[\;FSU-Epoch(\,\textnormal{\normalfont $t \in T$}\,)\;]
+    \begin{equation*}
+    \begin{split}
+    \Diamond ( & \texttt{CGKA@move\_start\_of\_epoch} \land \texttt{epoch} = t + 1 \land \neg \texttt{learnedKey[$t$]} ) \\
+    & \implies ( \neg \texttt{learnedKey[$t$]} ) \,\;{\mathcal {U}}\;\, \texttt{CGKA@end\_of\_game}
+    \end{split}
+    \end{equation*}
+\end{LTL}
+
+\begin{LTL}[\;FSU\;]
+    $$
+    \textbf{Never-Trivial} \implies \bigwedge\limits_{t=0}^{T} \;\,\textbf{FSU-Epoch}(t)
+    $$
+\end{LTL}
+k
