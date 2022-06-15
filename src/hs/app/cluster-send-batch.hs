@@ -6,20 +6,17 @@ module Main
 
 import Control.Exception (SomeException, displayException, try)
 import Control.Monad.Except
-import Data.Foldable
---import Data.List (intersperse)
 import Data.Bifunctor (bimap, first)
+import Data.Foldable
 import Data.String (IsString(..))
-import Data.Text (unlines)
-import Data.Text.Builder.Linear (runBuilder)
+import Data.Text (Text)
 import Data.Text.IO (hGetContents, hPutStrLn, putStrLn)
 import Data.Validation
 import Prelude hiding (putStrLn, unlines)
 import System.Environment (getArgs)
 import System.IO (Handle, IOMode(ReadMode), hIsEOF, openFile, stderr, stdin)
-import Thesis.Batch.Mandate
 import Thesis.Batch.Invoker
-import Thesis.Batch.Printer
+import Thesis.Batch.Mandate
 import Thesis.Batch.Scanner
 
 
@@ -27,11 +24,13 @@ main :: IO ()
 main = finalize $ do
     (source, handle) <- parseArgs
     stream           <- lift $ hGetContents handle
-    lift $ putStrLn stream
-    config <- liftEither . first show . toEither $ markdownScanner source stream
-    lift . putStrLn . runBuilder $ renderMarkdown config
-    lift . putStrLn . unlines . fmap (fromString . show) . toList $ domain config
+    config           <- liftEither . first show . toEither $ markdownScanner source stream
+    printPreamble source config
     lift . void $ invokeCluster `fulfills` config
+
+
+finalize :: ExceptT String IO a -> IO ()
+finalize computation = runExceptT computation >>= either (hPutStrLn stderr . fromString) (const $ pure ())
 
 
 parseArgs :: ExceptT String IO (FilePath, Handle)
@@ -48,16 +47,25 @@ parseArgs = do
     pure res
 
 
-{-
-printMorphism :: Parameterized -> Specification -> IO ()
-printMorphism (ltl, row, col) (minDFA, limMEM, lenVEC) =
-    let renders :: (IsString a, Monoid a) => [a] -> a
-        renders ks = "( " <> fold (intersperse ", " ks) <> " )"
-        txtKeys = renders [ renderCell    ltl, renderCell    row, renderCell    col ] :: Builder
-        txtVals = renders [ renderCell minDFA, renderCell limMEM, renderCell lenVEC ] :: Builder
-    in  putStrLn . runBuilder $ fold [ "  ", txtKeys, "    -->    ", txtVals ]
--}
-
-
-finalize :: ExceptT String IO a -> IO ()
-finalize computation = runExceptT computation >>= either (hPutStrLn stderr . fromString) (const $ pure ())
+printPreamble :: FilePath -> BatchMandate -> ExceptT String IO ()
+printPreamble path =
+    let prefix :: Word -> Text
+        prefix n = fold
+            [ "Mandate specification successfully parsed from:\n"
+            , "\n"
+            , "  "
+            , fromString path
+            , "\n"
+            , "\n"
+            , "\n"
+            , "Batch configuration size:\n"
+            , "\n"
+            , "  "
+            , fromString $ show n
+            , " jobs\n"
+            , "\n"
+            , "\n"
+            , "Sending batch to cluster...\n"
+            , "\n"
+            ]
+    in  lift . putStrLn . prefix . cardinality

@@ -189,7 +189,7 @@ pandocScanner (Pandoc _ blocks) =
                     Header _ _ txt                                   -> contextSwitch txt
                     Table _ _ _ (TableHead _ hs) bs (TableFoot _ fs) -> absorbTabular $ cellGrid hs bs fs
                     _                                                -> pure
-            in  \b -> transformState b
+            in  transformState
 
         absorbTabular :: Validation ScanFault (NonEmpty (NonEmpty Text)) -> GradualScanner
         absorbTabular = \case

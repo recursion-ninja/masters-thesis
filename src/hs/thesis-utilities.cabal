@@ -27,20 +27,19 @@ Common language
     GHC2021
 
 
-Executable parse-mem-spec
+Executable cluster-send-batch
 
   import:
     language
 
   main-is:
-    parse-mem-spec.hs
+    cluster-send-batch.hs
 
   build-depends:
     base >=4.16 && <5,
     cluster-batch,
     mtl,
     text,
-    text-builder-linear,
     validation,
 
   hs-source-dirs:
@@ -58,7 +57,7 @@ Library cluster-batch
   build-depends:
     base >=4.16 && <5,
     commonmark,
-    commonmark-extensions ,
+    commonmark-extensions,
     commonmark-pandoc,
     containers,
     indexed-traversable,

@@ -31,8 +31,9 @@ extension-markdown    ?= md
 extension-portabledoc ?= pdf
 extension-postscript  ?= ps
 dir-thesis-source     ?= ./
-dir-thesis-chapters   ?= ./$(extension-markdown)/
-dir-thesis-figures    ?= ./$(extension-figure)/
+dir-thesis-auxiliary  ?= $(dir-thesis-source)auxiliary/
+dir-thesis-chapters   ?= $(dir-thesis-source)chapters/
+dir-thesis-figures    ?= $(dir-thesis-source)figures/
 dir-thesis-manuscript ?= ./
 
 #######
@@ -61,6 +62,10 @@ define thesis_source
 $(abspath $(addprefix $(dir-thesis-source),$(1)))
 endef
 
+define thesis_auxiliary
+$(abspath $(addprefix $(dir-thesis-auxiliary),$(1)))
+endef
+
 tikz-figures := $(patsubst $(call figure-source,%),$(call figure-output,%),$(wildcard $(call figure-source,*)))
 
 #######
@@ -69,47 +74,66 @@ tikz-figures := $(patsubst $(call figure-source,%),$(call figure-output,%),$(wil
 ###
 #######
 
-# Title of manuscript used in file name and inside the manuscript
-title-of-manuscript := Formal Verification of TreeKEM
+### Hunter Thesis template parameters:
+##
+# Thesis Participants
+thesis-param-author      := Alex Washburn
+thesis-param-advisor     := Subash Shankar
+thesis-param-reader      := Sven Dietrich
+thesis-param-director    := Saptarshi Debroy
+
+# Thesis Metadata
+thesis-param-title       := Formal Verification of TreeKEM
+thesis-param-date        := 2022-06-20
+thesis-param-year        := $(firstword $(subst -, ,$(thesis-param-date)))
+thesis-param-department  := Computer Science
+
+thesis-param-dedication  :=\
+This work is dedicated to future generations, with the hope that they experiance secure communication which is intuitively usable, inveterately ubiquitous, and indelibly unrestricted.
+
+thesis-param-acknowledge :=\
+First and foremost, I would like to thank my advisor Subash Shankar for his dilligent guidance throughout my masters program. \
+His numerous insights, astute inquiries, and supportive direction were paramount in completing this work. \
+Similarly, I would like to thank Sven Dietrich and Saptarshi Debroy for their participation in my thesis defense and their contributions towards strengthing my final manuscript. \
+Additionally I would like to thank William Sakas for his leadering as department chair, making possible the masters program under which this work was conducted. \
+Finally, I want to acknowledge the support of my partner, Erilia Wu, which both remained an unwavering constant and manifested in a myriad of forms. 
+
+thesis-param-abstract    :=\
+The features of Secure Group Messaging, the security guarantees of Message Layer Security, and the TreeKEM protocol designed to satisfy these guarantees and features are explored. \
+A motivation and methodology for verification via explicit model checking is presented. \
+Subsequently, a translation of the TreeKEM protocol into a Promela reference model is describe, examining the nuances explicit model checking brings. \
+Finally the results of the formal verifcation methods are discussed.
+
+thesis-param-keywords    :=\
+Formal Verification, Model Checking, Promela, Spin, TreeKEM
 
 # File format of chapters (defines ordering)
-format-of-chapters  := $(addprefix chapter[0-9][0-9].,$(extension-markdown))
+format-of-chapters := $(addprefix chapter[0-9][0-9].,$(extension-latex))
 
-thesis-appendix     := $(abspath $(dir-thesis-chapters)appendix.$(extension-markdown))
-thesis-backmatter   := $(call thesis_source,backmatter.tex)
-thesis-bibliography := $(call thesis_source,references.bib)
-thesis-chapters     := $(abspath $(sort $(wildcard $(addprefix $(dir-thesis-chapters),$(format-of-chapters)))))
-thesis-frontmatter  := $(call thesis_source,frontmatter.tex)
-thesis-header       := $(call thesis_source,include-header.tex)
-thesis-metadata     := $(call thesis_source,metadata.yaml)
-thesis-references   := $(call thesis_source,references.md)
-thesis-titlepage    := $(call thesis_source,titlepage.tex)
+# Thesis core content
+thesis-chapters    := $(abspath $(sort $(wildcard $(addprefix $(dir-thesis-chapters),$(format-of-chapters)))))
 
-manuscript-target   := \
-    $(abspath $(dir-thesis-manuscript)$(subst $(SPACE),-,$(title-of-manuscript)).$(extension-portabledoc))
+# Thesis supporting contexts
+thesis-preamble    := $(call thesis_auxiliary,preamble.$(extension-latex))
+thesis-frontmatter := $(call thesis_auxiliary,frontmatter.$(extension-latex))
+thesis-backmatter  := $(call thesis_auxiliary,backmatter.$(extension-latex))
 
-#######
-###
-#   Template sourcing for MANUSCRIPT
-###
-#######
 
-TEMPLATE_DL_DIR      := $(call thesis_source,.tmp_template_dl)
-CLEANTHESIS_TEMPLATE := cleanthesis.sty
-CLEANTHESIS_REPO     := https://github.com/derric/cleanthesis
-CLEANTHESIS_VERSION  := 63d1fdd815
-TEMPLATE_FILES       := $(CLEANTHESIS_TEMPLATE)
 
-#######
-###
-#   Auto-generated templating files for MANUSCRIPT
-###
-#######
+thesis-template    := $(call thesis_source,thesis.$(extension-latex))
 
-TMP1 := $(thesis-titlepage:%.tex=%.filled.tex)
-TMP2 := $(thesis-frontmatter:%.tex=%.filled.tex)
-TMP3 := $(thesis-backmatter:%.tex=%.filled.tex)
-TMP  := $(TMP1) $(TMP2) $(TMP3)
+
+# Thesis references
+thesis-bib-ref     := $(call thesis_auxiliary,references)
+thesis-bib-path    := $(thesis-bib-ref).bib
+
+# Thesis document class
+thesis-class-ref   := $(call thesis_auxiliary,hunterthesis)
+thesis-class-path  := $(thesis-class-ref).cls
+
+# Thesis PDF document file path
+manuscript-target  := \
+    $(abspath $(dir-thesis-manuscript)$(subst $(SPACE),-,$(thesis-param-title)).$(extension-portabledoc))
 
 #######
 ###
@@ -117,46 +141,37 @@ TMP  := $(TMP1) $(TMP2) $(TMP3)
 ###
 #######
 
-AUX_OPTS       := --wrap=preserve
-AUX_OPTS       += -V title:"$(title-of-manuscript)"
-AUX_OPTS       += -M cleanthesis=true -M cleanthesisbibfile=$(thesis-bibliography:%.bib=%)
-
 pandoc-options := -f markdown
 pandoc-options += --pdf-engine=pdflatex
 pandoc-options += --standalone
-pandoc-options += -M lang=en-US
-pandoc-options += --metadata-file=$(thesis-metadata)
-pandoc-options += --include-in-header=$(TMP1)
-pandoc-options += --include-before-body=$(TMP2)
-pandoc-options += --include-after-body=$(TMP3)
-pandoc-options += --citeproc
-pandoc-options += -M bibliography=$(thesis-bibliography)
-pandoc-options += -M link-citations=true
-## download from https://www.zotero.org/styles
-## cf. https://pandoc.org/MANUAL.html#citations
-#pandoc-options += --csl=chicago-author-date-de.csl
-#pandoc-options += --csl=chicago-note-bibliography.csl
-#pandoc-options += --csl=ieee.csl
-#pandoc-options += --csl=oxford-university-press-note.csl
-pandoc-options += --listings
-pandoc-options += -V title:"$(title-of-manuscript)"
-pandoc-options += -V documentclass=scrbook
-pandoc-options += -V papersize=a4
-pandoc-options += -V fontsize=8pt
-pandoc-options += -V classoption:open=right
-pandoc-options += -V classoption:twoside=true
-pandoc-options += -V classoption:cleardoublepage=empty
-pandoc-options += -V classoption:clearpage=empty
-pandoc-options += -V geometry:top=30mm
-pandoc-options += -V geometry:left=25mm
-pandoc-options += -V geometry:bottom=30mm
-pandoc-options += -V geometry:width=150mm
-pandoc-options += -V geometry:bindingoffset=6mm
-pandoc-options += --toc
-pandoc-options += --toc-depth=3
-pandoc-options += --number-sections
-pandoc-options += -V colorlinks=true
+#pandoc-options += --metadata-file=$(thesis-metadata)
+pandoc-options += --include-in-header=$(thesis-preamble)
+pandoc-options += --include-before-body=$(thesis-frontmatter)
+pandoc-options += --include-after-body=$(thesis-backmatter)
 pandoc-options += --resource-path=$(call thesis_source,.)
+pandoc-options += --citeproc
+pandoc-options += --listings
+pandoc-options += --verbose
+
+#pandoc-options += -M lang=en-US
+pandoc-options += -M bibliography=$(thesis-bib-path)
+pandoc-options += -M link-citations=true
+
+## download from https://www.zotero.org/styles
+#pandoc-options += --csl=ieee.csl
+pandoc-options += -V thesis-var-title:"$(thesis-param-title)"
+pandoc-options += -V thesis-var-author:"$(thesis-param-author)"
+pandoc-options += -V thesis-var-date:"$(thesis-param-date)"
+pandoc-options += -V thesis-var-year:"$(thesis-param-year)"
+pandoc-options += -V thesis-var-department:"$(thesis-param-department)"
+pandoc-options += -V thesis-var-advisor:"$(thesis-param-advisor)"
+pandoc-options += -V thesis-var-reader:"$(thesis-param-reader)"
+pandoc-options += -V thesis-var-dedication:"$(thesis-param-dedication)"
+pandoc-options += -V thesis-var-acknowledge:"$(thesis-param-acknowledge)"
+pandoc-options += -V thesis-var-abstract:"$(thesis-param-abstract)"
+pandoc-options += -V thesis-var-keywords:"$(thesis-param-keywords)"
+pandoc-options += -V documentclass=$(thesis-class-ref)
+pandoc-options += -V classoption:bibfile=$(thesis-bib-ref)
 
 #######
 ###
@@ -169,10 +184,10 @@ pandoc-options += --resource-path=$(call thesis_source,.)
 all:: thesis
 
 clean::
-	@-rm -rf $(TMP) $(TEMPLATE_DL_DIR)
+	@-rm -f $(manuscript-target)
 
 distclean:: clean
-	@-rm -f $(manuscript-target) $(tikz-figures) $(TEMPLATE_FILES)
+	@-rm -f $(tikz-figures)
 
 install:: $(manuscript-target)
 
@@ -186,13 +201,7 @@ installdirs:: $(dir $(manuscript-target))
 
 .PHONY: thesis
 
-## Use Clean Thesis template (https://github.com/derric/cleanthesis)
-thesis: TEMPLATE_FILE    += $(CLEANTHESIS_TEMPLATE)
-thesis: TEMPLATE_REPO    += $(CLEANTHESIS_REPO)
-thesis: TEMPLATE_VERSION += $(CLEANTHESIS_VERSION)
-#thesis: AUX_OPTS         += -M cleanthesis=true -M cleanthesisbibfile=$(thesis-bibliography:%.bib=%)
-thesis: pandoc-options   += --include-in-header=$(thesis-header) $(AUX_OPTS)
-thesis: $(CLEANTHESIS_TEMPLATE) $(manuscript-target)
+thesis: $(HUNTERTHESIS_CLASS) $(manuscript-target)
 
 #######
 ###
@@ -203,25 +212,22 @@ thesis: $(CLEANTHESIS_TEMPLATE) $(manuscript-target)
 $(dir $(manuscript-target)):
 	@mkdir -p $@
 
-## Download template files
-$(TEMPLATE_FILES):
-	@rm -rf $(TEMPLATE_DL_DIR)
-	@git clone --quiet --single-branch --branch master --depth 100 $(TEMPLATE_REPO) $(TEMPLATE_DL_DIR)
-	@( cd $(TEMPLATE_DL_DIR) && git checkout --quiet $(TEMPLATE_VERSION) )
-	@cp $(TEMPLATE_DL_DIR)/$(TEMPLATE_FILE) ./$(TEMPLATE_FILE)
-	@rm -rf $(TEMPLATE_DL_DIR)
-
 ## Build image files
 $(call figure-output,%): $(call figure-source,%)
 	latexmk $< -cd -output-directory=$(dir $@) -shell-escape
 	latexmk $< -cd -C
 
-## Build thesis
-$(manuscript-target): $(thesis-chapters) $(thesis-references) $(APPENDIX) $(thesis-metadata) $(thesis-bibliography) $(TMP) $(tikz-figures)
-	pandoc $(pandoc-options) -o $@ $(thesis-chapters) $(thesis-references) $(APPENDIX)
 
-## Build auxiliary files (title page, frontmatter, backmatter, references)
-$(TMP): $(call thesis_source,%.filled.tex: %.tex) $(thesis-metadata)
-	pandoc $(AUX_OPTS) --template=$< --metadata-file=$(thesis-metadata) -o $@ $<
+## Build thesis
+$(manuscript-target): $(thesis-template) $(thesis-chapters) $(thesis-bib-path) $(thesis-class-path) $(thesis-preamble) $(tikz-figures)
+	( cd $(dir-thesis-source); \
+	  pdflatex $<; \
+	  biber    $(subst .$(extension-latex),,$<); \
+	  pdflatex $<; \
+	  pdflatex $<; \
+	  pdflatex $<; \
+	  mv $(subst $(extension-latex),$(extension-portabledoc),$<) $@; \
+	)
+
 
 endif # IMPORT_MAKE_MANUSCRIPT

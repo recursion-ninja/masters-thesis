@@ -1,6 +1,7 @@
-# Verification Methodology {#sec:methodology}
+\hypertarget{sec:methodology}{%
+\chapter{Verification Methodology}\label{sec:methodology}}
 
-The presence or absence of attacks on cryptographic protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption [@clark1997survey].
+The presence or absence of attacks on cryptographic protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption \autocite{clark1997survey}.
 Often attacks are discovered years, if not decades, after a protocol has been in active use.
 Late discovery of these attacks after widespread adoption of the protocol requires rapid effort to fix the protocol and encourage all systems using the protocol to update to the revised version.
 Often this updating process itself takes years of migration work or the migration never occurs.
@@ -8,12 +9,12 @@ This is especially problematic for embedded systems which cannot be easily retri
 For these reasons, it is of paramount importance to identify all possible attacks on TreeKEM as early as possible, so they can be corrected before widespread adoption of the MLS standard.
 
 Formal verification takes many forms, with many techniques and tools at our disposal, and choosing the correct verification tool is of utter importance.
-In the past, Burrows–Abadi–Needham (BAN) [@burrows1989logic] logic was the tool of choice for verifying cryptographic protocols.
-Unfortunately, protocols verified by BAN logic were later found to have undiscovered attacks [@10.5555/188307.188350].
+In the past, Burrows--Abadi--Needham (BAN) \autocite{burrows1989logic} logic was the tool of choice for verifying cryptographic protocols.
+Unfortunately, protocols verified by BAN logic were later found to have undiscovered attacks \autocite{10.5555/188307.188350}.
 BAN was subsequently critiqued for not being able to fully verify crucial aspects of cryptographic protocols.
 Because of such concerns, results and conclusions from verification techniques using BAN logic stating that no attacks exist can be a false-positive.
 The kind false-positive verification of security that BAN logic provided could cause the very lapses in post-adoption security that the verification had attempted to preempt.
-BAN logic has since fallen out of favor and instead been replaced by model checking techniques [@marrero1997model], which have been able to produce attacks on cryptographic protocols which BAN techniques incorrectly verified as secure.
+BAN logic has since fallen out of favor and instead been replaced by model checking techniques \autocite{marrero1997model}, which have been able to produce attacks on cryptographic protocols which BAN techniques incorrectly verified as secure.
 
 This work presents the verification of the TreeKEM protocol's FS and PCS security guarantees.
 To verify these security guarantees, the CGKA security game is used as an abstraction of the TreeKEM protocol, as well as all other CGKA-conforming protocols.
@@ -26,15 +27,15 @@ Recall that what differentiates SM from SGM is that SGM involves two or more par
 There is no theoretical limit to the number of parties the TreeKEM protocol supports.
 However, we also stated that model checking represents all possible states of protocol as a finite diagram of transitions.
 Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while our model checker requires a finite number of states.
-The IETF states that MLS in practice should support approximately 50,000 participants [@Omara2020], which is a finite, yet this very large number is problematic for the chosen methodology explicit state model checking.
-This work parameterizes the model in terms of $T$ and $N$ from the definition of *Non-adaptive* $(T, C, N, \textbf{\texttt{P}}, \epsilon)$ *CGKA Security*and limits the scope of verification to within the selected parameters.
-In practice, this means the results presented for a specified $T_{max}$ and $N_{max}$ only provide verification of security against $(T, C, N)$-attackers for all $T \in [1, T_{max}]$, $C \in [1, T]$ and $N \in [2, N_{max}]$.
+The IETF states that MLS in practice should support approximately 50,000 participants \autocite{Omara2020}, which is a finite, yet this very large number is problematic for the chosen methodology explicit state model checking.
+This work parameterizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
+In practice, this means the results presented for a specified \(T_{max}\) and \(N_{max}\) only provide verification of security against \((T, C, N)\)-attackers for all \(T \in [1, T_{max}]\), \(C \in [1, T]\) and \(N \in [2, N_{max}]\).
 
+\hypertarget{explicit-state-model-checking}{%
+\section{Explicit state model checking}\label{explicit-state-model-checking}}
 
-## Explicit state model checking
-
-Model checking exists as the preferred alternative to BAN logic techniques for verifying cryptographic protocols [@kacprzak2006comparing] [@lomuscio2007verification] [@van2004symbolic].
-Model checking represents all possible states of protocol as a finite graph of transitions [@clarke1981design].
+Model checking exists as the preferred alternative to BAN logic techniques for verifying cryptographic protocols \autocite{kacprzak2006comparing} \autocite{lomuscio2007verification} \autocite{van2004symbolic}.
+Model checking represents all possible states of protocol as a finite graph of transitions \autocite{clarke1981design}.
 The model checker then asserts that one or more properties holds for the protocol by traversing through all combinations of transitions through the diagram.
 If a property holds, the model checker will assert that there is no possible set of transitions through states that exist in the protocol which violate the specified property.
 If the property does not hold, the model checker will produce a counter-example sequence of transitions through possible states showing how the specified property can be violated.
@@ -44,17 +45,17 @@ This constructive proof methodology offered by explicit state model checking, th
 The principle drawback of explicit state model checking is the immensity of the state-space as the complexity of the model grows.
 Each possible state in the model is uniquely represented and all transitions for all states are computed during verification.
 Controlling memory usage to represent and traverse the search-space without greatly sacrificing the speed of verification remains a problem with limited tractability.
-For TreeKEM, the parameters $T$ and $N$ are supplied to the model.
-The model is then verified by exhaustively searching all possible protocol states over $T$ epochs and with the total unique group members ranging from $2$ to $N$.
-Incrementing the $T$ parameter while holding $N$ constant, generally, increases the state-space by $2$ orders of magnitude.
-However, incrementing the $N$ parameter while holding $T$ constant, only increases the state-space by $\frac{1}{2}$ an orders of magnitude.
-Due to the constraints engineering constraints presented by explicit state model checking, the verification work presented will only consider the combinatorial collection of all models parameterized by $T$ and $N$, where $T \in [1, T_{max}]$ and $N \in [2, N_{max}]$.
+For TreeKEM, the parameters \(T\) and \(N\) are supplied to the model.
+The model is then verified by exhaustively searching all possible protocol states over \(T\) epochs and with the total unique group members ranging from \(2\) to \(N\).
+Incrementing the \(T\) parameter while holding \(N\) constant, generally, increases the state-space by \(2\) orders of magnitude.
+However, incrementing the \(N\) parameter while holding \(T\) constant, only increases the state-space by \(\frac{1}{2}\) an orders of magnitude.
+Due to the constraints engineering constraints presented by explicit state model checking, the verification work presented will only consider the combinatorial collection of all models parameterized by \(T\) and \(N\), where \(T \in [1, T_{max}]\) and \(N \in [2, N_{max}]\).
 
-
-## Linear Temporal Logic
+\hypertarget{linear-temporal-logic}{%
+\section{Linear Temporal Logic}\label{linear-temporal-logic}}
 
 Correctly specifying the properties which must hold for the cryptographic protocol is one of the most important aspects of model checking techniques.
-Fortunately, Linear Temporal Logic (LTL) [@4567924] is an almost perfectly tailored language for representing the security guarantees at the CGKA abstraction level.
+Fortunately, Linear Temporal Logic (LTL) \autocite{4567924} is an almost perfectly tailored language for representing the security guarantees at the CGKA abstraction level.
 Additionally, LTL usage in conjunction with an explicit state model checker is a well supported and researched technique.
 LTL allows a precisely definition of what must occur in specific segments of time during the the protocol's transition through possible states.
 An example of LTL's expressive power is that it allows for stating that a property must always hold, eventually hold, hold until another property holds, holds in the next state, never holds, or any combination of these.
@@ -66,22 +67,22 @@ This perfect balance of expressiveness is important, because the more expressive
 LTL possesses all the logical operators of the two-element Boolean algebra with the addition of four temporal operators
 The temporal operators are presented below as a short had reference for formulas described in Section \ref{#sec:LTL-security}.
 
-$$
+\[
 \begin{aligned}[t]
                  \bigcirc & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Next''}     & \varphi\textrm{ holds at the next state} \hfill &\\
                  \Diamond & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Finally''}  & \varphi\textrm{ eventually holds, in either the current or future state} \hfill &\\
                  \Box     & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Globally''} & \varphi\textrm{ holds at the current state and all future states} \hfill &\\
   \psi \;{\mathcal {U}}\, & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Until''}    & \varphi\textrm{ eventually holds and $\psi$ holds at every state until then} \hfill &\\
 \end{aligned}
-$$
+\]
 
+\hypertarget{promela}{%
+\section{Promela}\label{promela}}
 
-## Promela
-
-Once we decided to use model checking with LTL as the formal verification methodology, we must then select the appropriate tools to use - the Protocol Meta Language (PROMELA) [@holzmann1980basic], [@holzmann1990design].
-It exists as a precise and convenient specification for defining all possible states and transitions for TreeKEM. 
-By specifying the protocol in PROMELA, we can allow the PROMELA "translator: to take a high-level, human readable description of TreeKEM and produce a much larger machine readable list with all the possible states and transitions in TreeKEM. 
-Manually defining all these states and transitions would take an inordinate amount of time and is prone to errors. 
+Once we decided to use model checking with LTL as the formal verification methodology, we must then select the appropriate tools to use - the Protocol Meta Language (PROMELA) \autocite{holzmann1980basic}, \autocite{holzmann1990design}.
+It exists as a precise and convenient specification for defining all possible states and transitions for TreeKEM.
+By specifying the protocol in PROMELA, we can allow the PROMELA ``translator: to take a high-level, human readable description of TreeKEM and produce a much larger machine readable list with all the possible states and transitions in TreeKEM.
+Manually defining all these states and transitions would take an inordinate amount of time and is prone to errors.
 Producing an exhaustive and correct representation of TreeKEM's possible states and transitions is one aspect of the verification process, at which machines are exceptionally reliable, while humans are not.
 
 The language of PROMELA is similar to the venerable C programming language.
@@ -124,19 +125,19 @@ Lastly, PROMELA supports a \texttt{d\_step} block, which allows specifying that 
 Unlike an \texttt{atomic} block, a \texttt{d\_step} block cannot include any nondeterministic constructs.
 Judicious use of \texttt{d\_step} can greatly simplify the state-space search as well as improve the comprehensibility of any counterexamples produced by the model checker.
 
-
-## Spin
+\hypertarget{spin}{%
+\section{Spin}\label{spin}}
 
 Once PROMELA is used to produce all possible states and transitions of TreeKEM, we must supply that representation to a model checker which will verify LTL specifications.
-Among the many options of model checkers, we will use the SPIN model checker [@godefroid1990using], [@holzmann1997model].
+Among the many options of model checkers, we will use the SPIN model checker \autocite{godefroid1990using}, \autocite{holzmann1997model}.
 SPIN provides several important features for our verification goals.
-The main difficulty with model checking is the size of the number of states and transitions [@burch1992symbolic].
+The main difficulty with model checking is the size of the number of states and transitions \autocite{burch1992symbolic}.
 Since model checking works by checking every possible combination of states and transitions, the size of the state-space directly impacts the feasibility.
-SPIN provides some solutions to making this problem tractable, the culmination of over three decades of research and development. 
-First, SPIN supports "on-the-fly" verification [@rudin1987limits], which means that SPIN does not need to consider the entire set of states and transitions at the same time, but instead can work on just subsets until the whole set is verified.
-Second, SPIN also uses a "partial ordering" of the states and transitions [@shannon1958note] to reduce the number of subsets it needs to verify before being certain that a property holds for the whole set of states and transitions.
-Both "on-the-fly" verification and "partial order" reduction are enabled by default as they can be used in conjunction with minimal drawbacks [@valmari1993fly], [@peled1994combining], [@holzmann1995improvement], [@couvreur1999fly].
-Consideration was made to use TopSpin [@DonaldsonM_AMAST2006], a PROMELA pre-processing plugin for SPIN which performs symmetry reduction as well.
+SPIN provides some solutions to making this problem tractable, the culmination of over three decades of research and development.
+First, SPIN supports ``on-the-fly'' verification \autocite{rudin1987limits}, which means that SPIN does not need to consider the entire set of states and transitions at the same time, but instead can work on just subsets until the whole set is verified.
+Second, SPIN also uses a ``partial ordering'' of the states and transitions \autocite{shannon1958note} to reduce the number of subsets it needs to verify before being certain that a property holds for the whole set of states and transitions.
+Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by default as they can be used in conjunction with minimal drawbacks \autocite{valmari1993fly}, \autocite{peled1994combining}, \autocite{holzmann1995improvement}, \autocite{couvreur1999fly}.
+Consideration was made to use TopSpin \autocite{DonaldsonM_AMAST2006}, a PROMELA pre-processing plugin for SPIN which performs symmetry reduction as well.
 Unfortunately, this theoretically viable technique is not practically usable as the plugin has not been maintained in over a decade.
 Additionally, SPIN supports numerous compile time directive which alter the state-space representation, search trajectories, and time-memory trade-offs.
 Because of these (and many more) techniques, SPIN allows efficiently working with a large state-space that the novel portions of TreeKEM produce when modeled with PROMELA.

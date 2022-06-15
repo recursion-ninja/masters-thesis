@@ -8,8 +8,7 @@ module Thesis.Batch.Invoker.SubProcess
     , makeClusterJob
     ) where
 
-
---import Control.Applicative (liftA3)
+import Control.Monad (when)
 import Data.Foldable
 import Data.Functor (($>))
 import Data.String (IsString(fromString))
@@ -52,9 +51,13 @@ instance Semigroup InvokedOutput where
 -- artifacts of the process.
 makeClusterJob :: Parameterized -> Specification -> IO InvokedOutput
 makeClusterJob param specs =
-    let debugBefore :: IO ()
-        debugBefore = putStrLn . runBuilder $ fold ["  $ ", fromString makeCommand]
---        debugBefore = pure ()
+    let debuggingEnabled :: Bool
+        debuggingEnabled = False
+
+        debuggingWith    = when debuggingEnabled
+
+        debugBefore :: IO ()
+        debugBefore = debuggingWith $ putStrLn . runBuilder $ fold ["  $ ", fromString makeCommand]
 
         debugExitCode :: ExitCode -> Builder
         debugExitCode ExitSuccess     = "SUCCESS"
@@ -67,8 +70,8 @@ makeClusterJob param specs =
                     , "exitErrs: " <> exitErrs r
                     , "exitOuts: " <> exitOuts r
                     ]
-            in  traverse_ (putStrLn . runBuilder) reports $> r
---        debugAfter = pure ()
+                debugging = debuggingWith $ traverse_ (putStrLn . runBuilder) reports
+            in  debugging $> r
 
         makeCommand = case cmdspec clusterJob of
             ShellCommand x -> x
