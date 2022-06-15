@@ -47,7 +47,13 @@ invokeCluster param@(ltl, row, col) specs@(minDFA, limMEM, lenVEC) =
             let txtSuffix :: Builder
                 txtSuffix = case exitCode res of
                     ExitSuccess   -> "PASS"
-                    ExitFailure c -> fold ["FAIL (", txtPads 3 c, ")\n", exitErrs res]
+                    ExitFailure c -> fold
+                        [ "FAIL (", txtPads 3 c, ")\n"
+                        , "  STDOUT:\n"
+                        , exitOuts res
+                        , "  STDERR:\n"
+                        , exitErrs res
+                        ]
             in  txtPref "Status" <> txtSuffix
 
         txtDump :: Builder -> IO ()
