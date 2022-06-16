@@ -190,6 +190,9 @@ cluster-push: $(filepath-bundle-complete) ask-password
 	@$(call scp-with,"$(filepath-bundle)","$(cluster-auth):./")
 
 cluster-verify: cluster-push
+	$(info Alloc: $(alloc-memory) MiB)
+	$(info Usage:    $(usage-memory) MiB)
+	$(info Param:    $(param-memory) GiB)
 	@$(call ssh-with,'qsub $(cluster-options) $(cluster-filepath-script)')
 
 
@@ -224,7 +227,7 @@ $(filepath-pbs-config): $(filepath-pbs-defaults) $(filepath-pbs-template)
 	  --output=$@ \
 	  --read=markdown \
 	  --template=$(filepath-pbs-template) \
-	  --variable=allocs:$(param-memory) \
+	  --variable=allocs:$(alloc-memory) \
 	  --variable=cores:$(param-cores) \
 	  --variable=memory:$(usage-memory) \
 	  --variable=mem-gibi:$(param-memory) \

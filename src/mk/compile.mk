@@ -108,34 +108,40 @@ endif
 ###
 #######
 
-basis-memory-encoded := $(call int_encode,1024) # Binary base
-extra-memory-encoded := $(call int_encode,128)  # Gibibyte(s)
-param-memory-encoded := $(call int_encode,20)   # Gibibyte(s)
-alloc-memory-encoded := $(call int_multiply,$(basis-memory-encoded),$(param-memory-encoded))
+basis-memory-encoded := 1024 # Binary base
+extra-memory-encoded := 2048 # Mebibyte(s)
+param-memory-encoded := 20   # Gibibyte(s)
+alloc-memory-encoded := $(call multiply,$(basis-memory-encoded),$(param-memory-encoded))
 ifdef memory
 # NOTE:
 # Memory is specified by users in GiB, but accepted by SPIN in MiB.
 ifneq (,$(findstring G,$(memory)))
-param-memory-encoded := $(call   int_encode,$(subst G,,$(memory))
-alloc-memory-encoded := $(call int_multiply,$(basis-memory-encoded),$(param-memory-encoded))
+#$(info Gibi branch $(memory))
+param-memory-encoded := $(subst G,,$(memory))
+alloc-memory-encoded := $(call multiply,$(basis-memory-encoded),$(param-memory-encoded))
 # NOTE:
 # Memory is specified by users in MiB
 else
-alloc-memory-encoded := $(call int_encode,$(memory))
-param-memory-encoded := $(call int_divide,$(alloc-memory-encoded),$(basis-memory-encoded))
+#$(info Mebi branch $(memory))
+alloc-memory-encoded := $(memory)
+param-memory-encoded := $(call divide,$(alloc-memory-encoded),$(basis-memory-encoded))
 endif
 endif
-usage-memory-encoded := $(call int_plus,$(alloc-memory-encoded),$(extra-memory-encoded))
+usage-memory-encoded := $(call plus,$(alloc-memory-encoded),$(extra-memory-encoded))
 
 
 # Max RAM allocation of program in MiB
-alloc-memory := $(call int_decode,$(alloc-memory-encoded))
-
-# Max RAM allocation of program in GiB
-param-memory := $(call int_decode,$(param-memory-encoded))
+alloc-memory := $(alloc-memory-encoded)
 
 # Max RAM Usage of PBS script in MiB
-usage-memory := $(call int_decode,$(usage-memory-encoded))
+usage-memory := $(usage-memory-encoded)
+
+# Max RAM allocation of program in GiB
+param-memory := $(param-memory-encoded)
+
+#$(info Alloc: $(alloc-memory) MiB)
+#$(info Usage:    $(usage-memory) MiB)
+#$(info Param:    $(param-memory) GiB)
 
 #######
 ###

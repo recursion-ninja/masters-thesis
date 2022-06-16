@@ -4,14 +4,14 @@
 The verification results of a model have no bearing on TreeKEM unless the model is a faithful and equivalent translation of the protocol.
 To verify the TreeKEM protocol, the CGKA security game is used.
 Proof that the TreeKEM protocol is a CGKA protocol, as well as proof that results of the CGKA security game for any CGKA protocol are valid for FS and PCS, have already been produced \autocite{alwen2020security}.
-Justifying the equivalence of this works modeling of the CGKA security game is pivotal to the soundness of verifying FS and PCS for TreeKEM.
+Justifying the equivalence of this work's modeling of both the CGKA security game and the side channel attacker knowledge gained while observing the TreeKEM protocol, is pivotal to the soundness of verifying FS and PCS for TreeKEM.
+
 
 \hypertarget{sec:game-adaptations}{%
 \section{CGKA game formalization}\label{sec:game-adaptations}}
 
-Many novel techniques were used when translating the abstractly defined CGKA security game to a rigorous and model suitable for explicit state model checking.
-The CGKA security game is originally defined as a massively concurrent, infinite game.
-An infinite game does not have a definite end (CITE).
+Many novel techniques were used when formalizing the abstractly defined CGKA security game to a rigorous and model suitable for explicit state model checking.
+The CGKA security game is originally defined as a massively concurrent game, without a bounded win condition.
 This is not always problematic for explicit state model checking, but regrettably it is with regards to CGKA security game.
 
 Within the CGKA game the attacker makes a series of queries to the available oracles.
@@ -21,9 +21,9 @@ A direct modeling of the CGKA game with a \((T, C, N)\)-attacker would require \
 A single state in the state-space would constitute the unique combination of all actor processes' internal states, all message queue states, and the global protocol state.
 Unfortunately, because of the monotonically increasing counters, there can be no finite representation of the infinite game.
 
-To construct a finite model of an infinite game, the states of the model must not have depend on any monotonically increasing temporal information.
-Temporal information converges to a limit in finitely many steps or converges to a to a finite cycles in finitely many steps can all be finitely modeled.
-If a model's state depends on non-converging temporal information, it necessitates that the state-vector length and search-space are infinite.
+To construct a finite model of an unbounded game, the states of the model must not have depend on any monotonically increasing temporal information.
+Temporal information which converges to a limit in finitely many steps or converges to a to a finite cycle in finitely many steps can all be finitely modeled.
+If a model's state depends on non-converging temporal information, it necessitates that the state-vector length and search-space are unbounded.
 This follows from the following three facts.
 
 \begin{enumerate}
@@ -33,12 +33,12 @@ This follows from the following three facts.
 \item
   The model's state and the equivalent state-vector's encoding must include monotonically increasing temporal information.
 \item
-  In an infinite game, there is no finite encoding of monotonically increasing temporal information.
+  In an unbounded game, there is no finite encoding of monotonically increasing temporal information.
 \end{enumerate}
 
 While explicit state model checking is sophisticated, it ultimate reduces to an exhaustive search which uses a myriad of techniques to cleverly reduce the search space.
-There does not exist an general technique for reducing an infinite search space to a finite one, as this would yield a solution to the halting problem.
-Considerable thought was given towards identifying a specific infinite-to-finite reduction for the CGKA security game, but the author is unable to present such a technique in this work.
+There does not exist an general technique for reducing an unbounded, potentially infinite, search space to a finite one, as this would yield a solution to the halting problem.
+Considerable thought was given towards identifying a specific unbounded-to-finite reduction for the CGKA security game, but the author is unable to present such a technique in this work.
 Instead, different techniques are presented to ``truncate'' an equivalent finite ``prefix'' of the CGKA security game.
 
 \hypertarget{exhaustiveness}{%
@@ -52,6 +52,8 @@ This existential focus permits leniency for redundancy within the CGKA security 
 Conversely, modeling the CGKA security game such that it is amenable to explicit state model checking demands absolute parsimony within definition.
 Considering the CGKA games definition through the lens an exhaustive state-space search, both conveniently and surprisingly, leads to many possible game simplifications.
 Because all states are considered, equivalent or superfluous sequences can be reasoned about, identified, and collapsed.
+
+Consider the 
 
 \hypertarget{elided-group-members}{%
 \subsection{Elided Group Members}\label{elided-group-members}}
