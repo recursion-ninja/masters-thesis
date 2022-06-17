@@ -190,9 +190,9 @@ cluster-push: $(filepath-bundle-complete) ask-password
 	@$(call scp-with,"$(filepath-bundle)","$(cluster-auth):./")
 
 cluster-verify: cluster-push
-	$(info Alloc: $(alloc-memory) MiB)
-	$(info Usage:    $(usage-memory) MiB)
-	$(info Param:    $(param-memory) GiB)
+#	$(info Alloc: $(alloc-memory) MiB)
+#	$(info Usage: $(usage-memory) MiB)
+#	$(info Param:    $(param-memory) GiB)
 	@$(call ssh-with,'qsub $(cluster-options) $(cluster-filepath-script)')
 
 

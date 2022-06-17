@@ -155,9 +155,6 @@ opt-memory := \
     -DSPACE
 endif
 
-opt-properties := #\
-    -DREACH
-
 opt-thread := \
     -DMEMLIM=$(alloc-memory) \
     -DNCORE=$(param-cores)
@@ -172,9 +169,12 @@ opt-vector := \
     -DCOLLAPSE \
     -DVECTORSZ=$(param-vector)
 
+opt-properties := #\
+    -DREACH
+
 directives-glue := $(SPACE)\$(NEWLINE)$(SPACE)$(SPACE)
 
-directives-list := $(strip $(opt-properties) $(opt-memory) $(opt-timing) $(opt-thread) $(opt-vector))
+directives-list := $(strip $(opt-timing) $(opt-thread) $(opt-vector) $(opt-memory) $(opt-properties))
 
 directives-rows := $(subst $(SPACE),$(directives-glue),$(directives-list))
 

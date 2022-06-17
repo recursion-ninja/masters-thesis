@@ -55,7 +55,7 @@ $(call figure-with-extension,$(extension-latex),$(1))
 endef
 
 define figure-with-extension
-$(call thesis_source,$(addprefix $(dir-thesis-figures),$(addsuffix .$(1),$(2))))
+$(addprefix $(dir-thesis-figures),$(addsuffix .$(1),$(2)))
 endef
 
 define thesis_source
@@ -66,13 +66,19 @@ define thesis_auxiliary
 $(abspath $(addprefix $(dir-thesis-auxiliary),$(1)))
 endef
 
-tikz-figures := $(patsubst $(call figure-source,%),$(call figure-output,%),$(wildcard $(call figure-source,*)))
-
 #######
 ###
 #   Variables for MANUSCRIPT
 ###
 #######
+
+tikz-figures := $(patsubst $(call figure-source,%),$(call figure-output,%),$(wildcard $(call figure-source,*)))
+
+$(info fig-source*:$(TAB) $(call figure-source,*))
+$(info wildcard:$(TAB) $(wildcard $(call figure-source,*)))
+$(info tikz-figures: $(tikz-figures))
+
+row-delimiter := $(SPACE)\$(NEWLINE)$(SPACE)$(SPACE)
 
 ### Hunter Thesis template parameters:
 ##
@@ -135,6 +141,13 @@ thesis-class-path  := $(thesis-class-ref).cls
 manuscript-target  := \
     $(abspath $(dir-thesis-manuscript)$(subst $(SPACE),-,$(thesis-param-title)).$(extension-portabledoc))
 
+artifact-extension :=\
+    $(sort aux bcf blg dvi fdb_latexmk fls lof log out ps run.xml thm toc)
+artifact-directory :=\
+    $(sort $(dir-thesis-source) $(dir-thesis-auxiliary) $(dir-thesis-chapters) $(dir-thesis-figures))
+artifact-filepaths :=\
+    $(sort $(foreach dir,$(artifact-directory),$(addprefix $(dir)*.,$(artifact-extension))))
+
 #######
 ###
 #   Pandoc options
@@ -184,7 +197,8 @@ pandoc-options += -V classoption:bibfile=$(thesis-bib-ref)
 all:: thesis
 
 clean::
-	@-rm -f $(manuscript-target)
+	-rm -f$(row-delimiter)$(manuscript-target) 
+	-rm -f$(row-delimiter)$(subst $(SPACE),$(row-delimiter),$(artifact-filepaths))
 
 distclean:: clean
 	@-rm -f $(tikz-figures)

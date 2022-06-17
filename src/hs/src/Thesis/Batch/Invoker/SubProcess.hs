@@ -52,7 +52,7 @@ instance Semigroup InvokedOutput where
 makeClusterJob :: Parameterized -> Specification -> IO InvokedOutput
 makeClusterJob param specs =
     let debuggingEnabled :: Bool
-        debuggingEnabled = True
+        debuggingEnabled = False
 
         debuggingWith    = when debuggingEnabled
 
