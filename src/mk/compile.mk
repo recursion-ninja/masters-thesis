@@ -149,11 +149,18 @@ param-memory := $(param-memory-encoded)
 ###
 #######
 
+opt-properties := #\
+    -DREACH
+
 ifeq ("$(param-min-dfa)","Yes")
 opt-memory := \
     -DMA=$(param-vector) \
     -DSPACE
 endif
+
+opt-random := \
+    -DP_RAND=1618033988 \
+    -DT_RAND=1155727349
 
 opt-thread := \
     -DMEMLIM=$(alloc-memory) \
@@ -162,19 +169,15 @@ opt-thread := \
 opt-timing := \
     -DNOBOUNDCHECK \
     -DNOFAIR \
-    -DSEP_STATE \
     -DXUSAFE
 
 opt-vector := \
     -DCOLLAPSE \
     -DVECTORSZ=$(param-vector)
 
-opt-properties := #\
-    -DREACH
-
 directives-glue := $(SPACE)\$(NEWLINE)$(SPACE)$(SPACE)
 
-directives-list := $(strip $(opt-timing) $(opt-thread) $(opt-vector) $(opt-memory) $(opt-properties))
+directives-list := $(strip $(opt-random) $(opt-timing) $(opt-thread) $(opt-vector) $(opt-memory) $(opt-properties))
 
 directives-rows := $(subst $(SPACE),$(directives-glue),$(directives-list))
 
@@ -243,7 +246,7 @@ $(dir-backup-trail):
 	mkdir -p $@
 
 $(filepath-verifier): $(dir-binaries) $(sources-verifier)
-	gcc $(directives-glue) $(directives-rows) \
+	$(subst $(SPACE),$(directives-glue),gcc $(directives-list)) \
 	-O3 \
 	-o $@ \
 	$(filepath-encoding-in-C)

@@ -1,0 +1,20 @@
+%------------------------------------- Custom *Term* definitions ---------------
+\usepackage{etoolbox}
+\usepackage{import}
+\usepackage{xspace}
+
+\subimport{./}{abreviations}
+
+\newcommand{\CGKAdef}{\textsc{\textbf{CGKA}}\xspace}%
+\newcommand{\CGKAsec}{\Abrev{CGKA} security game\xspace}%
+\newcommand{\CGKAmod}[3]{\ensuremath{\mathcal{M}_{\texttt{CGKA}}\langle\, \mathtt{#1},\, #2,\, #3\,\rangle}}
+\newcommand{\Protocol}[1]{\texttt{\textit{#1}}}
+\newcommand{\Oracle}[2]{%
+{\ttfamily%
+\textbf{#1}%
+\expandafter\ifstrempty\expandafter{#2}{()}%
+{(\(\,\mathtt{#2}\,\))}%
+}\xspace%
+}%
+\newcommand{\OutOfMemory}{\ensuremath{\mathtt{O\,O\,M}}}
+%------------------------------------- Custom *Term* definitions ---------------

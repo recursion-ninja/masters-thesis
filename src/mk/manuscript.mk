@@ -34,6 +34,7 @@ dir-thesis-source     ?= ./
 dir-thesis-auxiliary  ?= $(dir-thesis-source)auxiliary/
 dir-thesis-chapters   ?= $(dir-thesis-source)chapters/
 dir-thesis-figures    ?= $(dir-thesis-source)figures/
+dir-thesis-tables     ?= $(dir-thesis-source)tables/
 dir-thesis-manuscript ?= ./
 
 #######
@@ -58,6 +59,10 @@ define figure-with-extension
 $(addprefix $(dir-thesis-figures),$(addsuffix .$(1),$(2)))
 endef
 
+define table-source
+$(addprefix $(dir-thesis-tables),$(addsuffix .$(extension-latex),$(1)))
+endef
+
 define thesis_source
 $(abspath $(addprefix $(dir-thesis-source),$(1)))
 endef
@@ -72,11 +77,13 @@ endef
 ###
 #######
 
-tikz-figures := $(patsubst $(call figure-source,%),$(call figure-output,%),$(wildcard $(call figure-source,*)))
+#tikz-figures := $(patsubst $(call figure-source,%),$(call figure-output,%),$(wildcard $(call figure-source,*)))
+list-figures := $(wildcard $(call figure-source,*))
+list-tables  := $(wildcard $(call  table-source,*))
 
-$(info fig-source*:$(TAB) $(call figure-source,*))
-$(info wildcard:$(TAB) $(wildcard $(call figure-source,*)))
-$(info tikz-figures: $(tikz-figures))
+#$(info fig-source*:$(TAB) $(call figure-source,*))
+#$(info wildcard:$(TAB) $(wildcard $(call figure-source,*)))
+#$(info tikz-figures: $(tikz-figures))
 
 row-delimiter := $(SPACE)\$(NEWLINE)$(SPACE)$(SPACE)
 
@@ -196,9 +203,7 @@ pandoc-options += -V classoption:bibfile=$(thesis-bib-ref)
 
 all:: thesis
 
-clean::
-	-rm -f$(row-delimiter)$(manuscript-target) 
-	-rm -f$(row-delimiter)$(subst $(SPACE),$(row-delimiter),$(artifact-filepaths))
+clean:: thesis-clean
 
 distclean:: clean
 	@-rm -f $(tikz-figures)
@@ -217,6 +222,10 @@ installdirs:: $(dir $(manuscript-target))
 
 thesis: $(HUNTERTHESIS_CLASS) $(manuscript-target)
 
+thesis-clean:
+	-rm -f$(row-delimiter)$(manuscript-target) 
+	-rm -f$(row-delimiter)$(subst $(SPACE),$(row-delimiter),$(artifact-filepaths))
+
 #######
 ###
 #   Build Targets
@@ -227,13 +236,13 @@ $(dir $(manuscript-target)):
 	@mkdir -p $@
 
 ## Build image files
-$(call figure-output,%): $(call figure-source,%)
-	latexmk $< -cd -output-directory=$(dir $@) -shell-escape
-	latexmk $< -cd -C
+#$(call figure-output,%): $(call figure-source,%)
+#	latexmk $< -cd -output-directory=$(dir $@) -shell-escape
+#	latexmk $< -cd -C
 
 
 ## Build thesis
-$(manuscript-target): $(thesis-template) $(thesis-chapters) $(thesis-bib-path) $(thesis-class-path) $(thesis-preamble) $(tikz-figures)
+$(manuscript-target): $(thesis-template) $(thesis-chapters) $(thesis-bib-path) $(thesis-class-path) $(thesis-preamble) $(list-figures) $(list-tables)
 	( cd $(dir-thesis-source); \
 	  pdflatex $<; \
 	  biber    $(subst .$(extension-latex),,$<); \

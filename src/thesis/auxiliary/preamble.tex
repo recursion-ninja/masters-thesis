@@ -1,44 +1,44 @@
-%------------------------------------- Pandoc Templating -----------------------
-%
-% Thesis Metadata
-\title       {Formal Verification of TreeKEM}
-\date        {2022-06-20}
-\year        {2022}
-\department  {Computer Science}
-
-% Thesis Participants
-\author      {Alex Washburn}
-\advisor     {Subash Shankar}
-\reader      {Sven Dietrich}
-\director    {Saptarshi Debroy}
-
-% Thesis Special Pages
-\dedication {%
-This work is dedicated to future generations, with the hope that they experiance secure communication which is intuitively usable, inveterately ubiquitous, and indelibly unrestricted.
-}
-
-\acknowledge{%
-First and foremost, I would like to thank my advisor Subash Shankar for his dilligent guidance throughout my masters program.
-His numerous insights, astute inquiries, and supportive direction were paramount in completing this work.
-Similarly, I would like to thank Sven Dietrich and Saptarshi Debroy for their participation in my thesis defense and their contributions towards strengthing my final manuscript.
-Additionally I would like to thank William Sakas for his leadering as department chair, making possible the masters program under which this work was conducted.
-Finally, I want to acknowledge the support of my partner, Erilia Wu, which both remained an unwavering constant and manifested in a myriad of forms.
-}
-
-\abstract{%
-The features of Secure Group Messaging, the security guarantees of Message Layer Security, and the TreeKEM protocol designed to satisfy these guarantees and features are explored.
-A motivation and methodology for verification via explicit model checking is presented.
-Subsequently, a translation of the TreeKEM protocol into a Promela reference model is describe, examining the nuances explicit model checking brings.
-Finally the results of the formal verifcation methods are discussed.
-}
-
-\keywords{%
-Formal Verification, Model Checking, Promela, Spin, TreeKEM
-}
-%------------------------------------- Pandoc Templating -----------------------
 
 %\subimport{./}{abreviations}
-\subimport{./}{terms}
+\subimport{./}{metadata}
+\subimport{./}{shorthand}
+
+%------------------------------------- TikZ figure styles ----------------------
+\usepackage{adjustbox}
+\usepackage{bbding}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning}
+
+% Boundary / labeling nodes
+\tikzstyle{boxed} = [rectangle, draw, dashed, minimum height=9.5cm, minimum width=16.75cm]
+
+\tikzstyle{label} = [text width=9.5cm, text centered,minimum width=9.5cm, rotate=90 ]
+
+% Actor nodes	
+\tikzstyle{ident} = [circle, draw, fill=green!40, text width=2em, text centered, minimum height=2em, node distance=3cm]
+
+\tikzstyle{vdots} = [text width=2em, text centered, minimum height=2em, node distance=3cm]
+
+\tikzstyle{agent} = [ellipse, draw, fill=green!40, text width=6em, text centered, minimum height=2em, node distance=2cm]
+
+% Game/protocol interfaces
+\tikzstyle{oracl} = [rectangle, draw, fill=blue!15, text width=7.5em, text centered, minimum height=2em, node distance=3cm]
+
+\tikzstyle{algor} = [diamond, draw, fill=blue!30, text width=3.75em, text badly centered, node distance=2.5cm, inner sep=0pt]
+
+\tikzstyle{cntrl} = [regular polygon, regular polygon sides=6, draw, fill=red!35, text width=1.2cm, text centered, minimum height=1.4cm, node distance=1cm, inner sep=0.0625mm]
+
+\tikzstyle{ended} = [regular polygon, regular polygon sides=8, draw, fill=red!35, text width=1.2cm, text centered, minimum height=1.4cm, node distance=1cm, inner sep=0.0625mm]
+
+% Transitions
+\tikzstyle{line} = [draw, very thick, color=black!50, -latex']
+
+\tikzstyle{choice} = [draw, thick,dash pattern={on 7pt off 2pt on 1pt off 3pt}, color=black!50, -latex']
+
+\tikzstyle{triangle} = [fill=black!50, regular polygon, regular polygon sides=3, shape border rotate=180]
+%------------------------------------- TikZ figure styles ----------------------
+
 
 %------------------------------------- Custom definitions ----------------------
 \usepackage{ntheorem}

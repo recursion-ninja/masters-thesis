@@ -55,7 +55,8 @@ instance DefaultOrdered ExtractedRow where
         , "N"
         , "Runtime (seconds)"
         , "Runtime (timestamp)"
-        , "Memory (MiBs)"
+        , "Mebibytes"
+        , "Memory (Human)"
         , "State Vector (bytes)"
         , "States"
         , "Transitions"
@@ -86,15 +87,29 @@ instance ToNamedRecord ExtractedRow where
                     (days, time) = runInSeconds `quotRem` dayInSeconds
                 in  fold [show days, "d ", printSeconds time]
 
-            rowMemory' :: String
-            rowMemory' =
+            scientificBytes = formatScientific Fixed (Just 3)
+
+            rowMebibytes :: String
+            rowMebibytes =
                 let (MkFixed bytes) = rowMemory
                     mebi :: Scientific
                     mebi = fromRational $ bytes % resolution (1 :: MiB)
-                in  formatScientific Fixed (Just 3) mebi
+                in  scientificBytes mebi
+
+            rowMemory' :: String
+            rowMemory' =
+                let (MkFixed bytes) = rowMemory
+                    oneMebi = resolution (1 :: MiB)
+                    oneGibi = resolution (1 :: GiB)
+                    (scaling, abrev)
+                        | bytes < oneGibi = (oneMebi, "MiB")
+                        | otherwise       = (oneGibi, "Gib")
+                    humanForm = fromRational $ bytes % scaling
+                in  scientificBytes humanForm <> " " <> abrev
 
             rowDirectives' :: ByteString
             rowDirectives' = unwords $ sort rowDirectives
+            
         in  namedRecord $ zipWith
             encodeFieldValue
             fieldKeys
@@ -104,6 +119,7 @@ instance ToNamedRecord ExtractedRow where
             , FieldValueOf rowSecurityN
             , FieldValueOf rowRuntime'
             , FieldValueOf rowWallClock
+            , FieldValueOf rowMebibytes
             , FieldValueOf rowMemory'
             , FieldValueOf rowVectorLen
             , FieldValueOf rowStates

@@ -62,8 +62,14 @@ The work presented here does not attempt memoization of sub-problems, though thi
 \begin{figure}
   \centering
   \caption{\label{fig:CGKA-informal}Transition graph of informal CGKA definition}
-  \includegraphics[width=\textwidth]{figures/CGKA-informal.png}
+  \resizebox{\textwidth}{!}{\subimport{../figures/}{CGKA-Informal}}
 \end{figure}
+
+%\begin{figure}
+%  \centering
+%  \caption{\label{fig:CGKA-informal}Transition graph of informal CGKA definition}
+%  \resizebox{\textwidth}{!}{\subimport{../figures/}{CGKA-Informal}}
+%\end{figure}
 
 \hypertarget{exhaustiveness}{%
 \subsection{Exhaustiveness}\label{exhaustiveness}}
@@ -108,9 +114,9 @@ Quite obviously it permits an infinite loop in within \CGKAmod, which in turn ma
 The following are examples of permitted idempotency by the informal \CGKAsec definition:
 
 \begin{itemize}
-  \item For some \(t\), the attacker querries \Oracle{reveal}{t}    two or more times throught the \CGKAsec.  
-  \item For some \(i\), the attacker querries \Oracle{no-del}{ID_i} two or more times throught the \CGKAsec.
-  \item For some \(i\), and some \(t\), the attacker querries \Oracle{corr}{ID_i} two or more times during epoch \(t\).
+  \item For some \(t\),\\~\hspace{4em}\(\mathcal{A}\) querries \Oracle{reveal}{t}    two or more times throught the \CGKAsec.  
+  \item For some \(i\),\\~\hspace{4em}\(\mathcal{A}\) querries \Oracle{no-del}{ID_i} two or more times throught the \CGKAsec.
+  \item For some \(i\), and some \(t\),\\~\hspace{4em}\(\mathcal{A}\) querries \Oracle{corr}{ID_i} two or more times during epoch \(t\).
 \end{itemize}
 
 Since the verification methodology for \CGKAmod{P}{T}{N} exhuastively explores all possible \CGKAsec states, all sequences of operations \(q \circ p \gets q^{*}\) are equivelent.
@@ -130,16 +136,28 @@ Consider a \((T, C, N)\)-attacker \(\mathcal{A}\).
 As defined, in each epoch $t < T$ the transition from epoch $t$ to epoch $t+1$ can only occur in one of the following ways:
 
 \begin{itemize}
-  \item For some \(i\), \(\mathtt{ID_i}\) calls \Protocol{add} and subsequently \(\mathcal{A}\) queries \Oracle{deliver}{t,\, ID_i,\, ID_{*} }
-  \item For some \(i\), \(\mathtt{ID_i}\) calls \Protocol{rmv} and subsequently \(\mathcal{A}\) queries \Oracle{deliver}{t,\, ID_i,\, ID_{*} }
-  \item For some \(i\), \(\mathtt{ID_i}\) calls \Protocol{upd} and subsequently \(\mathcal{A}\) queries \Oracle{deliver}{t,\, ID_i,\, ID_{*} }
-  \item For some \(i\), \(\mathcal{A}\) queries \Oracle{add-user}{ID_i}    then \Oracle{deliver}{t,\, ID_i,\, ID_{*}}
-  \item For some \(i\), \(\mathcal{A}\) queries \Oracle{remove-user}{ID_i} then \Oracle{deliver}{t,\, ID_i,\, ID_{*}}
-  \item For some \(i\), \(\mathcal{A}\) queries \Oracle{send-update}{ID_i} then \Oracle{deliver}{t,\, ID_i,\, ID_{*}}
+  \item For some \(i\),\\~\hspace{4em}\(\mathtt{ID_i}\) calls \Protocol{add} and subsequently \(\mathcal{A}\) queries \Oracle{deliver}{t,\, ID_i,\, ID_{*} }
+  \item For some \(i\),\\~\hspace{4em}\(\mathtt{ID_i}\) calls \Protocol{rmv} and subsequently \(\mathcal{A}\) queries \Oracle{deliver}{t,\, ID_i,\, ID_{*} }
+  \item For some \(i\),\\~\hspace{4em}\(\mathtt{ID_i}\) calls \Protocol{upd} and subsequently \(\mathcal{A}\) queries \Oracle{deliver}{t,\, ID_i,\, ID_{*} }
+  \item For some \(i\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{add-user}{ID_i}    and subsequently queries \Oracle{deliver}{t,\, ID_i,\, ID_{*}}
+  \item For some \(i\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{remove-user}{ID_i} and subsequently queries \Oracle{deliver}{t,\, ID_i,\, ID_{*}}
+  \item For some \(i\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{send-update}{ID_i} and subsequently queries \Oracle{deliver}{t,\, ID_i,\, ID_{*}}
 \end{itemize}
+
+Note that in each possible epoch transtion, \(\mathcal{A}\) decides which control message is delivered defining the next epoch.
+Furthermore, note that \(\mathcal{A}\) querying \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i} results in the same control message being sent to the \Abrev{DS} as \(\mathtt{ID_i}\) calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}; respectively.
+Both the sequences originating with either \(\mathcal{A}\) querying an oracle or \(\mathtt{ID_i}\) calling an algorithm result in the same epoch transition once \Oracle{deliver}{t,\, ID_i,\, ID_{*}} is queried, without any other effect on the protocol state.
+Due to the exhuastively methodology in verifying \CGKAmod{P}{T}{N}, both initiating epoch transitions options are explored, resulting in duplicate paths to the same epoch transition state.
+Hence, we can omit the group members from calling calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}, and without loss of generality, have \(\mathcal{A}\) query \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i}; respectively.
+The graph not looks like.
 
 \hypertarget{decidability}{%
 \subsection{Decidability}\label{decidability}}
+
+TODO:
+
+Bounded epochs to \(T\).
+No indepotent operations, each operation advances protocol state towards transition.
 
 \hypertarget{sec:game-oracles}{%
 \section{Oracles}\label{sec:game-oracles}}

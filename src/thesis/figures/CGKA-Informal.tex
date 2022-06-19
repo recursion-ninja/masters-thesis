@@ -1,41 +1,3 @@
-\documentclass[crop,convert={density=600,outext=.png}]{standalone}
-
-\usepackage{adjustbox}
-\usepackage{import}
-\usepackage{tikz}
-\usetikzlibrary{shapes,arrows,positioning}
-\subimport{../auxiliary/}{terms}
-\begin{document}
-
-% Boundary / labeling nodes
-\tikzstyle{boxed} = [rectangle, draw, dashed, minimum height=9.5cm, minimum width=16.75cm]
-
-\tikzstyle{label} = [text width=9.5cm, text centered,minimum width=9.5cm, rotate=90 ]
-
-% Actor nodes	
-\tikzstyle{ident} = [circle, draw, fill=green!40, text width=2em, text centered, minimum height=2em, node distance=3cm]
-
-\tikzstyle{vdots} = [text width=2em, text centered, minimum height=2em, node distance=3cm]
-
-\tikzstyle{agent} = [ellipse, draw, fill=green!40, text width=6em, text centered, minimum height=2em, node distance=2cm]
-
-% Game/protocol interfaces
-\tikzstyle{oracl} = [rectangle, draw, fill=blue!15, text width=7.5em, text centered, minimum height=2em, node distance=3cm]
-	
-\tikzstyle{algor} = [diamond, draw, fill=blue!30, text width=3.75em, text badly centered, node distance=2.5cm, inner sep=0pt]
-
-\tikzstyle{ended} = [regular polygon, regular polygon sides=8, draw, fill=red!35, text width=1.2cm, text centered, minimum height=1.4cm, node distance=1cm, inner sep=0.0625mm]
-
-% Transitions
-\tikzstyle{line} = [draw, very thick, color=black!50, -latex']
-
-\tikzstyle{choice} = [draw, thick,dash pattern={on 7pt off 2pt on 1pt off 3pt}, color=black!50, -latex']
-
-\tikzstyle{triangle} = [fill=black!50, regular polygon, regular polygon sides=3, shape border rotate=180]
-	
-\centering
-\noindent
-\trimbox{1.3cm -0.1cm 0cm -0.1cm}{ 
 \begin{tikzpicture}[ node distance = 0.5cm and 0.5cm, auto]
 \node[agent, anchor=west ] (ATK) {\textbf{Attacker}};
 \node[boxed, below left=2cm and 0.5cm of ATK.south west, anchor=north west] (BOXED) {};
@@ -125,11 +87,9 @@
 
 \path[line]([xshift=-0.75mm,yshift=1mm] ID1.south west)--([xshift=-1.5mm,yshift=1.5mm] ALG-PRC.north east);
 \path[line]([xshift=-0.75mm,yshift=1mm] ID2.south west)--([xshift=-0.5mm,yshift=0.5mm] ALG-PRC.north east);
-\path[line]([xshift=2mm,    yshift=1mm] IDS.south west)--([xshift=0.5mm,yshift=-0.5mm] ALG-PRC.north east);
+\path[line]([xshift= 2.00mm,yshift=1mm] IDS.south west)--([xshift=0.5mm,yshift=-0.5mm] ALG-PRC.north east);
 \path[line]([xshift=-0.75mm,yshift=1mm] IDN.south west)--([xshift=1.5mm,yshift=-1.5mm] ALG-PRC.north east);
 
 %\draw [brown] (current bounding box.south west) rectangle (current bounding box.north east);
 %\draw[gray,step=0.25] (0,0) grid (20, 18);
 \end{tikzpicture}
-}
-\end{document}          

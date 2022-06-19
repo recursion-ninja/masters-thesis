@@ -48,6 +48,8 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 ###
 #######
 
+logging-output-pattern := $(info-symbol-pattern).*.log
+
 filename-results := results.csv
 filepath-results := $(abspath $(addprefix $(dir-documents),$(filename-results)))
 
@@ -56,9 +58,6 @@ filepath-outputs := $(abspath $(filename-outputs))
 
 argument-demark  := $(SPACE)\$(NEWLINE)$(SPACE)$(SPACE)
 argument-outputs := $(subst $(SPACE),$(argument-demark),$(sort $(strip $(filepath-outputs))))
-
-
-
 
 
 dir-logged-trails := $(abspath $(dir-logging)$(dir-backup))/
@@ -104,8 +103,6 @@ cluster-user := ${CLUSTER_USER}
 cluster-pass := ${CLUSTER_PASS}
 cluster-auth := $(cluster-user)@$(cluster-host)
 cluster-pbs  := $(process)$(cluster-pbs-suffix)
-
-logging-output-pattern := $(info-symbol-pattern).*.log
 
 cluster-output-pattern := $(info-string-pattern)/$(logging-output-pattern)
 cluster-trails-pattern := *.$(info-symbol-pattern).trail
@@ -163,9 +160,11 @@ installdirs:: $(dir $(filepath-results))
 ###
 #######
 
-.PHONY: cluster-results
+.PHONY: cluster-results tabular-results
 
-cluster-results: $(filepath-results)
+cluster-results: cluster-pull $(filepath-results)
+
+tabular-results: $(filepath-results)
 
 #######
 ###
@@ -173,7 +172,7 @@ cluster-results: $(filepath-results)
 ###
 #######
 
-$(filepath-results): $(filepath-parser)	cluster-pull $(dir $(filepath-results))
+$(filepath-results): $(filepath-parser) $(dir $(filepath-results))
 	$< $(argument-demark) $(argument-outputs) > $@
 
 $(dir $(filepath-results)):
