@@ -1,34 +1,17 @@
-\documentclass[crop,convert={density=600,outext=.png}]{standalone}
-
-\usepackage{tikz}
- 
-\begin{document}
- 
 \begin{tikzpicture}[thick]
  
-% Set A
-\node[label={$SGM$}] (A) at (0,0.6) {};
- 
-% Set B
-\node[label={$CGKA$}] (B) at (0,-0.4) {};
- 
-% Set C
-\node[label=$MLS$] (C) at (0, -1.4) {};
+\node[] (A) at ( 0.00,  0.90 ) {\textit{SGM}};
+\node[] (B) at ( 0.00, -0.10 ) {\textit{CGKA}};
+\node[] (C) at ( 0.00, -1.10 ) {\textit{MLS}};
+\node[] (D) at ( 0.00, -2.50 ) {\textit{TreeKEM}};
+\node[] (W) at ( 3.75,  0.70 ) {Usability};
+\node[] (X) at ( 3.70, -0.30 ) {Security};
+\node[] (Y) at ( 3.80, -1.30 ) {Efficiency};
+\node[] (Z) at ( 4.30, -2.30 ) {Implementation};
 
-% Set D
-\node[label=$TreeKEM$] (D) at (0,-2.85) {};
-
-\node[label={Usability}]      (W) at (3.75, 0.4) {};
-\node[label={Security}]       (X) at (3.7,-0.7) {};
-\node[label={Efficiency}]     (Y) at (3.8,-1.8) {};
-\node[label={Implementation}] (Z) at (4.3,-2.9) {};
-
-
-\draw (0,-1) circle(2.5cm);
-\draw (0,-1.5) circle(2cm);
-\draw (0,-2) circle(1.5cm);
-\draw (0,-2.5) circle(1cm);
+\draw ( 0, -1.0 ) circle(2.5cm);
+\draw ( 0, -1.5 ) circle(2.0cm);
+\draw ( 0, -2.0 ) circle(1.5cm);
+\draw ( 0, -2.5 ) circle(1.0cm);
  
 \end{tikzpicture}
- 
-\end{document}

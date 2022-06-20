@@ -1,25 +1,29 @@
 \hypertarget{preliminaries}{%
 \chapter{Preliminaries}\label{preliminaries}}
 
-Modern cryptography has made great progress in improving accessibility and usability of strong encryption.
+The domains of information security and modern cryptography have made great progress in improving accessibility and usability of strong encryption.
 Secure, accessible, and intuitive communication between two parties has become is ubiquitous worldwide.
 Such secure bidirectional communication channels are known as \Abrev{SM}.
 Secure Messaging is supported by a variety of services including ChatSecure, CryptoCat, Cyber Dust, Cyphr, Facebook Messenger, G Data Secure Chat, Gajim, GNOME Fractal, Google Allo, Haven, Kakao Talk, Line, Element, Signal, Silence, Silent Phone, Skype, Telegram, Viber, WhatsApp, and Wickr, Wire.
 The utility that these bidirectional protocols provide to the two communicating parties is undeniable.
 However, generalizing the security guarantees of \Abrev{SM} to communication with more than two parties is still an area of active research.
-This generalization to multi-party communication is known as \Abrev{SGM}.
-The desireable security of multi-party communication is explored below, with the assumption of correct cryptographic primatives.
+
+The desirable operations and security of multi-party communication protocol is explored below.
+After defining the goals of such a protocol, verification methodology is laid out.
+The verification performed assumes the correctness of cryptographic primitives and utilizes side channel information to determine the validitiy of the protocol.
+Lastly, a discussion and interpretation of the verification results is presented along with and avevues of future work.
 
 
 \hypertarget{secure-group-messaging}{%
 \section{Secure Group Messaging}\label{secure-group-messaging}}
 
-\Abrev{SGM} described the \emph{use case} of secure multi-party communication.
+The generalization of two-party \Abrev{SM} to multi-party communication is known as \Abrev{SGM}.
+\Abrev{SGM} describes the \emph{use case} of secure multi-party communication, but not the details of how the use case is achieved.
 To be considered a \Abrev{SGM} protocol \autocite{ietf-mls-protocol-14}, The \Abrev{IETF} the following operations must exist for each participating member: create a new communication group consisting of a set of known members, send a message to all members in the group, receive a message from a member in the group, add a new member to the group, and remove an existing member from the group.
 One of the novel features of \Abrev{SGM} is the ability for members to be added and removed from the secure communication channel.
 In the simpler case when two parties use \Abrev{SM}, additional participants cannot be added.
 Rather than ``removing'' a participant, the communication channel is simply closed when either party wishes to cease communication.
-The \Abrev{SGM} requirement of adding and removing participants to the secure communication channel poses interesting open challenges in the field of cryptography.
+The \Abrev{SGM} requirement of adding and removing participants to the secure communication channel poses interesting open challenges in the field of cryptographic protocol design.
 
 
 \hypertarget{message-layer-security}{%
@@ -32,24 +36,26 @@ The standardized specification of \Abrev{MLS} is still an area of active develop
 However, the core security aspects of \Abrev{MLS} relevant to the work presented has remained constant since the initial draft of \Abrev{MLS}.
 
 \Abrev{MLS} describes the protocol environment in which protocol agents interact.
-The Internet threat model of RFC3552 \autocite{rescorla2003rfc3552} is the context within which the \Abrev{MLS} specifies it's security guarantees.
-Simply put, the Internet threat model assumes that the attacker has complete control of the network.
+The \Abrev{ITM} of RFC3552 \autocite{rescorla2003rfc3552} is the context within which the \Abrev{MLS} specifies it's security guarantees.
+Simply put, the \Abrev{ITM} assumes that the attacker has complete control of the network.
 There are only a two caveats to consider with regard to the attacker's network control, and these are determined by two network agents with which \Abrev{MLS} participants can interact.
-\Abrev{MLS} specifies the existence of an authentication service (AS) from which a messenger can request fresh public key for a specified contact which can be immediately used within the \Abrev{MLS} protocol.
-An advantage of using the AS as described in \Abrev{MLS} is that it allows the contact to asynchronously query the AS for the corresponding secret key at a later time, ameliorating potential protocol synchronization issues.
-In addition to the AS, \Abrev{MLS} specifies the existence of a delivery service (DS).
-The DS can receive messages addressed to any contact and the DS stores the messages until the contact queries it for new messages.
-Importantly, the DS will always deliver messages from all senders to a contact in the order that they were sent by the senders.
-The existence of AS and a DS are required, though these do not need to be the same provider, nor do they need to be centralized.
+\Abrev{MLS} specifies the existence of an \Abrev{AS} from which a messenger can request fresh public key for a specified contact which can be immediately used within the \Abrev{MLS} protocol.
+An advantage of using the \Abrev{AS} as described in \Abrev{MLS} is that it allows the contact to asynchronously query the \Abrev{AS} for the corresponding secret key at a later time, ameliorating potential protocol synchronization issues.
+In addition to the \Abrev{AS}, \Abrev{MLS} specifies the existence of a \Abrev{DS}.
+The \Abrev{DS} can receive messages addressed to any contact and the \Abrev{DS} stores the messages until the contact queries it for new messages.
+Importantly, the \Abrev{DS} will always deliver messages from all senders to a contact in the order that they were sent by the senders.
+The existence of \Abrev{AS} and a \Abrev{DS} are required, though these do not need to be the same provider, nor do they need to be centralized.
 The attacker is assumed to not be able to masquerade as the authentication service nor violate the message authentication codes within which the message ordering is encoded.
 
 The most scrutinized aspect of the \Abrev{MLS} specification involves the provides a set of security guarantees that participants in a conforming a protocol can expect.
-The security guarantees of \Abrev{MLS} includes many ``solved problems'' in the field of cryptography with respect to the Internet threat model; notably: end-to-end encryption \autocite{padlipsky1978limitations}, message confidentiality (CITE), message integrity \autocite{voydock1983security}, message authentication \autocite{jueneman1983message}, and membership authentication \autocite{chaum1985showing}.
-However, \Abrev{MLS} also specifies interesting open problems of (perfect) forward secrecy (PFS) \autocite{gunther1989identity} and post-compromise security (PCS) \autocite{cohn2016post} as security guarantees of the key-agreement protocol.
-
-Both PFS and PCS have been researched with respect to bidirectional \Abrev{SM}, producing provably secure as well as efficient constructions.
+The security guarantees of \Abrev{MLS} includes many ``solved problems'' in the field of cryptography with respect to the \Abrev{ITM}; notably: end-to-end encryption \autocite{padlipsky1978limitations}, message confidentiality (CITE), message integrity \autocite{voydock1983security}, message authentication \autocite{jueneman1983message}, and membership authentication \autocite{chaum1985showing}.
+However, \Abrev{MLS} also specifies interesting open problems related to \Abrev{FS} \autocite{gunther1989identity} and \Abrev{PCS} \autocite{cohn2016post} as security guarantees of the group key-agreement protocol.
+Both \Abrev{FS} and \Abrev{PCS} have been researched with respect to bidirectional \Abrev{SM}, producing provably secure as well as efficient constructions.
 A popular example is the double-ratchet-based AXOLOTL algorithm \autocite{perrin2014axolotl} and it's derivatives which are used by most \Abrev{SM} protocols.
-However, the requirement of PFS and PCS laid out by the \Abrev{MLS} specification for a \Abrev{SGM} protocol has introduced a novel area of research, as the double-ratchet-based algorithms do not directly map to multi-party communication.
+Interestingly, prior definitions of \Abrev{FS} introduced with the development of AXOLOTL were not defined generally enough to be directly used by \Abrev{MLS}.
+\Abrev{MLS} defines a more general security guarantee for the multi-party notion of \Abrev{FS}, 
+
+However, the requirement of \Abrev{FS} and \Abrev{PCS} laid out by the \Abrev{MLS} specification for a \Abrev{SGM} protocol has introduced a novel area of research, as the double-ratchet-based algorithms do not directly map to multi-party communication.
 Indeed, these \Abrev{MLS} security guarantees have been the chief focus of research related to \Abrev{MLS} and it's iterative development.
 A trivial construction exists by utilizing a bidirectional \Abrev{SM} protocol, and forming a fully connected graph of all \Abrev{SGM} participants.
 However, it is obvious that this trivial construction's control messages scale quadratically in the size of the communication group whenever the key agreement requires an update.
@@ -69,8 +75,8 @@ The first is Asynchronous Ratcheting Tree (ART) \autocite{cohn2018ends} describe
 The second is TreeKEM \autocite{bhargavan:hal-02425247} similarly conceived in 2018, but formally described in 2019.
 The Internet Engineering Task Force has put it's support behind the TreeKEM protocol along with many other corporate and government sponsors.
 Consequently, research directed towards ART has stalled while developments for TreeKEM and it's derivatives have progressed rapidly.
-As the \Abrev{MLS} draft specification has gone through over a dozen revisions in the last half decade, the concurrent development and refinement of the TreeKEM protocol has significantly informed the direction and language of \Abrev{MLS}.
-The verification work presented here will ignore ART and instead focus exclusively on the TreeKEM protocol.
+As the \Abrev{MLS} draft specification has gone through over a dozen revisions in the last half decade, the complimentary development and refinement of the TreeKEM protocol has significantly informed the direction and language of \Abrev{MLS}.
+The verification work presented here will ignore ART and focus exclusively on the TreeKEM protocol.
 
 TreeKEM provides functionality for achieving each of the six operations to be considered a \Abrev{SGM} protocol.
 Additionally TreeKEM aims to satisfy both the efficiency goals and security guarantees of the \Abrev{MLS} specification.
@@ -81,7 +87,7 @@ A shared secret key is used to initiate a symmetric hash ratchet which defines a
 The stream is used until the shared secret key evolves, after which, a new stream is initiated using the evolved key.
 Hash ratchet's produced by TreeKEM are analogous to double-ratchet based protocols in prior work, with the notable difference that, rather than using two ratchets for the two group members, TreeKEM uses a left balanced binary tree structure to define key agreement as a propagation from leaves of the tree to the root node, which supports an arbitrarily large number of group members instead of explicitly two members.
 This novel generalization presented in TreeKEM is at the heart of constructing a protocol implementation satisfying the \Abrev{MLS} specification.
-Unsurprisingly, this same generalization is appreciably linked to proving and verifying the FS and PCS security guarantees of TreeKEM.
+Unsurprisingly, this same generalization is appreciably linked to proving and verifying the \Abrev{FS} and \Abrev{PCS} security guarantees of TreeKEM.
 
 The TreeKEM protocol is based around a left balanced binary tree (CITE) shared by all participants.
 Each leaf node in the tree contains the public key of exactly one group member, with each group member being associated with a unique leaf in the tree.
@@ -102,11 +108,12 @@ For a visualization of this process, refer to Figure 3 of \autocite{alwen2020sec
 \section{Communication Epochs}\label{communication-epochs}}
 
 The temporality of \Abrev{SGM} protocols, as with the \Abrev{SM} protocols which proceeded them, is important to understanding how security of the protocol is defined.
-Delineation of communication into discrete quanta refered to as ``epochs,'' is (genrally) the way temporality is discussed when considering protocol security.
+Delineation of communication into discrete quanta referred to as ``epochs,'' is (generally) the way temporality is discussed when considering protocol security.
 Protocol epochs can be understood in terms of the \Abrev{SGM} usage.
 A communication group is a set of two or more agents using multiple devices to engage in secure communication.
-To initialize a group, members to connect to the AS and DS providers which transmit the requisite credentials and values used for authentication of and encryption between group members.
-Subsequently, group members exchange messages with an enforced total ordering mediated by the DS and authenticated via the AS, allowing for asynchronous communication with offline members while preventing the general sequencing issues and race conditions which arise from concurrency.
+To initialize a group, members to connect to the \Abrev{AS} and \Abrev{DS} providers which transmit the requisite credentials and values used for authentication of and encryption between group members.
+Using this initial information, the instigating group member begins the first encryption ``epoch'' by sending control messages to all other group members allowing them to securely derive the initial shared symmetric key.
+Subsequently, group members exchange messages with an enforced total ordering mediated by the \Abrev{DS} and authenticated via the \Abrev{AS}, allowing for asynchronous communication with offline members while preventing the general sequencing issues and race conditions which arise from concurrency.
 Additionally, any group member begins a new encryption ``epoch'' by competing one of the following are the operations:
 
 \begin{itemize}
@@ -119,22 +126,22 @@ Additionally, any group member begins a new encryption ``epoch'' by competing on
   \end{itemize}
 
 Advancing to a new epoch requires the creation of a new symmetric key known to all group members and secret to all other parties.
-Forward Secrecy and Post Compromise Secrecy for TreeKEM, as well as other \Abrev{SGM} protocols, are delineated in said epochs.
-The inputs for a group member to generate the new symmetric key is refered to as an update secret.
+\Abrev{FSU} and \Abrev{PCS} for TreeKEM, as well as other \Abrev{SGM} protocols, are delineated in said epochs.
+The inputs for a group member to generate the new symmetric key is referred to as an update secret.
 An update secret is an intentionally abstract concept, defined as any cryptographic material stored by the group member required to process a control message which advanced the protocol from one epoch to the next, permitting the member to successfully generate the shared group key of the next epoch.
-Each protocol may have a different specific form that update secret(s) take for a group member, but the interaction of group member upadate secrets with protocol control messages are the main focus of verifying security guarantees.
+Each protocol may have a different specific form that update secret(s) take for a group member, but the interaction of group member update secrets with protocol control messages are the main focus of verifying security guarantees.
 
 
-\hypertarget{forward-secrecy}{%
-\section{Forward Secrecy}\label{forward-secrecy}}
+\hypertarget{forward-secrecy-with-updates}{%
+\section{Forward Secrecy with Updates}\label{forward-secrecy-with-updates}}
 
-Forward Secrecy (FS) is a desirable security guarantee which offers protection in the case that a protocol's long-term secret key(s) are compromised.
-The idea behind FS is that even when all of a group member's current key material is compromised, messages delivered prior to the compromise are still secret.
-PFS has been used in bidirectional key agreement communication protocols, including Transport Layer Security (TLS) (CITE) protocols such as OpenSSL (CITE), as well as \Abrev{SM} protocols such as the Signal Protocol (CITE).
-While the definition of FS has been explored and made rigorously clear for bidirectional key agreement protocols, the notion of FS requires extension in the multi-directional \Abrev{MLS} specification.
-The following is the definition of FS in the multi-directional protocol context \autocite{alwen2020security} which has been adopted by \Abrev{MLS}.
+\Abrev{FS} is a desirable security guarantee which offers protection in the case that a protocol's long-term secret key(s) are compromised.
+The idea behind \Abrev{FS} is that even when all of a group member's current key material is compromised, messages delivered prior to the compromise are still secret.
+\Abrev{FS} has been used in bidirectional key agreement communication protocols, including Transport Layer Security (TLS) (CITE) protocols such as OpenSSL (CITE), as well as \Abrev{SM} protocols such as the Signal Protocol (CITE).
+While the definition of \Abrev{FS} has been explored and made rigorously clear for bidirectional key agreement protocols, the notion of \Abrev{FS} requires extension in the multi-directional \Abrev{MLS} specification.
+The following is the definition of \Abrev{FSU} in the multi-directional protocol context \autocite{alwen2020security} which has been adopted by \Abrev{MLS}.
 
-\begin{definition}[Forward Secrecy]
+\begin{definition}[Forward Secrecy with Updates]
 If the state of any group member is leaked at some point, all previous update secrets remain hidden from the attacker.
 \end{definition}
 
@@ -142,10 +149,10 @@ If the state of any group member is leaked at some point, all previous update se
 \hypertarget{post-compromise-security}{%
 \section{Post-compromise Security}\label{post-compromise-security}}
 
-Post-compromise Security (PCS), within the context of bidirectional key agreement protocols, has been conflated with the definition of FS.
-However, within the multi-directional \Abrev{MLS} specification, the difference between FS and PCS has been separated to describe different security guarantee protocol when one or more of the protocol's long-term secret key(s) are compromised.
-The idea behind PCS is that no matter how many compromises of key material occur among the group members previously, once no new compromises occur, the group members will eventually reestablished secrecy through continued protocol usage.
-The following definition of PCS in the multi-directional protocol context \autocite{alwen2020security} which has been adopted by \Abrev{MLS}.
+Post-compromise Security (\Abrev{PCS}), within the context of bidirectional key agreement protocols, has been conflated with the definition of \Abrev{FS}.
+However, within the multi-directional \Abrev{MLS} specification, the difference between \Abrev{FS} and \Abrev{PCS} has been separated to describe different security guarantee protocol when one or more of the protocol's long-term secret key(s) are compromised.
+The idea behind \Abrev{PCS} is that no matter how many compromises of key material occur among the group members previously, once no new compromises occur, the group members will eventually reestablished secrecy through continued protocol usage.
+The following definition of \Abrev{PCS} in the multi-directional protocol context \autocite{alwen2020security} which has been adopted by \Abrev{MLS}.
 
 \begin{definition}[Post-compromise Security]
 After every group member whose state was leaked performs an update, and that update is processed by the group, update secrets become secret again.
@@ -167,21 +174,20 @@ A continuous group key-agreement scheme is defined by the following collection o
   Given an \(ID\), outputs initial state \(\gamma\).
 \item \Protocol{create} \(: \Gamma \times \overrightarrow{ID} \to (\Gamma, W)\)\\
   From state \(\gamma\) and list of \(ID\)s, outputs new state \(\gamma'\) and control message \(w\).
-\item \Protocol{add}    \(: \Gamma \times ID \to (\Gamma, W, T)\)\\
-  From state \(\gamma\) and \(ID\), outputs new state \(\gamma'\), control message \(w\) and control message \(t\).
-\item \Protocol{rem}    \(: \Gamma \times ID \to (\Gamma, T)\)\\
-  From state \(\Gamma\) and \(ID\), outputs new state \(\gamma'\) and a control message \(t\).
-\item \Protocol{upd}    \(: \Gamma \to (\Gamma, T)\)\\
-  From state \(\gamma\), outputs new state \(\gamma'\) and control message \(t\).
-\item \Protocol{proc}   \(: \Gamma \times T \to (\Gamma, I)\)\\
-  From state \(\gamma\) and control message \(t\), outputs new state \(\gamma'\) and update secret \(I\).
+\item \Protocol{add}    \(: \Gamma \times ID \to (\Gamma, W, U)\)\\
+  From state \(\gamma\) and \(ID\), outputs new state \(\gamma'\), control message \(w\) and control message \(u\).
+\item \Protocol{rem}    \(: \Gamma \times ID \to (\Gamma, U)\)\\
+  From state \(\Gamma\) and \(ID\), outputs new state \(\gamma'\) and a control message \(u\).
+\item \Protocol{upd}    \(: \Gamma \to (\Gamma, U)\)\\
+  From state \(\gamma\), outputs new state \(\gamma'\) and control message \(u\).
+\item \Protocol{proc}   \(: \Gamma \times U \to (\Gamma, I)\)\\
+  From state \(\gamma\) and control message \(u\), outputs new state \(\gamma'\) and update secret \(I\).
 \end{itemize}
 
 The abstract collection of algorithms \CGKAdef is used to maintain secure communications between a group of 2 or more participants.
-Any group member can call any function from \CGKAdef, producing new states \(\gamma \in \Gamma\) and either none, one, or both control messages \(w \in W,\; t \in T\).
-There are ``welcome'' control messages \(w \in W\) for a new member entering the group.
-There are also ``standard'' control messages \(t \in T\) for existing members in the group instructing them how to update the shared symmetric key and advance to the next communication epoch.
-The algorithm \(proc\) consumes control messages \(t \in T\) and produces a secret \(i \in I\).
+Any group member can call any function from \CGKAdef, producing new states \(\gamma \in \Gamma\) and either none, one, or both control messages \(w \in W,\; u \in U\).
+These are ``welcome'' control messages \(w \in W\) for a new member entering the group and ``update'' control messages \(u \in U\) for existing members in the group instructing them how to update the shared symmetric key and advance to the next epoch.
+The algorithm \(proc\) consumes control messages \(u \in U\) and produces a secret \(i \in I\).
 Each call to \(proc\) corresponds to a new epoch, and the secret \(i\) is the cryptographic secret update(s) required for the client with \(ID\) to maintain \Abrev{CGKA} in the new epoch.
 Because the communication is defined in terms of epochs, \Abrev{CGKA} should satisfy both Forward Secrecy and Post-compromise Security with respect to communication epochs.
 The six requisite algorithms required for \CGKAdef can be produced by the functionality of the TreeKEM protocol.
@@ -214,19 +220,22 @@ The \CGKAsec defines the following oracles:
 
 The first six oracles are intuitively thin wrappers for the corresponding algorithm from the \CGKAdef definition.
 Importantly, these oracles encapsulate from the attacker the stateful production and consumption of group member state values \(\gamma \in \Gamma\) as well as the emission of secret key material values \(i \in I\).
-Control messages \(w \in W\) and \(t \in T\) are still broadcast across the network and assumed to be intercepted by the attacker.
+Control messages \(w \in W\) and \(u \in U\) are still broadcast across the network and assumed to be intercepted by the attacker.
 The definition of control messages within the TreeKEM protocol dictates that messages are are authenticated by the group members, which justifies the absence of an oracle permitting the attacker to change or replay intercepted control messages in the \Abrev{CGKA} game.
 
-Despite the encapsulation, querying the \Oracle{add-user}{}, \Oracle{remove-user}{}, and \Oracle{send-update}{} oracles permit the attacker to guide the protocol execution by instructing group members to begin new epochs on whichever terms the attacker considers favorable.
+Despite the encapsulation, querying these oracles permits the attacker to both perform and observe ``side effects'' related to the protocol's execution.
+Side channel information gained is querying oracles is dependent on the protocol with which the \CGKAsec is being played.
+Hence, many propositions regarding the \CGKAsec semantics can only be correctly reasoned about when the protocol under consideration is also specified.
+One semantic which is invariant of a specific protocol, emerges from querying the \Oracle{add-user}{}, \Oracle{remove-user}{}, and \Oracle{send-update}{} oracles, confering onto the attacker the ability to guide the protocol execution by instructing group members to begin new epochs on whichever terms the attacker considers favorable.
 Likewise the \Oracle{deliver}{} oracle permits the attacker to control when each user receives control messages and subsequently advances to the next epoch.
 Because the attacker has access to the \Oracle{deliver}{} oracle, it does not matter who, attacker or group member, attempts to initiate a new epoch, ultimately the attacker decides via querying the \Oracle{deliver}{} oracle which epoch-initiating control messages are processed by the group.
 Phrased differently, a multiple new epochs can be concurrently initiated either from a group member calling the \textbf{add}, \textbf{rmv}, or \textbf{upd} algorithm from \CGKAdef, or from the attacker querying the \Oracle{add-user}{}, \Oracle{remove-user}{}, or \Oracle{send-update}{} oracles, but regardless of the epoch initiation attempt's origin, the attacker chooses via querying the \Oracle{deliver}{} oracle which of the possible initiation attempts is definitively processed by the group as the next epoch.
 
-The DS is guaranteed by the \Abrev{MLS} specification to provide all parties with a consistent presentation of messaging in and between epochs.
-Note that when the attacker selects the terms under which the epoch transitions from \(t\) to \(t+1\), the DS is compelled to \emph{not} deliver any other control messages attempting to transition from \(t\) to \(t+1\), as doing so would provide an inconsistent view of the protocol evolution.
-Hence, any messages received by the DS but have not yet been delivered to the recipient must be continuously checked and potentially discarded if they would present an inconsistent message ordering within an epoch or present an interleaving of epoch transitions.
-An important consequence of maintaining this consistent view within the context of the adversarial \Abrev{CGKA} game is that, when the attacker queries the \Oracle{deliver}{} oracle enabling a chosen epoch transition from \(t\) to \(t+1\), the DS must discard all other epoch transition messages with originated in a previous epoch.
-By judiciously querying the \Oracle{add-user}{}, \Oracle{remove-user}{}, \Oracle{send-update}{}, and \Oracle{deliver}{} oracles, the attacker can effectively decide the protocol evolution, choosing which epoch transition they find desirable to be processed by the group members, and compelling the DS to discard all other potential epoch transitions within the deliver queue.
+The \Abrev{DS} is guaranteed by the \Abrev{MLS} specification to provide all parties with a consistent presentation of messaging in and between epochs.
+Note that when the attacker selects the terms under which the epoch transitions from \(t\) to \(t+1\), the \Abrev{DS} is compelled to \emph{not} deliver any other control messages attempting to transition from \(t\) to \(t+1\), as doing so would provide an inconsistent view of the protocol evolution.
+Hence, any messages received by the \Abrev{DS} but have not yet been delivered to the recipient must be continuously checked and potentially discarded if they would present an inconsistent message ordering within an epoch or present an interleaving of epoch transitions.
+An important consequence of maintaining this consistent view within the context of the adversarial \Abrev{CGKA} game is that, when the attacker queries the \Oracle{deliver}{} oracle enabling a chosen epoch transition from \(t\) to \(t+1\), the \Abrev{DS} must discard all other epoch transition messages with originated in a previous epoch.
+By judiciously querying the \Oracle{add-user}{}, \Oracle{remove-user}{}, \Oracle{send-update}{}, and \Oracle{deliver}{} oracles, the attacker can effectively decide the protocol evolution, choosing which epoch transition they find desirable to be processed by the group members, and compelling the \Abrev{DS} to discard all other potential epoch transitions within the deliver queue.
 
 The final four oracles exist to provide the attacker with means to gain undue knowledge of secret aspects of the \Abrev{CGKA} protocol.
 The \Oracle{no-del}{} oracle forces the specified user to \emph{not} delete old key material when advancing to a new epoch.
@@ -234,22 +243,23 @@ The \Oracle{corr}{} oracle ``corrupts'' the specified user, revealing the user's
 The \Oracle{reveal}{} oracle produces the group's shared symmetric key of the specified epoch for the attacker.
 The \Oracle{chall}{} oracle allows the attacker to signal that they believe that they have succeeded in violating the \Abrev{CGKA} protocol's security and the game should immediately cease so the attacker can provide proof of their successful attack by demonstrating \emph{advantage}.
 
-Note that the requisite query to the \Oracle{init} oracle flips a random bit \(b\) uniformly at random is which remains constant for the entirety of the game and is used for the traditional ``real-or-random'' challenges in security games.
+Note that the requisite query to the \Oracle{init}{} oracle flips a random bit \(b\) uniformly at random is which remains constant for the entirety of the game and is used for the traditional ``real-or-random'' challenges in security games.
 If and only if \(b=1\) will the real control messages be broadcast across the network for the attacker to intercept when querying \Oracle{create-group}{}, \Oracle{add-user}{}, \Oracle{remove-user}{}, and \Oracle{send-update}{} oracles.
 Similarly if and only if \(b=1\) will the real member states and update secrets be revealed to the attacker when querying the \Oracle{corr}{} and \Oracle{reveal}{} oracles.
 When \(b=0\), random values are instead broadcast and revealed to the attacker when querying the oracles.
 The goal of the attacker is to prove advantage by discriminating the value of \(b\) with probability grater than \(\frac{1}{2}\).
 
 An attacker proving \emph{advantage} is defined by the \CGKAsec as a parameterized expression involving oracles of the game.
-A tuple \((T, C, N)\) parameterizes the attacker \(\mathcal{A}\), with \(T \in \left[1, \infty \right]\), \(C \in \left[0, T \right]\), and \(N \in \left[2, \infty \right]\).
+A tuple \((T, C, N)\) parametrizes the attacker \(\mathcal{A}\), with \(T \in \left[1, \infty \right]\), \(C \in \left[0, T \right]\), and \(N \in \left[2, \infty \right]\).
 The \(T\) value indicates that the protocol runs in at most \(T\) epochs, during which time the attacker can make at most \(C\) challenge queries, and the total unique group members of the protocol can never exceed \(N\).
 Furthermore there exists a predicate \textbf{\texttt{P}} (potentially always true), which indicates that a trivial attack did not occur.
 The \((T, C, N)\)-attacker \(\mathcal{A}\) proves \emph{advantage} by ending the game via a query to the \Oracle{chall}{} oracle, winning the \CGKAsec, if and only if the attacker:
 
-\begin{itemize}
+\begin{enumerate}
 \item Correctly determines the value random bit \(b\)
-\item The predicate \textbf{\texttt{P}} evaluates to \texttt{true}.
-\end{itemize}
+\item The predicate \textbf{\texttt{P}} evaluates to \(\top\).
+\end{enumerate}
+\vspace{\parsep}
 
 \begin{definition}[\Abrev{CGKA} advantage]
 The advantage proved by $\mathcal{A}$ is defined as,
@@ -283,19 +293,41 @@ There is a clear sub-setting relationship between these abstract concepts illust
 
 \begin{figure}
 \centering
-\caption{\label{fig:venn-protocols}Specificity relationship between definitions}
-%\resizebox{0.5\textwidth}{!}{\subimport{../figures/}{venn-protocols}}
-%\includegraphics[width=0.5\textwidth,height=5cm]{figures/venn-protocols.png}
+\caption{\label{fig:venn-protocols}Specificity relationship between preliminary definitions}
+\resizebox{0.5\textwidth}{!}{\subimport{../figures/}{venn-protocols}}
 \end{figure}
 
-The definition of \Abrev{CGKA} and the construction of the \CGKAsec offers an abstraction between the protocol specific implementation and the desired security guarantees of FS and PCS specified by \Abrev{MLS}.
-An equivalence proof of non-adaptive \Abrev{CGKA} security \ref{def:CGKA-Security} with FS and also with PCS accompanies its original description \autocite{alwen2020security}.
+The definition of \Abrev{CGKA} and the construction of the \CGKAsec offers an abstraction between the protocol specific implementation and the desired security guarantees of \Abrev{FSU} and \Abrev{PCS} specified by \Abrev{MLS}.
+An equivalence proof of non-adaptive \Abrev{CGKA} security definition \ref{def:CGKA-Security} with \Abrev{FSU} and also with \Abrev{PCS} accompanies its original description \autocite{alwen2020security}.
 This work relies on the equivalence proof in order to soundly use \Abrev{CGKA} as a verifiable abstraction.
 The equivalence proof results in the correlary that an attacker playing the \CGKAsec can only gain advantage by exploiting side-channel attack on the given \Abrev{CGKA}-conforming protocol.
-A model of the \CGKAsec for a given \Abrev{CGKA}-conforming protocol, which verifies FS and PCS at the abstraction level, will consequently verify the FS and PCS security guarantees for the protocol, assuming that the protocol implementation is defect-free.
-Operating at this selected level of abstraction is powerful, providing verification framework for a whole class of current and future protocols.
-However, the \Abrev{CGKA} abstraction cannot verify that a given implementation of a protocol is defect-free implementation.
-A separate and specific verification effort is required to prove that any chosen implementation provides the a correct version of the \Abrev{CGKA} algorithms.
-All results presented by this work assume that the TreeKEM algorithm's implementation is correct.
-The verification shows that, if given an implementation of TreeKEM which provides defect-free algorithms required by the \Abrev{CGKA} definition, then the protocol also provides the FS and PCS security guarantees due to an absence of side channel attacks.
-Furthermore, the verification results reduce future obligations to derive verification of FS and PCS for all \Abrev{CGKA}-conforming protocol implementations to only verify algorithm correctness, and provide an a protocol modeling of the potential side channel information.
+
+Consider a model \CGKAmod{}{}{} of the \CGKAsec.
+To formulate arbitrary propositions regarding the model, \CGKAmod{}{}{} must be parameterized by a given \Abrev{CGKA}-conforming protocol \(\mathtt{P}\), denoted by \CGKAmod{P}{}{}.
+utilizing the equivalence proof, a verification result of \CGKAmod{P}{}{} which verifies \Abrev{FSU} and \Abrev{PCS} at the abstraction level, will consequently verify the \Abrev{FSU} and \Abrev{PCS} security guarantees for the defined protocol \(\mathtt{P}\).
+Operating at this selected level of abstraction is powerful, providing \(\mathcal{M}_{\texttt{CGKA}}\) as verification framework for a whole class of current and future protocols.
+However, the \Abrev{CGKA} abstraction and model \CGKAmod{P}{}{} cannot verify that a given implementation of a protocol \(\mathtt{P}\) is defect-free implementation.
+Additionally, the \Abrev{CGKA} abstraction and model \CGKAmod{P}{}{} are dependent on the protocol parameter \(P\).
+
+This work reduces future verification burdens for all \Abrev{CGKA}-conforming protocol implementations \(P\) in the following ways.
+First, a separate and specific verification effort is required to prove that the implementation of \(\mathtt{P}\) provides the a correct version of the \Abrev{CGKA} algorithms.
+Second, the model \CGKAmod{}{}{} must be parameterized by \(P\) and then verified.
+The parameterizable model \CGKAmod{}{}{} produced during and described within this work exposes a polymorphic interface for a protocol to express side channel information the attacker learns from querying oracles.
+To produce \CGKAmod{P}{}{}, the interface methods must be instantiated for \(P\) as well an encapsulated representation of the attacker knowledge which is maintained via the interface.
+After performing these two verification efforts, if a predicate \(\varphi\) is verified for \CGKAmod{P}{}{}, then the predicate \(\varphi\) holds for \(P\).
+
+Even operating without a formal model, the \Abrev{CGKA} abstraction is a powerful tool.
+Acompanying the description of \Abrev{CGKA}, \CGKAdef, and the \CGKAsec the authors also include an application of mathematically analyzing TreeKEM with the \CGKAsec.
+The result of the analysis was a constructive counter-example demonstrating that TreeKEM, as originally defined, is \emph{not} \Abrev{FS}.
+Following the revelation of TreeKEM's deficiency the same authors present a new definition of TreeKEM, substituting the use of a standard PKE cryptographic primitive with UPKE, which remedies the defect and regains the \Abrev{FSU} security guarantee for TreeKEM.
+
+The proceeding work will perform verification of two versions of TreeKEM.
+All results presented by this work assume that the TreeKEM algorithms' implementations are correct.
+Verification of TreeKEM will consider both the original definition of TreeKEM as well as the remedied version of TreeKEM, denoted by \VersionOne and \VersionTwo; respectively.
+Using the notation introduced above, the \Abrev{CGKA} abstraction for TreeKEM produces the \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{} models, which will both be verified.
+Verifying the correctness of the \Abrev{CGKA} algorithm implementations for each TreeKEM version is beyond the scope of this work.
+Rather, it is assumed that a given an implementation of the specified TreeKEM version \(\mathtt{P}\) provides defect-free algorithms.
+If the defect-free algorithm assumption holds, then a verification of the \Abrev{FSU} or \Abrev{PCS} security guarantee for \CGKAmod{P}{}{} also verifies the security guarantee for corresponding TreeKEM version implementation.
+The verification hypotheses are depicted in Table \ref{tab:verification-hypotheses}.
+
+\subimport{../tables/}{verification-hypotheses}

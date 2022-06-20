@@ -1,8 +1,46 @@
 %------------------------------------- Custom *Term* definitions ---------------
-\newcommand{\CGKAdef}{\textsc{\textbf{CGKA}}\xspace}%
+% Shorthands for: CGKA 
+\newcommand{\CGKAdef}{\ensuremath{\lceil\!\textbf{\textit{CGKA}}\!\rfloor}\xspace}%
 \newcommand{\CGKAsec}{\Abrev{CGKA} security game\xspace}%
-\newcommand{\CGKAmod}[3]{\ensuremath{\mathcal{M}_{\texttt{CGKA}}\langle\, \mathtt{#1},\, #2,\, #3\,\rangle}}
-\newcommand{\Protocol}[1]{\texttt{\textit{#1}}}
+\newcommand{\CGKAmod}[3]{\ensuremath{\mathcal{M}_{\texttt{CGKA}}%
+\expandafter\ifstrempty\expandafter{#1}
+{
+	\expandafter\ifstrempty\expandafter{#2}
+	{
+		\expandafter\ifstrempty\expandafter{#3}
+		{}
+		{\langle\,#3\,\rangle}
+	}
+	{
+		\expandafter\ifstrempty\expandafter{#3}
+		{\langle\,#2\,\rangle}
+		{\langle\,#2,\, #3\,\rangle}
+	}
+}
+{
+	\expandafter\ifstrempty\expandafter{#2}
+	{
+		\expandafter\ifstrempty\expandafter{#3}
+		{\langle\,\mathtt{#1}\,\rangle}
+		{\langle\,\mathtt{#1},\, #3\,\rangle}
+	}
+	{
+		\expandafter\ifstrempty\expandafter{#3}
+		{\langle\,\mathtt{#1},\, #2\,\rangle}
+		{\langle\,\mathtt{#1},\, #2,\, #3\,\rangle}
+	}
+}
+}%
+\xspace
+}%
+
+% Shorthands for: TreeKEM versions
+\newcommand{\VersionAny}[1]{\ensuremath{\mathtt{v#1}^{\mathtt{\textbf{\scalebox{.55}[1.0]{TreeKEM}}}}}\xspace}%
+\newcommand{\VersionOne}{\VersionAny{1}}%
+\newcommand{\VersionTwo}{\VersionAny{2}}%
+
+% Shorthands for: Oracle and Protocol references
+\newcommand{\Protocol}[1]{\texttt{\textit{#1}}\xspace}
 \newcommand{\Oracle}[2]{%
 {\ttfamily%
 \textbf{#1}%
@@ -12,8 +50,8 @@
 }%
 
 % Table entries
-\newcommand{\OutOfMemory}{\ensuremath{\mathtt{O\,O\,M}}}
-\newcommand{\MinimizedDFA}{\ensuremath{\min_{\vec{s}\,\in\,\Sigma}\textbf{\scalebox{.60}[1.0]{DFA}}(\vec{s}\,)}}
+\newcommand{\OutOfMemory}{\ensuremath{\mathtt{O\,O\,M}}\xspace}
+\newcommand{\MinimizedDFA}{\ensuremath{\min_{\vec{s}\,\in\,\Sigma}\textbf{\scalebox{.60}[1.0]{DFA}}(\vec{s}\,)}\xspace}
 
 % Checkmark and X-mark
 \newcommand{\cmark}{\ding{52}\xspace}%
