@@ -1,10 +1,4 @@
 %------------------------------------- Custom *Term* definitions ---------------
-\usepackage{etoolbox}
-\usepackage{import}
-\usepackage{xspace}
-
-\subimport{./}{abreviations}
-
 \newcommand{\CGKAdef}{\textsc{\textbf{CGKA}}\xspace}%
 \newcommand{\CGKAsec}{\Abrev{CGKA} security game\xspace}%
 \newcommand{\CGKAmod}[3]{\ensuremath{\mathcal{M}_{\texttt{CGKA}}\langle\, \mathtt{#1},\, #2,\, #3\,\rangle}}
@@ -16,5 +10,12 @@
 {(\(\,\mathtt{#2}\,\))}%
 }\xspace%
 }%
+
+% Table entries
 \newcommand{\OutOfMemory}{\ensuremath{\mathtt{O\,O\,M}}}
+\newcommand{\MinimizedDFA}{\ensuremath{\min_{\vec{s}\,\in\,\Sigma}\textbf{\scalebox{.60}[1.0]{DFA}}(\vec{s}\,)}}
+
+% Checkmark and X-mark
+\newcommand{\cmark}{\ding{52}\xspace}%
+\newcommand{\xmark}{\ding{56}\xspace}%
 %------------------------------------- Custom *Term* definitions ---------------

@@ -18,6 +18,7 @@ For a given LTL predicate $\varphi$ we define \CGKAmod{P}{T}{N} as follows:
 \end{split}
 \]
 
+
 \hypertarget{sec:game-adaptations}{%
 \section{CGKA game formalization}\label{sec:game-adaptations}}
 
@@ -71,6 +72,7 @@ The work presented here does not attempt memoization of sub-problems, though thi
 %  \resizebox{\textwidth}{!}{\subimport{../figures/}{CGKA-Informal}}
 %\end{figure}
 
+
 \hypertarget{exhaustiveness}{%
 \subsection{Exhaustiveness}\label{exhaustiveness}}
 
@@ -97,6 +99,7 @@ Therefore, for all \((T, C, N)\)-attacker \(\mathcal{A}\), \(C \in [1, T]\).
 Because the exhaustive state space of is explored, at each epoch the attacker chooses one of the three explicit querying options related to \Oracle{reveal}{} and \Oracle{chall}{}.
 Hence within the model \CGKAmod{P}{T}{N}, the parameter \(C\) is linearly dependant on \(T\) for all \((T, C, N)\)-attackers and does not need to be a model parameter.
 Similar reductions will follow while formalizing \CGKAmod{P}{T}{N} from the informal \CGKAsec definition.
+
 
 \hypertarget{idempotence}{%
 \subsection{Idempotence}\label{idempotence}}
@@ -127,6 +130,7 @@ By disallowing idempotency within the game, each query made by the attacker will
 A consequence of this, is that attacker queries necissarily advance the game state towards the next epoch tranision, or when within the final epoch, advance towards the query to \Oracle{chall}{}.
 This necissarily progression of the \CGKAsec within the model \CGKAmod{P}{T}{N} both reduces the runtime verification as well as permits verification that the model \CGKAmod{P}{T}{N} halts.
 
+
 \hypertarget{elided-group-members}{%
 \subsection{Elided Group Members}\label{elided-group-members}}
 
@@ -151,6 +155,7 @@ Due to the exhuastively methodology in verifying \CGKAmod{P}{T}{N}, both initiat
 Hence, we can omit the group members from calling calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}, and without loss of generality, have \(\mathcal{A}\) query \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i}; respectively.
 The graph not looks like.
 
+
 \hypertarget{decidability}{%
 \subsection{Decidability}\label{decidability}}
 
@@ -159,32 +164,42 @@ TODO:
 Bounded epochs to \(T\).
 No indepotent operations, each operation advances protocol state towards transition.
 
+
 \hypertarget{sec:game-oracles}{%
 \section{Oracles}\label{sec:game-oracles}}
+
 
 \hypertarget{corrupt}{%
 \subsection{Corrupt}\label{corrupt}}
 
+
 \hypertarget{hoard}{%
 \subsection{Hoard}\label{hoard}}
+
 
 \hypertarget{reveal}{%
 \subsection{Reveal}\label{reveal}}
 
+
 \hypertarget{insert}{%
 \subsection{Insert}\label{insert}}
+
 
 \hypertarget{remove}{%
 \subsection{Remove}\label{remove}}
 
+
 \hypertarget{update}{%
 \subsection{Update}\label{update}}
+
 
 \hypertarget{deliver}{%
 \subsection{Deliver}\label{deliver}}
 
+
 \hypertarget{sec:LTL-security}{%
 \section{Security}\label{sec:LTL-security}}
+
 
 \hypertarget{pcs-as-ltl}{%
 \subsection{PCS as LTL}\label{pcs-as-ltl}}
@@ -194,6 +209,7 @@ No indepotent operations, each operation advances protocol state towards transit
     \Box \Big(\, ( \texttt{CGKA@start\_of\_epoch} \land \texttt{unsafeIDs} = 0 ) \implies \neg \texttt{learnedKey[epoch]} \Big)
     $$
 \end{LTL}
+
 
 \hypertarget{fsu-as-ltl}{%
 \subsection{FSU as LTL}\label{fsu-as-ltl}}

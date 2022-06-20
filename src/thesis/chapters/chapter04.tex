@@ -1,6 +1,7 @@
 \hypertarget{verification-results}{%
 \chapter{Verification Results}\label{verification-results}}
 
+
 \hypertarget{compilation-directives}{%
 \section{Compilation Directives}\label{compilation-directives}}
 
@@ -9,6 +10,7 @@ Not all compile time directives are compatible with all models.
 Some directives require a proof by the user that certain conditions hold within the model for the directive's usage to be sound.
 Furthermore, many directives' usage are are mutually exclusive with one or more other directives.
 Still, with these restrictions in mind, the careful selection of compile-time directives is vital to successfully grappling with the enormity of memory usage resulting from the potentially exponential state-space explosion.
+
 
 \hypertarget{partial-order-reduction}{%
 \subsection{Partial Order Reduction}\label{partial-order-reduction}}
@@ -33,6 +35,7 @@ Instead this work made use of a single partial order reduction directive:
 The \texttt{XUSAFE} directive disables validity checks of the strictly synchronizing message passing queues.
 The encoded model of TreeKEM does not utilize these queues, hence any check related to them would be superfluous.
 No noticeable performance gains were observed by utilizing the \texttt{XUSAFE}, but it's usage was retained regardless.
+
 
 \hypertarget{state-vector-encoding}{%
 \subsection{State Vector Encoding}\label{state-vector-encoding}}
@@ -77,6 +80,8 @@ During verification of TreeKEM, it is always the case that the \texttt{SPACE} di
 This conditional directive usage creates an ``optimization partition'' bifurcating verification runs into two sets of utilized directives.
 An important consequence of this partitioning relates to comparative analysis of the verification run-time characteristics.
 Such comparisons can only soundly be with other verification runs within the same set, utilizing the same directives.
+In the tables presented below, the presence of a checkmark (\cmark) in the column labeled $\MinimizedDFA$ indicates that the associated parameterized model and results were run with this time/memory trade-off strategy enabled.
+
 
 \hypertarget{multi-core-tuning}{%
 \subsection{Multi-core Tuning}\label{multi-core-tuning}}
@@ -97,6 +102,7 @@ The \texttt{MEMLIM} directive specifies the upper limit of memory usable by the 
 Specifying this has the important effect of preventing the verification process from thrashing by utilizing more virtual memory than real memory exists on the verification machine(s).
 Moreover, the \texttt{NCORE} directive informs the model checker at compile-time the maximum number of usable processors is \(Y\), permitting the compiler to make informed approximations to minimize parallelism overhead and maximize multi-core throughput.
 The verification work's utilization of both \texttt{MEMLIM} and \texttt{NCORE} directives when utilizing a multi-core computing cluster had notable impact on the overall ``states per second'' processing performance.
+
 
 \hypertarget{run-time-improvement}{%
 \subsection{Run-time Improvement}\label{run-time-improvement}}
@@ -122,6 +128,7 @@ Consequently, the finalized model does not require bounds checking and the disab
 Similarly the \texttt{NOFAIR} removes the data structures and tracking subroutines required to reason about and verify fairness properties.
 The verification of TreeKEM does not include any fairness properties.
 Hence the \texttt{NOFAIR} directive is always enabled.
+
 
 \hypertarget{reproducible-randomness}{%
 \subsection{Reproducible Randomness}\label{reproducible-randomness}}
@@ -151,8 +158,8 @@ Y = \texttt{1155727349} = & \bigg | \, \frac{\pi}{e} \!\!\!\! & * \, 10^9 \, \bi
 \end{aligned}
 \end{equation}
 
-\hypertarget{other}{%
-\subsection{Other}\label{other}}
+
+\subimport{../tables/}{results-V1-HLT-PRELIM}
 
 
 \hypertarget{post-compromise-security}{%

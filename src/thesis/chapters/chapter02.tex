@@ -37,6 +37,7 @@ The IETF states that MLS in practice should support approximately 50,000 partici
 This work parameterizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
 In practice, this means the results presented for a specified \(T_{max}\) and \(N_{max}\) only provide verification of security against \((T, C, N)\)-attackers for all \(T \in [1, T_{max}]\), \(C \in [1, T]\) and \(N \in [2, N_{max}]\).
 
+
 \hypertarget{explicit-state-model-checking}{%
 \section{Explicit state model checking}\label{explicit-state-model-checking}}
 
@@ -56,6 +57,7 @@ The model is then verified by exhaustively searching all possible protocol state
 Incrementing the \(T\) parameter while holding \(N\) constant, generally, increases the state-space by \(2\) orders of magnitude.
 However, incrementing the \(N\) parameter while holding \(T\) constant, only increases the state-space by \(\frac{1}{2}\) an orders of magnitude.
 Due to the constraints engineering constraints presented by explicit state model checking, the verification work presented will only consider the combinatorial collection of all models parameterized by \(T\) and \(N\), where \(T \in [1, T_{max}]\) and \(N \in [2, N_{max}]\).
+
 
 \hypertarget{linear-temporal-logic}{%
 \section{Linear Temporal Logic}\label{linear-temporal-logic}}
@@ -81,6 +83,7 @@ The temporal operators are presented below as a short had reference for formulas
   \psi \;{\mathcal {U}}\, & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Until''}    & \varphi\textrm{ eventually holds and $\psi$ holds at every state until then} \hfill~ &\\
 \end{aligned}
 \]
+
 
 \hypertarget{promela}{%
 \section{Promela}\label{promela}}
@@ -243,6 +246,7 @@ d_step {
 }
 \end{verbatim}
 \end{figure}
+
 
 \hypertarget{spin}{%
 \section{Spin}\label{spin}}
