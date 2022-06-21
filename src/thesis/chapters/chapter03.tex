@@ -157,100 +157,12 @@ Furthermore, note that \(\mathcal{A}\) querying \Oracle{add-user}{ID_i}, \Oracle
 Both the sequences originating with either \(\mathcal{A}\) querying an oracle or \(\mathtt{ID_i}\) calling an algorithm result in the same epoch transition once \Oracle{deliver}{t,\, ID_i,\, ID_{*}} is queried, without any other effect on the protocol state.
 Due to the exhuastively methodology in verifying \CGKAmod{P}{T}{N}, both initiating epoch transitions options are explored, resulting in duplicate paths to the same epoch transition state.
 Hence, we can omit the group members from calling calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}, and without loss of generality, have \(\mathcal{A}\) query \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i}; respectively.
-The graph not looks like.
 
 
-\hypertarget{decidability}{%
-\subsection{Decidability}\label{decidability}}
+%\hypertarget{decidability}{%
+%\subsection{Decidability}\label{decidability}}
 
-TODO:
+%TODO:
 
-Bounded epochs to \(T\).
-No indepotent operations, each operation advances protocol state towards transition.
-
-
-\hypertarget{sec:game-oracles}{%
-\section{Oracles}\label{sec:game-oracles}}
-
-
-\hypertarget{corrupt}{%
-\subsection{Corrupt}\label{corrupt}}
-
-
-\hypertarget{hoard}{%
-\subsection{Hoard}\label{hoard}}
-
-
-\hypertarget{reveal}{%
-\subsection{Reveal}\label{reveal}}
-
-
-\hypertarget{insert}{%
-\subsection{Insert}\label{insert}}
-
-
-\hypertarget{remove}{%
-\subsection{Remove}\label{remove}}
-
-
-\hypertarget{update}{%
-\subsection{Update}\label{update}}
-
-
-\hypertarget{deliver}{%
-\subsection{Deliver}\label{deliver}}
-
-
-\hypertarget{sec:LTL-security}{%
-\section{Security}\label{sec:LTL-security}}
-
-
-\hypertarget{hlt-as-ltl}{%
-\subsection{Termination as LTL}\label{hlt-as-ltl}}
-
-\begin{LTL}[\,\LTLPredicate{HLT}\,]
-    $$
-    \Diamond \texttt{CGKA@end\_of\_game}
-    $$
-\end{LTL}
-
-We consider the \Abrev{LTL} predicate \LTLPredicate{HLT}, which indicates that the \CGKAmod{P}{T}{N} model always terminates.
-To support this verification, a state label \texttt{end\_of\_game} has been included in the PROMELA model indicating the final state of the \CGKAsec. 
-The model has a single control process for the \CGKAsec named \texttt{CGKA}.
-An \Abrev{LTL} atom \texttt{CGKA@end\_of\_game} is true if an only if the process \texttt{CGKA} is at state \texttt{end\_of\_game}.
-With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \models \LTLPredicate{HLT} \) is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
-
-
-\hypertarget{pcs-as-ltl}{%
-\subsection{\Abrev{PCS} as LTL}\label{pcs-as-ltl}}
-
-\begin{LTL}[\,\LTLPredicate{PCS}\,]
-    $$
-    \Box \Big(\, ( \texttt{CGKA@start\_of\_epoch} \land \texttt{unsafeIDs} = 0 ) \implies \neg \texttt{learnedKey[epoch]} \Big)
-    $$
-\end{LTL}
-
-
-\hypertarget{fsu-as-ltl}{%
-\subsection{\Abrev{FSU} as LTL}\label{fsu-as-ltl}}
-
-\begin{LTL}[\;Never-Trivial\;]
-    $$
-    \Box \left( \texttt{CGKA@move\_corrupt} \implies \texttt{hoarding[targetID]} = \texttt{NEVER} \right)
-    $$
-\end{LTL}
-
-\begin{LTL}[\;FSU-Epoch(\,\textnormal{\normalfont $t \in T$}\,)\;]
-    \begin{equation*}
-    \begin{split}
-    \Diamond ( & \texttt{CGKA@move\_start\_of\_epoch} \land \texttt{epoch} = t + 1 \land \neg \texttt{learnedKey[$t$]} ) \\
-    & \implies ( \neg \texttt{learnedKey[$t$]} ) \,\;{\mathcal {U}}\;\, \texttt{CGKA@end\_of\_game}
-    \end{split}
-    \end{equation*}
-\end{LTL}
-
-\begin{LTL}[\,\LTLPredicate{FSU}\,]
-    $$
-    \textbf{Never-Trivial} \implies \bigwedge\limits_{t=0}^{T-1} \;\,\textbf{FSU-Epoch}(t)
-    $$
-\end{LTL}
+%Bounded epochs to \(T\).
+%No indepotent operations, each operation advances protocol state towards transition.

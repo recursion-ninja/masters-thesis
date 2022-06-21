@@ -1,41 +1,254 @@
-\hypertarget{conclusion}{%
-\chapter{Conclusion}\label{conclusion}}
+\hypertarget{results}{%
+\chapter{Preliminary Results}\label{results}}
 
-The main contribution of this work is the formalization of the \CGKAsec as well as presenting an acompanying parametric and protocol-polymorphic \CGKAmod{P}{}{} model.
-This \CGKAmod{}{}{} model incorporates a variety of sound reductions from the informal \CGKAsec definition, leading to dramatically simplifies model encoding.
-Furthermore, performance tuning of the model along with performance observations are documented in detail.
-Regretably, the number of verification observations is insufficient to confidently declare support of, or falsification of any stated security hypotheses.
-
-
-\hypertarget{future-work}{%
-\section{Future Work}\label{future-work}}
-
-Publication of this thesis is far from the terminus of the work herin.
-Continued research building upon the contents of this thesis are numerous.
+Here the resulting verification observations for the models \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{} are discussed.
+As described above in chapter \ref{sec:model-formalization}, the verification of the models are bounded, and hold only for the protocol prefixes up to \( T_{max} \) with at most \( N_{max }\) group members.
+Verification was performed on each parameter combination for \CGKAmod{P}{T}{N} parameterized by \( \mathtt{P} \in \{\, \VersionOne ,\, \VersionTwo \,\} \), \( T \in [\,4,\, T_{max} \,] \), and \( N \in [\,2,\, N_{max} \,] \).
+The domain of each \CGKAmod{P}{T}{N} model parameter is listed in Table \ref{tab:model-param-domain}.
+All observed verification results are tabulated in Appendix \ref{apx:Observations}.
+At the time of submitting this thesis draft, a cursory glance will reveal that not all verification prcoesses have completed.
+These planned but incomplete observations are indicated by a \NA in table entries.
 
 
-\hypertarget{more-observations}{%
-\subsection{Extending the Observation Set}\label{more-observations}}
+\hypertarget{performance-tuning}{%
+\section{Performance Tuning}\label{performance-tuning}}
 
-The most obvious avenue of future work is to continue verifying different parameterization of \CGKAmod{P}{T}{N} models in order to increase the tabulated observations.
-Most importantly is the observation of the model \CGKAmod{\VersionOne}{12}{8}, as this will determine the verification methodology's relationship with prior work and known security issues.
-The author intends to pursue this work in the immediate future.
-
-
-\hypertarget{more-predicates}{%
-\subsection{Adding LTL Predicates}\label{more-predicates}}
-
-The general construction of the \CGKAmod{P}{T}{N} lends itself well towards extension and repeat use.
-Consideration and verification of other desirable properties for \CGKAdef protocols would be a logical extension of this work.
-One particular area where the \CGKAmod{P}{T}{N} model may be particularly well suited, is the exploration of loosening the \Abrev{MLS} specification's constraints on the \Abrev{DS} semantics.
-Perhaps fewer requirement can be placed on the \Abrev{DS}, required protocol to assume less from the \Abrev{DS}, while still maintaining all the \Abrev{MLS} security guarantees.
-Pursuing this, or similar inquiries, would require minor modifications to the \CGKAmod{P}{T}{N} model's implementation.
+The performance and scaling of the verification efforts for \CGKAmod{}{}{} are contextualized.
+Both time and memory constraints must be considered and a morderately comprehensive understanding of the verification tool Spin is required to correctly tune performance.
+Spin supports many compile-time directives which allows for specifying the possible time-memory trade-off strategies which are desirable when verifying the specific model.
+Not all compile time directives are compatible with all models.
+Some directives require a proof by the user that certain conditions hold within the model for the directive's usage to be sound.
+Furthermore, many directives' usage are are mutually exclusive with one or more other directives.
+Still, with these restrictions in mind, the careful selection of compile-time directives is vital to successfully grappling with the enormity of memory usage resulting from the potentially exponential state-space explosion.
 
 
-\hypertarget{unbounded-verification}{%
-\subsection{Unbounded Verification}\label{unbounded-verification}}
+\hypertarget{partial-order-reduction}{%
+\subsection{Partial Order Reduction}\label{partial-order-reduction}}
 
-The final suggestion of future work was alluded to in Section \ref{sec:game-adaptations}, which involves identifying a finite model encoding for an unbounded \(T\) and/or \(N\) parameter.
-Obviously the verification results would be stronger for a new \( \CGKAmod{P}{T}{N}^{'} \) model which considered \emph{all} possible epochs \(T\) or \emph{all} possible group sizes \(N\).
-The dependence on parameter \(N\) for tracking group membership and the left balanced binary tree with the attacker's knowledgebase representation, leads the author to believe that a finite encoding with respect to the parameter \(N\) is likely impossible.To achieve such an encoding for \(T\), both the global state variables of \( \CGKAmod{P}{T}{N}^{'} \) as well as the attacker knowledgebase module for \texttt{P} would require ``independence'' for from the epoch information.
-One possible approach may be finding an encoding of \( \CGKAmod{P}{T}{N}^{'} \) which is a Markov process \autocite{markov1906a}.
+Partial-order reduction methods represent a well understood collection of state exploration techniques \autocite{godefroid1990using}, \autocite{godefroid1991using}, \autocite{godefroid1994partial}, \autocite{holzmann1995improvement}, \autocite{katz1992verification}, \autocite{peled1993all}, \autocite{valmari1989stubborn}, \autocite{valmari1992stubborn} whose combined usage can greatly reduce the model checking search-space.
+Such techniques are applicable for verifying local and termination of concurrent models.
+Furthermore, these techniques are equally applicable for verifying LTL properties, even reducing the state-space when verifying liveness and safety properties within concurrent models \autocite{wolper1983reasoning}.
+The specific partial order reduction technique of ``simultaneous reachability'' analysis \autocite{van1997partial} enables the verification of non-executable transitions, absence of deadlock, and buffer overflows.
+The extensive research and engineering effort put into the myriad of partial order reduction techniques have all been incorporated into verification strategies of SPIN, and are enabled by default,requiring manual ``opt-out'' compilation directives in order to disable them.
+SPIN intelligently selects applicable partial order reduction techniques for the concurrency of the model, the LTL properties to be verified, and the topology of the state-space.
+The verification work presented permitted the usage all the partial order reduction technique made available by SPIN.
+No comparative verification(s) were made to observe the run-time difference between explicitly forbidding partial order reduction and permitting the ``enabled by default'' techniques available to SPIN.
+
+The verification work refrained from from both disabling partial order reduction via the \texttt{NOREDUCE} directive as well as experiment with potential performance gains or regressions introduced by the \texttt{NIBIS} directive.
+Instead this work made use of a single partial order reduction directive:
+
+\begin{itemize}
+\item \texttt{XUSAFE}
+\end{itemize}
+
+The \texttt{XUSAFE} directive disables validity checks of the strictly synchronizing message passing queues.
+The encoded model of TreeKEM does not utilize these queues, hence any check related to them would be superfluous.
+No noticeable performance gains were observed by utilizing the \texttt{XUSAFE}, but it's usage was retained regardless.
+
+
+\hypertarget{multi-core-tuning}{%
+\subsection{Multi-core Tuning}\label{multi-core-tuning}}
+
+Since version 5.0, SPIN has supported performing model checking on multi-core machines \autocite{holzmann2007design}.
+This support brings with it non-trivial engineering considerations, such as how to ensure partial order reduction remains sound across multiple independent processors, how to exchange search state results between processors, how to share or segregate memory, and how to minimize parallelism overhead.
+There are two primary directives used my SPIN for approximating the optimal multi-core verification strategy at compile-time.
+Both of these are used by this work while verifying TreeKEM.
+
+\begin{itemize}
+\item
+  \texttt{MEMLIM=}\(X\)
+\item
+  \texttt{NCORE=}\(Y\)
+\end{itemize}
+
+The \texttt{MEMLIM} directive specifies the upper limit of memory usable by the model checker to be \(X\) mebibytes for the duration it's verification.
+Specifying this has the important effect of preventing the verification process from thrashing by utilizing more virtual memory than real memory exists on the verification machine(s).
+Moreover, the \texttt{NCORE} directive informs the model checker at compile-time the maximum number of usable processors is \(Y\), permitting the compiler to make informed approximations to minimize parallelism overhead and maximize multi-core throughput.
+The verification work's utilization of both \texttt{MEMLIM} and \texttt{NCORE} directives when utilizing a multi-core computing cluster had notable impact on the overall ``states per second'' processing performance.
+
+
+\hypertarget{run-time-improvement}{%
+\subsection{Run-time Improvement}\label{run-time-improvement}}
+
+Without any special direction SPIN includes a number of run-time checks and overhead structures to support functionality which may or may not actually be required for verification.
+For each of these ``safety rails'' added to the verification by default, there exists a directive to remove the run-time feature.
+The verification of TreeKEM does not require all run-time features and the following directives are used to remove the associated run-time increases.
+
+\begin{itemize}
+\item
+  \texttt{NOBOUNDCHECK}
+\item
+  \texttt{NOFAIR}
+\end{itemize}
+
+The \texttt{NOBOUNDCHECK} directive removes run-time bounds checking when indexing arrays.
+While enabled, the bound checking provides extremely useful debugging information.
+Enabling bounds checking is useful while developing the model, but once confidence has been established that indexing errors do not exist in the model, such bounds checks are superfluous.
+Additionally, the \texttt{NOBOUNDCHECK} performs run-time checks when synchronously accessing message queues.
+The TreeKEM model does not use such message channels.
+Consequently, the finalized model does not require bounds checking and the disabling directive is used during verification.
+
+Similarly the \texttt{NOFAIR} removes the data structures and tracking subroutines required to reason about and verify fairness properties.
+The verification of TreeKEM does not include any fairness properties.
+Hence the \texttt{NOFAIR} directive is always enabled.
+
+
+\hypertarget{reproducible-randomness}{%
+\subsection{Reproducible Randomness}\label{reproducible-randomness}}
+
+Like many problems with arbitrary alternation or stochastic search strategies, SPIN provides the opportunity for specifying seeds to exactly reproduce the results of random selection.
+The benefits of reproducibility are difficult to understate.
+Before the model is finalized, reproducibility is essential during the debugging process.
+On the other hand, once the model is finalized, reproducibility is required for certainty during peer review.
+Hence, directives for specify seed values are utilized throughout the verification work.
+
+\begin{itemize}
+\item
+  \texttt{P\_RAND=}\(X\)
+\item
+  \texttt{T\_RAND=}\(Y\)
+\end{itemize}
+
+The first randomness directive, \texttt{P\_RAND}, is utilized to specify the random seed which determines process scheduling order for multi-process models.
+The second, \texttt{T\_RAND} is also utilized, and corresponding the seed value dictates the transition exploration order when traversing the state-space.
+Random seed values for \texttt{P\_RAND} and \texttt{T\_RAND} were set by manipulating the known numerical constants as defined below.
+The transparency of the random seed value selection exists as a ``no tricks up my sleeve'' technique for specifying arbitrary seed values.
+
+\begin{equation}
+\begin{aligned}[t]
+X = \texttt{1618033988} = & \bigg | \, \phi          \!\!\!\! & * \, 10^9 \, \bigg |\\
+Y = \texttt{1155727349} = & \bigg | \, \frac{\pi}{e} \!\!\!\! & * \, 10^9 \, \bigg |\\
+\end{aligned}
+\end{equation}
+
+
+\hypertarget{state-vector-encoding}{%
+\subsection{State Vector Encoding}\label{state-vector-encoding}}
+
+Each state within the model's state-space is encoded as a ``state-vector.''
+The state vectors uniquely map to each state within the model.
+Given that the main memory requirements of model checking lies in exhaustive state-space search, it is unsurprising that specifying the encoding of the state-vectors has a pronounced impact on memory usage.
+There are to relevant directives used to influence the model checker's representation of state-vectors.
+Note that all four directives can be used in conjunction for compounding effects.
+
+\begin{itemize}
+\item
+  \texttt{COLLAPSE}
+\item
+  \texttt{VECTORSZ=}\(X\)
+\item
+  \texttt{MA=}\(X\)
+\item
+  \texttt{SPACE}
+\end{itemize}
+
+The \texttt{VECTORSZ} directive is used to specify the number of byte \(X\) to allocate for each state-vector.
+Specifying a number of bytes which is insufficient to represent the state vector will cause the compilation of the model to fail with an approximate suggestion of the correct number of bytes to specify.
+The \texttt{VECTORSZ} directive is required when the state-vector length exceeds the SPIN default of \(1024\) bytes.
+Likewise, the \texttt{COLLAPSE} directive applies compression the the state-vector representation.
+
+A final two memory related directives are utilized conditionally during the verification of TreeKEM.
+For large values of \(T\) and \(N\), the \texttt{MA} and \texttt{SPACE} directives are utilized in conjunction to increase the tractable values of \(T_{max}\) and \(N_{max}\).
+The conjunction of these two directives produces a very significant memory reduction, however the usage of \texttt{MA} causes an appreciable increase in verification run-time.
+This time-memory trade-off is necessary to make verification of higher \(T_{max}\) and \(N_{max}\) values tractable, even on modern computing cluster hardware.
+
+The \texttt{MA} directive is used to specify the maximum number of bytes \(X\) that a state vector can require.
+Spin internally stores several sets of model states.
+Using the information regarding the upper bound \(X\) for state-vector bytes, the \texttt{MA} directive enables a method of storing a set of states is a binary decision tree (BDD) \autocite{holzmann1999minimized}.
+To determine if the state is in the set, Spin treated the state vector as a bit-sting and feeds it to the BDD, with BDD accepting the string treating the state is in the set, the BDD rejecting the string representing state is not being in the set.
+Further steps are taken to reduce the BDD into a minimal DFA representation of a 256-ary decision tree.
+Insertion, deletion, and membership queries take linear time in the length of the state-vector.
+The translation alone between DFA representation represents a stark time/memory trade-off, as linear time set membership is a stark difference between Spin's default hash-set storage method, resulting in reducing memory requirements while increasing verification run-time.
+
+The \texttt{SPACE} directive instructs the compiler to encode the state transition graph as well as select search algorithms with the goal of reducing memory usage at the expense of verification time.
+During verification of TreeKEM, it is always the case that the \texttt{SPACE} directive is utilized if and only if the \texttt{MA} is also utilized.
+This conditional directive usage creates an ``optimization partition'' bifurcating verification runs into two sets of utilized directives.
+An important consequence of this partitioning relates to comparative analysis of the verification run-time characteristics.
+Such comparisons can only soundly be with other verification runs within the same set, utilizing the same directives.
+In the tables presented below, the presence of a checkmark (\cmark) in the column labeled $\MinimizedDFA$ indicates that the associated parameterized model and results were run with this time/memory trade-off strategy enabled.
+Table \ref{tab:state-vector-len} displays the state vector's byte length for each \CGKAmod{\VersionOne}{}{} parameterized model under verification.
+
+\begin{table}[h!]
+\label{tab:state-vector-len}
+\caption{State vector byte length for each model parameterization of \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{}.}
+\hfill
+\begin{minipage}{0.45\textwidth}
+  \centering
+  \subimport{../tables/}{lengths-V1-state-vector-PRELIM.tex}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \centering
+  \subimport{../tables/}{lengths-V2-state-vector-PRELIM.tex}
+\end{minipage}
+\hfill
+\end{table}
+
+\hypertarget{scalability-limits}{%
+\subsection{Scalability Limits}\label{scalability-limits}}
+
+The state-vector lengths detailed in Table \ref{tab:state-vector-len} and columns observing verification performance within Appendix \ref{apx:Observations} provide an initial basis for interpreting the scalability of the \CGKAmod{P}{T}{N} model.
+The records of all these tables are currently incomplete, missing entries for protocol \VersionOne with larger \(T\) and \(N\) parameters, and missing protocol \VersionTwo entirely.
+Still some scaling information can be gleaned.
+
+It is easy to notice that a progression from \( (\,T,\, N\,) \) to \( (\,T+1,\, N\,) \) is more significant in memory usage than a progression from \( (\,T,\, N\,) \) to \( (\,T,\, N+4\,) \).
+The large jump in state-space and transition count between modeling successive epochs provides a secondary metric demonstrating this characteristic.
+Hence the number of epoch the model is verified for drives the memory usage.
+This intuitively makes sense, as each new epoch multiplicatively expands the diameter of the state-space.
+
+Interestingly, the verification runtime for \LTLPredicate{HLT} and \LTLPredicate{FSU} does not appear strongly correlated with the \(T\) and \(N\) parameters.
+The author does not have a definative explanation for this behavior.
+One postulate is that the group membership size limited to at most \(N\) has a strange combinatorial relationship with the distribution of membership states in TreeKEM's left balanced binary tree of secret keys.
+Since the attacker knowledge base and group membership alterations depend on the tree topologies permitted by the parameter \(N\), this may create a ``far-from-uniform'' distribution of state-spaces for different \(N\) values.
+
+
+\hypertarget{hypothesis-outcomes}{%
+\section{Hypothesis Testing}\label{hypothesis-outcomes}}
+
+By interpreting the observations collected in Appendix \ref{apx:Observations} one can disern whether the hypotheses enumerated in Table \ref{tab:verification-hypotheses} and described in Chapter \ref{sec:methodology} have been supported or falsified.
+Each hypothesis sill be considered individually, noting the interprative limitations imposed by the currently incomplete series of observations.
+
+
+\hypertarget{post-compromise-security}{%
+\subsection{Confidence Check}\label{post-compromise-security}}
+
+The simplest of the three \Abrev{LTL} predicates defined in Section \ref{sec:LTL-security} is \LTLPredicate{HLT}.
+The verification of \LTLPredicate{HLT} is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
+While \LTLPredicate{HLT} is not truly a security property of \CGKAmod{}{}{}, it is used as a methodology confidence check.
+Failure to verify \LTLPredicate{HLT} woiuld cast serious doubt that the model verification methodology is being performed correctly on more complex \Abrev{LTL} predicates.
+Verification results for \LTLPredicate{HLT} is displayed in Tables \ref{tab:V1-HLT} and \ref{tab:V2-HLT}.
+
+All observations in Tables \ref{tab:V1-HLT} and \ref{tab:V2-HLT} report a successful verification of \LTLPredicate{HLT}.
+These observations support the notion \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) and none falsify it.
+From the observations obtained so far, one can conclude that the confidence check which has successfully verified \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) does not introduce any doubt regarding the verification methodology.
+
+
+\hypertarget{post-compromise-security}{%
+\subsection{Post Compromise Security}\label{post-compromise-security}}
+
+The hypotheses listed in Table \ref{tab:verification-hypotheses} show an expectation that \Abrev{PCS} should be verifiable for both \VersionOne and \VersionTwo protocols.
+
+With regards to the first protocol \VersionOne, all observations in Table \ref{tab:V1-PCS} report a either successful verification of \LTLPredicate{PCS} or an ``out of memory'' error (\OutOfMemory).
+With no observation falsify the hypothesis, these limited observations provide only support for the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
+Thought the hypothesis is supported by the current observations, gathering more observations of increasingly complex \CGKAmod{\VersionOne}{}{} parameterization should be gathered before making security conclusions.
+
+Unfortunately there are no current observations for protocol \VersionTwo shown in Table \ref{tab:V-PCS} and consequently no support for, or falsification of the hypothesis.
+No security conclusions should be derived until the planned observation set can be completely gathered. 
+
+
+\hypertarget{future-secrecy}{%
+\subsection{Future Secrecy}\label{future-secrecy}}
+
+As indicated in Table \ref{tab:verification-hypotheses}, the first protocol \VersionOne is known to have a \Abrev{FSU} security deficiency, so the hypothesis is that verification of \LTLPredicate{FSU} should be fail for \emph{at least} \CGKAmod{\VersionOne}{12}{8}.
+While prior work \autocite{alwen2020security} indicates \( \CGKAmod{\VersionOne}{12}{8} \not \models \LTLPredicate{FSU} \), it is possible that a simpler model with lower \(T\) and/or \(N\) parameters may exist which also demonstrates the \Abrev{FSU} security deficiency.
+Similarly, there may be many \CGKAmod{\VersionOne}{T}{N} models with simpler \(T\) and \(N\) parameters which verify \LTLPredicate{FSU}.
+The aforementioned single \Abrev{FSU} security deficiency example point does not delineate a boundary at which \((T, C, N)\)-attacker does not demonstrate advantage but a \((T+1, C, N)\)-attacker or a \((T, C, N+1)\)-attacker is able to demonstrate advantage for the original protocol \VersionOne.
+Verifcation observations related to \LTLPredicate{FSU} ought to be the most intriguing.
+
+Table \ref{tab:V1-FSU} reports only successful verification of \LTLPredicate{FSU}.
+However, the observations are not complete and most importantly, do not include \CGKAmod{\VersionOne}{12}{8}.
+Without knowledge of where in the \CGKAmod{\VersionOne}{T}{N} model parameter space the \Abrev{FSU} security deficiency manifests, the observations do not provide any support for or falsification of the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
+A verification observation for \CGKAmod{\VersionOne}{12}{8} would provide additional context and permit a deduction regarding the models relationship towards the hypothesis.
+The current observations do not reveal any security conclusions.
+
+As with \Abrev{PCS}, there are also currently no \LTLPredicate{FSU} observations for protocol \VersionTwo shown in Table \ref{tab:V2-FSU} and consequently no support for, or falsification of the hypothesis.
+No security conclusions should be derived until the planned observation set can be completely gathered.
