@@ -1,5 +1,5 @@
 \hypertarget{results}{%
-\chapter{Results}\label{results}}
+\chapter{Preliminary Results}\label{results}}
 
 Here the verification results for the models \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{} are presented.
 As described above in chapter \ref{sec:model-formalization}, the verification of the models are bounded, and hold only for the protocol prefixes up to \( T_{max} \) with at most \( N_{max }\) group members.
@@ -165,10 +165,18 @@ In the tables presented below, the presence of a checkmark (\cmark) in the colum
 Table \ref{tab:state-vector-len} displays the state vector's byte length for each \CGKAmod{\VersionOne}{}{} parameterized model under verification.
 
 \begin{table}[h!]
+\label{tab:state-vector-len}
+\caption{State vector byte length for each model parameterization of \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{}.}
+\hfill
+\begin{minipage}{0.45\textwidth}
   \centering
-  \label{tab:state-vector-len}
-  \caption{State vector byte length for each model parameterization of \CGKAmod{\VersionOne}{}{}.\\Note that the model's state vector is indepenent of \Abrev{LTL} predicate $\varphi$}
-  \subimport{../tables/}{state-vector-byte-length-PRELIM}
+  \subimport{../tables/}{lengths-V1-state-vector-PRELIM.tex}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \centering
+  \subimport{../tables/}{lengths-V2-state-vector-PRELIM.tex}
+\end{minipage}
+\hfill
 \end{table}
 
 
@@ -180,55 +188,13 @@ The verification of \LTLPredicate{HLT} is successful if and only if every possib
 While \LTLPredicate{HLT} is not truly a security property of \CGKAmod{}{}{}, it is used as a sanity check to ensure that the model verification is being performed correctlt on more complex \Abrev{LTL} predicates.
 Verification results for \LTLPredicate{HLT} is displayed in Table \ref{tab:V1-HLT}.
 
-\begin{table}[h!]
-  \centering
-  \label{tab:V1-HLT}
-  \caption{Performance results of $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{HLT}$}
-  \subimport{../tables/}{results-V1-HLT-PRELIM}
-\end{table}
-
-\begin{table}[h!]
-  \centering
-  \label{tab:V2-HLT}
-  \caption{Performance results of $\CGKAmod{\VersionTwo}{T}{N} \models \LTLPredicate{HLT}$}
-  \subimport{../tables/}{results-V2-HLT-PRELIM}
-\end{table}
-
 
 \hypertarget{post-compromise-security}{%
 \section{Post Compromise Security}\label{post-compromise-security}}
 
-\begin{table}[h!]
-  \centering
-  \label{tab:V1-PCS}
-  \caption{Performance results of $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{PCS}$}
-  \subimport{../tables/}{results-V1-PCS-PRELIM}
-\end{table}
-
-\begin{table}[h!]
-  \centering
-  \label{tab:V2-PCS}
-  \caption{Performance results of $\CGKAmod{\VersionTwo}{T}{N} \models \LTLPredicate{PCS}$}
-  \subimport{../tables/}{results-V2-PCS-PRELIM}
-\end{table}
-
 
 \hypertarget{future-secrecy}{%
 \section{Future Secrecy}\label{future-secrecy}}
-
-\begin{table}[h!]
-  \centering
-  \label{tab:V1-FSU}
-  \caption{Performance results of $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{FSU}$}
-  \subimport{../tables/}{results-V1-FSU-PRELIM}
-\end{table}
-
-\begin{table}[h!]
-  \centering
-  \label{tab:V2-FSU}
-  \caption{Performance results of $\CGKAmod{\VersionTwo}{T}{N} \models \LTLPredicate{FSU}$}
-  \subimport{../tables/}{results-V2-FSU-PRELIM}
-\end{table}
 
 
 \hypertarget{scalability-limits}{%

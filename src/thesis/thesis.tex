@@ -11,12 +11,16 @@ bibfile=\ResourcePath./references
 
 \ThesisFrontmatter
 
-\import{./chapters/}{chapter01}
-\import{./chapters/}{chapter02}
-\import{./chapters/}{chapter03}
-\import{./chapters/}{chapter04}
-\import{./chapters/}{chapter05}
+\import{\ChaptersPath}{chapter01}
+\import{\ChaptersPath}{chapter02}
+\import{\ChaptersPath}{chapter03}
+% Break ToC here to nicely span across two pages
+\addtocontents{toc}{\protect\newpage}
+\import{\ChaptersPath}{chapter04}
+\import{\ChaptersPath}{chapter05}
 
-\ThesisBackmatter
+\begin{ThesisBackmatter}
+\import{\ResourcePath}{observations}
+\end{ThesisBackmatter}
 
 \end{document}

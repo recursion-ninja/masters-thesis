@@ -1,0 +1,24 @@
+\chapter{Appendix: Observations}
+
+\newcommand{\ObservationTable}[2]{%
+\begin{table}[h!]
+  \centering
+  \label{tab:V#1-#2}
+  \caption{Observations for $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{#2}$}
+  \subimport{../tables/}{results-V#1-#2-PRELIM}
+\end{table}
+}
+
+\begin{table}[h!]
+  \centering
+  \label{tab:table-legend}
+  \caption{Legend of symbols appearing in tables}
+  \subimport{../tables/}{tabular-legend.tex}
+\end{table}
+
+\ObservationTable{1}{HLT}
+\ObservationTable{2}{HLT}
+\ObservationTable{1}{PCS}
+\ObservationTable{2}{PCS}
+\ObservationTable{1}{FSU}
+\ObservationTable{2}{FSU}
