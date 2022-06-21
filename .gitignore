@@ -1,3 +1,5 @@
+src/thesis/auxiliary/hunterthesis.cls
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

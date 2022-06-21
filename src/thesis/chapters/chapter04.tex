@@ -1,10 +1,16 @@
-\hypertarget{verification-results}{%
-\chapter{Verification Results}\label{verification-results}}
+\hypertarget{results}{%
+\chapter{Results}\label{results}}
 
+Here the verification results for the models \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{} are presented.
+As described above in chapter \ref{sec:model-formalization}, the verification of the models are bounded, and hold only for the protocol prefixes up to \( T_{max} \) with at most \( N_{max }\) group members.
+Verification was performed on each parameter combination for \CGKAmod{P}{T}{N} parameterized by \( \mathtt{P} \in \{\, \VersionOne ,\, \VersionTwo \,\} \), \( T \in [\,4,\, T_{max} \,] \), and \( N \in [\,2,\, N_{max} \,] \).
+At the time of submitting this thesis draft, not all verification prcoesses have completed, and are indicated by a \NA in table entries.
 
-\hypertarget{compilation-directives}{%
-\section{Compilation Directives}\label{compilation-directives}}
+\hypertarget{performance-tuning}{%
+\section{Performance Tuning}\label{performance-tuning}}
 
+Prior to the verification results of LTL predicates on \CGKAmod{}{}{}, the performance and scaling of the verification efforts are contextualized.
+Both time and memory constraints must be considered and a morderately comprehensive understanding of the verification tool Spin is required to correctly tune performance.
 Spin supports many compile-time directives which allows for specifying the possible time-memory trade-off strategies which are desirable when verifying the specific model.
 Not all compile time directives are compatible with all models.
 Some directives require a proof by the user that certain conditions hold within the model for the directive's usage to be sound.
@@ -28,59 +34,12 @@ The verification work refrained from from both disabling partial order reduction
 Instead this work made use of a single partial order reduction directive:
 
 \begin{itemize}
-\item
-  \texttt{XUSAFE}
+\item \texttt{XUSAFE}
 \end{itemize}
 
 The \texttt{XUSAFE} directive disables validity checks of the strictly synchronizing message passing queues.
 The encoded model of TreeKEM does not utilize these queues, hence any check related to them would be superfluous.
 No noticeable performance gains were observed by utilizing the \texttt{XUSAFE}, but it's usage was retained regardless.
-
-
-\hypertarget{state-vector-encoding}{%
-\subsection{State Vector Encoding}\label{state-vector-encoding}}
-
-Each state within the model's state-space is encoded as a ``state-vector.''
-The state vectors uniquely map to each state within the model.
-Given that the main memory requirements of model checking lies in exhaustive state-space search, it is unsurprising that specifying the encoding of the state-vectors has a pronounced impact on memory usage.
-There are to relevant directives used to influence the model checker's representation of state-vectors.
-Note that all four directives can be used in conjunction for compounding effects.
-
-\begin{itemize}
-\item
-  \texttt{COLLAPSE}
-\item
-  \texttt{VECTORSZ=}\(X\)
-\item
-  \texttt{MA=}\(X\)
-\item
-  \texttt{SPACE}
-\end{itemize}
-
-The \texttt{VECTORSZ} directive is used to specify the number of byte \(X\) to allocate for each state-vector.
-Specifying a number of bytes which is insufficient to represent the state vector will cause the compilation of the model to fail with an approximate suggestion of the correct number of bytes to specify.
-The \texttt{VECTORSZ} directive is required when the state-vector length exceeds the SPIN default of \(1024\) bytes.
-Likewise, the \texttt{COLLAPSE} directive applies compression the the state-vector representation.
-
-A final two memory related directives are utilized conditionally during the verification of TreeKEM.
-For large values of \(T\) and \(N\), the \texttt{MA} and \texttt{SPACE} directives are utilized in conjunction to increase the tractable values of \(T_{max}\) and \(N_{max}\).
-The conjunction of these two directives produces a very significant memory reduction, however the usage of \texttt{MA} causes an appreciable increase in verification run-time.
-This time-memory trade-off is necessary to make verification of higher \(T_{max}\) and \(N_{max}\) values tractable, even on modern computing cluster hardware.
-
-The \texttt{MA} directive is used to specify the maximum number of bytes \(X\) that a state vector can require.
-Spin internally stores several sets of model states.
-Using the information regarding the upper bound \(X\) for state-vector bytes, the \texttt{MA} directive enables a method of storing a set of states is a binary decision tree (BDD) \autocite{holzmann1999minimized}.
-To determine if the state is in the set, Spin treated the state vector as a bit-sting and feeds it to the BDD, with BDD accepting the string treating the state is in the set, the BDD rejecting the string representing state is not being in the set.
-Further steps are taken to reduce the BDD into a minimal DFA representation of a 256-ary decision tree.
-Insertion, deletion, and membership queries take linear time in the length of the state-vector.
-The translation alone between DFA representation represents a stark time/memory trade-off, as linear time set membership is a stark difference between Spin's default hash-set storage method, resulting in reducing memory requirements while increasing verification run-time.
-
-The \texttt{SPACE} directive instructs the compiler to encode the state transition graph as well as select search algorithms with the goal of reducing memory usage at the expense of verification time.
-During verification of TreeKEM, it is always the case that the \texttt{SPACE} directive is utilized if and only if the \texttt{MA} is also utilized.
-This conditional directive usage creates an ``optimization partition'' bifurcating verification runs into two sets of utilized directives.
-An important consequence of this partitioning relates to comparative analysis of the verification run-time characteristics.
-Such comparisons can only soundly be with other verification runs within the same set, utilizing the same directives.
-In the tables presented below, the presence of a checkmark (\cmark) in the column labeled $\MinimizedDFA$ indicates that the associated parameterized model and results were run with this time/memory trade-off strategy enabled.
 
 
 \hypertarget{multi-core-tuning}{%
@@ -159,19 +118,117 @@ Y = \texttt{1155727349} = & \bigg | \, \frac{\pi}{e} \!\!\!\! & * \, 10^9 \, \bi
 \end{equation}
 
 
-\subimport{../tables/}{results-V1-HLT-PRELIM}
+\hypertarget{state-vector-encoding}{%
+\subsection{State Vector Encoding}\label{state-vector-encoding}}
+
+Each state within the model's state-space is encoded as a ``state-vector.''
+The state vectors uniquely map to each state within the model.
+Given that the main memory requirements of model checking lies in exhaustive state-space search, it is unsurprising that specifying the encoding of the state-vectors has a pronounced impact on memory usage.
+There are to relevant directives used to influence the model checker's representation of state-vectors.
+Note that all four directives can be used in conjunction for compounding effects.
+
+\begin{itemize}
+\item
+  \texttt{COLLAPSE}
+\item
+  \texttt{VECTORSZ=}\(X\)
+\item
+  \texttt{MA=}\(X\)
+\item
+  \texttt{SPACE}
+\end{itemize}
+
+The \texttt{VECTORSZ} directive is used to specify the number of byte \(X\) to allocate for each state-vector.
+Specifying a number of bytes which is insufficient to represent the state vector will cause the compilation of the model to fail with an approximate suggestion of the correct number of bytes to specify.
+The \texttt{VECTORSZ} directive is required when the state-vector length exceeds the SPIN default of \(1024\) bytes.
+Likewise, the \texttt{COLLAPSE} directive applies compression the the state-vector representation.
+
+A final two memory related directives are utilized conditionally during the verification of TreeKEM.
+For large values of \(T\) and \(N\), the \texttt{MA} and \texttt{SPACE} directives are utilized in conjunction to increase the tractable values of \(T_{max}\) and \(N_{max}\).
+The conjunction of these two directives produces a very significant memory reduction, however the usage of \texttt{MA} causes an appreciable increase in verification run-time.
+This time-memory trade-off is necessary to make verification of higher \(T_{max}\) and \(N_{max}\) values tractable, even on modern computing cluster hardware.
+
+The \texttt{MA} directive is used to specify the maximum number of bytes \(X\) that a state vector can require.
+Spin internally stores several sets of model states.
+Using the information regarding the upper bound \(X\) for state-vector bytes, the \texttt{MA} directive enables a method of storing a set of states is a binary decision tree (BDD) \autocite{holzmann1999minimized}.
+To determine if the state is in the set, Spin treated the state vector as a bit-sting and feeds it to the BDD, with BDD accepting the string treating the state is in the set, the BDD rejecting the string representing state is not being in the set.
+Further steps are taken to reduce the BDD into a minimal DFA representation of a 256-ary decision tree.
+Insertion, deletion, and membership queries take linear time in the length of the state-vector.
+The translation alone between DFA representation represents a stark time/memory trade-off, as linear time set membership is a stark difference between Spin's default hash-set storage method, resulting in reducing memory requirements while increasing verification run-time.
+
+The \texttt{SPACE} directive instructs the compiler to encode the state transition graph as well as select search algorithms with the goal of reducing memory usage at the expense of verification time.
+During verification of TreeKEM, it is always the case that the \texttt{SPACE} directive is utilized if and only if the \texttt{MA} is also utilized.
+This conditional directive usage creates an ``optimization partition'' bifurcating verification runs into two sets of utilized directives.
+An important consequence of this partitioning relates to comparative analysis of the verification run-time characteristics.
+Such comparisons can only soundly be with other verification runs within the same set, utilizing the same directives.
+In the tables presented below, the presence of a checkmark (\cmark) in the column labeled $\MinimizedDFA$ indicates that the associated parameterized model and results were run with this time/memory trade-off strategy enabled.
+Table \ref{tab:state-vector-len} displays the state vector's byte length for each \CGKAmod{\VersionOne}{}{} parameterized model under verification.
+
+\begin{table}[h!]
+  \centering
+  \label{tab:state-vector-len}
+  \caption{State vector byte length for each model parameterization of \CGKAmod{\VersionOne}{}{}.\\Note that the model's state vector is indepenent of \Abrev{LTL} predicate $\varphi$}
+  \subimport{../tables/}{state-vector-byte-length-PRELIM}
+\end{table}
+
+
+\hypertarget{verification-outcomes}{%
+\section{Verification Outcomes}\label{verification-outcomes}}
+
+The simplest of the three \Abrev{LTL} predicates defined in Section \ref{sec:LTL-security} is \LTLPredicate{HLT}.
+The verification of \LTLPredicate{HLT} is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
+While \LTLPredicate{HLT} is not truly a security property of \CGKAmod{}{}{}, it is used as a sanity check to ensure that the model verification is being performed correctlt on more complex \Abrev{LTL} predicates.
+Verification results for \LTLPredicate{HLT} is displayed in Table \ref{tab:V1-HLT}.
+
+\begin{table}[h!]
+  \centering
+  \label{tab:V1-HLT}
+  \caption{Performance results of $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{HLT}$}
+  \subimport{../tables/}{results-V1-HLT-PRELIM}
+\end{table}
+
+\begin{table}[h!]
+  \centering
+  \label{tab:V2-HLT}
+  \caption{Performance results of $\CGKAmod{\VersionTwo}{T}{N} \models \LTLPredicate{HLT}$}
+  \subimport{../tables/}{results-V2-HLT-PRELIM}
+\end{table}
 
 
 \hypertarget{post-compromise-security}{%
 \section{Post Compromise Security}\label{post-compromise-security}}
 
-\subimport{../tables/}{results-V1-PCS-PRELIM}
+\begin{table}[h!]
+  \centering
+  \label{tab:V1-PCS}
+  \caption{Performance results of $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{PCS}$}
+  \subimport{../tables/}{results-V1-PCS-PRELIM}
+\end{table}
+
+\begin{table}[h!]
+  \centering
+  \label{tab:V2-PCS}
+  \caption{Performance results of $\CGKAmod{\VersionTwo}{T}{N} \models \LTLPredicate{PCS}$}
+  \subimport{../tables/}{results-V2-PCS-PRELIM}
+\end{table}
 
 
 \hypertarget{future-secrecy}{%
 \section{Future Secrecy}\label{future-secrecy}}
 
-\subimport{../tables/}{results-V1-FSU-PRELIM}
+\begin{table}[h!]
+  \centering
+  \label{tab:V1-FSU}
+  \caption{Performance results of $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{FSU}$}
+  \subimport{../tables/}{results-V1-FSU-PRELIM}
+\end{table}
+
+\begin{table}[h!]
+  \centering
+  \label{tab:V2-FSU}
+  \caption{Performance results of $\CGKAmod{\VersionTwo}{T}{N} \models \LTLPredicate{FSU}$}
+  \subimport{../tables/}{results-V2-FSU-PRELIM}
+\end{table}
 
 
 \hypertarget{scalability-limits}{%

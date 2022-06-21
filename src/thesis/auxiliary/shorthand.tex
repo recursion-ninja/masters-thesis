@@ -1,6 +1,6 @@
 %------------------------------------- Custom *Term* definitions ---------------
 % Shorthands for: CGKA 
-\newcommand{\CGKAdef}{\ensuremath{\lceil\!\textbf{\textit{CGKA}}\!\rfloor}\xspace}%
+\newcommand{\CGKAdef}{\ensuremath{{}^{\ulcorner}\!\!\textbf{\textit{CGKA}}_{\!\lrcorner}}\xspace}%
 \newcommand{\CGKAsec}{\Abrev{CGKA} security game\xspace}%
 \newcommand{\CGKAmod}[3]{\ensuremath{\mathcal{M}_{\texttt{CGKA}}%
 \expandafter\ifstrempty\expandafter{#1}
@@ -51,9 +51,13 @@
 
 % Table entries
 \newcommand{\OutOfMemory}{\ensuremath{\mathtt{O\,O\,M}}\xspace}
-\newcommand{\MinimizedDFA}{\ensuremath{\min_{\vec{s}\,\in\,\Sigma}\textbf{\scalebox{.60}[1.0]{DFA}}(\vec{s}\,)}\xspace}
+\newcommand{\MinimizedDFA}{\ensuremath{\min_{\vec{s}\,\in\,\Sigma}\textbf{\scalebox{.55}[1.0]{DFA}}(\vec{s}\,)}\xspace}
+\newcommand{\NA}{\ensuremath{\sfrac{\mathtt{\textbf{N}}}{\mathtt{\textbf{A}}}}}
 
 % Checkmark and X-mark
 \newcommand{\cmark}{\ding{52}\xspace}%
 \newcommand{\xmark}{\ding{56}\xspace}%
+
+
+\newcommand{\LTLPredicate}[1]{\ensuremath{\llparenthesis\mathtt{#1}\rr					parenthesis}\xspace}
 %------------------------------------- Custom *Term* definitions ---------------

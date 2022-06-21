@@ -1,44 +1,66 @@
-\begin{table}[h!]
-
-\centering
-\label{tab:V1-FSU }
-\caption{Performance results of $\CGKAmod{TreeKEMv1}{T}{N} \models FSU$}
-
-\begin{tabular}{ r r c c r r r r }
+\scriptsize
+\begin{tabular}{ r c c c r r r r }
 
 \toprule
 
- $T$ & $N$ & Verified & \( \displaystyle \MinimizedDFA \) & Runtime & Memory & States & Transitions \\
+{\normalsize $T$} &
+{\normalsize $N$} &
+{\normalsize Verified} &
+{\normalsize \( \displaystyle \MinimizedDFA \)} &
+{\normalsize Runtime} &
+{\normalsize Memory} &
+{\normalsize States} &
+{\normalsize Transitions}\\
 
 \midrule
 
- 4 & 4 & \cmark & \xmark & 0d 22h 20m 49s & 355.629 MiB &  2,186,233 &  3,106,667 \\
- 4 & 5 & \cmark & \xmark & 0d 06h 12m 25s & 423.626 MiB &  3,566,153 &  5,082,283 \\
- 4 & 6 & \cmark & \xmark & 0d 11h 54m 24s & 423.626 MiB &  3,566,153 &  5,082,283 \\
- 4 & 7 & \cmark & \xmark & 0d 09h 18m 26s & 425.140 MiB &  3,566,153 &  5,082,283 \\
- 4 & 8 & \cmark & \xmark & 0d 17h 20m 09s & 425.802 MiB &  3,566,153 &  5,082,283 \\
- 5 & 4 & \cmark & \xmark & 0d 22h 15m 19s & 676.191 MiB & 14,414,316 & 20,461,355 \\
- 5 & 5 & \cmark & \xmark & 0d 00h 43m 23s & 946.133 MiB & 18,464,501 & 26,478,511 \\
- 5 & 6 & \cmark & \xmark & 0d 00h 58m 58s &   1.110 GiB & 22,370,585 & 32,229,064 \\
- 5 & 7 & \cmark & \xmark & 0d 11h 12m 39s &   1.129 GiB & 23,450,038 & 33,768,964 \\
- 5 & 8 & \cmark & \xmark & 0d 11h 56m 12s &   1.133 GiB & 23,493,087 & 33,820,835 \\
- 6 & 4 & \cmark & \xmark & 0d 16h 15m 13s &   1.966 GiB & 59,737,607 & 85,317,813 \\
- 6 & 5 & \cmark & \xmark & 0d 02h 39m 50s &   2.233 GiB & 49,326,908 & 71,167,602 \\
- 6 & 6 & \cmark & \xmark & 0d 21h 08m 24s &   1.849 GiB & 37,313,775 & 54,202,176 \\
- 6 & 7 & \cmark & \cmark & 0d 01h 37m 26s &   2.165 GiB & 43,823,837 & 63,814,675 \\
- 6 & 8 & \cmark & \cmark & 0d 19h 11m 18s &   1.661 GiB & 29,477,628 & 42,884,902 \\
- 7 & 4 & \cmark & \cmark & 0d 13h 08m 39s &   1.165 GiB & 24,177,851 & 34,542,519 \\
- 7 & 5 & \cmark & \cmark & 0d 18h 06m 51s &   2.710 GiB & 56,513,009 & 80,872,284 \\
- 7 & 6 & \cmark & \cmark & 0d 21h 58m 09s &   2.232 GiB & 43,666,746 & 63,393,269 \\
- 7 & 7 & \cmark & \cmark & 0d 09h 54m 19s &   1.325 GiB & 21,597,288 & 31,636,624 \\
- 7 & 8 & \cmark & \cmark & 0d 01h 19m 46s &   1.868 GiB & 32,544,240 & 47,705,989 \\
- 8 & 5 & \cmark & \cmark & 0d 18h 47m 33s &   1.920 GiB & 34,674,437 & 49,764,609 \\
- 8 & 6 & \cmark & \cmark & 0d 21h 44m 43s &   1.673 GiB & 27,322,466 & 39,391,070 \\
- 8 & 7 & \cmark & \cmark & 0d 19h 26m 36s &   2.341 GiB & 41,430,202 & 60,645,780 \\
- 8 & 8 & \cmark & \cmark & 0d 15h 10m 20s &   1.875 GiB & 32,448,499 & 47,719,471 \\
+  4 & 4 & \cmark & \xmark & 0d 22h 20m 49s & 355.629 MiB &  2,186,233 &  3,106,667 \\
+  4 & 5 & \cmark & \xmark & 0d 06h 12m 25s & 423.626 MiB &  3,566,153 &  5,082,283 \\
+  4 & 6 & \cmark & \xmark & 0d 11h 54m 24s & 423.626 MiB &  3,566,153 &  5,082,283 \\
+  4 & 7 & \cmark & \xmark & 0d 09h 18m 26s & 425.140 MiB &  3,566,153 &  5,082,283 \\
+  4 & 8 & \cmark & \xmark & 0d 17h 20m 09s & 425.802 MiB &  3,566,153 &  5,082,283 \\
+  5 & 4 & \cmark & \xmark & 0d 22h 15m 19s & 676.191 MiB & 14,414,316 & 20,461,355 \\
+  5 & 5 & \cmark & \xmark & 0d 00h 43m 23s & 946.133 MiB & 18,464,501 & 26,478,511 \\
+  5 & 6 & \cmark & \xmark & 0d 00h 58m 58s &   1.110 GiB & 22,370,585 & 32,229,064 \\
+  5 & 7 & \cmark & \xmark & 0d 11h 12m 39s &   1.129 GiB & 23,450,038 & 33,768,964 \\
+  5 & 8 & \cmark & \xmark & 0d 11h 56m 12s &   1.133 GiB & 23,493,087 & 33,820,835 \\
+  6 & 4 & \cmark & \xmark & 0d 16h 15m 13s &   1.966 GiB & 59,737,607 & 85,317,813 \\
+  6 & 5 & \cmark & \xmark & 0d 02h 39m 50s &   2.233 GiB & 49,326,908 & 71,167,602 \\
+  6 & 6 & \cmark & \xmark & 0d 21h 08m 24s &   1.849 GiB & 37,313,775 & 54,202,176 \\
+  6 & 7 & \cmark & \cmark & 0d 01h 37m 26s &   2.165 GiB & 43,823,837 & 63,814,675 \\
+  6 & 8 & \cmark & \cmark & 0d 19h 11m 18s &   1.661 GiB & 29,477,628 & 42,884,902 \\
+  7 & 4 & \cmark & \cmark & 0d 13h 08m 39s &   1.165 GiB & 24,177,851 & 34,542,519 \\
+  7 & 5 & \cmark & \cmark & 0d 18h 06m 51s &   2.710 GiB & 56,513,009 & 80,872,284 \\
+  7 & 6 & \cmark & \cmark & 0d 21h 58m 09s &   2.232 GiB & 43,666,746 & 63,393,269 \\
+  7 & 7 & \cmark & \cmark & 0d 09h 54m 19s &   1.325 GiB & 21,597,288 & 31,636,624 \\
+  7 & 8 & \cmark & \cmark & 0d 01h 19m 46s &   1.868 GiB & 32,544,240 & 47,705,989 \\
+  8 & 5 & \cmark & \cmark & 0d 18h 47m 33s &   1.920 GiB & 34,674,437 & 49,764,609 \\
+  8 & 6 & \cmark & \cmark & 0d 21h 44m 43s &   1.673 GiB & 27,322,466 & 39,391,070 \\
+  8 & 7 & \cmark & \cmark & 0d 19h 26m 36s &   2.341 GiB & 41,430,202 & 60,645,780 \\
+  8 & 8 & \cmark & \cmark & 0d 15h 10m 20s &   1.875 GiB & 32,448,499 & 47,719,471 \\
+  9 & 4 & \NA    &        &                &             &            &            \\
+  9 & 5 & \NA    &        &                &             &            &            \\
+  9 & 6 & \NA    &        &                &             &            &            \\
+  9 & 7 & \NA    &        &                &             &            &            \\
+  9 & 8 & \NA    &        &                &             &            &            \\
+ 10 & 4 & \NA    &        &                &             &            &            \\
+ 10 & 5 & \NA    &        &                &             &            &            \\
+ 10 & 6 & \NA    &        &                &             &            &            \\
+ 10 & 7 & \NA    &        &                &             &            &            \\
+ 10 & 8 & \NA    &        &                &             &            &            \\
+ 11 & 4 & \NA    &        &                &             &            &            \\
+ 11 & 5 & \NA    &        &                &             &            &            \\
+ 11 & 6 & \NA    &        &                &             &            &            \\
+ 11 & 7 & \NA    &        &                &             &            &            \\
+ 11 & 8 & \NA    &        &                &             &            &            \\
+ 12 & 4 & \NA    &        &                &             &            &            \\
+ 12 & 5 & \NA    &        &                &             &            &            \\
+ 12 & 6 & \NA    &        &                &             &            &            \\
+ 12 & 7 & \NA    &        &                &             &            &            \\
+ 12 & 8 & \NA    &        &                &             &            &            \\
 
 \bottomrule
 
 \end{tabular}
 
-\end{table}
+\normalsize

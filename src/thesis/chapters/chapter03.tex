@@ -205,10 +205,19 @@ No indepotent operations, each operation advances protocol state towards transit
 \section{Security}\label{sec:LTL-security}}
 
 
+\hypertarget{hlt-as-ltl}{%
+\subsection{Termination as LTL}\label{hlt-as-ltl}}
+
+\begin{LTL}[\,\LTLPredicate{HLT}\,]
+    $$
+    \Diamond \texttt{CGKA@end\_of\_game}
+    $$
+\end{LTL}
+
 \hypertarget{pcs-as-ltl}{%
 \subsection{\Abrev{PCS} as LTL}\label{pcs-as-ltl}}
 
-\begin{LTL}[\,\Abrev{PCS}\,]
+\begin{LTL}[\,\LTLPredicate{PCS}\,]
     $$
     \Box \Big(\, ( \texttt{CGKA@start\_of\_epoch} \land \texttt{unsafeIDs} = 0 ) \implies \neg \texttt{learnedKey[epoch]} \Big)
     $$
@@ -216,7 +225,7 @@ No indepotent operations, each operation advances protocol state towards transit
 
 
 \hypertarget{fsu-as-ltl}{%
-\subsection{FSU as LTL}\label{fsu-as-ltl}}
+\subsection{\Abrev{FSU} as LTL}\label{fsu-as-ltl}}
 
 \begin{LTL}[\;Never-Trivial\;]
     $$
@@ -233,9 +242,8 @@ No indepotent operations, each operation advances protocol state towards transit
     \end{equation*}
 \end{LTL}
 
-\begin{LTL}[\;FSU\;]
+\begin{LTL}[\,\LTLPredicate{FSU}\,]
     $$
-    \textbf{Never-Trivial} \implies \bigwedge\limits_{t=0}^{T} \;\,\textbf{FSU-Epoch}(t)
+    \textbf{Never-Trivial} \implies \bigwedge\limits_{t=0}^{T-1} \;\,\textbf{FSU-Epoch}(t)
     $$
 \end{LTL}
-k

@@ -1,0 +1,128 @@
+\documentclass{article}
+
+\usepackage[paperwidth=20cm, paperheight=30cm, margin=0mm]{geometry}
+
+\usepackage{tikz}
+
+\usetikzlibrary{shapes,arrows,positioning}
+
+% Title Page
+\title{}
+\author{}
+
+\renewenvironment{abstract}
+{\small
+	\begin{center}
+		\bfseries \abstractname\vspace{-.5em}\vspace{0pt}
+	\end{center}
+	\list{}{%
+		\setlength{\leftmargin}{5cm}
+		\setlength{\rightmargin}{\leftmargin}%
+	}%
+	\item\relax}
+{\endlist}
+
+
+\begin{document}
+
+\vspace*{1cm}
+
+\begin{abstract}
+In the following model, a $( \textbf{T}, \textbf{C}, \textbf{N} )$-attacker is an attacker $\mathcal{A}$ that runs in time of at most $\textbf{T}$ epochs, makes at most $\textbf{C}$ challenge queries (but to limited one per epoch), and never produces a group with more than $\textbf{N}$ members.
+The attacker wins the CGKA security game if they correctly guesses the random bit $b$ in the end and the safety predicate $P$ evaluates to true on the queries made by the attacker.\\
+
+In the control flow graph below, yellow nodes make nondeterministic choices, and dashed lines represent a nondeterministic path chosen by the origin node.
+\end{abstract}
+
+\vspace*{1cm}
+
+\tikzstyle{block} = [rectangle, draw, fill=green!40, text width=11em, text centered, minimum height=4em, node distance=3cm]
+
+\tikzstyle{cloud} = [ellipse, draw, fill=yellow!60, text width=11em, text centered, node distance=3cm]
+
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, text width=4.5em, text badly centered, node distance=2.5cm, inner sep=0pt]
+
+\tikzstyle{line} = [draw, thick, color=black!50, -latex']
+
+\tikzstyle{choice} = [draw, thick,dash pattern={on 7pt off 2pt on 1pt off 3pt}, color=black!50, -latex']
+
+\centering
+\begin{tikzpicture}[ node distance = 2cm and 3cm, auto]
+	\node[block, anchor=west] (I1) {Fix upper limits:\\\textbf{T} $\in \mathcal{Z}^+$\\\textbf{C} $\in \left\{ 1 \dots \textbf{T} \right\} \subset \mathcal{Z}^+$\\\textbf{N} $\in \mathcal{Z}^+ \setminus \left\{ 1 \right\}$};
+	\node[cloud, below of=I1] (I2) {Select parameter values:\\$T^{*} \in \left\{ 1 \dots \textbf{T} \right\} \subset \mathcal{Z}^+$\\$C^{*} \in \left\{ 1 \dots \textbf{C} \right\} \subset \mathcal{Z}^+$\\$N^{*} \in \left\{ 2 \dots \textbf{N} \right\} \subset \mathcal{Z}^+$};
+	\node[block, below of=I2] (I3) {Initialize Global State\\$t \gets 0$\\$c \gets 0$\\$M \gets \emptyset$\\};
+	\node[block, below of=I3] (I4) {Create Messaging Group\\$G \gets \left\{ ID_0, ID_1, \dots ID_{N^{*}}\right\}$\\};
+	\node[cloud, below of=I4] (Game) {Play CGKA Game\\$t \gets t + 1$};
+	\node[cloud, below of=Game] (Attack) {Attacker Challenges\\$c \gets c + 1$};
+	\node[block, below of=Attack] (Check) {Safety Check\\ LTL statements apply here};
+	
+	\node[block, above right=2cm    and 1cm    of Game] (Add) {Add group member};
+	\node[block, above right=0.15cm and 3.25cm of Game] (Rmv) {Remove group member};
+	\node[block, below right=0.15cm and 3.25cm of Game] (Upd) {Update secrets};
+	\node[block, below right=2cm    and 1cm    of Game] (Dlv) {Deliver message};
+
+	\node[block, above left=2cm    and 1cm    of Attack] (Corrupt) {Corrupt a member};
+    \node[block, above left=0.15cm and 3.25cm of Attack] (Hoard) {Stop secret deletion};
+    \node[block, below left=0.15cm and 3.25cm of Attack] (Reveal) {Reveal root secret};
+			
+	\path[line](I1)--(I2);
+	\path[line](I2)--(I3);
+	\path[line](I3)--(I4);
+	\path[line](I4)--(Game);
+	\path[line](Game)  edge node {iff $\textbf{\textit{t}} > \textbf{\textit{T}}^{*}$} (Attack);
+	\path[line](Attack)edge node {iff $\textbf{\textit{c}} > \textbf{\textit{C}}^{*}$} (Check);
+	
+	\path[choice](Game)-|(Add);
+	\path[choice](Game)-|(Rmv);
+	\path[choice](Game)-|(Upd);
+	\path[choice](Game)-|(Dlv);
+	\path[line](Add)--(Game);
+	\path[line](Rmv)--(Game);
+	\path[line](Upd)--(Game);
+	\path[line](Dlv)--(Game);
+
+	\path[choice](Attack)-|(Corrupt);
+	\path[choice](Attack)-|(Hoard);
+	\path[choice](Attack)-|(Reveal);
+	\path[line](Corrupt)--(Attack);
+    \path[line](Hoard)--(Attack);
+	\path[line](Reveal)--(Attack);
+
+
+\end{tikzpicture}
+%
+%Fix the following limits:
+%\begin{itemize}
+%	\item \textbf{T} $\in \mathcal{Z}^+$ 
+%	\item \textbf{C} $\in \left\{ 1 \dots \textbf{T} \right\} \subset \mathcal{Z}^+$ 
+%	\item \textbf{N} $\in \mathcal{Z}^+ \setminus \left\{ 1 \right\}$
+%\end{itemize}
+%
+%
+%Select parameter values:
+%\begin{itemize}
+%	\item $T^{*} \in \left\{ 1 \dots \textbf{T} \right\} \subset \mathcal{Z}^+$ 
+%	\item $C^{*} \in \left\{ 1 \dots \textbf{C} \right\} \subset \mathcal{Z}^+$ 
+%	\item $N^{*} \in \left\{ 2 \dots \textbf{N} \right\} \subset \mathcal{Z}^+$ 
+%\end{itemize}
+%
+%Initialize Global State\\
+%$t \gets 0$\\
+%$c \gets 0$\\
+%$M \gets \emptyset$\\
+%
+%Create Messaging Group\\
+%$G \gets \left\{ ID_0, ID_1, \dots ID_{N^{*}}\right\}$\\
+%
+%Play CGKA Game\\
+%$t \gets t + 1$\\
+%
+%Attacker Challenges\\
+%$c \gets c + 1$\\
+%
+%Safety Check\\
+%$safe \gets \texttt{Safe(M,)}$
+
+
+
+\end{document}          

@@ -31,6 +31,9 @@ dir-binaries         ?= ./
 dir-documents        ?= ./
 dir-thesis-utilities ?= ./
 dir-make-definitions ?= ./
+dir-marshalcy-config ?= $(dir-documents)marshalcy/
+ext-marshalcy-config := .config
+def-marshalcy-config := subdivision
 
 #######
 ###
@@ -50,11 +53,16 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 ###
 #######
 
-filename-batcher := cluster-send-batch
-filepath-batcher := $(abspath $(dir-binaries)$(filename-batcher))
+ref-marshalcy-config := $(def-marshalcy-config)
+ifdef marshalcy
+ref-marshalcy-config := $(marshalcy)
+endif
 
-filename-mandate := mandate.config
-filepath-mandate := $(abspath $(dir-documents)$(filename-mandate))
+filename-batcher   := cluster-send-batch
+filepath-batcher   := $(abspath $(dir-binaries)$(filename-batcher))
+
+filename-marshalcy := $(ref-marshalcy-config)$(ext-marshalcy-config)
+filepath-marshalcy := $(abspath $(dir-marshalcy-config)$(filename-marshalcy))
 
 #######
 ###
@@ -78,7 +86,7 @@ install:: $(filepath-batcher)
 
 .PHONY: cluster-batch-jobs cluster-batcher
 
-cluster-batch-jobs: $(filepath-batcher) $(filepath-mandate)
+cluster-batch-jobs: $(filepath-batcher) $(filepath-marshalcy)
 	$< $(lastword $^)
 
 cluster-batcher: $(filepath-batcher)
@@ -91,6 +99,5 @@ cluster-batcher: $(filepath-batcher)
 
 $(filepath-batcher): $(dir-thesis-utilities)
 	( cd $(dir-thesis-utilities); cabal install $(notdir $@) --installdir=$(dir $@) --install-method=copy; )
-
 
 endif # IMPORT_MAKE_BATCH
