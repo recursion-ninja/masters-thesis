@@ -37,6 +37,14 @@ The IETF states that MLS in practice should support approximately 50,000 partici
 This work parametrizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
 In practice, this means the results presented for a specified \(T_{max}\) and \(N_{max}\) only provide verification of security against \((T, C, N)\)-attackers for all \(T \in [1, T_{max}]\), \(C \in [1, T]\) and \(N \in [2, N_{max}]\).
 
+Referring back to the verification hypotheses in Table \ref{tab:verification-hypotheses}, any outcome which falsifies a hypothesis is an interesting result.
+If a counter-example is produced violating \Abrev{PCS} for either version of the protocol, then a previously unknown security defect for TreeKEM has been discovered.
+If a counter-example is produced violating \Abrev{FSU} for the revised \VersionTwo, this also discovers a security defect.
+The original \VersionOne has been shown to have a \Abrev{FSU} deficiency for a \((12, 12, 8)\)-attacker \(\mathcal{A}\) \autocite{alwen2020security}.
+Hence a successful \Abrev{FSU} verification for the original \VersionOne with parameters corresponding to \(\mathcal{A}\) indicates either an in the model.
+In order to ensure at least one observation of the \Abrev{FSU} deficiency of the original \VersionOne, the bounds are set to \(12 = T_{max}\) and \(8 = N_{max}\).
+The observed verification results are tabulated in Appendix \ref{apx:Observations} and discussed in Chapter \ref{results}.
+
 
 \hypertarget{explicit-state-model-checking}{%
 \section{Explicit state model checking}\label{explicit-state-model-checking}}
@@ -105,7 +113,7 @@ However, PROMELA also differs from C in important ways which facilitate explicit
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- Deterministic operations}
+\caption{PROMELA example --- deterministic operations}
 \begin{verbatim}
 // type  identifier   value    range
 bool     BitVar     = true; // [0, 1]
@@ -148,7 +156,7 @@ However, the nondeterministic nature of these conditional constructs provide muc
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- Non-deterministic choice via \texttt{if}}
+\caption{PROMELA example --- non-deterministic choice via \texttt{if}}
 \begin{verbatim}
 BitVar = true;
 NonNeg = 8;
@@ -165,7 +173,7 @@ fi
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- Non-deterministic repetition via \texttt{do}}
+\caption{PROMELA example --- non-deterministic repetition via \texttt{do}}
 \begin{verbatim}
 BitVar = true;
 NonNeg = 8;
@@ -189,7 +197,7 @@ The expressive power provided by PROMELA's \texttt{if}, \texttt{do}, and \texttt
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- Non-determinisim via \texttt{select}}
+\caption{PROMELA example --- non-determinisim via \texttt{select}}
 \begin{verbatim}
 byte RandomArray[16];
 byte i;
@@ -258,7 +266,7 @@ Labels prefixed with \texttt{progress} identify states which the program must tr
 Finally, a labeled state may be referenced in an \Abrev{LTL} predicate.
 
 \begin{figure}
-\caption{PROMELA example --- State labels}
+\caption{PROMELA example --- state labels}
 \begin{verbatim}
 byte NumArray[6];
 int  prod = 0;

@@ -1,15 +1,19 @@
 \hypertarget{results}{%
 \chapter{Preliminary Results}\label{results}}
 
-Here the verification results for the models \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{} are presented.
+Here the resulting verification observations for the models \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{} are discussed.
 As described above in chapter \ref{sec:model-formalization}, the verification of the models are bounded, and hold only for the protocol prefixes up to \( T_{max} \) with at most \( N_{max }\) group members.
 Verification was performed on each parameter combination for \CGKAmod{P}{T}{N} parameterized by \( \mathtt{P} \in \{\, \VersionOne ,\, \VersionTwo \,\} \), \( T \in [\,4,\, T_{max} \,] \), and \( N \in [\,2,\, N_{max} \,] \).
-At the time of submitting this thesis draft, not all verification prcoesses have completed, and are indicated by a \NA in table entries.
+The domain of each \CGKAmod{P}{T}{N} model parameter is listed in Table \ref{tab:model-param-domain}.
+All observed verification results are tabulated in Appendix \ref{apx:Observations}.
+At the time of submitting this thesis draft, a cursory glance will reveal that not all verification prcoesses have completed.
+These planned but incomplete observations are indicated by a \NA in table entries.
+
 
 \hypertarget{performance-tuning}{%
 \section{Performance Tuning}\label{performance-tuning}}
 
-Prior to the verification results of LTL predicates on \CGKAmod{}{}{}, the performance and scaling of the verification efforts are contextualized.
+The performance and scaling of the verification efforts for \CGKAmod{}{}{} are contextualized.
 Both time and memory constraints must be considered and a morderately comprehensive understanding of the verification tool Spin is required to correctly tune performance.
 Spin supports many compile-time directives which allows for specifying the possible time-memory trade-off strategies which are desirable when verifying the specific model.
 Not all compile time directives are compatible with all models.
@@ -179,24 +183,72 @@ Table \ref{tab:state-vector-len} displays the state vector's byte length for eac
 \hfill
 \end{table}
 
+\hypertarget{scalability-limits}{%
+\subsection{Scalability Limits}\label{scalability-limits}}
 
-\hypertarget{verification-outcomes}{%
-\section{Verification Outcomes}\label{verification-outcomes}}
+The state-vector lengths detailed in Table \ref{tab:state-vector-len} and columns observing verification performance within Appendix \ref{apx:Observations} provide an initial basis for interpreting the scalability of the \CGKAmod{P}{T}{N} model.
+The records of all these tables are currently incomplete, missing entries for protocol \VersionOne with larger \(T\) and \(N\) parameters, and missing protocol \VersionTwo entirely.
+Still some scaling information can be gleaned.
 
-The simplest of the three \Abrev{LTL} predicates defined in Section \ref{sec:LTL-security} is \LTLPredicate{HLT}.
-The verification of \LTLPredicate{HLT} is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
-While \LTLPredicate{HLT} is not truly a security property of \CGKAmod{}{}{}, it is used as a sanity check to ensure that the model verification is being performed correctlt on more complex \Abrev{LTL} predicates.
-Verification results for \LTLPredicate{HLT} is displayed in Table \ref{tab:V1-HLT}.
+It is easy to notice that a progression from \( (\,T,\, N\,) \) to \( (\,T+1,\, N\,) \) is more significant in memory usage than a progression from \( (\,T,\, N\,) \) to \( (\,T,\, N+4\,) \).
+The large jump in state-space and transition count between modeling successive epochs provides a secondary metric demonstrating this characteristic.
+Hence the number of epoch the model is verified for drives the memory usage.
+This intuitively makes sense, as each new epoch multiplicatively expands the diameter of the state-space.
+
+Interestingly, the verification runtime for \LTLPredicate{HLT} and \LTLPredicate{FSU} does not appear strongly correlated with the \(T\) and \(N\) parameters.
+The author does not have a definative explanation for this behavior.
+One postulate is that the group membership size limited to at most \(N\) has a strange combinatorial relationship with the distribution of membership states in TreeKEM's left balanced binary tree of secret keys.
+Since the attacker knowledge base and group membership alterations depend on the tree topologies permitted by the parameter \(N\), this may create a ``far-from-uniform'' distribution of state-spaces for different \(N\) values.
+
+
+\hypertarget{hypothesis-outcomes}{%
+\section{Hypothesis Testing}\label{hypothesis-outcomes}}
+
+By interpreting the observations collected in Appendix \ref{apx:Observations} one can disern whether the hypotheses enumerated in Table \ref{tab:verification-hypotheses} and described in Chapter \ref{sec:methodology} have been supported or falsified.
+Each hypothesis sill be considered individually, noting the interprative limitations imposed by the currently incomplete series of observations.
 
 
 \hypertarget{post-compromise-security}{%
-\section{Post Compromise Security}\label{post-compromise-security}}
+\subsection{Confidence Check}\label{post-compromise-security}}
+
+The simplest of the three \Abrev{LTL} predicates defined in Section \ref{sec:LTL-security} is \LTLPredicate{HLT}.
+The verification of \LTLPredicate{HLT} is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
+While \LTLPredicate{HLT} is not truly a security property of \CGKAmod{}{}{}, it is used as a methodology confidence check.
+Failure to verify \LTLPredicate{HLT} woiuld cast serious doubt that the model verification methodology is being performed correctly on more complex \Abrev{LTL} predicates.
+Verification results for \LTLPredicate{HLT} is displayed in Tables \ref{tab:V1-HLT} and \ref{tab:V2-HLT}.
+
+All observations in Tables \ref{tab:V1-HLT} and \ref{tab:V2-HLT} report a successful verification of \LTLPredicate{HLT}.
+These observations support the notion \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) and none falsify it.
+From the observations obtained so far, one can conclude that the confidence check which has successfully verified \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) does not introduce any doubt regarding the verification methodology.
+
+
+\hypertarget{post-compromise-security}{%
+\subsection{Post Compromise Security}\label{post-compromise-security}}
+
+The hypotheses listed in Table \ref{tab:verification-hypotheses} show an expectation that \Abrev{PCS} should be verifiable for both \VersionOne and \VersionTwo protocols.
+
+With regards to the first protocol \VersionOne, all observations in Table \ref{tab:V1-PCS} report a either successful verification of \LTLPredicate{PCS} or an ``out of memory'' error (\OutOfMemory).
+With no observation falsify the hypothesis, these limited observations provide only support for the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
+Thought the hypothesis is supported by the current observations, gathering more observations of increasingly complex \CGKAmod{\VersionOne}{}{} parameterization should be gathered before making security conclusions.
+
+Unfortunately there are no current observations for protocol \VersionTwo shown in Table \ref{tab:V-PCS} and consequently no support for, or falsification of the hypothesis.
+No security conclusions should be derived until the planned observation set can be completely gathered. 
 
 
 \hypertarget{future-secrecy}{%
-\section{Future Secrecy}\label{future-secrecy}}
+\subsection{Future Secrecy}\label{future-secrecy}}
 
+As indicated in Table \ref{tab:verification-hypotheses}, the first protocol \VersionOne is known to have a \Abrev{FSU} security deficiency, so the hypothesis is that verification of \LTLPredicate{FSU} should be fail for \emph{at least} \CGKAmod{\VersionOne}{12}{8}.
+While prior work \autocite{alwen2020security} indicates \( \CGKAmod{\VersionOne}{12}{8} \not \models \LTLPredicate{FSU} \), it is possible that a simpler model with lower \(T\) and/or \(N\) parameters may exist which also demonstrates the \Abrev{FSU} security deficiency.
+Similarly, there may be many \CGKAmod{\VersionOne}{T}{N} models with simpler \(T\) and \(N\) parameters which verify \LTLPredicate{FSU}.
+The aforementioned single \Abrev{FSU} security deficiency example point does not delineate a boundary at which \((T, C, N)\)-attacker does not demonstrate advantage but a \((T+1, C, N)\)-attacker or a \((T, C, N+1)\)-attacker is able to demonstrate advantage for the original protocol \VersionOne.
+Verifcation observations related to \LTLPredicate{FSU} ought to be the most intriguing.
 
-\hypertarget{scalability-limits}{%
-\section*{Scalability Limits}\label{scalability-limits}}
-\addcontentsline{toc}{subsection}{Scalability Limits}
+Table \ref{tab:V1-FSU} reports only successful verification of \LTLPredicate{FSU}.
+However, the observations are not complete and most importantly, do not include \CGKAmod{\VersionOne}{12}{8}.
+Without knowledge of where in the \CGKAmod{\VersionOne}{T}{N} model parameter space the \Abrev{FSU} security deficiency manifests, the observations do not provide any support for or falsification of the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
+A verification observation for \CGKAmod{\VersionOne}{12}{8} would provide additional context and permit a deduction regarding the models relationship towards the hypothesis.
+The current observations do not reveal any security conclusions.
+
+As with \Abrev{PCS}, there are also currently no \LTLPredicate{FSU} observations for protocol \VersionTwo shown in Table \ref{tab:V2-FSU} and consequently no support for, or falsification of the hypothesis.
+No security conclusions should be derived until the planned observation set can be completely gathered.

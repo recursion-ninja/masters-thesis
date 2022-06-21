@@ -1,19 +1,28 @@
-\chapter{Appendix: Observations}
+\hypertarget{apx:Observations}{%
+\chapter{Appendix: Observations}\label{apx:Observations}}
+
 
 \newcommand{\ObservationTable}[2]{%
 \begin{table}[h!]
   \centering
   \label{tab:V#1-#2}
-  \caption{Observations for $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{#2}$}
+  \caption{Observations for $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{#2}$.}
   \subimport{../tables/}{results-V#1-#2-PRELIM}
 \end{table}
 }
 
 \begin{table}[h!]
   \centering
+  \label{tab:model-param-domain}
+  \caption{Verification domain of \( \CGKAmod{P}{T}{N} \models \varphi \) parameters.}
+  \subimport{../tables/}{model-param-domain}
+\end{table}
+
+\begin{table}[h!]
+  \centering
   \label{tab:table-legend}
   \caption{Legend of symbols appearing in tables}
-  \subimport{../tables/}{tabular-legend.tex}
+  \subimport{../tables/}{tabular-legend}
 \end{table}
 
 \ObservationTable{1}{HLT}

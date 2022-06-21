@@ -2,17 +2,17 @@
 \chapter{Model Formalization}\label{sec:model-formalization}}
 
 The verification results of a model have no bearing on TreeKEM unless the model is a faithful and equivalent translation of the protocol.
-To verify the TreeKEM protocol, the \CGKAdef is used to derive the model for verification.
-Proof that the TreeKEM protocol is a \Abrev{CGKA} protocol, as well as proof that results of the \CGKAdef for any \Abrev{CGKA} protocol are valid for \Abrev{FSU} and \Abrev{PCS}, have already been produced \autocite{alwen2020security}.
-Formalizing and justifying the equivalence of this work's modeling of both the \CGKAdef and the side channel attacker knowledge gained while observing the TreeKEM protocol, is pivotal to the soundness of verifying \Abrev{FSU} and \Abrev{PCS} for TreeKEM.
+To verify the TreeKEM protocol, the \CGKAsec is used to derive the model for verification.
+Proof that the TreeKEM protocol is a \Abrev{CGKA} protocol, as well as proof that results of the \CGKAsec for any \Abrev{CGKA} protocol are valid for \Abrev{FSU} and \Abrev{PCS}, have already been produced \autocite{alwen2020security}.
+Formalizing and justifying the equivalence of this work's modeling of both the \CGKAsec and the side channel attacker knowledge gained while observing the TreeKEM protocol, is pivotal to the soundness of verifying \Abrev{FSU} and \Abrev{PCS} for TreeKEM.
 
 Within this chapter we will formalize a parameterized model \CGKAmod{P}{T}{N}.
 For a given LTL predicate $\varphi$ we define \CGKAmod{P}{T}{N} as follows:
 
 \[
 \begin{split}
-\CGKAmod{P}{T}{N}\quad\models\quad& \varphi \textrm{ iff }\quad\forall t \in [1, T],\, n \in [2, N], c \in [1, T]\\
-  & \varphi \textrm{ holds in all possible \CGKAsec\!s}\\
+\CGKAmod{P}{T}{N}\quad\models\quad& \varphi \;\;\;\textrm{ iff }\;\;\;\forall\; t \in [1, T],\, n \in [2, N],\, c \in [1, T]\\
+  & \varphi \textrm{ holds in all possible \CGKAsec\!\!s}\\
   & \textrm{with a \CGKAdef complatible protocol } \mathtt{P}\\
   & \textrm{played by an } (t, c, n)\textrm{-attacker}
 \end{split}
@@ -22,9 +22,9 @@ For a given LTL predicate $\varphi$ we define \CGKAmod{P}{T}{N} as follows:
 \hypertarget{sec:game-adaptations}{%
 \section{CGKA game formalization}\label{sec:game-adaptations}}
 
-Many novel techniques were used when formalizing the abstractly defined \CGKAdef to a rigorous and model suitable for explicit state model checking.
-The \CGKAdef is originally defined informally as a massively concurrent game, without a bounded win condition as shown in Figure \ref{fig:CGKA-informal}.
-This is not always problematic for explicit state model checking, but regrettably it is with regards to \CGKAdef.
+Many novel techniques were used when formalizing the abstractly defined \CGKAsec to a rigorous and model suitable for explicit state model checking.
+The \CGKAsec is originally defined informally as a massively concurrent game, without a bounded win condition as shown in Figure \ref{fig:CGKA-informal}.
+This is not always problematic for explicit state model checking, but regrettably it is with regards to \CGKAsec.
 
 Within the CGKA game the attacker makes a series of queries to the available oracles.
 Queries to oracles drive the \Abrev{CGKA} protocol's state over time, however, when playing the game as originally defined there are no guaranteed limits on total attacker queries to all oracles.
@@ -50,12 +50,12 @@ This follows from the following three facts.
 
 While explicit state model checking is sophisticated, it ultimate reduces to an exhaustive search which uses a myriad of techniques to cleverly reduce the search space.
 There does not exist an general technique for reducing an unbounded, potentially infinite, search space to a finite one, as this would yield a solution to the halting problem.
-Considerable thought was given towards identifying a specific unbounded-to-finite reduction for the \CGKAdef, but the author is unable to present such a technique in this work.
-Instead, different techniques are presented to ``truncate'' an equivalent finite ``prefix'' of the \CGKAdef.
-In terms of a \((T, C, N)\)-attacker \(\mathcal{A}\), verification is performed from epochs $0$ to \(T_{max}\), truncating the \CGKAdef to all prefix sequences containing at most \(T_{max}\) epochs.
+Considerable thought was given towards identifying a specific unbounded-to-finite reduction for the \CGKAsec, but the author is unable to present such a technique in this work.
+Instead, different techniques are presented to ``truncate'' an equivalent finite ``prefix'' of the \CGKAsec.
+In terms of a \((T, C, N)\)-attacker \(\mathcal{A}\), verification is performed from epochs $0$ to \(T_{max}\), truncating the \CGKAsec to all prefix sequences containing at most \(T_{max}\) epochs.
 
-The model of \CGKAdef for the TreeKEM protocol described subsequently in this chapter, is be parameterized by $t \in \{ 0, T_{max} \}$.
-Model parameterization by $t$ means that the \CGKAdef is played until epoch $t$ is reached, at which point play continues \emph{without} advancing to epoch $t+$, with the attacker eventually ending the game with a call to \Oracle{deliver}{}.
+The model of \CGKAsec for the TreeKEM protocol described subsequently in this chapter, is be parameterized by $t \in \{ 0, T_{max} \}$.
+Model parameterization by $t$ means that the \CGKAsec is played until epoch $t$ is reached, at which point play continues \emph{without} advancing to epoch $t+$, with the attacker eventually ending the game with a call to \Oracle{deliver}{}.
 Verification for the finite \CGKAsec prefixes less than or equal to \(T_{max}\) requires $|\{ 0, T_{max} \}|$ separate verification runs, one for verifying the CGKA model parameterized by each possible $t$ value with $t \in \{ 0, T_{max} \}$.
 While simple and effective, this approach does involve duplicate verification work, with the verification of the model for $t$ being an optimal substructure for verifying the model parameterized by $t+1$.
 The work presented here does not attempt memoization of sub-problems, though this is theoretically and practically possible with additional engineering effort.
@@ -77,11 +77,11 @@ The work presented here does not attempt memoization of sub-problems, though thi
 \subsection{Exhaustiveness}\label{exhaustiveness}}
 
 Verification through explicit state model checking relies on exhaustiveness as it's proof method.
-However, the definition of the \CGKAdef had no notion of considering every possible interleaving of actions when created.
+However, the definition of the \CGKAsec had no notion of considering every possible interleaving of actions when created.
 Instead, it was defined in a manner which made existential proofs easy to describe and reason about.
 Proofs and counterexamples from previous works \autocite{alwen2019double}, \autocite{alwen2020security} take the form of scrutinizing the existence of a sequence of queries made by the attacker.
-This existential focus permits leniency for redundancy within the \CGKAdef definition.
-Conversely, modeling the \CGKAdef such that it is amenable to explicit state model checking demands absolute parsimony within definition.
+This existential focus permits leniency for redundancy within the \CGKAsec definition.
+Conversely, modeling the \CGKAsec such that it is amenable to explicit state model checking demands absolute parsimony within definition.
 Considering the CGKA games definition through the lens an exhaustive state-space search, both conveniently and surprisingly, leads to many possible game simplifications.
 Because all states are considered, equivalent or superfluous sequences can be reasoned about, identified, and collapsed.
 
@@ -213,6 +213,13 @@ No indepotent operations, each operation advances protocol state towards transit
     \Diamond \texttt{CGKA@end\_of\_game}
     $$
 \end{LTL}
+
+We consider the \Abrev{LTL} predicate \LTLPredicate{HLT}, which indicates that the \CGKAmod{P}{T}{N} model always terminates.
+To support this verification, a state label \texttt{end\_of\_game} has been included in the PROMELA model indicating the final state of the \CGKAsec. 
+The model has a single control process for the \CGKAsec named \texttt{CGKA}.
+An \Abrev{LTL} atom \texttt{CGKA@end\_of\_game} is true if an only if the process \texttt{CGKA} is at state \texttt{end\_of\_game}.
+With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \models \LTLPredicate{HLT} \) is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
+
 
 \hypertarget{pcs-as-ltl}{%
 \subsection{\Abrev{PCS} as LTL}\label{pcs-as-ltl}}
