@@ -13,9 +13,7 @@ versio
 bibfile
 
 # Citation references in markdown
-\[\@
-[\w\-\.\:]
-+\]
+\[\@[\w\-\.\:]+\]
 
 # URL matcher
 (((ht|f)tp(s?))\://)?(www.|[a-zA-Z].)?[a-zA-Z0-9\-\.]+\.\w+(\:[0-9]+)*(/($|[a-zA-Z0-9\.\,\;\?\'\\\+&amp;%\$#\=~_\-]+))*
