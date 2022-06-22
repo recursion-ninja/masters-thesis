@@ -18,7 +18,6 @@ SGM
 SSL
 TLS
 TODO
-
 # CGKA game terms:
 CGKA
 chall
@@ -27,3 +26,19 @@ upd
 rmv
 proc
 del
+# Abreviations
+AS
+DS
+SM
+SGM
+LTL
+MLS
+ART
+FS
+FSU
+PCS
+CGKA
+IETF
+ITM
+LBBT
+

@@ -7,6 +7,8 @@
 \\texttt
 \\times
 \\normalfont
+\llparenthesis
+\rrparenthesis
 versio
 
 # Citation references in markdown
@@ -17,3 +19,27 @@ versio
 
 
 # ((ht|f)tp(s?)\://)?([\w\-]+\.)+(\w\w+)(\:[0-9]+)?(/[a-zA-Z0-9\.\,\;\?\'\$#\=~_\-]+)*/? 
+
+%------------------------------------- Custom *Term* definitions ---------------
+% Shorthands for: CGKA 
+\xspace
+\CGKAsec
+\CGKAdef
+\CGKAmod
+\VersionAny
+\VersionOne
+\VersionTwo
+\Protocol
+\Oracle
+\OutOfMemory
+\MinimizedDFA
+\NA
+\cmark
+\xmark
+\LTLPredicate
+\siBytes
+\siMiBytes
+\siGiBytes
+\Abrev
+\DefineAbreviation
+%------------------------------------- Custom *Term* definitions ---------------
