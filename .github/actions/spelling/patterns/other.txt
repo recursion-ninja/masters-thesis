@@ -22,24 +22,24 @@ versio
 
 %------------------------------------- Custom *Term* definitions ---------------
 % Shorthands for: CGKA 
-\xspace
-\CGKAsec
-\CGKAdef
-\CGKAmod
-\VersionAny
-\VersionOne
-\VersionTwo
-\Protocol
-\Oracle
-\OutOfMemory
-\MinimizedDFA
-\NA
-\cmark
-\xmark
-\LTLPredicate
-\siBytes
-\siMiBytes
-\siGiBytes
-\Abrev
-\DefineAbreviation
+\\xspace
+\\CGKAsec
+\\CGKAdef
+\\CGKAmod
+\\VersionAny
+\\VersionOne
+\\VersionTwo
+\\Protocol
+\\Oracle
+\\OutOfMemory
+\\MinimizedDFA
+\\NA
+\\cmark
+\\xmark
+\\LTLPredicate
+\\siBytes
+\\siMiBytes
+\\siGiBytes
+\\Abrev
+\\DefineAbreviation
 %------------------------------------- Custom *Term* definitions ---------------

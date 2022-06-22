@@ -158,7 +158,7 @@ Both the sequences originating with either \(\mathcal{A}\) querying an oracle or
 Due to the exhuastively methodology in verifying \CGKAmod{P}{T}{N}, both initiating epoch transitions options are explored, resulting in duplicate paths to the same epoch transition state.
 Hence, we can omit the group members from calling calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}, and without loss of generality, have \(\mathcal{A}\) query \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i}; respectively.
 
-We arrive at a formalized and reduced \CGKA{P}{T}{N} model for a$( \textbf{T}, \textbf{C}, \textbf{N} )$-attacker depicted in Figure \ref{fig:CGKA-old-flowchart}.
+We arrive at a formalized and reduced \CGKAmod{P}{T}{N} model for a$( \textbf{T}, \textbf{C}, \textbf{N} )$-attacker depicted in Figure \ref{fig:CGKA-old-flowchart}.
 Within the depiction, yellow nodes make nondeterministic choices, and dashed lines represent a nondeterministic path chosen by the origin node.
 
 \begin{figure}

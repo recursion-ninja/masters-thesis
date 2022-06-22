@@ -4,39 +4,39 @@
 	\node[blockOLD, below of=I2] (I3) {Initialize Global State\\$t \gets 0$\\$c \gets 0$\\$M \gets \emptyset$\\};
 	\node[blockOLD, below of=I3] (I4) {Create Messaging Group\\$G \gets \left\{ ID_0, ID_1, \dots ID_{N^{*}}\right\}$\\};
 	\node[cloudOLD, below of=I4] (Game) {Play CGKA Game\\$t \gets t + 1$};
-	\node[cloudOLD, below of=Game] (Attack) {Attacker Challenges\\Game Ends};
+	\node[cloudOLD, below right=2cm and 1cm of Game] (Attack)  {Attacker Gains\\Information};
+	\node[cloudOLD, below left= 2cm and 1cm of Game] (Advance) {Attacker Advances\\Epoch};
 	\node[blockOLD, below of=Attack] (Check) {Safety Check\\ LTL statements here};
 	
-	\node[blockOLD, above right=2cm    and 1cm    of Game] (Add) {Add group member};
-	\node[blockOLD, above right=0.15cm and 3.25cm of Game] (Rmv) {Remove group member};
-	\node[blockOLD, below right=0.15cm and 3.25cm of Game] (Upd) {Update secrets};
-	\node[blockOLD, below right=2cm    and 1cm    of Game] (Dlv) {Deliver message};
+	\node[blockOLD, below right=5.0cm and -6cm of Advance] (Add) {Add group member};
+	\node[blockOLD, below right=3.0cm and -4cm of Advance] (Rmv) {Remove group member};
+	\node[blockOLD, below right=1.0cm and -2cm of Advance] (Upd) {Update secrets};
 
-	\node[blockOLD, above left=2cm    and 1cm    of Attack] (Corrupt) {Corrupt a member};
-    \node[blockOLD, above left=0.15cm and 3.25cm of Attack] (Hoard) {Stop secret deletion};
-    \node[blockOLD, below left=0.15cm and 3.25cm of Attack] (Reveal) {Reveal root secret};
+%	\node[blockOLD, above left=2cm    and 1cm    of Attack] (Corrupt) {Corrupt a member};
+%    \node[blockOLD, above left=0.15cm and 3.25cm of Attack] (Hoard) {Stop secret deletion};
+%    \node[blockOLD, below left=0.15cm and 3.25cm of Attack] (Reveal) {Reveal root secret};
 			
 	\path[lineOLD](I1)--(I2);
 	\path[lineOLD](I2)--(I3);
 	\path[lineOLD](I3)--(I4);
 	\path[lineOLD](I4)--(Game);
-	\path[lineOLD](Game)  edge node {iff $\textbf{\textit{t}} > \textbf{\textit{T}}^{*}$} (Attack);
+	\path[choiceOLD](Game)|-(Attack);
+	\path[choiceOLD](Game)|-(Advance);
+	% edge node {iff $\textbf{\textit{t}} < \textbf{\textit{T - 1}}^{*}$\\$t \gets t + 1$} (Advance);
 	
-	\path[choiceOLD](Game)-|(Add);
-	\path[choiceOLD](Game)-|(Rmv);
-	\path[choiceOLD](Game)-|(Upd);
-	\path[choiceOLD](Game)-|(Dlv);
-	\path[lineOLD](Add)--(Game);
-	\path[lineOLD](Rmv)--(Game);
-	\path[lineOLD](Upd)--(Game);
-	\path[lineOLD](Dlv)--(Game);
-
-	\path[choiceOLD](Game)-|(Corrupt);
-	\path[choiceOLD](Game)-|(Hoard);
-	\path[choiceOLD](Game)-|(Reveal);
-	\path[lineOLD](Corrupt)--(Attack);
-    \path[lineOLD](Hoard)--(Attack);
-	\path[lineOLD](Reveal)--(Attack);
+	\path[choiceOLD](Advance)|-(Add);
+	\path[choiceOLD](Advance)|-(Rmv);
+	\path[choiceOLD](Advance)|-(Upd);
+%	\path[lineOLD](Add)--(Game);
+%	\path[lineOLD](Rmv)--(Game);
+%	\path[lineOLD](Upd)--(Game);
+%
+%	\path[choiceOLD](Game)-|(Corrupt);
+%	\path[choiceOLD](Game)-|(Hoard);
+%	\path[choiceOLD](Game)-|(Reveal);
+%	\path[lineOLD](Corrupt)--(Attack);
+%    \path[lineOLD](Hoard)--(Attack);
+%	\path[lineOLD](Reveal)--(Attack);
 
 
 \end{tikzpicture}
