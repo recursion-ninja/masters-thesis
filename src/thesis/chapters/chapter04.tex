@@ -25,7 +25,7 @@ The global state variables of the \CGKAmod{P}{T}{N} are important to understand 
 Their importance follows from the fact that only global variable within the \CGKAmod{P}{T}{N} model can be referenced in the \Abrev{LTL} predicates.
 Many of these global variables are directly dependent on parameters \(T\) and \(N\).
 Notably, a series of ``C-like'' constant macro deinintions.
-Theses constants are ``hard-coded'' when compiling a parameterized model, and referenced throughout the model's PROMELA encoding.
+These constants are ``hard-coded'' when compiling a parameterized model, and referenced throughout the model's PROMELA encoding.
 
 The constants are described in Table \ref{tab:constants-from-parameters} and depicted in Figure \ref{fig:Encoded-Constants}.
 There are five broad categories of parameter-dependant constants, which are described in the same order in Table \ref{tab:constants-from-parameters}.
@@ -40,13 +40,13 @@ There are five broad categories of parameter-dependant constants, which are desc
 
 The bit width constants are used to specify the width of PROMELA \texttt{unsigned} types used within the model encoding.
 Generally, the unsigned types are represent either an epoch, a user ID, or a \Abrev{LBBT} vertex index.
-When representing an epoch or user ID, one additional ``sentinel'' value is added to the reprsentation space, allowing for the absence of an epoch or user ID to be reprsented int he same type.
-Careful consideration of PROMELA \texttt{unsigned} type's specifyied bit width must be taken into account when defining the representation.
-For example \(N=7\) requires only 3 bits to represent all possible values \([0,7]\), but to represent a possibly missing user ID an extra value of \((7 + 1 = 8)\) is added to the range, and 4 bits are required to represent all posible user ID values in the range \([0,\, 8]\).
+When representing an epoch or user ID, one additional ``sentinel'' value is added to the representation space, allowing for the absence of an epoch or user ID to be represented int he same type.
+Careful consideration of PROMELA \texttt{unsigned} type's specified bit width must be taken into account when defining the representation.
+For example \(N=7\) requires only 3 bits to represent all possible values \([0,7]\), but to represent a possibly missing user ID an extra value of \((7 + 1 = 8)\) is added to the range, and 4 bits are required to represent all possible user ID values in the range \([0,\, 8]\).
 
 \begin{table}[h!]
   \centering
-  \caption{\label{tab:constants-from-parameters} Derivation of \CGKAmod{P}{T}{N} model constants from \(T\) and \(N\).}
+  \caption{\label{tab:constants-from-parameters}Derivation constants in \CGKAmod{P}{T}{N} model from parameters\(T\) and \(N\).}
   \subimport{../tables/}{constants-from-parameters}
 \end{table}
     
@@ -78,7 +78,7 @@ For example \(N=7\) requires only 3 bits to represent all possible values \([0,7
 \end{verbatim}
 \end{figure}
 
-Global state variables differ from the constants bentioned above, as they are mutable and their values change throught the course of program execution.
+Global state variables differ from the constants bentioned above, as they are mutable and their values change throughout the course of program execution.
 The global variables for the \CGKAmod{P}{T}{N} are shown in Figure \ref{fig:Global-State}.
 There are boolean array to track \Oracle{chall}{} queries, group membership, and group member ``saftey'' (corruption), as well as byte arrays representing epoch initiation and secret retention for each user.
 The \texttt{unsigned} variable \texttt{epoch} stores the current epoch of the furthest advanced user ID within the \CGKAsec.
@@ -113,7 +113,7 @@ local unsigned targetID  : BITS_USERID; // ID of the effected member
 
 The \CGKAmod{P}{T}{N} model transparently reflects the \CGKAsec operations and logic.
 First the \CGKAmod{P}{T}{N} model is initialized via \texttt{CGKA\_initialize} as depicted in Figure \ref{fig:Control-Initialization}.
-Next the first epoch, epoch \(0\), is initiated in a subsquent call to \texttt{CGKA\_create\_group}, shown in Figure \ref{fig:Control-Group-Creation}.
+Next the first epoch, epoch \(0\), is initiated in a subsequent call to \texttt{CGKA\_create\_group}, shown in Figure \ref{fig:Control-Group-Creation}.
 Finally, play nondeterministically progresses via the main control loop defined within \texttt{CGKA\_security\_game}, as illistrated by Figure \ref{fig:Control-Loop}.
 Each loop iteration invokes either \texttt{play\_move\_with\_commitment} or \texttt{play\_move\_without\_commitment}, shown in Figures \ref{fig:Control-Commitment} and \ref{fig:Control-Noncommitment}, which advance play to the next epoch or remain in the same epoch respectively.
 
@@ -291,7 +291,7 @@ The attacker does not have access to the global state in the \CGKAmod model, and
 
 A query of \Oracle{corrupt}{ID_n} within the \CGKAmod{P}{T}{N} model encoding performs a sequence of operations detailed in Figure \ref{fig:Oracle-Corrupt} which fulfills the oracle's semantics.
 First the oracle encoding updates the attacker's knowledgebase via the \texttt{attacker\_learn\_leaf} and \texttt{attacker\_amend\_knowledge} interface methods for the protocol \texttt{P}.
-The knowledge upadte may be iterative if the corrupted user has held onto secret cryptographic material from previous epoch.
+The knowledge update may be iterative if the corrupted user has held onto secret cryptographic material from previous epoch.
 Once all requisite information is transmitted from the oracle to the attacker, the oracle marks \(\mathtt{ID_n}\) as \texttt{unsafe}.
 Lastly the oracle prompts the attacker to declare if their knowledgebase includes one or more \Abrev{LBBT} root node secrets for any epoch.
 

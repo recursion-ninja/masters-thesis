@@ -151,47 +151,9 @@ manuscript-target  := \
 artifact-extension :=\
     $(sort aux bcf blg dvi fdb_latexmk fls lof log out ps run.xml thm toc)
 artifact-directory :=\
-    $(sort $(dir-thesis-source) $(dir-thesis-auxiliary) $(dir-thesis-chapters) $(dir-thesis-figures))
+    $(sort $(dir-thesis-source) $(dir-thesis-auxiliary) $(dir-thesis-chapters) $(dir-thesis-figures) $(dir-thesis-tables))
 artifact-filepaths :=\
     $(sort $(foreach dir,$(artifact-directory),$(addprefix $(dir)*.,$(artifact-extension))))
-
-#######
-###
-#   Pandoc options
-###
-#######
-
-pandoc-options := -f markdown
-pandoc-options += --pdf-engine=pdflatex
-pandoc-options += --standalone
-#pandoc-options += --metadata-file=$(thesis-metadata)
-pandoc-options += --include-in-header=$(thesis-preamble)
-pandoc-options += --include-before-body=$(thesis-frontmatter)
-pandoc-options += --include-after-body=$(thesis-backmatter)
-pandoc-options += --resource-path=$(call thesis_source,.)
-pandoc-options += --citeproc
-pandoc-options += --listings
-pandoc-options += --verbose
-
-#pandoc-options += -M lang=en-US
-pandoc-options += -M bibliography=$(thesis-bib-path)
-pandoc-options += -M link-citations=true
-
-## download from https://www.zotero.org/styles
-#pandoc-options += --csl=ieee.csl
-pandoc-options += -V thesis-var-title:"$(thesis-param-title)"
-pandoc-options += -V thesis-var-author:"$(thesis-param-author)"
-pandoc-options += -V thesis-var-date:"$(thesis-param-date)"
-pandoc-options += -V thesis-var-year:"$(thesis-param-year)"
-pandoc-options += -V thesis-var-department:"$(thesis-param-department)"
-pandoc-options += -V thesis-var-advisor:"$(thesis-param-advisor)"
-pandoc-options += -V thesis-var-reader:"$(thesis-param-reader)"
-pandoc-options += -V thesis-var-dedication:"$(thesis-param-dedication)"
-pandoc-options += -V thesis-var-acknowledge:"$(thesis-param-acknowledge)"
-pandoc-options += -V thesis-var-abstract:"$(thesis-param-abstract)"
-pandoc-options += -V thesis-var-keywords:"$(thesis-param-keywords)"
-pandoc-options += -V documentclass=$(thesis-class-ref)
-pandoc-options += -V classoption:bibfile=$(thesis-bib-ref)
 
 #######
 ###
