@@ -48,4 +48,5 @@ bibfile
 \\adjustbox
 \\usepackage\{[\w\-\.\:]+\}
 \\autocite\{[\w\-\.\:]+\}
+\\hypertarget
 %------------------------------------- Custom *Term* definitions ---------------

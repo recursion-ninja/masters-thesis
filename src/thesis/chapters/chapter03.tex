@@ -91,7 +91,7 @@ As defined, in each epoch \(\mathcal{A}\) must perform exactly one of the follow
 \begin{itemize}
   \item Query \Oracle{reveal}{} exactly once.
   \item Query \Oracle{chall}{}  exactly once.
-  \item Query niether \Oracle{reveal}{} or \Oracle{chall}{}.
+  \item Query neither \Oracle{reveal}{} or \Oracle{chall}{}.
 \end{itemize}
 
 Additionally, to terminate the \CGKAsec, \(\mathcal{A}\) must query \Oracle{chall}{} once.
@@ -106,14 +106,14 @@ Similar reductions will follow while formalizing \CGKAmod{P}{T}{N} from the info
 
 A literal interpretation of the informal \CGKAsec definition permits many redundant state transitions.
 Importantly idempotent operations are permitted.
-For a sequence of operations \( \{ o_0 \circ o_{1} \circ \ldots \circ o_{m-1} \circ o_{m} \} \), and idempotent operation \(q\) is one in which \(q = q \circ q = q \circ p \circ q\) for all subsequences \(p = \{o_i \ldots o_j \} \in \{ o_0 \circ o_{1} \circ \ldots \circ o_{m-1} \circ o_{m} \} \).
+For a sequence of operations \( \{ o_0 \circ o_{1} \circ \ldots \circ o_{m-1} \circ o_{m} \} \), and idempotent operation \(q\) is one in which \(q = q \circ q = q \circ p \circ q\) for all sub-sequences \(p = \{o_i \ldots o_j \} \in \{ o_0 \circ o_{1} \circ \ldots \circ o_{m-1} \circ o_{m} \} \).
 Similarly, for all sequences of operations containing an idempotent operation \(q\), between every operand in the sequence after the first occurrence of \(q\), an additional occurrence of \(q\) can be inserted without effecting the result of the operations.
-As shorthand, we will denote \(q \circ p \gets q^{*}\) to represent the expansion of a sequence \(p\) containing an idempotent operation \(q\) into the set of all sequences \(p\) with possible insertions of additional \(q\) opertations into \(p\).
+As shorthand, we will denote \(q \circ p \gets q^{*}\) to represent the expansion of a sequence \(p\) containing an idempotent operation \(q\) into the set of all sequences \(p\) with possible insertions of additional \(q\) operations into \(p\).
 It will be clear to an attentive reader that the cardinality of \(q \circ p \gets q^{*}\) is countably infinite, as it follows the same logical construction of the rational numbers.
 
-The concept of idempotency phrased in the context of a stateful protocol modeled as a transittion graph, relates an idempotent operation \(q\) as one in which, performing \(q\), then at a later point while in state \(s\) performing \(q\) again, results in a cycle from \(s\) to \(s\).
-This is probelematic for an exhaustive search.
-Quite obviously it permits an infinite loop in within \CGKAmod, which in turn makes certain LTL statement impossible to verify as well as increasing the verification runtime.
+The concept of idempotency phrased in the context of a stateful protocol modeled as a transition graph, relates an idempotent operation \(q\) as one in which, performing \(q\), then at a later point while in state \(s\) performing \(q\) again, results in a cycle from \(s\) to \(s\).
+This is problematic for an exhaustive search.
+Quite obviously it permits an infinite loop in within \CGKAmod, which in turn makes certain LTL statement impossible to verify as well as increasing the verification run-time
 The following are examples of permitted idempotency by the informal \CGKAsec definition:
 
 \begin{itemize}
@@ -126,19 +126,19 @@ The following are examples of permitted idempotency by the informal \CGKAsec def
 
 \end{itemize}
 
-Since the verification methodology for \CGKAmod{P}{T}{N} exhuastively explores all possible \CGKAsec states, all sequences of operations \(q \circ p \gets q^{*}\) are equivalent.
+Since the verification methodology for \CGKAmod{P}{T}{N} exhaustively explores all possible \CGKAsec states, all sequences of operations \(q \circ p \gets q^{*}\) are equivalent.
 Hence we can collapse the cyclical search through the countably infinite number of idempotent sequences, considering them all to be the same unique state without effecting the verification of an LTL property \(\varphi\).
 To disallow the cycles formed by idempotent operations, each operation above is permitted only once per period within which the operation is idempotent.
 Within the \CGKAmod Promela encoding, repeated sequences of idempotent operations are tabulated within the global game state and guarded against.
 By disallowing idempotency within the game, each query made by the attacker will never result in a return to a previous game state.
-A consequence of this, is that attacker queries necissarily advance the game state towards the next epoch tranision, or when within the final epoch, advance towards the query to \Oracle{chall}{}.
-This necissarily progression of the \CGKAsec within the model \CGKAmod{P}{T}{N} both reduces the runtime verification as well as permits verification that the model \CGKAmod{P}{T}{N} halts.
+A consequence of this, is that attacker queries necessarily advance the game state towards the next epoch transition, or when within the final epoch, advance towards the query to \Oracle{chall}{}.
+This necessarily progression of the \CGKAsec within the model \CGKAmod{P}{T}{N} both reduces the run-time verification as well as permits verification that the model \CGKAmod{P}{T}{N} halts.
 
 
 \hypertarget{elided-group-members}{%
 \subsection{Elided Group Members}\label{elided-group-members}}
 
-The complexity of the asynchronous, multi-party communication described by the informal \CGKAsec definition is illistrated within Figure \ref{fig:CGKA-informal}.
+The complexity of the asynchronous, multi-party communication described by the informal \CGKAsec definition is illustrated within Figure \ref{fig:CGKA-informal}.
 However, exhaustiveness can once again reduce model complexity.
 Consider a \((T, C, N)\)-attacker \(\mathcal{A}\).
 As defined, in each epoch $t < T$ the transition from epoch $t$ to epoch $t+1$ can only occur in one of the following ways:
@@ -155,17 +155,16 @@ As defined, in each epoch $t < T$ the transition from epoch $t$ to epoch $t+1$ c
 Note that in each possible epoch transition, \(\mathcal{A}\) decides which control message is delivered defining the next epoch.
 Furthermore, note that \(\mathcal{A}\) querying \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i} results in the same control message being sent to the \Abrev{DS} as \(\mathtt{ID_i}\) calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}; respectively.
 Both the sequences originating with either \(\mathcal{A}\) querying an oracle or \(\mathtt{ID_i}\) calling an algorithm result in the same epoch transition once \Oracle{deliver}{t,\, ID_i,\, ID_{*}} is queried, without any other effect on the protocol state.
-Due to the exhuastively methodology in verifying \CGKAmod{P}{T}{N}, both initiating epoch transitions options are explored, resulting in duplicate paths to the same epoch transition state.
+Due to the exhaustively methodology in verifying \CGKAmod{P}{T}{N}, both initiating epoch transitions options are explored, resulting in duplicate paths to the same epoch transition state.
 Hence, we can omit the group members from calling calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}, and without loss of generality, have \(\mathcal{A}\) query \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i}; respectively.
 
-We arrive at a formalized and reduced \CGKAmod{P}{T}{N} model for a$( \textbf{T}, \textbf{C}, \textbf{N} )$-attacker depicted in Figure \ref{fig:CGKA-old-flowchart}.
-Within the depiction, yellow nodes make nondeterministic choices, and dashed lines represent a nondeterministic path chosen by the origin node.
-
-\begin{figure}
-  \centering
-  \caption{\label{fig:CGKA-old-flowchart}Flowchart of formalized CGKA security game.}
-  \resizebox{\textwidth}{!}{\subimport{../figures/}{flow-chart}}
-\end{figure}
+%We arrive at a formalized and reduced \CGKAmod{P}{T}{N} model for a$( \textbf{T}, \textbf{C}, \textbf{N} )$-attacker depicted in Figure \ref{fig:CGKA-old-flowchart}.
+%Within the depiction, yellow nodes make nondeterministic choices, and dashed lines represent a nondeterministic path chosen by the origin node.
+%\begin{figure}
+%  \centering
+%  \caption{\label{fig:CGKA-old-flowchart}Flowchart of formalized CGKA security game.}
+%  \resizebox{\textwidth}{!}{\subimport{../figures/}{flow-chart}}
+%\end{figure}
 
 %\hypertarget{decidability}{%
 %\subsection{Decidability}\label{decidability}}
@@ -173,4 +172,4 @@ Within the depiction, yellow nodes make nondeterministic choices, and dashed lin
 %TODO:
 
 %Bounded epochs to \(T\).
-%No indepotent operations, each operation advances protocol state towards transition.
+%No idempotent operations, each operation advances protocol state towards transition.

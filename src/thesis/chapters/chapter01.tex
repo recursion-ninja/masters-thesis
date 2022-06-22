@@ -10,8 +10,8 @@ However, generalizing the security guarantees of \Abrev{SM} to communication wit
 
 The desirable operations and security of multi-party communication protocol is explored below.
 After defining the goals of such a protocol, verification methodology is laid out.
-The verification performed assumes the correctness of cryptographic primitives and utilizes side channel information to determine the validitiy of the protocol.
-Lastly, a discussion and interpretation of the verification results is presented along with and avevues of future work.
+The verification performed assumes the correctness of cryptographic primitives and utilizes side channel information to determine the validity of the protocol.
+Lastly, a discussion and interpretation of the verification results is presented along with and avenues of future work.
 
 
 \hypertarget{secure-group-messaging}{%
@@ -226,7 +226,7 @@ The definition of control messages within the TreeKEM protocol dictates that mes
 Despite the encapsulation, querying these oracles permits the attacker to both perform and observe ``side effects'' related to the protocol's execution.
 Side channel information gained is querying oracles is dependent on the protocol with which the \CGKAsec is being played.
 Hence, many propositions regarding the \CGKAsec semantics can only be correctly reasoned about when the protocol under consideration is also specified.
-One semantic which is invariant of a specific protocol, emerges from querying the \Oracle{add-user}{}, \Oracle{remove-user}{}, and \Oracle{send-update}{} oracles, confering onto the attacker the ability to guide the protocol execution by instructing group members to begin new epochs on whichever terms the attacker considers favorable.
+One semantic which is invariant of a specific protocol, emerges from querying the \Oracle{add-user}{}, \Oracle{remove-user}{}, and \Oracle{send-update}{} oracles, conferring onto the attacker the ability to guide the protocol execution by instructing group members to begin new epochs on whichever terms the attacker considers favorable.
 Likewise the \Oracle{deliver}{} oracle permits the attacker to control when each user receives control messages and subsequently advances to the next epoch.
 Because the attacker has access to the \Oracle{deliver}{} oracle, it does not matter who, attacker or group member, attempts to initiate a new epoch, ultimately the attacker decides via querying the \Oracle{deliver}{} oracle which epoch-initiating control messages are processed by the group.
 Phrased differently, a multiple new epochs can be concurrently initiated either from a group member calling the \textbf{add}, \textbf{rmv}, or \textbf{upd} algorithm from \CGKAdef, or from the attacker querying the \Oracle{add-user}{}, \Oracle{remove-user}{}, or \Oracle{send-update}{} oracles, but regardless of the epoch initiation attempt's origin, the attacker chooses via querying the \Oracle{deliver}{} oracle which of the possible initiation attempts is definitively processed by the group as the next epoch.
@@ -250,7 +250,7 @@ When \(b=0\), random values are instead broadcast and revealed to the attacker w
 The goal of the attacker is to prove advantage by discriminating the value of \(b\) with probability grater than \(\frac{1}{2}\).
 
 An attacker proving \emph{advantage} is defined by the \CGKAsec as a parameterized expression involving oracles of the game.
-A tuple \((T, C, N)\) parametrizes the attacker \(\mathcal{A}\), with \(T \in \left[1, \infty \right]\), \(C \in \left[0, T \right]\), and \(N \in \left[2, \infty \right]\).
+A tuple \((T, C, N)\) parameterizes the attacker \(\mathcal{A}\), with \(T \in \left[1, \infty \right]\), \(C \in \left[0, T \right]\), and \(N \in \left[2, \infty \right]\).
 The \(T\) value indicates that the protocol runs in at most \(T\) epochs, during which time the attacker can make at most \(C\) challenge queries, and the total unique group members of the protocol can never exceed \(N\).
 Furthermore there exists a predicate \textbf{\texttt{P}} (potentially always true), which indicates that a trivial attack did not occur.
 The \((T, C, N)\)-attacker \(\mathcal{A}\) proves \emph{advantage} by ending the game via a query to the \Oracle{chall}{} oracle, winning the \CGKAsec, if and only if the attacker:
@@ -300,7 +300,7 @@ There is a clear sub-setting relationship between these abstract concepts illust
 The definition of \Abrev{CGKA} and the construction of the \CGKAsec offers an abstraction between the protocol specific implementation and the desired security guarantees of \Abrev{FSU} and \Abrev{PCS} specified by \Abrev{MLS}.
 An equivalence proof of non-adaptive \Abrev{CGKA} security definition \ref{def:CGKA-Security} with \Abrev{FSU} and also with \Abrev{PCS} accompanies its original description \autocite{alwen2020security}.
 This work relies on the equivalence proof in order to soundly use \Abrev{CGKA} as a verifiable abstraction.
-The equivalence proof results in the correlary that an attacker playing the \CGKAsec can only gain advantage by exploiting side-channel attack on the given \Abrev{CGKA}-conforming protocol.
+The equivalence proof results in the corollary that an attacker playing the \CGKAsec can only gain advantage by exploiting side-channel attack on the given \Abrev{CGKA}-conforming protocol.
 
 Consider a model \CGKAmod{}{}{} of the \CGKAsec.
 To formulate arbitrary propositions regarding the model, \CGKAmod{}{}{} must be parameterized by a given \Abrev{CGKA}-conforming protocol \(\mathtt{P}\), denoted by \CGKAmod{P}{}{}.
@@ -317,7 +317,7 @@ To produce \CGKAmod{P}{}{}, the interface methods must be instantiated for \(P\)
 After performing these two verification efforts, if a predicate \(\varphi\) is verified for \CGKAmod{P}{}{}, then the predicate \(\varphi\) holds for \(P\).
 
 Even operating without a formal model, the \Abrev{CGKA} abstraction is a powerful tool.
-Acompanying the description of \Abrev{CGKA}, \CGKAdef, and the \CGKAsec the authors also include an application of mathematically analyzing TreeKEM with the \CGKAsec.
+Accompanying the description of \Abrev{CGKA}, \CGKAdef, and the \CGKAsec the authors also include an application of mathematically analyzing TreeKEM with the \CGKAsec.
 The result of the analysis was a constructive counter-example demonstrating that TreeKEM, as originally defined, is \emph{not} \Abrev{FS}.
 Following the revelation of TreeKEM's deficiency the same authors present a new definition of TreeKEM, substituting the use of a standard PKE cryptographic primitive with UPKE, which remedies the defect and regains the \Abrev{FSU} security guarantee for TreeKEM.
 

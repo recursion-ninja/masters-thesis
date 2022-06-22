@@ -14,7 +14,7 @@ These planned but incomplete observations are indicated by a \NA in table entrie
 \section{Performance Tuning}\label{performance-tuning}}
 
 The performance and scaling of the verification efforts for \CGKAmod{}{}{} are contextualized.
-Both time and memory constraints must be considered and a morderately comprehensive understanding of the verification tool Spin is required to correctly tune performance.
+Both time and memory constraints must be considered and a moderately comprehensive understanding of the verification tool Spin is required to correctly tune performance.
 Spin supports many compile-time directives which allows for specifying the possible time-memory trade-off strategies which are desirable when verifying the specific model.
 Not all compile time directives are compatible with all models.
 Some directives require a proof by the user that certain conditions hold within the model for the directive's usage to be sound.
@@ -194,8 +194,8 @@ The large jump in state-space and transition count between modeling successive e
 Hence the number of epoch the model is verified for drives the memory usage.
 This intuitively makes sense, as each new epoch multiplicatively expands the diameter of the state-space.
 
-Interestingly, the verification runtime for \LTLPredicate{HLT} and \LTLPredicate{FSU} does not appear strongly correlated with the \(T\) and \(N\) parameters.
-The author does not have a definative explanation for this behavior.
+Interestingly, the verification run-time for \LTLPredicate{HLT} and \LTLPredicate{FSU} does not appear strongly correlated with the \(T\) and \(N\) parameters.
+The author does not have a definitive explanation for this behavior.
 One postulate is that the group membership size limited to at most \(N\) has a strange combinatorial relationship with the distribution of membership states in TreeKEM's left balanced binary tree of secret keys.
 Since the attacker knowledge base and group membership alterations depend on the tree topologies permitted by the parameter \(N\), this may create a ``far-from-uniform'' distribution of state-spaces for different \(N\) values.
 
@@ -203,8 +203,8 @@ Since the attacker knowledge base and group membership alterations depend on the
 \hypertarget{hypothesis-outcomes}{%
 \section{Hypothesis Testing}\label{hypothesis-outcomes}}
 
-By interpreting the observations collected in Appendix \ref{apx:Observations} one can disern whether the hypotheses enumerated in Table \ref{tab:verification-hypotheses} and described in Chapter \ref{sec:methodology} have been supported or falsified.
-Each hypothesis sill be considered individually, noting the interprative limitations imposed by the currently incomplete series of observations.
+By interpreting the observations collected in Appendix \ref{apx:Observations} one can discern whether the hypotheses enumerated in Table \ref{tab:verification-hypotheses} and described in Chapter \ref{sec:methodology} have been supported or falsified.
+Each hypothesis sill be considered individually, noting the interpretive limitations imposed by the currently incomplete series of observations.
 
 
 \hypertarget{post-compromise-security}{%
@@ -213,7 +213,7 @@ Each hypothesis sill be considered individually, noting the interprative limitat
 The simplest of the three \Abrev{LTL} predicates defined in Section \ref{sec:LTL-security} is \LTLPredicate{HLT}.
 The verification of \LTLPredicate{HLT} is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
 While \LTLPredicate{HLT} is not truly a security property of \CGKAmod{}{}{}, it is used as a methodology confidence check.
-Failure to verify \LTLPredicate{HLT} woiuld cast serious doubt that the model verification methodology is being performed correctly on more complex \Abrev{LTL} predicates.
+Failure to verify \LTLPredicate{HLT} would cast serious doubt that the model verification methodology is being performed correctly on more complex \Abrev{LTL} predicates.
 Verification results for \LTLPredicate{HLT} is displayed in Tables \ref{tab:V1-HLT} and \ref{tab:V2-HLT}.
 
 All observations in Tables \ref{tab:V1-HLT} and \ref{tab:V2-HLT} report a successful verification of \LTLPredicate{HLT}.
@@ -241,7 +241,7 @@ As indicated in Table \ref{tab:verification-hypotheses}, the first protocol \Ver
 While prior work \autocite{alwen2020security} indicates \( \CGKAmod{\VersionOne}{12}{8} \not \models \LTLPredicate{FSU} \), it is possible that a simpler model with lower \(T\) and/or \(N\) parameters may exist which also demonstrates the \Abrev{FSU} security deficiency.
 Similarly, there may be many \CGKAmod{\VersionOne}{T}{N} models with simpler \(T\) and \(N\) parameters which verify \LTLPredicate{FSU}.
 The aforementioned single \Abrev{FSU} security deficiency example point does not delineate a boundary at which \((T, C, N)\)-attacker does not demonstrate advantage but a \((T+1, C, N)\)-attacker or a \((T, C, N+1)\)-attacker is able to demonstrate advantage for the original protocol \VersionOne.
-Verifcation observations related to \LTLPredicate{FSU} ought to be the most intriguing.
+Verification observations related to \LTLPredicate{FSU} ought to be the most intriguing.
 
 Table \ref{tab:V1-FSU} reports only successful verification of \LTLPredicate{FSU}.
 However, the observations are not complete and most importantly, do not include \CGKAmod{\VersionOne}{12}{8}.

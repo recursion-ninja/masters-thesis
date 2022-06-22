@@ -8,9 +8,9 @@
 
 \midrule
 
-\texttt{T}             & \( T \) & \CGKAsec specurity parameter \(T\) \\
-\texttt{C}             & \( T \) & \CGKAsec specurity parameter \(C\) \\
-\texttt{N}             & \( N \) & \CGKAsec specurity parameter \(N\) \\
+\texttt{T}             & \( T \) & \CGKAsec security parameter \(T\) \\
+\texttt{C}             & \( T \) & \CGKAsec security parameter \(C\) \\
+\texttt{N}             & \( N \) & \CGKAsec security parameter \(N\) \\
 \hline
 \texttt{BITS\_T}       & \( \lfloor \log_{2}(\,                  T-1 \,) \rfloor + 1 \) & Bits required to represent \( T - 1 \) \\
 \texttt{BITS\_C}       & \( \lfloor \log_{2}(\,                  C-1 \,) \rfloor + 1 \) & Bits required to represent \( C - 1 \) \\
@@ -19,7 +19,7 @@
 \texttt{BITS\_USERID}  & \( \lfloor \log_{2}(\,                  N-1 \,) \rfloor + 1 \) & Bits required to represent an ``UserID'' value \\
 \texttt{BITS\_VERTEX}  & \( \lfloor \log_{2}(\, 2^{\mathtt{BITS\_N}} \,) \rfloor + 1 \) & Bits required to represent a \Abrev{LBBT} ``Vertex'' index\\
 \hline
-\texttt{TREE\_ORDER}   & \(                 2^{\mathtt{BITS\_N} + 1} - 1 \) & Verticies within the LBBT  \\
+\texttt{TREE\_ORDER}   & \(                 2^{\mathtt{BITS\_N} + 1} - 1 \) & Vertices within the LBBT  \\
 \texttt{ROOT}          & \(                                            0 \) & ``Vertex'' index for root node \\
 \texttt{LEAF}          & \( \lfloor\frac{\mathtt{TREE\_ORDER}}{2}\rfloor \) & ``Vertex'' index for first leaf node \\
 \hline

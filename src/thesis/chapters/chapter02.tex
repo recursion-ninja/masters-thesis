@@ -16,11 +16,11 @@ Because of such concerns, results and conclusions from verification techniques u
 The kind false-positive verification of security that BAN logic provided could cause the very lapses in post-adoption security that the verification had attempted to preempt.
 BAN logic has since fallen out of favor and instead been replaced by model checking techniques \autocite{marrero1997model}, which have been able to produce attacks on cryptographic protocols which BAN techniques incorrectly verified as secure.
 
-Theorem proving, when possible is th preferred method of cyptographic protocol verification.
+Theorem proving, when possible, is the preferred method of cryptographic protocol verification.
 Generally, modern protocols are constructed in too complex of a manner for a theorem prover to verify.
-When defining a protocol in terms compatible with modern theroerm provers issues of termination checking, proof tactic seclection, and SMT limitations greatly impede computer automated verification.
-Human guidance is still required to direct theorem provers towards the verifcation goal.
-The specialized and time-consuming nature of utilizing a theroerm prover is the chief reason model checking has been generally favored, the work presented here being no exception.
+When defining a protocol in terms compatible with modern theorem provers issues of termination checking, proof tactic selection, and SMT limitations greatly impede computer automated verification.
+Human guidance is still required to direct theorem provers towards the verification goal.
+The specialized and time-consuming nature of utilizing a theorem prover is the chief reason model checking has been generally favored, the work presented here being no exception.
 
 This work presents the verification of the TreeKEM protocol's FS and PCS security guarantees.
 To verify these security guarantees, the CGKA security game is used as an abstraction of the TreeKEM protocol, as well as all other CGKA-conforming protocols.
@@ -34,7 +34,7 @@ There is no theoretical limit to the number of parties the TreeKEM protocol supp
 However, we also stated that model checking represents all possible states of protocol as a finite diagram of transitions.
 Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while our model checker requires a finite number of states.
 The IETF states that MLS in practice should support approximately 50,000 participants \autocite{Omara2020}, which is a finite, yet this very large number is problematic for the chosen methodology explicit state model checking.
-This work parametrizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
+This work parameterizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
 In practice, this means the results presented for a specified \(T_{max}\) and \(N_{max}\) only provide verification of security against \((T, C, N)\)-attackers for all \(T \in [1, T_{max}]\), \(C \in [1, T]\) and \(N \in [2, N_{max}]\).
 
 Referring back to the verification hypotheses in Table \ref{tab:verification-hypotheses}, any outcome which falsifies a hypothesis is an interesting result.
@@ -197,7 +197,7 @@ The expressive power provided by PROMELA's \texttt{if}, \texttt{do}, and \texttt
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- non-determinisim via \texttt{select}}
+\caption{PROMELA example --- non-determinism via \texttt{select}}
 \begin{verbatim}
 byte RandomArray[16];
 byte i;
