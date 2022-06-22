@@ -204,7 +204,7 @@ progress_epoch:
       // 2. Play a Commitment Move
       :: epoch != FINAL_EPOCH -> play_move_with_commitment ( ); break
 
-      // 3. Play a Non-commital Move
+      // 3. Play a Non-committal Move
       :: !(commitmentRequired) -> play_move_without_commitment ( )
       od;
   }
