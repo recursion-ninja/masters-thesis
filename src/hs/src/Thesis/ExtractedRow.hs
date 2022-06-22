@@ -12,7 +12,7 @@ import Data.ByteString.Char8 (unwords)
 import Data.Csv (DefaultOrdered(..), ToField(..), ToNamedRecord(..), namedRecord, (.=))
 import Data.Fixed (Fixed(MkFixed), Pico, resolution)
 import Data.Foldable
-import Data.List (sort)
+import Data.List (intercalate, sort, unfoldr)
 import Data.Ratio
 import Data.Scientific (FPFormat(Fixed), Scientific, formatScientific)
 import Data.Time.Clock (DiffTime, diffTimeToPicoseconds, nominalDay, secondsToDiffTime)
@@ -22,7 +22,7 @@ import GHC.Exts (IsList(fromList))
 import Prelude hiding (putStr, readFile, unwords)
 import Thesis.BinaryUnit
 import Unsafe.Coerce (unsafeCoerce)
-
+import Numeric (showInt)
 
 data  ExtractedRow
     = ExtractedRow
@@ -67,28 +67,39 @@ instance DefaultOrdered ExtractedRow where
 instance ToNamedRecord ExtractedRow where
 
     toNamedRecord row@(ExtractedRow {..}) =
-        let encodeFieldValue :: ByteString -> Fieldable -> (ByteString, ByteString)
-            encodeFieldValue key (FieldValueOf val) = key .= val
-
-            fieldKeys = toList $ headerOrder row
-
-            diffToSecs :: DiffTime -> Integer
+        let diffToSecs :: DiffTime -> Integer
             diffToSecs = (`div` resolution (1 :: Pico)) . diffTimeToPicoseconds
 
-            rowRuntime' :: Integer
-            rowRuntime' = diffToSecs rowRuntime
-
-            rowWallClock :: String
-            rowWallClock =
-                let runInSeconds = diffToSecs rowRuntime
+            diffToWallClock :: DiffTime -> String
+            diffToWallClock timespan =
+                let runInSeconds = diffToSecs timespan
                     dayInSeconds = diffToSecs $ unsafeCoerce nominalDay
                     todInSeconds = timeToTimeOfDay . secondsToDiffTime
                     printSeconds = formatTime defaultTimeLocale "%Hh %Mm %Ss" . todInSeconds
                     (days, time) = runInSeconds `quotRem` dayInSeconds
                 in  fold [show days, "d ", printSeconds time]
 
+            directiveRendering = unwords . sort
+
+            encodeFieldValue :: ByteString -> Fieldable -> (ByteString, ByteString)
+            encodeFieldValue key (FieldValueOf val) = key .= val
+
+            fieldKeys = toList $ headerOrder row
+
             scientificBytes = formatScientific Fixed (Just 3)
 
+            showWithCommas :: Integral i => i -> String
+            showWithCommas = 
+                let chunksOf :: Int -> [a] -> [[a]]
+                    chunksOf n  = takeWhile (not . null) . unfoldr (Just . splitAt n)
+                    
+                    groupDigits :: [a] -> [[a]]
+                    groupDigits = reverse . chunksOf 3 . reverse
+                    
+                    addInCommas = intercalate ","
+                    
+                in  addInCommas . groupDigits . (`showInt` "")
+            
             rowMebibytes :: String
             rowMebibytes =
                 let (MkFixed bytes) = rowMemory
@@ -103,13 +114,10 @@ instance ToNamedRecord ExtractedRow where
                     oneGibi = resolution (1 :: GiB)
                     (scaling, abrev)
                         | bytes < oneGibi = (oneMebi, "MiB")
-                        | otherwise       = (oneGibi, "Gib")
+                        | otherwise       = (oneGibi, "GiB")
                     humanForm = fromRational $ bytes % scaling
                 in  scientificBytes humanForm <> " " <> abrev
 
-            rowDirectives' :: ByteString
-            rowDirectives' = unwords $ sort rowDirectives
-            
         in  namedRecord $ zipWith
             encodeFieldValue
             fieldKeys
@@ -117,13 +125,12 @@ instance ToNamedRecord ExtractedRow where
             , FieldValueOf rowProperty
             , FieldValueOf rowSecurityT
             , FieldValueOf rowSecurityN
-            , FieldValueOf rowRuntime'
-            , FieldValueOf rowWallClock
+            , FieldValueOf $ diffToSecs rowRuntime
+            , FieldValueOf $ diffToWallClock rowRuntime
             , FieldValueOf rowMebibytes
             , FieldValueOf rowMemory'
             , FieldValueOf rowVectorLen
-            , FieldValueOf rowStates
-            , FieldValueOf rowTransitions
-            , FieldValueOf rowDirectives'
+            , FieldValueOf $ showWithCommas rowStates
+            , FieldValueOf $ showWithCommas rowTransitions
+            , FieldValueOf $ directiveRendering rowDirectives
             ]
-

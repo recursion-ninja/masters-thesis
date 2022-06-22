@@ -1,0 +1,39 @@
+\begin{tabular}{ l c l }
+
+\toprule
+
+{\normalsize Constant} &
+{\normalsize Definition} &
+{\normalsize Description}\\
+
+\midrule
+
+\texttt{T}             & \( T \) & \CGKAsec specurity parameter \(T\) \\
+\texttt{C}             & \( T \) & \CGKAsec specurity parameter \(C\) \\
+\texttt{N}             & \( N \) & \CGKAsec specurity parameter \(N\) \\
+\hline
+\texttt{BITS\_T}       & \( \lfloor \log_{2}(\,                  T-1 \,) \rfloor + 1 \) & Bits required to represent \( T - 1 \) \\
+\texttt{BITS\_C}       & \( \lfloor \log_{2}(\,                  C-1 \,) \rfloor + 1 \) & Bits required to represent \( C - 1 \) \\
+\texttt{BITS\_N}       & \( \lfloor \log_{2}(\,                  N-1 \,) \rfloor + 1 \) & Bits required to represent \( N - 1 \) \\
+\texttt{BITS\_EPOCH}   & \( \lfloor \log_{2}(\,                  T-1 \,) \rfloor + 1 \) & Bits required to represent an ``Epoch''  value \\
+\texttt{BITS\_USERID}  & \( \lfloor \log_{2}(\,                  N-1 \,) \rfloor + 1 \) & Bits required to represent an ``UserID'' value \\
+\texttt{BITS\_VERTEX}  & \( \lfloor \log_{2}(\, 2^{\mathtt{BITS\_N}} \,) \rfloor + 1 \) & Bits required to represent a \Abrev{LBBT} ``Vertex'' index\\
+\hline
+\texttt{TREE\_ORDER}   & \(                 2^{\mathtt{BITS\_N} + 1} - 1 \) & Verticies within the LBBT  \\
+\texttt{ROOT}          & \(                                            0 \) & ``Vertex'' index for root node \\
+\texttt{LEAF}          & \( \lfloor\frac{\mathtt{TREE\_ORDER}}{2}\rfloor \) & ``Vertex'' index for first leaf node \\
+\hline
+\texttt{NEVER}         & \( 2^{\mathtt{BITS\_T}} - 1 \) & Missing data ``Epoch''  sentinel value \\
+\texttt{NONE}          & \( 2^{\mathtt{BITS\_N}} - 1 \) & Missing data ``UserID'' sentinel value \\
+\hline
+\texttt{MAX\_REVEAL}   & \(                    T - 1 \) & Limit to \Oracle{reveal}{} queries \\
+\texttt{FIRST\_EPOCH}  & \(                        0 \) & Loop lower bound for ``Epoch''  values \\
+\texttt{FINAL\_EPOCH}  & \(                    T - 1 \) & Loop upper bound for ``Epoch''  values \\
+\texttt{FIRST\_USERID} & \(                        0 \) & Loop lower bound for ``UserID'' values \\
+\texttt{FINAL\_USERID} & \(                    N - 1 \) & Loop upper bound for ``Epoch''  values \\
+\texttt{FIRST\_VERTEX} & \(                        0 \) & Loop lower bound for ``Vertex'' values \\
+\texttt{FINAL\_VERTEX} & \( \mathtt{TREE\_ORDER} - 1 \) & Loop upper bound for ``Vertex'' values \\
+
+\bottomrule
+
+\end{tabular}

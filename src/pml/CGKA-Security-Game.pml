@@ -198,7 +198,7 @@ inline CGKA_create_group ( )
         {
             membership[n] = n < sample;
         };
-    }
+    };
     printf( "\n***********************\n* CGKA: Create Group! *\n***********************\n" );
 
     d_step
@@ -206,7 +206,7 @@ inline CGKA_create_group ( )
         unsigned id0 : BITS_USERID = 0;
         unsigned ep0 : BITS_EPOCH  = 0;
         messaging_move ( ep0, id0, NONE, NONE );
-    }
+    };
     print_membership ( );
 }
 
