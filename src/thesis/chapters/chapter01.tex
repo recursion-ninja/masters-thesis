@@ -101,7 +101,25 @@ Iteratively, the member moves up the spine of the tree from their leaf node to t
 When the member has propagated the changes to the root node, the final seed value \(s_r\) is determined to be the new shared secret key.
 Note that each member of the group can derive the seed value required to update their copy of the shared key by decrypting the seed value \(s_n\) on the node prior to where the path from said member and the initiating member intersect.
 Once each member has the requisite seed value, they each locally resume the iterative process of updating the tree and arrive at the same construction as that of the initiating member.
-For a visualization of this process, refer to Figure 3 of \autocite{alwen2020security}.
+For a visualization of this process, refer to Figure \ref{fig:CGKA-TreeKEM-Secrets}.
+
+\begin{figure}[h!]
+\centering
+\caption{%
+\label{fig:CGKA-TreeKEM-Secrets}%
+An update operation initiated by the party at leaf \(v_0\) : First, a random ``seed value'' \(s_0\) is chosen.
+Thereafter, a PRG is applied iteratively at every level \(i\) of \(v_0\)'s direct path in order to derive
+(i) a PKE secret key \(sk_i\) for that level (from which a public key can be computed using the key generation algorithm) and
+(ii) a seed \(s_{i+1}\) for the next level.
+Every seed \(s_i\) is encrypted using the public key of the corresponding co-path node \(v_{i-1}\).
+Sometimes, such a node can be blank, in which case \(s_i\) must be encrypted using the public keys of each node in the resolution, which is the smallest set of nodes covering all leaves in the subtree of \(v_{i-1}\).
+This ensures that all these nodes are able to compute the keys from \(v_i\) upward.
+The update secret \(I\) produced by such an update is the seed value \(s_d\) at the root.
+}%
+\copyrightbox[b]
+{\includegraphics[width=\textwidth]{./figures/CGKA-TreeKEM-Secrets.eps}}
+{\CopyrightReuse{alwen2020security}}
+\end{figure}
 
 
 \hypertarget{communication-epochs}{%
@@ -167,7 +185,7 @@ For \Abrev{SGM}, this general definition has been extended to \Abrev{CGKA} \auto
 
 A continuous group key-agreement scheme is defined by the following collection of algorithms:
 
-\[ \CGKAdef = (\,\Protocol{init},\, \Protocol{create},\, \Protocol{add},\, \Protocol{rem},\, \Protocol{upd},\, \Protocol{proc}\,) \]
+\[ \CGKAdef = \left(\,\Protocol{init},\, \Protocol{create},\, \Protocol{add},\, \Protocol{rem},\, \Protocol{upd},\, \Protocol{proc}\,\right) \]
 
 \begin{itemize}
 \item \Protocol{init}   \(: ID \to \Gamma\)\\
@@ -202,7 +220,7 @@ The same work which defines \Abrev{CGKA} also defines an oracle-based security g
 Each oracle is defined in terms of one or more of the algorithms from the \CGKAdef definition.
 The attacker can query all of the game's oracles, and through the sequence of query's, the attacker uses the oracles to direct the execution of the \Abrev{CGKA} protocol.
 In the game the attacker is given access to various oracles to drive the execution of a \Abrev{CGKA} protocol.
-For a visualization of each oracles' semantics, refer to Figure 1 of \autocite{alwen2020security}.
+For a visualization of each oracles' semantics, refer to Figure \ref{fig:CGKA-Oracles} of \autocite{alwen2020security}.
 The \CGKAsec defines the following oracles:
 
 \begin{itemize}
@@ -217,6 +235,17 @@ The \CGKAsec defines the following oracles:
 \item \Oracle{reveal}{t}
 \item \Oracle{chall}{t}
 \end{itemize}
+
+\begin{figure}[h!]
+\centering
+\caption{%
+\label{fig:CGKA-Oracles}%
+Oracles for the \CGKAsec for a scheme \CGKAdef.
+}%
+\copyrightbox[b]
+{\includegraphics[width=\textwidth]{./figures/CGKA-Oracles.eps}}
+{\CopyrightReuse{alwen2020security}}
+\end{figure}
 
 The first six oracles are intuitively thin wrappers for the corresponding algorithm from the \CGKAdef definition.
 Importantly, these oracles encapsulate from the attacker the stateful production and consumption of group member state values \(\gamma \in \Gamma\) as well as the emission of secret key material values \(i \in I\).
@@ -331,8 +360,9 @@ If the defect-free algorithm assumption holds, then a verification of the \Abrev
 The verification hypotheses are depicted in Table \ref{tab:verification-hypotheses}.
 
 \begin{table}[h!]                                                                                                                      
-  \centering
-  \label{tab:verification-hypotheses}
-  \caption{Verification Hypotheses of \CGKAmod{P}{}{}}
-  \subimport{../tables/}{verification-hypotheses}
+\caption{%
+\label{tab:verification-hypotheses}%
+Verification Hypotheses of \CGKAmod{P}{}{}.
+}%
+\subimport{../tables/}{verification-hypotheses}
 \end{table}

@@ -45,9 +45,12 @@ Careful consideration of PROMELA \texttt{unsigned} type's specified bit width mu
 For example \(N=7\) requires only 3 bits to represent all possible values \([0,7]\), but to represent a possibly missing user ID an extra value of \((7 + 1 = 8)\) is added to the range, and 4 bits are required to represent all possible user ID values in the range \([0,\, 8]\).
 
 \begin{table}[h!]
-  \centering
-  \caption{\label{tab:constants-from-parameters}Derivation constants in \CGKAmod{P}{T}{N} model from parameters\(T\) and \(N\).}
-  \subimport{../tables/}{constants-from-parameters}
+\centering
+\caption{%
+\label{tab:constants-from-parameters}%
+Derivation constants in \CGKAmod{P}{T}{N} model from parameters\(T\) and \(N\).
+}%
+\subimport{../tables/}{constants-from-parameters}
 \end{table}
     
 \begin{figure}[h!]

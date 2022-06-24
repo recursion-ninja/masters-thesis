@@ -46,3 +46,4 @@ Backmatter
 Frontmatter
 Gameplay
 Erilia
+knowledgebase

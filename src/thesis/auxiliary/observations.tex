@@ -3,26 +3,32 @@
 
 
 \newcommand{\ObservationTable}[2]{%
-\begin{table}[h!]
-  \centering
-  \label{tab:V#1-#2}
-  \caption{Observations for $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{#2}$.}
-  \subimport{../tables/}{results-V#1-#2-PRELIM}
+\begin{table}[!ht]
+\centering
+\caption{%
+\label{tab:V#1-#2}%
+Observations for $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{#2}$.
+}%
+\subimport{../tables/}{results-V#1-#2-PRELIM}
 \end{table}
 }
 
-\begin{table}[h!]
-  \centering
-  \label{tab:model-param-domain}
-  \caption{Verification domain of \( \CGKAmod{P}{T}{N} \models \varphi \) parameters.}
-  \subimport{../tables/}{model-param-domain}
+\begin{table}[!ht]
+\centering
+\caption{%
+\label{tab:model-param-domain}%
+Verification domain of \( \CGKAmod{P}{T}{N} \models \varphi \) parameters.
+}%
+\subimport{../tables/}{model-param-domain}
 \end{table}
 
-\begin{table}[h!]
-  \centering
-  \label{tab:table-legend}
-  \caption{Legend of symbols appearing in tables}
-  \subimport{../tables/}{tabular-legend}
+\begin{table}[!ht]
+\centering
+\caption{%
+\label{tab:table-legend}%
+Legend of symbols appearing in tables.
+}%
+\subimport{../tables/}{tabular-legend}
 \end{table}
 
 \ObservationTable{1}{HLT}

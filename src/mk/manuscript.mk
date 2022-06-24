@@ -149,7 +149,7 @@ manuscript-target  := \
     $(abspath $(dir-thesis-manuscript)$(subst $(SPACE),-,$(thesis-param-title)).$(extension-portabledoc))
 
 artifact-extension :=\
-    $(sort aux bcf blg dvi fdb_latexmk fls lof log out ps run.xml thm toc)
+    $(sort aux bcf blg dvi fdb_latexmk fls lof log out ps run.xml synctex\(busy\) thm toc)
 artifact-directory :=\
     $(sort $(dir-thesis-source) $(dir-thesis-auxiliary) $(dir-thesis-chapters) $(dir-thesis-figures) $(dir-thesis-tables))
 artifact-filepaths :=\
@@ -210,7 +210,7 @@ $(manuscript-target): $(thesis-template) $(thesis-chapters) $(thesis-bib-path) $
 	  biber    $(subst .$(extension-latex),,$<); \
 	  pdflatex $<; \
 	  pdflatex $<; \
-	  pdflatex $<; \
+#	  pdflatex $<; \
 	  mv $(subst $(extension-latex),$(extension-portabledoc),$<) $@; \
 	)
 
