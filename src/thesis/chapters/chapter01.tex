@@ -78,6 +78,24 @@ Consequently, research directed towards ART has stalled while developments for T
 As the \Abrev{MLS} draft specification has gone through over a dozen revisions in the last half decade, the complimentary development and refinement of the TreeKEM protocol has significantly informed the direction and language of \Abrev{MLS}.
 The verification work presented here will ignore ART and focus exclusively on the TreeKEM protocol.
 
+\begin{figure}[h!]
+  \centering
+  \caption{%
+  \label{fig:CGKA-TreeKEM-Secrets}%
+  An update operation initiated by the party at leaf \(v_0\) : First, a random ``seed value'' \(s_0\) is chosen.
+  Thereafter, a PRG is applied iteratively at every level \(i\) of \(v_0\)'s direct path in order to derive
+  (i) a PKE secret key \(sk_i\) for that level (from which a public key can be computed using the key generation algorithm) and
+  (ii) a seed \(s_{i+1}\) for the next level.
+  Every seed \(s_i\) is encrypted using the public key of the corresponding co-path node \(v_{i-1}\).
+  Sometimes, such a node can be blank, in which case \(s_i\) must be encrypted using the public keys of each node in the resolution, which is the smallest set of nodes covering all leaves in the subtree of \(v_{i-1}\).
+  This ensures that all these nodes are able to compute the keys from \(v_i\) upward.
+  The update secret \(I\) produced by such an update is the seed value \(s_d\) at the root.
+  }%
+  \copyrightbox[b]
+  {\includegraphics[width=\textwidth]{./figures/CGKA-TreeKEM-Secrets.eps}}
+  {\CopyrightReuse{alwen2020security}}
+  \end{figure}
+  
 TreeKEM provides functionality for achieving each of the six operations to be considered a \Abrev{SGM} protocol.
 Additionally TreeKEM aims to satisfy both the efficiency goals and security guarantees of the \Abrev{MLS} specification.
 Conformance with both of these definitions are a result of TreeKEM's construction.
@@ -102,24 +120,6 @@ When the member has propagated the changes to the root node, the final seed valu
 Note that each member of the group can derive the seed value required to update their copy of the shared key by decrypting the seed value \(s_n\) on the node prior to where the path from said member and the initiating member intersect.
 Once each member has the requisite seed value, they each locally resume the iterative process of updating the tree and arrive at the same construction as that of the initiating member.
 For a visualization of this process, refer to Figure \ref{fig:CGKA-TreeKEM-Secrets}.
-
-\begin{figure}[h!]
-\centering
-\caption{%
-\label{fig:CGKA-TreeKEM-Secrets}%
-An update operation initiated by the party at leaf \(v_0\) : First, a random ``seed value'' \(s_0\) is chosen.
-Thereafter, a PRG is applied iteratively at every level \(i\) of \(v_0\)'s direct path in order to derive
-(i) a PKE secret key \(sk_i\) for that level (from which a public key can be computed using the key generation algorithm) and
-(ii) a seed \(s_{i+1}\) for the next level.
-Every seed \(s_i\) is encrypted using the public key of the corresponding co-path node \(v_{i-1}\).
-Sometimes, such a node can be blank, in which case \(s_i\) must be encrypted using the public keys of each node in the resolution, which is the smallest set of nodes covering all leaves in the subtree of \(v_{i-1}\).
-This ensures that all these nodes are able to compute the keys from \(v_i\) upward.
-The update secret \(I\) produced by such an update is the seed value \(s_d\) at the root.
-}%
-\copyrightbox[b]
-{\includegraphics[width=\textwidth]{./figures/CGKA-TreeKEM-Secrets.eps}}
-{\CopyrightReuse{alwen2020security}}
-\end{figure}
 
 
 \hypertarget{communication-epochs}{%
