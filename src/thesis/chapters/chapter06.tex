@@ -1,5 +1,5 @@
-\hypertarget{conclusion}{%
-\chapter{Conclusion}\label{conclusion}}
+\hypertarget{sec:conclusion}{%
+\chapter{Conclusion}\label{sec:conclusion}}
 
 The main contribution of this work is the formalization of the \CGKAsec as well as presenting an accompanying parametric and protocol-polymorphic \CGKAmod{P}{}{} model.
 This \CGKAmod{}{}{} model incorporates a variety of sound reductions from the informal \CGKAsec definition, leading to dramatically simplifies model encoding.
@@ -7,23 +7,23 @@ Furthermore, performance tuning of the model along with performance observations
 Regrettably, the number of verification observations is insufficient to confidently declare support of, or falsification of any stated security hypotheses.
 
 
-\hypertarget{future-work}{%
-\section{Future Work}\label{future-work}}
+\hypertarget{sec:future-work}{%
+\section{Future Work}\label{sec:future-work}}
 
 Publication of this thesis is far from the terminus of the work herein
 Continued research building upon the contents of this thesis are numerous.
 
 
-\hypertarget{more-observations}{%
-\subsection{Extending the Observation Set}\label{more-observations}}
+\hypertarget{sec:more-observations}{%
+\subsection{Extending the Observation Set}\label{sec:more-observations}}
 
 The most obvious avenue of future work is to continue verifying different parameterization of \CGKAmod{P}{T}{N} models in order to increase the tabulated observations.
 Most importantly is the observation of the model \CGKAmod{\VersionOne}{12}{8}, as this will determine the verification methodology's relationship with prior work and known security issues.
 The author intends to pursue this work in the immediate future.
 
 
-\hypertarget{more-predicates}{%
-\subsection{Adding LTL Predicates}\label{more-predicates}}
+\hypertarget{sec:more-predicates}{%
+\subsection{Adding LTL Predicates}\label{sec:more-predicates}}
 
 The general construction of the \CGKAmod{P}{T}{N} lends itself well towards extension and repeat use.
 Consideration and verification of other desirable properties for \CGKAdef protocols would be a logical extension of this work.
@@ -32,8 +32,8 @@ Perhaps fewer requirement can be placed on the \Abrev{DS}, required protocol to 
 Pursuing this, or similar inquiries, would require minor modifications to the \CGKAmod{P}{T}{N} model's implementation.
 
 
-\hypertarget{unbounded-verification}{%
-\subsection{Unbounded Verification}\label{unbounded-verification}}
+\hypertarget{sec:unbounded-verification}{%
+\subsection{Unbounded Verification}\label{sec:unbounded-verification}}
 
 The final suggestion of future work was alluded to in Section \ref{sec:game-adaptations}, which involves identifying a finite model encoding for an unbounded \(T\) and/or \(N\) parameter.
 Obviously the verification results would be stronger for a new \( \CGKAmod{P}{T}{N}^{'} \) model which considered \emph{all} possible epochs \(T\) or \emph{all} possible group sizes \(N\).

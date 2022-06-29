@@ -40,16 +40,14 @@ This follows from the following three facts.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
-\item
-  Each state in the state-space must have a unique state-vector encoding.
-\item
-  The model's state and the equivalent state-vector's encoding must include monotonically increasing temporal information.
-\item
-  In an unbounded game, there is no finite encoding of monotonically increasing temporal information.
+\item Each state in the state-space must have a unique state-vector encoding.
+\item The model's state and the equivalent state-vector's encoding must include monotonically increasing temporal information.
+\item In an unbounded game, there is no finite encoding of monotonically increasing temporal information.
 \end{enumerate}
 
 While explicit state model checking is sophisticated, it ultimate reduces to an exhaustive search which uses a myriad of techniques to cleverly reduce the search space.
 There does not exist an general technique for reducing an unbounded, potentially infinite, search space to a finite one, as this would yield a solution to the halting problem.
+State-space dependence on temporality is a long-known difficulty with model checking \autocite{henzinger1994symbolic}.
 Considerable thought was given towards identifying a specific unbounded-to-finite reduction for the \CGKAsec, but the author is unable to present such a technique in this work.
 Instead, different techniques are presented to ``truncate'' an equivalent finite ``prefix'' of the \CGKAsec.
 In terms of a \((T, C, N)\)-attacker \(\mathcal{A}\), verification is performed from epochs $0$ to \(T_{max}\), truncating the \CGKAsec to all prefix sequences containing at most \(T_{max}\) epochs.
@@ -73,13 +71,13 @@ The work presented here does not attempt memoization of sub-problems, though thi
 %\end{figure}
 
 
-\hypertarget{exhaustiveness}{%
-\subsection{Exhaustiveness}\label{exhaustiveness}}
+\hypertarget{sec:exhaustiveness}{%
+\subsection{Exhaustiveness}\label{sec:exhaustiveness}}
 
 Verification through explicit state model checking relies on exhaustiveness as it's proof method.
 However, the definition of the \CGKAsec had no notion of considering every possible interleaving of actions when created.
 Instead, it was defined in a manner which made existential proofs easy to describe and reason about.
-Proofs and counterexamples from previous works \autocite{alwen2019double}, \autocite{alwen2020security} take the form of scrutinizing the existence of a sequence of queries made by the attacker.
+Proofs and counterexamples from previous works \autocite{alwen2019double, alwen2020security} take the form of scrutinizing the existence of a sequence of queries made by the attacker.
 This existential focus permits leniency for redundancy within the \CGKAsec definition.
 Conversely, modeling the \CGKAsec such that it is amenable to explicit state model checking demands absolute parsimony within definition.
 Considering the CGKA games definition through the lens an exhaustive state-space search, both conveniently and surprisingly, leads to many possible game simplifications.
@@ -101,8 +99,8 @@ Hence within the model \CGKAmod{P}{T}{N}, the parameter \(C\) is linearly depend
 Similar reductions will follow while formalizing \CGKAmod{P}{T}{N} from the informal \CGKAsec definition.
 
 
-\hypertarget{idempotence}{%
-\subsection{Idempotence}\label{idempotence}}
+\hypertarget{sec:idempotence}{%
+\subsection{Idempotence}\label{sec:idempotence}}
 
 A literal interpretation of the informal \CGKAsec definition permits many redundant state transitions.
 Importantly idempotent operations are permitted.
@@ -135,8 +133,8 @@ A consequence of this, is that attacker queries necessarily advance the game sta
 This necessarily progression of the \CGKAsec within the model \CGKAmod{P}{T}{N} both reduces the run-time verification as well as permits verification that the model \CGKAmod{P}{T}{N} halts.
 
 
-\hypertarget{elided-group-members}{%
-\subsection{Elided Group Members}\label{elided-group-members}}
+\hypertarget{sec:elided-group-members}{%
+\subsection{Elided Group Members}\label{sec:elided-group-members}}
 
 The complexity of the asynchronous, multi-party communication described by the informal \CGKAsec definition is illustrated within Figure \ref{fig:CGKA-informal}.
 However, exhaustiveness can once again reduce model complexity.
@@ -158,13 +156,13 @@ Both the sequences originating with either \(\mathcal{A}\) querying an oracle or
 Due to the exhaustively methodology in verifying \CGKAmod{P}{T}{N}, both initiating epoch transitions options are explored, resulting in duplicate paths to the same epoch transition state.
 Hence, we can omit the group members from calling calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}, and without loss of generality, have \(\mathcal{A}\) query \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i}; respectively.
 
-%We arrive at a formalized and reduced \CGKAmod{P}{T}{N} model for a$( \textbf{T}, \textbf{C}, \textbf{N} )$-attacker depicted in Figure \ref{fig:CGKA-old-flowchart}.
-%Within the depiction, yellow nodes make nondeterministic choices, and dashed lines represent a nondeterministic path chosen by the origin node.
-%\begin{figure}
-%  \centering
-%  \caption{\label{fig:CGKA-old-flowchart}Flowchart of formalized CGKA security game.}
-%  \resizebox{\textwidth}{!}{\subimport{../figures/}{flow-chart}}
-%\end{figure}
+We arrive at a formalized and reduced \CGKAmod{P}{T}{N} model for a$( \textbf{T}, \textbf{C}, \textbf{N} )$-attacker depicted in Figure \ref{fig:CGKA-old-flowchart}.
+Within the depiction, yellow nodes make nondeterministic choices, and dashed lines represent a nondeterministic path chosen by the origin node.
+\begin{figure}
+  \centering
+  \caption{\label{fig:CGKA-old-flowchart}Flowchart of formalized CGKA security game.}
+  \resizebox{\textwidth}{!}{\subimport{../figures/}{flow-chart}}
+\end{figure}
 
 %\hypertarget{decidability}{%
 %\subsection{Decidability}\label{decidability}}

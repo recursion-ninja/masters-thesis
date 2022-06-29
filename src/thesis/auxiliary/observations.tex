@@ -2,14 +2,14 @@
 \chapter{Appendix: Observations}\label{apx:Observations}}
 
 
-\newcommand{\ObservationTable}[2]{%
+\newcommand{\ObservationTable}[3]{%
 \begin{table}[!ht]
 \centering
 \caption{%
-\label{tab:V#1-#2}%
-Observations for $\CGKAmod{\VersionOne}{T}{N} \models \LTLPredicate{#2}$.
+\label{tab:V#1-#3}%
+Observations for \CGKAmod{#2}{T}{N}$ \models \LTLPredicate{#3}$.%
 }%
-\subimport{../tables/}{results-V#1-#2-PRELIM}
+\subimport{../tables/}{results-V#1-#3-PRELIM}
 \end{table}
 }
 
@@ -31,9 +31,9 @@ Legend of symbols appearing in tables.
 \subimport{../tables/}{tabular-legend}
 \end{table}
 
-\ObservationTable{1}{HLT}
-\ObservationTable{2}{HLT}
-\ObservationTable{1}{PCS}
-\ObservationTable{2}{PCS}
-\ObservationTable{1}{FSU}
-\ObservationTable{2}{FSU}
+\ObservationTable{1}{\VersionOne}{HLT}
+\ObservationTable{2}{\VersionTwo}{HLT}
+\ObservationTable{1}{\VersionOne}{PCS}
+\ObservationTable{2}{\VersionTwo}{PCS}
+\ObservationTable{1}{\VersionOne}{FSU}
+\ObservationTable{2}{\VersionTwo}{FSU}

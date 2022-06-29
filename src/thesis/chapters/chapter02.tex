@@ -1,35 +1,28 @@
 \hypertarget{sec:methodology}{%
 \chapter{Verification Methodology}\label{sec:methodology}}
 
-The presence or absence of attacks on cryptographic protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption \autocite{clark1997survey}.
-Often attacks are discovered years, if not decades, after a protocol has been in active use.
-Late discovery of these attacks after widespread adoption of the protocol requires rapid effort to fix the protocol and encourage all systems using the protocol to update to the revised version.
-Often this updating process itself takes years of migration work or the migration never occurs.
-This is especially problematic for embedded systems which cannot be easily retrieved and modified.
-For these reasons, it is of paramount importance to identify all possible attacks on TreeKEM as early as possible, so they can be corrected before widespread adoption of the MLS standard.
-
-Formal verification takes many forms, with many techniques and tools at our disposal, and choosing the correct verification tool is of utter importance.
-In the past, Burrows--Abadi--Needham (BAN) \autocite{burrows1989logic} logic was the tool of choice for verifying cryptographic protocols.
-Unfortunately, protocols verified by BAN logic were later found to have undiscovered attacks \autocite{10.5555/188307.188350}.
+Formal verification takes many forms, with many techniques and tools at our disposal, and choosing the correct verification tool is of utmost importance.
+In the past, \Abrev{BAN logic} \autocite{burrows1989logic} was the tool of choice for verifying cryptographic protocols.
+Unfortunately, protocols verified by \Abrev{BAN logic} were later found to have undiscovered attacks \autocite{10.5555/188307.188350}.
 BAN was subsequently critiqued for not being able to fully verify crucial aspects of cryptographic protocols.
-Because of such concerns, results and conclusions from verification techniques using BAN logic stating that no attacks exist can be a false-positive.
-The kind false-positive verification of security that BAN logic provided could cause the very lapses in post-adoption security that the verification had attempted to preempt.
-BAN logic has since fallen out of favor and instead been replaced by model checking techniques \autocite{marrero1997model}, which have been able to produce attacks on cryptographic protocols which BAN techniques incorrectly verified as secure.
+Because of such concerns, results and conclusions from verification techniques using \Abrev{BAN logic} stating that no attacks exist can be a false-positive.
+The kind false-positive verification of security that \Abrev{BAN logic} provided could cause the very lapses in post-adoption security that the verification had attempted to preempt.
+\Abrev{BAN logic} has since fallen out of favor and instead been replaced by model checking techniques \autocite{marrero1997model} and theorem proving \autocite{hoare1969axiomatic}, which have been able to produce attacks on cryptographic protocols which BAN techniques incorrectly verified as secure.
 
-Theorem proving, when possible, is the preferred method of cryptographic protocol verification.
-Generally, modern protocols are constructed in too complex of a manner for a theorem prover to verify.
-When defining a protocol in terms compatible with modern theorem provers issues of termination checking, proof tactic selection, and SMT limitations greatly impede computer automated verification.
+Theorem proving, when possible, is the preferred method of cryptographic protocol verification \autocite{bolignano1997towards}.
+Generally, modern protocols are constructed in too complex a manner for a theorem prover to verify, with automated theorem proving still being an area of active research \autocite{xiong2020smartverif, bhargavan2021text}.
+When defining a protocol in terms compatible with modern theorem provers issues of termination checking, proof tactic selection, and SMT limitations greatly impede computer automated verification \autocite{hassan2021automated}.
 Human guidance is still required to direct theorem provers towards the verification goal.
-The specialized and time-consuming nature of utilizing a theorem prover is the chief reason model checking has been generally favored, the work presented here being no exception.
+The specialized and time-consuming nature of human effort required when utilizing a theorem prover is the chief reason model checking has been generally favored, with the work presented here being no exception.
 
-This work presents the verification of the TreeKEM protocol's FS and PCS security guarantees.
-To verify these security guarantees, the CGKA security game is used as an abstraction of the TreeKEM protocol, as well as all other CGKA-conforming protocols.
-The CGKA security game will be modeled as an explicit finite state transition machine, representing all possible TreeKEM execution states.
-The security guarantees will be encoded as Liner Temporal Logic statements.
-Then explicit state model checking techniques will be applied to verify that the LTL encodings of FS and PCS are maintained in every possible state of the CGKA security game.
+This work presents the verification of the TreeKEM protocol's \Abrev{FSU} and \Abrev{PCS} security guarantees.
+To verify these security guarantees, the \CGKAsec is used as an abstraction of the TreeKEM protocol, as well as all other \CGKAdef-conforming protocols.
+The \CGKAsec will be modeled as an explicit finite state transition machine \autocite{rabin1959finite}, representing all possible TreeKEM execution states.
+The security guarantees will be encoded as \Abrev{LTL} statements \autocite{4567924}.
+Then explicit state model checking techniques will be applied to verify that the \Abrev{LTL} encodings of \Abrev{FSU} and \Abrev{PCS} are maintained in every possible state of the \CGKAsec.
 
 There is one last important detail the verification.
-Recall that what differentiates SM from SGM is that SGM involves two or more parties.
+Recall that what differentiates \Abrev{SM} from \Abrev{SGM} is that \Abrev{SGM} involves two or more parties.
 There is no theoretical limit to the number of parties the TreeKEM protocol supports.
 However, we also stated that model checking represents all possible states of protocol as a finite diagram of transitions.
 Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while our model checker requires a finite number of states.
@@ -46,12 +39,14 @@ In order to ensure at least one observation of the \Abrev{FSU} deficiency of the
 The observed verification results are tabulated in Appendix \ref{apx:Observations} and discussed in Chapter \ref{results}.
 
 
-\hypertarget{explicit-state-model-checking}{%
-\section{Explicit state model checking}\label{explicit-state-model-checking}}
+\hypertarget{sec:explicit-state-model-checking}{%
+\section{Explicit state model checking}\label{sec:explicit-state-model-checking}}
 
-Model checking exists as the preferred alternative to BAN logic techniques for verifying cryptographic protocols \autocite{kacprzak2006comparing} \autocite{lomuscio2007verification} \autocite{van2004symbolic}.
+Model checking exists as the preferred alternative to \Abrev{BAN logic} techniques for verifying cryptographic protocols \autocite{kacprzak2006comparing, lomuscio2007verification, van2004symbolic}.
 Model checking represents all possible states of protocol as a finite graph of transitions \autocite{clarke1981design}.
-The model checker then asserts that one or more properties holds for the protocol by traversing through all combinations of transitions through the diagram.
+There exist one or more start states in the transition graph representing possible starting condiitions.
+Transitions in the graph uniquely encode the possible changes in model state.
+The model checker then asserts that one or more properties holds for the protocol by traversing through all combinations of transitions through the graph \autocite{ORBi-a8d60ab6-1101-4434-9511-c01ea4e5a15b}.
 If a property holds, the model checker will assert that there is no possible set of transitions through states that exist in the protocol which violate the specified property.
 If the property does not hold, the model checker will produce a counter-example sequence of transitions through possible states showing how the specified property can be violated.
 This method of verifying cryptographic protocols is very attractive as the verification result is either an exhaustive proof of security guarantees or a novel cryptographic attack which can be analyzed and corrected.
@@ -67,20 +62,13 @@ However, incrementing the \(N\) parameter while holding \(T\) constant, only inc
 Due to the constraints engineering constraints presented by explicit state model checking, the verification work presented will only consider the combinatorial collection of all models parameterized by \(T\) and \(N\), where \(T \in [1, T_{max}]\) and \(N \in [2, N_{max}]\).
 
 
-\hypertarget{linear-temporal-logic}{%
-\section{Linear Temporal Logic}\label{linear-temporal-logic}}
+\hypertarget{sec:linear-temporal-logic}{%
+\section{Linear Temporal Logic}\label{sec:linear-temporal-logic}}
 
 Correctly specifying the properties which must hold for the cryptographic protocol is one of the most important aspects of model checking techniques.
-Fortunately, Linear Temporal Logic (LTL) \autocite{4567924} is an almost perfectly tailored language for representing the security guarantees at the CGKA abstraction level.
-Additionally, LTL usage in conjunction with an explicit state model checker is a well supported and researched technique.
-LTL allows a precisely definition of what must occur in specific segments of time during the the protocol's transition through possible states.
-An example of LTL's expressive power is that it allows for stating that a property must always hold, eventually hold, hold until another property holds, holds in the next state, never holds, or any combination of these.
-
-Generally, properties are classified as either \emph{safety}, \emph{liveness}, \emph{fairness}
-LTL possesses just enough expressive power to specify the FS and PCS security guarantees, but no more than that.
-This perfect balance of expressiveness is important, because the more expressive the logical framework we choose to define our security guarantees, the less efficient the available verification techniques will be.
-
-LTL possesses all the logical operators of the two-element Boolean algebra with the addition of four temporal operators
+Fortunately, \Abrev{LTL} \autocite{4567924} is an almost perfectly tailored language for representing the security guarantees at the CGKA abstraction level.
+Additionally, \Abrev{LTL} usage in conjunction with an explicit state model checker is a well supported and researched technique \autocite{clarke1994another, biere1999symbolic, bloem1999efficient}.
+\Abrev{LTL} possesses all the logical operators of the two-element Boolean algebra with the addition of four temporal operators
 The temporal operators are presented below as a short had reference for formulas described in Section \ref{#sec:LTL-security}.
 
 \[
@@ -92,11 +80,20 @@ The temporal operators are presented below as a short had reference for formulas
 \end{aligned}
 \]
 
+An example of \Abrev{LTL}'s expressive power is that it allows for stating that a property must always hold, eventually hold, hold until another property holds, holds in the next state, never holds, or any combination of these.
+Often, properties are classified as either \emph{safety}, \emph{liveness}, or \emph{fairness}; though more nuanced which do not adhere the these categories are also expressible with \Abrev{LTL}.
+A safety property ensures that an undesirable event never occurs \((\, \Box(\,\neg\varphi \,) \,)\).
+A liveness property requires progress towards an event \((\, \Box(\, \varphi \implies \Diamond(\,\psi \,) \,) \,)\).
+A fairness property ensures that a desirable even continues to happen \((\, \Box(\, \Diamond(\,\varphi \,) \,) \,)\).
+The usage of \Abrev{LTL} allows a precise definition of what must occur in specific segments of time during the the protocol's transition through possible states.
+\Abrev{LTL} possesses just enough expressive power to specify the FS and PCS security guarantees, but no more than that.
+This perfect balance of expressiveness is important, because the more expressive the logical framework we choose to define our security guarantees, the less efficient the available verification techniques will be.
 
-\hypertarget{promela}{%
-\section{Promela}\label{promela}}
 
-Once we decided to use model checking with LTL as the formal verification methodology, we must then select the appropriate tools to use - the Protocol Meta Language (PROMELA) \autocite{holzmann1980basic}, \autocite{holzmann1990design}.
+\hypertarget{sec:promela}{%
+\section{Promela}\label{sec:promela}}
+
+Once we decided to use model checking with \Abrev{LTL} as the formal verification methodology, we must then select the appropriate tools to use - the Protocol Meta Language (PROMELA) \autocite{holzmann1980basic, holzmann1990design}.
 It exists as a precise and convenient specification for defining all possible states and transitions for TreeKEM.
 By specifying the protocol in PROMELA, we can allow the PROMELA ``translator: to take a high-level, human readable description of TreeKEM and produce a much larger machine readable list with all the possible states and transitions in TreeKEM.
 Manually defining all these states and transitions would take an inordinate amount of time and is prone to errors.
@@ -108,12 +105,13 @@ PROMELA supports mutable variable assignment, treating all variables as a finite
 Assignments mutate an implicit global state.
 Variables can take the form of Boolean values, signed or unsigned numbers of varying bit widths, type-checked enumerations, or multi-dimensional arrays.
 PROMELA also provides looping constructs and an inlining of definition, similar to an inlined function call in C, allowing for code reuse.
+Examples of usages is dipicted in Figure \ref{fig:determinism}.
 These familiar C-like features of PROMELA are evaluated deterministically and linearly within the execution of a model defined in PROMELA.
 However, PROMELA also differs from C in important ways which facilitate explicit state graph construction and exhaustive search.
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- deterministic operations}
+\caption{\label{fig:determinism} PROMELA example --- deterministic operations}
 \begin{verbatim}
 // type  identifier   value    range
 bool     BitVar     = true; // [0, 1]
@@ -142,21 +140,21 @@ CodeReuse( NonNeg );
 
 
 PROMELA only provides non-deterministic conditional constructs.
-An \texttt{if} statement is supplied with one or more logical guards containing PROMELA expression which evaluates to a Boolean value and an associated (possibly empty) sequence PROMELA expressions for each guard.
+An \texttt{if} statement, shown in Figure \ref{fig:choice}, is supplied with one or more logical guards containing PROMELA expression which evaluates to a Boolean value and an associated (possibly empty) sequence PROMELA expressions for each guard.
 The model non-deterministically selects a guard which evaluates to \texttt{true} and follows the code path of the associated sequence of expressions.
 Once a the non-deterministically selected code path completes execution, execution resumes at the end of the \texttt{if} statement.
 Another similar non-deterministic conditional construct is provided by PROMELA.
-A \texttt{do} statement is also supplied with one or more pairs of logical guards and expression sequences.
+A \texttt{do} statement,statement, shown in Figure \ref{fig:repetition}, is also supplied with one or more pairs of logical guards and expression sequences.
 However, once a the non-deterministically selected code path of the \texttt{do} statement completes execution, execution resumes at the beginning of the \texttt{do} statement.
 Execution only resumes at the end of a \texttt{do} block when one of the non-deterministically selected code paths contains a \texttt{break} statement.
 This definition of the \texttt{do} statement provides nondeterministic looping behavior.
 The \texttt{if} statement permits identical behavior to C \texttt{if/else} statements if all guards are mutually exclusive.
 The \texttt{do} statement permits identical behavior to a while loop with correctly constructed guards.
-However, the nondeterministic nature of these conditional constructs provide much more expressive power within the model.
+However, the non-deterministic nature of these conditional constructs provide much more expressive power within the model.
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- non-deterministic choice via \texttt{if}}
+\caption{\label{fig:choice}PROMELA example --- non-deterministic choice via \texttt{if}}
 \begin{verbatim}
 BitVar = true;
 NonNeg = 8;
@@ -173,7 +171,7 @@ fi
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- non-deterministic repetition via \texttt{do}}
+\caption{\label{fig:repetition}PROMELA example --- non-deterministic repetition via \texttt{do}}
 \begin{verbatim}
 BitVar = true;
 NonNeg = 8;
@@ -188,7 +186,7 @@ od
 \end{figure}
 
 There exists one final nondeterministic construct provided by PROMELA.
-The \texttt{select} statement takes a contiguous, inclusive range of values and non-deterministically selects a value from within the range, assigning the result to a specified variable.
+The \texttt{select} statement, shown in Figure \ref{fig:selection}, takes a contiguous, inclusive range of values and non-deterministically selects a value from within the range, assigning the result to a specified variable.
 This replaces the notion of a random number generator within the model.
 Explicit state model checking requires that all possible states within the model be explicitly enumerated.
 Randomness is replaced by a range of nondeterministic values.
@@ -197,7 +195,7 @@ The expressive power provided by PROMELA's \texttt{if}, \texttt{do}, and \texttt
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- non-determinism via \texttt{select}}
+\caption{\label{fig:selection}PROMELA example --- non-determinism via \texttt{select}}
 \begin{verbatim}
 byte RandomArray[16];
 byte i;
@@ -214,11 +212,11 @@ for ( i : 0 .. 15 ) {
 A major difference from other C-like languages is PROMELA's support of concurrency.
 A model may include multiple processes, with no restrictions as to when and how the processes are created or terminated.
 The model of multiple processes considers the state transitions through each process being interleaved in any permissible permutation during the execution of the model.
-To further support modeling concurrency, PROMELA provides an \texttt{atomic} block for indicating that a sequence of expressions cannot be interleaved between processes.
+To further support modeling concurrency, PROMELA provides an \texttt{atomic} block, shown in Figure \ref{fig:atomic}, for indicating that a sequence of expressions cannot be interleaved between processes.
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- \texttt{atomic} block}
+\caption{\label{fig:atomic}PROMELA example --- \texttt{atomic} block}
 \begin{verbatim}
 byte SharedArray[32];
 int  sum = 0; 
@@ -235,13 +233,13 @@ for ( i : 0 .. 15 ) {
 \end{figure}
 
 
-Similarly, PROMELA supports a \texttt{d\_step} block, which allows specifying that a sequence of expressions are deterministic within the model and should be considered a single state within the generated state-space transition graph.
+Similarly, PROMELA supports a \texttt{d\_step} block as shown in Figure \ref{fig:dstep}, which allows specifying that a sequence of expressions are deterministic within the model and should be considered a single state within the generated state-space transition graph.
 Unlike an \texttt{atomic} block, a \texttt{d\_step} block cannot include any nondeterministic constructs.
 Judicious use of \texttt{d\_step} can greatly simplify the state-space search as well as improve the comprehensibility of any counterexamples produced by the model checker.
 
 \begin{figure}
 \centering
-\caption{PROMELA example --- \texttt{d\_step} block}
+\caption{\label{fig:dstep}PROMELA example --- \texttt{d\_step} block}
 \begin{verbatim}
 // All steps to assign the value to dim are collapsed.
 // There is a single state transition from dim being unassigned
@@ -264,9 +262,10 @@ Labels prefixed with \texttt{end} identify the set of valid end states in which 
 Labels prefixed with \texttt{accept} identify states which the program cannot transition through infinitely often if it executes infinitely.
 Labels prefixed with \texttt{progress} identify states which the program must transition through infinitely often if it executes infinitely.
 Finally, a labeled state may be referenced in an \Abrev{LTL} predicate.
+Examples usages of state labels are illistrated in Figure \ref{fig:state-label}.
 
 \begin{figure}
-\caption{PROMELA example --- state labels}
+\caption{\label{fig:state-label}PROMELA example --- state labels}
 \begin{verbatim}
 byte NumArray[6];
 int  prod = 0;
@@ -287,15 +286,15 @@ end_example: i = prod;
 \hypertarget{spin}{%
 \section{Spin}\label{spin}}
 
-Once PROMELA is used to produce all possible states and transitions of TreeKEM, we must supply that representation to a model checker which will verify LTL specifications.
-Among the many options of model checkers, we will use the SPIN model checker \autocite{godefroid1990using}, \autocite{holzmann1997model}.
+Once PROMELA is used to produce all possible states and transitions of TreeKEM, we must supply that representation to a model checker which will verify \Abrev{LTL} specifications.
+Among the many options of model checkers, we will use the SPIN model checker \autocite{godefroid1990using, holzmann1997model}.
 SPIN provides several important features for our verification goals.
 The main difficulty with model checking is the size of the number of states and transitions \autocite{burch1992symbolic}.
 Since model checking works by checking every possible combination of states and transitions, the size of the state-space directly impacts the feasibility.
 SPIN provides some solutions to making this problem tractable, the culmination of over three decades of research and development.
 First, SPIN supports ``on-the-fly'' verification \autocite{rudin1987limits}, which means that SPIN does not need to consider the entire set of states and transitions at the same time, but instead can work on just subsets until the whole set is verified.
 Second, SPIN also uses a ``partial ordering'' of the states and transitions \autocite{shannon1958note} to reduce the number of subsets it needs to verify before being certain that a property holds for the whole set of states and transitions.
-Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by default as they can be used in conjunction with minimal drawbacks \autocite{valmari1993fly}, \autocite{peled1994combining}, \autocite{holzmann1995improvement}, \autocite{couvreur1999fly}.
+Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by default as they can be used in conjunction with minimal drawbacks \autocite{valmari1993fly, peled1994combining, holzmann1995improvement, couvreur1999fly}.
 Consideration was made to use TopSpin \autocite{DonaldsonM_AMAST2006}, a PROMELA pre-processing plugin for SPIN which performs symmetry reduction as well.
 Unfortunately, this theoretically viable technique is not practically usable as the plugin has not been maintained in over a decade.
 Additionally, SPIN supports numerous compile time directive which alter the state-space representation, search trajectories, and time-memory trade-offs.

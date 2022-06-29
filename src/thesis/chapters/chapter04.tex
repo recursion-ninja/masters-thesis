@@ -289,8 +289,8 @@ The oracles of the \CGKAsec are replicated within the \CGKAmod{P}{T}{N} model.
 An oracle has access to and modifies the global protocol state via the global PROMELA variables.
 The attacker does not have access to the global state in the \CGKAmod model, and can only interact with the global state via the oracles.
 
-\hypertarget{corrupt}{%
-\subsection{Corrupt}\label{corrupt}}
+\hypertarget{sec:corrupt}{%
+\subsection{Corrupt}\label{sec:corrupt}}
 
 A query of \Oracle{corrupt}{ID_n} within the \CGKAmod{P}{T}{N} model encoding performs a sequence of operations detailed in Figure \ref{fig:Oracle-Corrupt} which fulfills the oracle's semantics.
 First the oracle encoding updates the attacker's knowledge-base via the \texttt{attacker\_learn\_leaf} and \texttt{attacker\_amend\_knowledge} interface methods for the protocol \texttt{P}.
@@ -347,8 +347,8 @@ move_corrupt: skip;
 \end{verbatim}
 \end{figure}
 
-\hypertarget{hoard}{%
-\subsection{Hoard}\label{hoard}}
+\hypertarget{sec:hoard}{%
+\subsection{Hoard}\label{sec:hoard}}
 
 A query of \Oracle{hoard}{ID_n} within the \CGKAmod{P}{T}{N} model encoding simply marks that \(\mathtt{ID_n}\) will not delete cryptographic secrets starting from the current epoch, as shown in Figure \ref{fig:Oracle-Hoard}.
 
@@ -387,8 +387,8 @@ move_reveal: skip;
 \end{figure}
 
 
-\hypertarget{insert}{%
-\subsection{Insert}\label{insert}}
+\hypertarget{sec:insert}{%
+\subsection{Insert}\label{sec:insert}}
 
 A query of \Oracle{reveal}{ID_m,\, ID_n} performs the epoch progression as displayed in Figure \ref{fig:Oracle-Insert}.
 First the oracle establishes \(\mathtt{ID_m}\) as \texttt{originID} and \(\mathtt{ID_n}\) as \texttt{targetID}.
@@ -448,8 +448,8 @@ move_remove: skip;
 \end{figure}
 
 
-\hypertarget{update}{%
-\subsection{Update}\label{update}}
+\hypertarget{sec:update}{%
+\subsection{Update}\label{sec:update}}
 
 A query of \Oracle{reveal}{ID_n} is displayed in Figure \ref{fig:Oracle-Update}.
 First the oracle establishes \(\mathtt{ID_n}\) as \texttt{originID}.
@@ -491,8 +491,8 @@ Representing the \Abrev{FSU} and \Abrev{PCS} security guarantees will be the pri
 An additional predicate checking for model termination is included as a methodology confidence check.
 
 
-\hypertarget{hlt-as-ltl}{%
-\subsection{Termination as LTL}\label{hlt-as-ltl}}
+\hypertarget{sec:hlt-as-ltl}{%
+\subsection{Termination as LTL}\label{sec:hlt-as-ltl}}
 
 \begin{LTL}[\,\LTLPredicate{HLT}\,]
     $$
@@ -507,8 +507,8 @@ An \Abrev{LTL} atom \texttt{CGKA@end\_of\_game} is true if an only if the proces
 With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \models \LTLPredicate{HLT} \) is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
 
 
-\hypertarget{pcs-as-ltl}{%
-\subsection{\Abrev{PCS} as LTL}\label{pcs-as-ltl}}
+\hypertarget{sec:pcs-as-ltl}{%
+\subsection{\Abrev{PCS} as LTL}\label{sec:pcs-as-ltl}}
 
 \begin{LTL}[\,\LTLPredicate{PCS}\,]
     $$
@@ -517,8 +517,8 @@ With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \model
 \end{LTL}
 
 
-\hypertarget{fsu-as-ltl}{%
-\subsection{\Abrev{FSU} as LTL}\label{fsu-as-ltl}}
+\hypertarget{sec:fsu-as-ltl}{%
+\subsection{\Abrev{FSU} as LTL}\label{sec:fsu-as-ltl}}
 
 \begin{LTL}[\;Never-Trivial\;]
     $$

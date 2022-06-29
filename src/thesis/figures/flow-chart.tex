@@ -1,17 +1,27 @@
 \begin{tikzpicture}[ node distance = 2cm and 3cm, auto]
-	\node[blockOLD, anchor=west] (I1) {Fix upper limits:\\\textbf{T} $\in \mathcal{Z}^+$\\\textbf{C} $\in \left\{ 1 \dots \textbf{T} \right\} \subset \mathcal{Z}^+$\\\textbf{N} $\in \mathcal{Z}^+ \setminus \left\{ 1 \right\}$};
+	\node[blockOLD, text width=12em, anchor=west] (I1) {Fix upper limits:\\\textbf{T} $\in \mathcal{Z}^+$\\\textbf{C} $\in \left\{ 1 \dots \textbf{T} \right\} \subset \mathcal{Z}^+$\\\textbf{N} $\in \mathcal{Z}^+ \setminus \left\{ 1 \right\}$};
 	\node[cloudOLD, below of=I1] (I2) {Select parameter values:\\$T^{*} \in \left\{ 1 \dots \textbf{T} \right\} \subset \mathcal{Z}^+$\\$C^{*} \in \left\{ 1 \dots \textbf{C} \right\} \subset \mathcal{Z}^+$\\$N^{*} \in \left\{ 2 \dots \textbf{N} \right\} \subset \mathcal{Z}^+$};
-	\node[blockOLD, below of=I2] (I3) {Initialize Global State\\$t \gets 0$\\$c \gets 0$\\$M \gets \emptyset$\\};
-	\node[blockOLD, below of=I3] (I4) {Create Messaging Group\\$G \gets \left\{ ID_0, ID_1, \dots ID_{N^{*}}\right\}$\\};
-	\node[cloudOLD, below of=I4] (Game) {Play CGKA Game\\$t \gets t + 1$};
+	\node[blockOLD, text width=12em, below of=I2] (I3) {Initialize Global State\\$t \gets 0$\\$c \gets 0$\\$M \gets \emptyset$\\};
+	\node[blockOLD, text width=12em, below of=I3] (I4) {Create Messaging Group\\$G \gets \left\{ ID_0, ID_1, \dots ID_{N^{*}}\right\}$\\};
+	\node[cloudOLD, below of=I4] (Game) {Play CGKA Game};
 	\node[cloudOLD, below right=2cm and 1cm of Game] (Attack)  {Attacker Gains\\Information};
 	\node[cloudOLD, below left= 2cm and 1cm of Game] (Advance) {Attacker Advances\\Epoch};
-	\node[blockOLD, below of=Attack] (Check) {Safety Check\\ LTL statements here};
+	\node[blockOLD, below=11cm of Game] (Check) {Challenge Ends Game\\Measure Advantage};
 	
-	\node[blockOLD, below right=5.0cm and -6cm of Advance] (Add) {Add group member};
-	\node[blockOLD, below right=3.0cm and -4cm of Advance] (Rmv) {Remove group member};
-	\node[blockOLD, below right=1.0cm and -2cm of Advance] (Upd) {Update secrets};
-
+	\node[blockOLD, anchor=north east, below right=1.0cm and -6.00cm of Advance] (Add) {Add group member};
+	\node[blockOLD, anchor=north east, below right=3.0cm and -4.00cm of Advance] (Rmv) {Remove group member};
+	\node[blockOLD, anchor=north east, below right=5.0cm and -2.00cm of Advance] (Upd) {Update secrets};
+	
+	\node[blockOLD, anchor=north west, below left=1.0cm and -6cm of Attack] (Cor) {Corrupt group member};
+	\node[blockOLD, anchor=north west, below left=3.0cm and -4cm of Attack] (Hrd) {Group member keeps secrets};
+	\node[blockOLD, anchor=north west, below left=5.0cm and -2cm of Attack] (Rvl) {Reveal shared secret key};
+	
+	\node[invis, text width=4em, above left= 3cm and -0.50cm of Add] (RPoint) {\small$t \gets t + 1$};
+	\node[invis, text width=3em, above right=3cm and  0.05cm of Cor] (LPoint) {\small$t \gets t$};
+	\node[invis, text width=7em, below=3.75cm of Game] (CPoint) {\small$iff \;\; t = \textbf{T} - 1$};
+	
+	\node[invis, text width=7em, above right=-0.15cm and 0.1cm of Advance] (VPoint) {\small$iff \;\; t < \textbf{T} - 1$};
+	
 %	\node[blockOLD, above left=2cm    and 1cm    of Attack] (Corrupt) {Corrupt a member};
 %    \node[blockOLD, above left=0.15cm and 3.25cm of Attack] (Hoard) {Stop secret deletion};
 %    \node[blockOLD, below left=0.15cm and 3.25cm of Attack] (Reveal) {Reveal root secret};
@@ -22,14 +32,18 @@
 	\path[lineOLD](I4)--(Game);
 	\path[choiceOLD](Game)|-(Attack);
 	\path[choiceOLD](Game)|-(Advance);
+	
+	
 	% edge node {iff $\textbf{\textit{t}} < \textbf{\textit{T - 1}}^{*}$\\$t \gets t + 1$} (Advance);
 	
-	\path[choiceOLD](Advance)|-(Add);
-	\path[choiceOLD](Advance)|-(Rmv);
-	\path[choiceOLD](Advance)|-(Upd);
-%	\path[lineOLD](Add)--(Game);
-%	\path[lineOLD](Rmv)--(Game);
-%	\path[lineOLD](Upd)--(Game);
+	\path[choiceOLD]([xshift=1.5cm,yshift=0.15cm] Advance.south)--([xshift=-0.5cm] Add.north east);
+	\path[choiceOLD]([xshift=1.5cm,yshift=0.15cm] Advance.south)--([xshift=-0.5cm]Rmv.north east);
+	\path[choiceOLD]([xshift=1.5cm,yshift=0.15cm] Advance.south)--([xshift=-0.5cm]Upd.north east);
+	
+\path[lineOLD](Add.west)-|(RPoint.south);
+\path[lineOLD](Rmv.west)-|(RPoint.south);
+\path[lineOLD](Upd.west)-|(RPoint.south);
+\path[lineOLD](RPoint.north)|-(Game.west);
 %
 %	\path[choiceOLD](Game)-|(Corrupt);
 %	\path[choiceOLD](Game)-|(Hoard);
@@ -37,6 +51,18 @@
 %	\path[lineOLD](Corrupt)--(Attack);
 %    \path[lineOLD](Hoard)--(Attack);
 %	\path[lineOLD](Reveal)--(Attack);
+
+\path[choiceOLD]([xshift=-1.5cm,yshift=0.15cm] Attack.south)--([xshift=0.5cm]Cor.north west);
+\path[choiceOLD]([xshift=-1.5cm,yshift=0.15cm] Attack.south)--([xshift=0.5cm]Hrd.north west);
+\path[choiceOLD]([xshift=-1.5cm,yshift=0.15cm] Attack.south)--([xshift=0.5cm]Rvl.north west);
+
+\path[lineOLD](Cor.east)-|(LPoint.south);
+\path[lineOLD](Hrd.east)-|(LPoint.south);
+\path[lineOLD](Rvl.east)-|(LPoint.south);
+\path[lineOLD](LPoint.north)|-(Game.east);
+
+\path[choiceOLD](Game.south)--(CPoint.north);
+\path[choiceOLD](CPoint.south)--(Check);
 
 
 \end{tikzpicture}
