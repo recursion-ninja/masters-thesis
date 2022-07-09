@@ -131,22 +131,22 @@ thesis-preamble    := $(call thesis_auxiliary,preamble.$(extension-latex))
 thesis-frontmatter := $(call thesis_auxiliary,frontmatter.$(extension-latex))
 thesis-backmatter  := $(call thesis_auxiliary,backmatter.$(extension-latex))
 
-
-
 thesis-template    := $(call thesis_source,thesis.$(extension-latex))
 
-
 # Thesis references
-thesis-bib-ref     := $(call thesis_auxiliary,references)
-thesis-bib-path    := $(thesis-bib-ref).bib
+thesis-bib-path    := $(call thesis_auxiliary,references.bib)
 
 # Thesis document class
-thesis-class-ref   := $(call thesis_auxiliary,hunterthesis)
-thesis-class-path  := $(thesis-class-ref).cls
+thesis-class-name  := hunterthesis.cls
+thesis-class-path  := $(call thesis_source,$(thesis-class-name))
+thesis-class-URI   := \
+    https://raw.githubusercontent.com/recursion-ninja/hunter-thesis-class/master/$(thesis-class-name)
 
 # Thesis PDF document file path
-manuscript-target  := \
-    $(abspath $(dir-thesis-manuscript)$(subst $(SPACE),-,$(thesis-param-title)).$(extension-portabledoc))
+manuscript-name   := \
+    $(subst $(SPACE),-,$(thesis-param-title))
+manuscript-target := \
+    $(abspath $(dir-thesis-manuscript)$(manuscript-name).$(extension-portabledoc))
 
 artifact-extension :=\
     $(sort aux bbl bcf blg dvi fdb_latexmk fls lof log lot out ps run.xml synctex\(busy\) thm toc)
@@ -185,6 +185,7 @@ installdirs:: $(dir $(manuscript-target))
 thesis: $(HUNTERTHESIS_CLASS) $(manuscript-target)
 
 thesis-clean:
+	( cd $(dir-thesis-source); latexmk -CA; )
 	-rm -f$(row-delimiter)$(manuscript-target) 
 	-rm -f$(row-delimiter)$(subst $(SPACE),$(row-delimiter),$(artifact-filepaths))
 
@@ -203,14 +204,16 @@ $(dir $(manuscript-target)):
 #	latexmk $< -cd -C
 
 
+$(thesis-class-path):
+	 wget -O $(thesis-class-path) $(thesis-class-URI)
+
 ## Build thesis
-$(manuscript-target): $(thesis-template) $(thesis-chapters) $(thesis-bib-path) $(thesis-class-path) $(thesis-preamble) $(list-figures) $(list-tables)
-	( cd $(dir-thesis-source); \
-	  pdflatex $<; \
-	  biber    $(subst .$(extension-latex),,$<); \
-	  pdflatex $<; \
-	  pdflatex $<; \
-#	  pdflatex $<; \
+$(manuscript-target): $(thesis-template)  $(thesis-chapters) $(thesis-class-path) $(thesis-bib-path) $(thesis-class-path) $(thesis-preamble) $(list-figures) $(list-tables)
+	( latexmk \
+	    -cd \
+	    -pdf \
+	    -pdflatex="pdflatex -interaction=nonstopmode" \
+	    -use-make $<; \
 	  mv $(subst $(extension-latex),$(extension-portabledoc),$<) $@; \
 	)
 

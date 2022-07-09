@@ -1,7 +1,7 @@
 \hypertarget{sec:model-encoding}{%
 \chapter{Model Encoding}\label{sec:model-encoding}}
 
-With the relationships of actors within the \CGKAsec formalized in Chapter \ref{sec:model-formalization}, a description of how the \CGKAsec is encoded into the \CGKAmod{P}{T}{N} is necessary for model justification.
+With the relationships of actors within the \CGKAsec\ formalized in Chapter\ \ref{sec:model-formalization}, a description of how the \CGKAsec\ is encoded into the \CGKAmod{P}{T}{N} is necessary for model justification.
 The \CGKAmod{P}{T}{N} model encoding can be segmented into three major components.
 The top-most component, contains is the encoding of the model's global state along with the model's initialization, control loop, and termination.
 Second, there is the collection of oracles queried by the attacker.
@@ -11,9 +11,9 @@ Lastly, the polymorphic module \texttt{P} encapsulating and maintaining the atta
 \hypertarget{sec:game-oracles}{%
 \section{CGKA Game}\label{sec:game-oracles}}
 
-A justifiable model of the \CGKAsec game requires a small core of global variables.
+A justifiable model of the \CGKAsec\ game requires a small core of global variables.
 These variables, importantly, are the only mutable values which can be used within an \Abrev{LTL} predicate during verification.
-The global state of mutates as the given permutation of protocol execution within the \CGKAsec is evaluated.
+The global state of mutates as the given permutation of protocol execution within the \CGKAsec\ is evaluated.
 Initialization of the global variables occurs first, followed by the creation of the model's \texttt{CGKA} process.
 The evolution of execution is guided by the main control loop within the \texttt{CGKA} process.
 
@@ -27,8 +27,8 @@ Many of these global variables are directly dependent on parameters \(T\) and \(
 Notably, a series of ``C-like'' constant macro definitions
 These constants are ``hard-coded'' when compiling a parameterized model, and referenced throughout the model's PROMELA encoding.
 
-The constants are described in Table \ref{tab:constants-from-parameters} and depicted in Figure \ref{fig:Encoded-Constants}.
-There are five broad categories of parameter-dependent constants, which are described in the same order in Table \ref{tab:constants-from-parameters}.
+The constants are described in Table\ \ref{tab:constants-from-parameters} and depicted in Figure\ \ref{fig:Encoded-Constants}.
+There are five broad categories of parameter-dependent constants, which are described in the same order in Table\ \ref{tab:constants-from-parameters}.
 
 \begin{enumerate}
 \item Security parameters
@@ -44,7 +44,7 @@ When representing an epoch or user ID, one additional ``sentinel'' value is adde
 Careful consideration of PROMELA \texttt{unsigned} type's specified bit width must be taken into account when defining the representation.
 For example \(N=7\) requires only 3 bits to represent all possible values \([0,7]\), but to represent a possibly missing user ID an extra value of \((7 + 1 = 8)\) is added to the range, and 4 bits are required to represent all possible user ID values in the range \([0,\, 8]\).
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \centering
 \caption{%
 \label{tab:constants-from-parameters}%
@@ -53,7 +53,7 @@ Derivation constants in \CGKAmod{P}{T}{N} model from parameters\(T\) and \(N\).
 \subimport{../tables/}{constants-from-parameters}
 \end{table}
     
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Encoded-Constants}\CGKAmod{}{}{} --- parameterized constants for \(T=12\) and \(N=8\).}
 \begin{verbatim}
@@ -82,14 +82,14 @@ Derivation constants in \CGKAmod{P}{T}{N} model from parameters\(T\) and \(N\).
 \end{figure}
 
 Global state variables differ from the constants mentioned above, as they are mutable and their values change throughout the course of program execution.
-The global variables for the \CGKAmod{P}{T}{N} are shown in Figure \ref{fig:Global-State}.
+The global variables for the \CGKAmod{P}{T}{N} are shown in Figure\ \ref{fig:Global-State}.
 There are Boolean array to track \Oracle{chall}{} queries, group membership, and group member ``safety'' (corruption), as well as byte arrays representing epoch initiation and secret retention for each user.
 The \texttt{unsigned} variable \texttt{epoch} stores the current epoch of the furthest advanced user ID within the \CGKAsec.
 The \texttt{unsigned} variables \texttt{originID} and \texttt{targetID} store user IDs effected by current query to \Oracle{add-user}{}, \Oracle{remove-user}{}, or \Oracle{send-update}{}.
 Including \texttt{originID} and \texttt{targetID} in the global state permits usage within \Abrev{LTL} predicates.
 
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Global-State}\CGKAmod{}{}{} --- global state of the \CGKAsec.}
 \begin{verbatim}
@@ -114,13 +114,13 @@ local unsigned targetID  : BITS_USERID; // ID of the effected member
 \hypertarget{subsec:control-loop}{%
 \subsection{Control Loop}\label{subsec:control-loop}}
 
-The \CGKAmod{P}{T}{N} model transparently reflects the \CGKAsec operations and logic.
-First the \CGKAmod{P}{T}{N} model is initialized via \texttt{CGKA\_initialize} as depicted in Figure \ref{fig:Control-Initialization}.
-Next the first epoch, epoch \(0\), is initiated in a subsequent call to \texttt{CGKA\_create\_group}, shown in Figure \ref{fig:Control-Group-Creation}.
-Finally, play non-deterministically progresses via the main control loop defined within \texttt{CGKA\_security\_game}, as illustrated by Figure \ref{fig:Control-Loop}.
-Each loop iteration invokes either \texttt{play\_move\_with\_commitment} or \texttt{play\_move\_without\_commitment}, shown in Figures \ref{fig:Control-Commitment} and \ref{fig:Control-Noncommitment}, which advance play to the next epoch or remain in the same epoch respectively.
+The \CGKAmod{P}{T}{N} model transparently reflects the \CGKAsec\ operations and logic.
+First the \CGKAmod{P}{T}{N} model is initialized via \texttt{CGKA\_initialize} as depicted in Figure\ \ref{fig:Control-Initialization}.
+Next the first epoch, epoch \(0\), is initiated in a subsequent call to \texttt{CGKA\_create\_group}, shown in Figure\ \ref{fig:Control-Group-Creation}.
+Finally, play non-deterministically progresses via the main control loop defined within \texttt{CGKA\_security\_game}, as illustrated by Figure\ \ref{fig:Control-Loop}.
+Each loop iteration invokes either \texttt{play\_move\_with\_commitment} or \texttt{play\_move\_without\_commitment}, shown in Figures\ \ref{fig:Control-Commitment} and\ \ref{fig:Control-Noncommitment}, which advance play to the next epoch or remain in the same epoch respectively.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Control-Initialization}\CGKAmod{}{}{} --- initialization of model.}
 \begin{verbatim}
@@ -159,7 +159,7 @@ inline CGKA_initialize()
 \end{figure}
 
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Control-Group-Creation}\CGKAmod{}{}{} --- initial group creation.}
 \begin{verbatim}
@@ -187,7 +187,7 @@ inline CGKA_create_group ( )
 \end{figure}
 
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Control-Loop}\CGKAmod{}{}{} --- main game loop.}
 \begin{verbatim}
@@ -223,7 +223,7 @@ end_of_game:
 \end{figure}
 
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Control-Commitment}\CGKAmod{}{}{} --- query which commits to next epoch.}
 \begin{verbatim}
@@ -254,7 +254,7 @@ inline play_move_with_commitment ( )
 \end{verbatim}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Control-Noncommitment}\CGKAmod{}{}{} --- query which remain in same epoch.}
 \begin{verbatim}
@@ -285,20 +285,20 @@ inline play_move_without_commitment ( )
 \hypertarget{sec:game-oracles}{%
 \section{Oracles}\label{sec:game-oracles}}
 
-The oracles of the \CGKAsec are replicated within the \CGKAmod{P}{T}{N} model.
+The oracles of the \CGKAsec\ are replicated within the \CGKAmod{P}{T}{N} model.
 An oracle has access to and modifies the global protocol state via the global PROMELA variables.
-The attacker does not have access to the global state in the \CGKAmod model, and can only interact with the global state via the oracles.
+The attacker does not have access to the global state in the \CGKAmod\ model, and can only interact with the global state via the oracles.
 
 \hypertarget{sec:corrupt}{%
 \subsection{Corrupt}\label{sec:corrupt}}
 
-A query of \Oracle{corrupt}{ID_n} within the \CGKAmod{P}{T}{N} model encoding performs a sequence of operations detailed in Figure \ref{fig:Oracle-Corrupt} which fulfills the oracle's semantics.
+A query of \Oracle{corrupt}{ID_n} within the \CGKAmod{P}{T}{N} model encoding performs a sequence of operations detailed in Figure\ \ref{fig:Oracle-Corrupt} which fulfills the oracle's semantics.
 First the oracle encoding updates the attacker's knowledge-base via the \texttt{attacker\_learn\_leaf} and \texttt{attacker\_amend\_knowledge} interface methods for the protocol \texttt{P}.
 The knowledge update may be iterative if the corrupted user has held onto secret cryptographic material from previous epoch.
 Once all requisite information is transmitted from the oracle to the attacker, the oracle marks \(\mathtt{ID_n}\) as \texttt{unsafe}.
 Lastly the oracle prompts the attacker to declare if their knowledge-base includes one or more \Abrev{LBBT} root node secrets for any epoch.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Oracle-Corrupt}\CGKAmod{}{}{} --- \Oracle{corr}{} encoding.}
 \begin{verbatim}
@@ -327,7 +327,7 @@ move_corrupt: skip;
     // For each epoch which the member has secrets
     // (this implies that the user was a member)
     // Then the attacker learns the secrets on the direct path
-    // between the member and the root node on the LBBT.
+    // between the member and the root node on the LBBT.\@
     unsigned peek : BITS_EPOCH;
     for ( peek : lowerBound .. upperBound )
     {
@@ -350,9 +350,9 @@ move_corrupt: skip;
 \hypertarget{sec:hoard}{%
 \subsection{Hoard}\label{sec:hoard}}
 
-A query of \Oracle{hoard}{ID_n} within the \CGKAmod{P}{T}{N} model encoding simply marks that \(\mathtt{ID_n}\) will not delete cryptographic secrets starting from the current epoch, as shown in Figure \ref{fig:Oracle-Hoard}.
+A query of \Oracle{hoard}{ID_n} within the \CGKAmod{P}{T}{N} model encoding simply marks that \(\mathtt{ID_n}\) will not delete cryptographic secrets starting from the current epoch, as shown in Figure\ \ref{fig:Oracle-Hoard}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Oracle-Hoard}\CGKAmod{}{}{} --- \Oracle{no-del}{} encoding.}
 \begin{verbatim}
@@ -369,9 +369,9 @@ move_hoard: skip;
 \hypertarget{reveal}{%
 \subsection{Reveal}\label{reveal}}
 
-Querying \Oracle{reveal}{} updates the attacker's knowledge-base via the \texttt{attacker\_learn\_root} interface method as shown in Figure \ref{fig:Oracle-Reveal}.
+Querying \Oracle{reveal}{} updates the attacker's knowledge-base via the \texttt{attacker\_learn\_root} interface method as shown in Figure\ \ref{fig:Oracle-Reveal}.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Oracle-Reveal}\CGKAmod{}{}{} --- \Oracle{reveal}{} encoding.}
 \begin{verbatim}
@@ -390,11 +390,11 @@ move_reveal: skip;
 \hypertarget{sec:insert}{%
 \subsection{Insert}\label{sec:insert}}
 
-A query of \Oracle{reveal}{ID_m,\, ID_n} performs the epoch progression as displayed in Figure \ref{fig:Oracle-Insert}.
+A query of \Oracle{reveal}{ID_m,\, ID_n} performs the epoch progression as displayed in Figure\ \ref{fig:Oracle-Insert}.
 First the oracle establishes \(\mathtt{ID_m}\) as \texttt{originID} and \(\mathtt{ID_n}\) as \texttt{targetID}.
 Then the oracle calls the abstract epoch advancement method \texttt{messaging\_move} which handles message passing and global state updates.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Oracle-Insert}\CGKAmod{}{}{} --- \Oracle{add-user}{} encoding.}
 \begin{verbatim}
@@ -416,12 +416,12 @@ move_insert: skip;
 \hypertarget{remove}{%
 \subsection{Remove}\label{remove}}
 
-A query of \Oracle{reveal}{ID_m,\, ID_n} is displayed in Figure \ref{fig:Oracle-Remove}.
+A query of \Oracle{reveal}{ID_m,\, ID_n} is displayed in Figure\ \ref{fig:Oracle-Remove}.
 First the oracle establishes \(\mathtt{ID_m}\) as \texttt{originID} and \(\mathtt{ID_n}\) as \texttt{targetID}.
 Next, the oracle conditionally decrements the \texttt{unsafeIDs} counter and ensures that \(\mathtt{unsafe[ID_n]}\) is false.
 Finally the oracle calls the abstract epoch advancement method \texttt{messaging\_move} which handles message passing and global state updates.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Oracle-Remove}\CGKAmod{}{}{} --- \Oracle{remove-user}{} encoding.}
 \begin{verbatim}
@@ -451,12 +451,12 @@ move_remove: skip;
 \hypertarget{sec:update}{%
 \subsection{Update}\label{sec:update}}
 
-A query of \Oracle{reveal}{ID_n} is displayed in Figure \ref{fig:Oracle-Update}.
+A query of \Oracle{reveal}{ID_n} is displayed in Figure\ \ref{fig:Oracle-Update}.
 First the oracle establishes \(\mathtt{ID_n}\) as \texttt{originID}.
 Next, the oracle conditionally decrements the \texttt{unsafeIDs} counter and ensures that \(\mathtt{unsafe[ID_m]}\) is false.
 Finally the oracle calls the abstract epoch advancement method \texttt{messaging\_move} which handles message passing and global state updates.
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption{\label{fig:Oracle-Update}\CGKAmod{}{}{} --- \Oracle{send-update}{} encoding.}
 \begin{verbatim}
@@ -495,14 +495,14 @@ An additional predicate checking for model termination is included as a methodol
 \subsection{Termination as LTL}\label{sec:hlt-as-ltl}}
 
 \begin{LTL}[\,\LTLPredicate{HLT}\,]
-    $$
+\[
     \Diamond \texttt{CGKA@end\_of\_game}
-    $$
+\]
 \end{LTL}
 
 We consider the \Abrev{LTL} predicate \LTLPredicate{HLT}, which indicates that the \CGKAmod{P}{T}{N} model always terminates.
 To support this verification, a state label \texttt{end\_of\_game} has been included in the PROMELA model indicating the final state of the \CGKAsec. 
-The model has a single control process for the \CGKAsec named \texttt{CGKA}.
+The model has a single control process for the \CGKAsec\ named \texttt{CGKA}.
 An \Abrev{LTL} atom \texttt{CGKA@end\_of\_game} is true if an only if the process \texttt{CGKA} is at state \texttt{end\_of\_game}.
 With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \models \LTLPredicate{HLT} \) is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
 
@@ -511,9 +511,9 @@ With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \model
 \subsection{\Abrev{PCS} as LTL}\label{sec:pcs-as-ltl}}
 
 \begin{LTL}[\,\LTLPredicate{PCS}\,]
-    $$
+\[
     \Box \Big(\, ( \texttt{CGKA@start\_of\_epoch} \land \texttt{unsafeIDs} = 0 ) \implies \neg \texttt{learnedKey[epoch]} \Big)
-    $$
+\]
 \end{LTL}
 
 
@@ -521,12 +521,13 @@ With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \model
 \subsection{\Abrev{FSU} as LTL}\label{sec:fsu-as-ltl}}
 
 \begin{LTL}[\;Never-Trivial\;]
-    $$
+\[
     \Box \left( \texttt{CGKA@move\_corrupt} \implies \texttt{hoarding[targetID]} = \texttt{NEVER} \right)
-    $$
+\]
 \end{LTL}
 
-\begin{LTL}[\;FSU-Epoch(\,\textnormal{\normalfont $t \in T$}\,)\;]
+
+\begin{LTL}[\;FSU-Epoch\,(\,\textnormal{\normalfont$t \in T$}\,)\;]
     \begin{equation*}
     \begin{split}
     \Diamond ( & \texttt{CGKA@move\_start\_of\_epoch} \land \texttt{epoch} = t + 1 \land \neg \texttt{learnedKey[$t$]} ) \\
@@ -536,7 +537,7 @@ With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \model
 \end{LTL}
 
 \begin{LTL}[\,\LTLPredicate{FSU}\,]
-    $$
+\[
     \textbf{Never-Trivial} \implies \bigwedge\limits_{t=0}^{T-1} \;\,\textbf{FSU-Epoch}(t)
-    $$
+\]
 \end{LTL}

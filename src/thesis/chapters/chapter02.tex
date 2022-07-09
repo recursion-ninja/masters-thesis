@@ -16,8 +16,8 @@ Human guidance is still required to direct theorem provers towards the verificat
 The specialized and time-consuming nature of human effort required when utilizing a theorem prover is the chief reason model checking has been generally favored, with the work presented here being no exception.
 
 This work presents the verification of the TreeKEM protocol's \Abrev{FSU} and \Abrev{PCS} security guarantees.
-To verify these security guarantees, the \CGKAsec is used as an abstraction of the TreeKEM protocol, as well as all other \CGKAdef-conforming protocols.
-The \CGKAsec will be modeled as an explicit finite state transition machine \autocite{rabin1959finite}, representing all possible TreeKEM execution states.
+To verify these security guarantees, the \CGKAsec\ is used as an abstraction of the TreeKEM protocol, as well as all other \CGKAdef-conforming protocols.
+The \CGKAsec\ will be modeled as an explicit finite state transition machine \autocite{rabin1959finite}, representing all possible TreeKEM execution states.
 The security guarantees will be encoded as \Abrev{LTL} statements \autocite{4567924}.
 Then explicit state model checking techniques will be applied to verify that the \Abrev{LTL} encodings of \Abrev{FSU} and \Abrev{PCS} are maintained in every possible state of the \CGKAsec.
 
@@ -26,17 +26,17 @@ Recall that what differentiates \Abrev{SM} from \Abrev{SGM} is that \Abrev{SGM} 
 There is no theoretical limit to the number of parties the TreeKEM protocol supports.
 However, we also stated that model checking represents all possible states of protocol as a finite diagram of transitions.
 Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while our model checker requires a finite number of states.
-The IETF states that MLS in practice should support approximately 50,000 participants \autocite{Omara2020}, which is a finite, yet this very large number is problematic for the chosen methodology explicit state model checking.
+The IETF states that MLS in practice should support approximately $50,000$ participants \autocite{Omara2020}, which is a finite, yet this very large number is problematic for the chosen methodology explicit state model checking.
 This work parameterizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
-In practice, this means the results presented for a specified \(T_{max}\) and \(N_{max}\) only provide verification of security against \((T, C, N)\)-attackers for all \(T \in [1, T_{max}]\), \(C \in [1, T]\) and \(N \in [2, N_{max}]\).
+In practice, this means the results presented for a specified \Tmax\ and \Nmax\ only provide verification of security against \((T, C, N)\)-attackers for all \(T \in [1, \Tmax]\), \(C \in [1, T]\) and \(N \in [2, \Nmax]\).
 
-Referring back to the verification hypotheses in Table \ref{tab:verification-hypotheses}, any outcome which falsifies a hypothesis is an interesting result.
+Referring back to the verification hypotheses in Table\ \ref{tab:verification-hypotheses}, any outcome which falsifies a hypothesis is an interesting result.
 If a counter-example is produced violating \Abrev{PCS} for either version of the protocol, then a previously unknown security defect for TreeKEM has been discovered.
 If a counter-example is produced violating \Abrev{FSU} for the revised \VersionTwo, this also discovers a security defect.
-The original \VersionOne has been shown to have a \Abrev{FSU} deficiency for a \((12, 12, 8)\)-attacker \(\mathcal{A}\) \autocite{alwen2020security}.
-Hence a successful \Abrev{FSU} verification for the original \VersionOne with parameters corresponding to \(\mathcal{A}\) indicates either an in the model.
-In order to ensure at least one observation of the \Abrev{FSU} deficiency of the original \VersionOne, the bounds are set to \(12 = T_{max}\) and \(8 = N_{max}\).
-The observed verification results are tabulated in Appendix \ref{apx:Observations} and discussed in Chapter \ref{results}.
+The original \VersionOne\ has been shown to have a \Abrev{FSU} deficiency for a \((12, 12, 8)\)-attacker \(\mathcal{A}\) \autocite{alwen2020security}.
+Hence a successful \Abrev{FSU} verification for the original \VersionOne\ with parameters corresponding to \(\mathcal{A}\) indicates either an in the model.
+In order to ensure at least one observation of the \Abrev{FSU} deficiency of the original \VersionOne, the bounds are set to \(12 = \Tmax\) and \(8 = \Nmax\).
+The observed verification results are tabulated in Appendix\ \ref{apx:Observations} and discussed in Chapter\ \ref{results}.
 
 
 \hypertarget{sec:explicit-state-model-checking}{%
@@ -46,7 +46,7 @@ Model checking exists as the preferred alternative to \Abrev{BAN logic} techniqu
 Model checking represents all possible states of protocol as a finite graph of transitions \autocite{clarke1981design}.
 There exist one or more start states in the transition graph representing possible starting condiitions.
 Transitions in the graph uniquely encode the possible changes in model state.
-The model checker then asserts that one or more properties holds for the protocol by traversing through all combinations of transitions through the graph \autocite{ORBi-a8d60ab6-1101-4434-9511-c01ea4e5a15b}.
+The model checker then asserts that one or more properties holds for the protocol by traversing through all combinations of transitions through the graph \autocite{Vardi1986}.
 If a property holds, the model checker will assert that there is no possible set of transitions through states that exist in the protocol which violate the specified property.
 If the property does not hold, the model checker will produce a counter-example sequence of transitions through possible states showing how the specified property can be violated.
 This method of verifying cryptographic protocols is very attractive as the verification result is either an exhaustive proof of security guarantees or a novel cryptographic attack which can be analyzed and corrected.
@@ -59,7 +59,7 @@ For TreeKEM, the parameters \(T\) and \(N\) are supplied to the model.
 The model is then verified by exhaustively searching all possible protocol states over \(T\) epochs and with the total unique group members ranging from \(2\) to \(N\).
 Incrementing the \(T\) parameter while holding \(N\) constant, generally, increases the state-space by \(2\) orders of magnitude.
 However, incrementing the \(N\) parameter while holding \(T\) constant, only increases the state-space by \(\frac{1}{2}\) an orders of magnitude.
-Due to the constraints engineering constraints presented by explicit state model checking, the verification work presented will only consider the combinatorial collection of all models parameterized by \(T\) and \(N\), where \(T \in [1, T_{max}]\) and \(N \in [2, N_{max}]\).
+Due to the constraints engineering constraints presented by explicit state model checking, the verification work presented will only consider the combinatorial collection of all models parameterized by \(T\) and \(N\), where \(T \in [1, \Tmax]\) and \(N \in [2, \Nmax]\).
 
 
 \hypertarget{sec:linear-temporal-logic}{%
@@ -69,7 +69,7 @@ Correctly specifying the properties which must hold for the cryptographic protoc
 Fortunately, \Abrev{LTL} \autocite{4567924} is an almost perfectly tailored language for representing the security guarantees at the CGKA abstraction level.
 Additionally, \Abrev{LTL} usage in conjunction with an explicit state model checker is a well supported and researched technique \autocite{clarke1994another, biere1999symbolic, bloem1999efficient}.
 \Abrev{LTL} possesses all the logical operators of the two-element Boolean algebra with the addition of four temporal operators
-The temporal operators are presented below as a short had reference for formulas described in Section \ref{#sec:LTL-security}.
+The temporal operators are presented below as a short had reference for formulas described in Section\ \ref{#sec:LTL-security}.
 
 \[
 \begin{aligned}[t]
@@ -93,9 +93,9 @@ This perfect balance of expressiveness is important, because the more expressive
 \hypertarget{sec:promela}{%
 \section{Promela}\label{sec:promela}}
 
-Once we decided to use model checking with \Abrev{LTL} as the formal verification methodology, we must then select the appropriate tools to use - the Protocol Meta Language (PROMELA) \autocite{holzmann1980basic, holzmann1990design}.
-It exists as a precise and convenient specification for defining all possible states and transitions for TreeKEM.
-By specifying the protocol in PROMELA, we can allow the PROMELA ``translator: to take a high-level, human readable description of TreeKEM and produce a much larger machine readable list with all the possible states and transitions in TreeKEM.
+Once we decided to use model checking with \Abrev{LTL} as the formal verification methodology, we must then select the appropriate tools to use --- the Protocol Meta Language (PROMELA) \autocite{holzmann1980basic, holzmann1990design}.
+It exists as a precise and convenient specification for defining all possible states and transitions for TreeKEM.\@
+By specifying the protocol in PROMELA, we can allow the PROMELA ``translator: to take a high-level, human readable description of TreeKEM and produce a much larger machine readable list with all the possible states and transitions in TreeKEM.\@
 Manually defining all these states and transitions would take an inordinate amount of time and is prone to errors.
 Producing an exhaustive and correct representation of TreeKEM's possible states and transitions is one aspect of the verification process, at which machines are exceptionally reliable, while humans are not.
 
@@ -105,8 +105,8 @@ PROMELA supports mutable variable assignment, treating all variables as a finite
 Assignments mutate an implicit global state.
 Variables can take the form of Boolean values, signed or unsigned numbers of varying bit widths, type-checked enumerations, or multi-dimensional arrays.
 PROMELA also provides looping constructs and an inlining of definition, similar to an inlined function call in C, allowing for code reuse.
-Examples of usages is dipicted in Figure \ref{fig:determinism}.
-These familiar C-like features of PROMELA are evaluated deterministically and linearly within the execution of a model defined in PROMELA.
+Examples of usages is dipicted in Figure\ \ref{fig:determinism}.
+These familiar C-like features of PROMELA are evaluated deterministically and linearly within the execution of a model defined in PROMELA.\@
 However, PROMELA also differs from C in important ways which facilitate explicit state graph construction and exhaustive search.
 
 \begin{figure}
@@ -140,11 +140,11 @@ CodeReuse( NonNeg );
 
 
 PROMELA only provides non-deterministic conditional constructs.
-An \texttt{if} statement, shown in Figure \ref{fig:choice}, is supplied with one or more logical guards containing PROMELA expression which evaluates to a Boolean value and an associated (possibly empty) sequence PROMELA expressions for each guard.
+An \texttt{if} statement, shown in Figure\ \ref{fig:choice}, is supplied with one or more logical guards containing PROMELA expression which evaluates to a Boolean value and an associated (possibly empty) sequence PROMELA expressions for each guard.
 The model non-deterministically selects a guard which evaluates to \texttt{true} and follows the code path of the associated sequence of expressions.
 Once a the non-deterministically selected code path completes execution, execution resumes at the end of the \texttt{if} statement.
-Another similar non-deterministic conditional construct is provided by PROMELA.
-A \texttt{do} statement,statement, shown in Figure \ref{fig:repetition}, is also supplied with one or more pairs of logical guards and expression sequences.
+Another similar non-deterministic conditional construct is provided by PROMELA.\@
+A \texttt{do} statement,statement, shown in Figure\ \ref{fig:repetition}, is also supplied with one or more pairs of logical guards and expression sequences.
 However, once a the non-deterministically selected code path of the \texttt{do} statement completes execution, execution resumes at the beginning of the \texttt{do} statement.
 Execution only resumes at the end of a \texttt{do} block when one of the non-deterministically selected code paths contains a \texttt{break} statement.
 This definition of the \texttt{do} statement provides nondeterministic looping behavior.
@@ -185,8 +185,8 @@ od
 \end{verbatim}
 \end{figure}
 
-There exists one final nondeterministic construct provided by PROMELA.
-The \texttt{select} statement, shown in Figure \ref{fig:selection}, takes a contiguous, inclusive range of values and non-deterministically selects a value from within the range, assigning the result to a specified variable.
+There exists one final nondeterministic construct provided by PROMELA.\@
+The \texttt{select} statement, shown in Figure\ \ref{fig:selection}, takes a contiguous, inclusive range of values and non-deterministically selects a value from within the range, assigning the result to a specified variable.
 This replaces the notion of a random number generator within the model.
 Explicit state model checking requires that all possible states within the model be explicitly enumerated.
 Randomness is replaced by a range of nondeterministic values.
@@ -212,7 +212,7 @@ for ( i : 0 .. 15 ) {
 A major difference from other C-like languages is PROMELA's support of concurrency.
 A model may include multiple processes, with no restrictions as to when and how the processes are created or terminated.
 The model of multiple processes considers the state transitions through each process being interleaved in any permissible permutation during the execution of the model.
-To further support modeling concurrency, PROMELA provides an \texttt{atomic} block, shown in Figure \ref{fig:atomic}, for indicating that a sequence of expressions cannot be interleaved between processes.
+To further support modeling concurrency, PROMELA provides an \texttt{atomic} block, shown in Figure\ \ref{fig:atomic}, for indicating that a sequence of expressions cannot be interleaved between processes.
 
 \begin{figure}
 \centering
@@ -233,7 +233,7 @@ for ( i : 0 .. 15 ) {
 \end{figure}
 
 
-Similarly, PROMELA supports a \texttt{d\_step} block as shown in Figure \ref{fig:dstep}, which allows specifying that a sequence of expressions are deterministic within the model and should be considered a single state within the generated state-space transition graph.
+Similarly, PROMELA supports a \texttt{d\_step} block as shown in Figure\ \ref{fig:dstep}, which allows specifying that a sequence of expressions are deterministic within the model and should be considered a single state within the generated state-space transition graph.
 Unlike an \texttt{atomic} block, a \texttt{d\_step} block cannot include any nondeterministic constructs.
 Judicious use of \texttt{d\_step} can greatly simplify the state-space search as well as improve the comprehensibility of any counterexamples produced by the model checker.
 
@@ -262,7 +262,7 @@ Labels prefixed with \texttt{end} identify the set of valid end states in which 
 Labels prefixed with \texttt{accept} identify states which the program cannot transition through infinitely often if it executes infinitely.
 Labels prefixed with \texttt{progress} identify states which the program must transition through infinitely often if it executes infinitely.
 Finally, a labeled state may be referenced in an \Abrev{LTL} predicate.
-Examples usages of state labels are illistrated in Figure \ref{fig:state-label}.
+Examples usages of state labels are illistrated in Figure\ \ref{fig:state-label}.
 
 \begin{figure}
 \caption{\label{fig:state-label}PROMELA example --- state labels}
@@ -298,4 +298,4 @@ Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by 
 Consideration was made to use TopSpin \autocite{DonaldsonM_AMAST2006}, a PROMELA pre-processing plugin for SPIN which performs symmetry reduction as well.
 Unfortunately, this theoretically viable technique is not practically usable as the plugin has not been maintained in over a decade.
 Additionally, SPIN supports numerous compile time directive which alter the state-space representation, search trajectories, and time-memory trade-offs.
-Because of these (and many more) techniques, SPIN allows efficiently working with a large state-space that the novel portions of TreeKEM produce when modeled with PROMELA.
+Because of these (and many more) techniques, SPIN allows efficiently working with a large state-space that the novel portions of TreeKEM produce when modeled with PROMELA.\@

@@ -1,8 +1,8 @@
 \hypertarget{sec:conclusion}{%
 \chapter{Conclusion}\label{sec:conclusion}}
 
-The main contribution of this work is the formalization of the \CGKAsec as well as presenting an accompanying parametric and protocol-polymorphic \CGKAmod{P}{}{} model.
-This \CGKAmod{}{}{} model incorporates a variety of sound reductions from the informal \CGKAsec definition, leading to dramatically simplifies model encoding.
+The main contribution of this work is the formalization of the \CGKAsec\ as well as presenting an accompanying parametric and protocol-polymorphic \CGKAmod{P}{}{} model.
+This \CGKAmod{}{}{} model incorporates a variety of sound reductions from the informal \CGKAsec\ definition, leading to dramatically simplifies model encoding.
 Furthermore, performance tuning of the model along with performance observations are documented in detail.
 Regrettably, the number of verification observations is insufficient to confidently declare support of, or falsification of any stated security hypotheses.
 
@@ -26,7 +26,7 @@ The author intends to pursue this work in the immediate future.
 \subsection{Adding LTL Predicates}\label{sec:more-predicates}}
 
 The general construction of the \CGKAmod{P}{T}{N} lends itself well towards extension and repeat use.
-Consideration and verification of other desirable properties for \CGKAdef protocols would be a logical extension of this work.
+Consideration and verification of other desirable properties for \CGKAdef\ protocols would be a logical extension of this work.
 One particular area where the \CGKAmod{P}{T}{N} model may be particularly well suited, is the exploration of loosening the \Abrev{MLS} specification's constraints on the \Abrev{DS} semantics.
 Perhaps fewer requirement can be placed on the \Abrev{DS}, required protocol to assume less from the \Abrev{DS}, while still maintaining all the \Abrev{MLS} security guarantees.
 Pursuing this, or similar inquiries, would require minor modifications to the \CGKAmod{P}{T}{N} model's implementation.
@@ -35,7 +35,7 @@ Pursuing this, or similar inquiries, would require minor modifications to the \C
 \hypertarget{sec:unbounded-verification}{%
 \subsection{Unbounded Verification}\label{sec:unbounded-verification}}
 
-The final suggestion of future work was alluded to in Section \ref{sec:game-adaptations}, which involves identifying a finite model encoding for an unbounded \(T\) and/or \(N\) parameter.
+The final suggestion of future work was alluded to in Section\ \ref{sec:game-adaptations}, which involves identifying a finite model encoding for an unbounded \(T\) and/or \(N\) parameter.
 Obviously the verification results would be stronger for a new \( \CGKAmod{P}{T}{N}^{'} \) model which considered \emph{all} possible epochs \(T\) or \emph{all} possible group sizes \(N\).
 The dependence on parameter \(N\) for tracking group membership and the left balanced binary tree with the attacker's knowledge-base representation, leads the author to believe that a finite encoding with respect to the parameter \(N\) is likely impossible.To achieve such an encoding for \(T\), both the global state variables of \( \CGKAmod{P}{T}{N}^{'} \) as well as the attacker knowledge-base module for \texttt{P} would require ``independence'' for from the epoch information.
 One possible approach may be finding an encoding of \( \CGKAmod{P}{T}{N}^{'} \) which is a Markov process \autocite{markov1906a}.

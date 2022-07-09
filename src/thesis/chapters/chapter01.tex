@@ -28,19 +28,19 @@ Still, each of these forms of attack, introduce the communicating parties to una
 
 Given the vast and potentially unknown range of potential attacks, a protocol is designed with a threat model \autocite{salter1998toward} which contextualizes the capabilities of an adversary and consequently defines domain from which attacks must be considered.
 Subsequently, the protocol will be designed to satisfy one or more security guarantees \autocite{rfc3552} within the threat model, an assertion that no advarsary within the threat model has the capability to violate any the protocol's safety guarantees.
-The presence or absence of attacks on secure communication protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption \cite{clark1997survey}.
+The presence or absence of attacks on secure communication protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption \autocite{clark1997survey}.
 Often attacks are discovered years, if not decades, after a protocol has been in active use \autocite{durumeric2014matter, shaik2015practical, cremers2017comprehensive, basin2018formal}.
 Late discovery of these attacks after widespread adoption of the protocol requires rapid effort to fix the protocol and encourage all systems using the protocol to update to the revised version \autocite{ghafoor2014analysis}.
 Regretably, this updating process itself takes years of migration work \autocite{markowsky2015scanning} or the migration never occurs.
 This is especially problematic for embedded systems which cannot be easily retrieved and require extra consideration to be securely updated \autocite{yoon2017remote, maroof2022irecover}.
 For these reasons, it is of paramount importance to identify all possible attacks on a new communication protocol as early as possible, so it can be corrected prior to widespread adoption.
 
-The desirable operations and security of multi-party communication protocol is explored below in Chapter \ref{sec:preliminaries}, with the threat model and security guarantees are detailed.
-After defining the goals of such a protocol, an existing protocol is identified as the state-of-the-art and selected as the protocol under consideration for this work in Section \ref{sec:treekem-protocol}.
-A verification methodology is laid out for the selected protocol in Chapter \ref{sec:methodology}.
-The verification performed assumes the correctness of cryptographic primitives and determines the validity of the protocol via modeling a security game framework described in Section \ref{sec:security-games}.
-An overview given in Chapter \ref{sec:model-encoding} describes the salient details of encoding the protocol model.
-Lastly, a discussion and interpretation of the verification results is presented in Chapter \ref{sec:results} along with and avenues of future work in Chapter \ref{sec:conclusion}.
+The desirable operations and security of multi-party communication protocol is explored below in Chapter\ \ref{sec:preliminaries}, with the threat model and security guarantees are detailed.
+After defining the goals of such a protocol, an existing protocol is identified as the state-of-the-art and selected as the protocol under consideration for this work in Section\ \ref{sec:treekem-protocol}.
+A verification methodology is laid out for the selected protocol in Chapter\ \ref{sec:methodology}.
+The verification performed assumes the correctness of cryptographic primitives and determines the validity of the protocol via modeling a security game framework described in Section\ \ref{sec:security-games}.
+An overview given in Chapter\ \ref{sec:model-encoding} describes the salient details of encoding the protocol model.
+Lastly, a discussion and interpretation of the verification results is presented in Chapter\ \ref{sec:results} along with and avenues of future work in Chapter\ \ref{sec:conclusion}.
 
 
 \hypertarget{sec:preliminaries}{%
@@ -86,7 +86,7 @@ However, \Abrev{MLS} also specifies interesting open problems related to \Abrev{
 Both \Abrev{FS} and \Abrev{PCS} have been researched with respect to bidirectional \Abrev{SM}, producing provably secure as well as efficient constructions.
 A popular example is the double-ratchet-based AXOLOTL algorithm \autocite{perrin2014axolotl} and it's derivatives which are used by most \Abrev{SM} protocols.
 Interestingly, prior definitions of \Abrev{FS} introduced with the development of AXOLOTL were not defined generally enough to be directly used by \Abrev{MLS}.
-\Abrev{MLS} defines a more general security guarantee for the multi-party notion of \Abrev{FS}, included in Section \ref{sec:forward-secrecy-with-updates}.
+\Abrev{MLS} defines a more general security guarantee for the multi-party notion of \Abrev{FS}, included in Section\ \ref{sec:forward-secrecy-with-updates}.
 
 However, the requirement of \Abrev{FS} and \Abrev{PCS} laid out by the \Abrev{MLS} specification for a \Abrev{SGM} protocol has introduced a novel area of research, as the double-ratchet-based algorithms do not directly map to multi-party communication.
 Indeed, these \Abrev{MLS} security guarantees have been the chief focus of research related to \Abrev{MLS} and it's iterative development.
@@ -120,13 +120,13 @@ A shared secret key is used to initiate a symmetric hash ratchet which defines a
 The stream is used until the shared secret key evolves, after which, a new stream is initiated using the evolved key.
 Hash ratchet's produced by TreeKEM are analogous to double-ratchet based protocols in prior work, with the notable difference that, rather than using two ratchets for the two group members, TreeKEM uses a left balanced binary tree structure to define key agreement as a propagation from leaves of the tree to the root node, which supports an arbitrarily large number of group members instead of explicitly two members.
 This novel generalization presented in TreeKEM is at the heart of constructing a protocol implementation satisfying the \Abrev{MLS} specification.
-Unsurprisingly, this same generalization is appreciably linked to proving and verifying the \Abrev{FS} and \Abrev{PCS} security guarantees of TreeKEM.
+Unsurprisingly, this same generalization is appreciably linked to proving and verifying the \Abrev{FS} and \Abrev{PCS} security guarantees of TreeKEM.\@
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \centering
   \caption[TreeKEM shared secret update.]{%
   \label{fig:CGKA-TreeKEM-Secrets}%
-  An update operation initiated by the party at leaf \(v_0\) : First, a random ``seed value'' \(s_0\) is chosen.
+  An update operation initiated by the party at leaf \(v_0\): First, a random ``seed value'' \(s_0\) is chosen.
   Thereafter, a PRG is applied iteratively at every level \(i\) of \(v_0\)'s direct path in order to derive
   (i) a PKE secret key \(sk_i\) for that level (from which a public key can be computed using the key generation algorithm) and
   (ii) a seed \(s_{i+1}\) for the next level.
@@ -152,7 +152,7 @@ Iteratively, the member moves up the spine of the tree from their leaf node to t
 When the member has propagated the changes to the root node, the final seed value \(s_r\) is determined to be the new shared secret key.
 Note that each member of the group can derive the seed value required to update their copy of the shared key by decrypting the seed value \(s_n\) on the node prior to where the path from said member and the initiating member intersect.
 Once each member has the requisite seed value, they each locally resume the iterative process of updating the tree and arrive at the same construction as that of the initiating member.
-For a visualization of this process, refer to Figure \ref{fig:CGKA-TreeKEM-Secrets}.
+For a visualization of this process, refer to Figure\ \ref{fig:CGKA-TreeKEM-Secrets}.
 
 
 \hypertarget{sec:communication-epochs}{%
@@ -232,7 +232,7 @@ A continuous group key-agreement scheme is defined by the following collection o
   From state \(\gamma\) and control message \(u\), outputs new state \(\gamma'\) and update secret \(I\).
 \end{itemize}
 
-The abstract collection of algorithms \CGKAdef is used to maintain secure communications between a group of two or more participants.
+The abstract collection of algorithms \CGKAdef\ is used to maintain secure communications between a group of two or more participants.
 Notably, a protocol which includes these algorithms can be used by a group to maintain continuous group key agreement of a shared secret key.
 
 Any group member can call any algorithm from \CGKAdef, producing new states \(\gamma \in \Gamma\) and either none, one, or both control messages \(w \in W,\; u \in U\).
@@ -240,8 +240,8 @@ These are ``welcome'' control messages \(w \in W\) for a new member entering the
 The algorithm \(proc\) consumes control messages \(u \in U\) and produces a secret \(i \in I\).
 Each call to \(proc\) by a user corresponds to that user entering a new epoch, and the secret \(i\) is the cryptographic secret update(s) required for the client with \(ID\) to maintain \Abrev{CGKA} in the new epoch.
 Because the communication is defined in terms of epochs, \Abrev{CGKA} should satisfy both Forward Secrecy and Post-compromise Security with respect to communication epochs.
-The six requisite algorithms required for \CGKAdef can be produced by the functionality of the TreeKEM protocol.
-For a visualization of each \CGKAdef algorithm defined using the functionality of TreeKEM, refer to Figure 4 of \autocite{alwen2020security}.
+The six requisite algorithms required for \CGKAdef\ can be produced by the functionality of the TreeKEM protocol.
+For a visualization of each \CGKAdef\ algorithm defined using the functionality of TreeKEM, refer to Figure 4 of \autocite{alwen2020security}.
 Using the six algorithms of \CGKAdef, the security guarantees in for TreeKEM are formulated in terms of a security game.
 
 
@@ -256,11 +256,11 @@ Often a security game includes one or more oracles.
 An oracle is an agent in the game the adversary can query and to receive information or have an action performed on their behalf, but imporantly the adversary is not informed how any querried information was produced nor how any querried action was performed.
 
 The same work which defines \Abrev{CGKA} also defines an oracle-based security game for \Abrev{CGKA}.
-Each oracle is defined in terms of one or more of the algorithms from the \CGKAdef definition.
+Each oracle is defined in terms of one or more of the algorithms from the \CGKAdef\ definition.
 The adversary can query all of the game's oracles, and through the sequence of query's, the adversary uses the oracles to direct the execution of the \Abrev{CGKA} protocol.
 In the game the adversary is given access to various oracles to drive the execution of a \Abrev{CGKA} protocol.
-For a visualization of each oracles' semantics, refer to Figure \ref{fig:CGKA-Oracles} of \autocite{alwen2020security}.
-The \CGKAsec defines the following oracles:
+For a visualization of each oracles' semantics, refer to Figure\ \ref{fig:CGKA-Oracles} of \autocite{alwen2020security}.
+The \CGKAsec\ defines the following oracles:
 
 \begin{itemize}
 \item \Oracle{init}{}
@@ -275,25 +275,25 @@ The \CGKAsec defines the following oracles:
 \item \Oracle{chall}{t}
 \end{itemize}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
 \caption[Oracles for the \CGKAsec]{%
 \label{fig:CGKA-Oracles}%
-Oracles for the \CGKAsec for a scheme \CGKAdef \(= \small\left(\,\Protocol{init},\, \Protocol{create},\, \Protocol{add},\, \Protocol{rem},\, \Protocol{upd},\, \Protocol{proc}\,\right)\).
+Oracles for the \CGKAsec\ for a scheme \CGKAdef\ \(= \small\left(\,\Protocol{init},\, \Protocol{create},\, \Protocol{add},\, \Protocol{rem},\, \Protocol{upd},\, \Protocol{proc}\,\right)\).
 }%
 \copyrightbox[b]
 {\includegraphics[width=\textwidth]{./figures/CGKA-Oracles.eps}}
 {\CopyrightReuse{alwen2020security}}
 \end{figure}
 
-The first six oracles are intuitively thin wrappers for the corresponding algorithm from the \CGKAdef definition.
+The first six oracles are intuitively thin wrappers for the corresponding algorithm from the \CGKAdef\ definition.
 Importantly, these oracles encapsulate from the adversary the stateful production and consumption of group member state values \(\gamma \in \Gamma\) as well as the emission of secret key material values \(i \in I\).
 Control messages \(w \in W\) and \(u \in U\) are still broadcast across the network and assumed to be intercepted by the adversary.
 The definition of control messages within the TreeKEM protocol dictates that messages are are authenticated by the group members, which justifies the absence of an oracle permitting the adversary to change or replay intercepted control messages in the \Abrev{CGKA} game.
 
 Despite the encapsulation, querying these oracles permits the adversary to both perform and observe ``side effects'' related to the protocol's execution.
-Side channel information gained in querying oracles is dependent on the protocol with which the \CGKAsec is being played.
-Hence, many propositions regarding the \CGKAsec semantics can only be correctly reasoned about when the protocol under consideration is also specified.
+Side channel information gained in querying oracles is dependent on the protocol with which the \CGKAsec\ is being played.
+Hence, many propositions regarding the \CGKAsec\ semantics can only be correctly reasoned about when the protocol under consideration is also specified.
 One semantic which is invariant of a specific protocol, emerges from querying the \Oracle{add-user}{}, \Oracle{remove-user}{}, and \Oracle{send-update}{} oracles, conferring onto the adversary the ability to guide the protocol execution by instructing group members to begin new epochs on whichever terms the adversary considers favorable.
 Likewise the \Oracle{deliver}{} oracle permits the adversary to control when each user receives control messages and subsequently advances to the next epoch.
 Because the adversary has access to the \Oracle{deliver}{} oracle, it does not matter who, adversary or group member, attempts to initiate a new epoch, ultimately the adversary decides via querying the \Oracle{deliver}{} oracle which epoch-initiating control messages are processed by the group.
@@ -317,7 +317,7 @@ Similarly if and only if \(b=1\) will the real member states and update secrets 
 When \(b=0\), random values are instead broadcast and revealed to the adversary when querying the oracles.
 The goal of the adversary is to prove advantage by discriminating the value of \(b\) with probability greater than \(\frac{1}{2}\).
 
-An adversary proving \emph{advantage} is defined by the \CGKAsec as a parameterized expression involving oracles of the game.
+An adversary proving \emph{advantage} is defined by the \CGKAsec\ as a parameterized expression involving oracles of the game.
 A tuple \((T, C, N)\) parameterizes the adversary \(\mathcal{A}\), with \(T \in \left[1, \infty \right]\), \(C \in \left[0, T \right]\), and \(N \in \left[2, \infty \right]\).
 The \(T\) value indicates that the protocol runs in at most \(T\) epochs, during which time the \(\mathcal{A}\) can make at most \(C\) challenge queries, and the total unique group members of the protocol can never exceed \(N\).
 Furthermore there exists a predicate \textbf{\texttt{P}} (potentially always true), which indicates that a trivial attack did not occur.
@@ -329,24 +329,23 @@ The \((T, C, N)\)-adversary \(\mathcal{A}\) proves \emph{advantage} by ending th
 \end{enumerate}
 \vspace{\parsep}
 
-\begin{definition}[\Abrev{CGKA} advantage]
+\begin{definition}[\Abrev{CGKA} advantage]\label{def:CGKA-Advantage}
 The advantage proved by $\mathcal{A}$ is defined as,
-$$ \normalfont{\textbf{Adv}}\left\{\CGKAdef,\textbf{\texttt{P}}\right\}(\mathcal{A})  = \left|\; \textbf{Pr}\left[ \,\mathcal{A}\text{ wins}\, \right] - \frac{1}{2} \;\right| $$
+\[ \normalfont{\textbf{Adv}}\left\{\CGKAdef,\textbf{\texttt{P}}\right\}(\mathcal{A})  = \left|\; \Pr\left[ \,\mathcal{A}\text{ wins}\, \right] - \frac{1}{2} \;\right| \]
 \end{definition}
 
-\begin{definition}[Non-adaptive $(T, C, N, \textbf{\texttt{P}}, \epsilon)$ \Abrev{CGKA} Security]  
-\label{def:CGKA-Security}
+\begin{definition}[Non-adaptive $(T, C, N, \textbf{\texttt{P}}, \epsilon)$ \Abrev{CGKA} Security]\label{def:CGKA-Security}
 A \Abrev{CGKA} protocol is said to be secure if and only if for all $(T, C, N)$-adversariess $\mathcal{A}$,
-$$ \normalfont\textbf{Adv}\left\{\CGKAdef,\textbf{\texttt{P}}\right\}(\mathcal{A}) \leq \epsilon $$
+\[ \normalfont\textbf{Adv}\left\{\CGKAdef,\textbf{\texttt{P}}\right\}(\mathcal{A}) \leq \epsilon \]
 \end{definition}
 
 The \Abrev{CGKA} algorithms, security game, and \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{\Abrev{CGKA} Security} definition are integral to the verification work presented in the subsequent chapters.
-Chapter \ref{sec:methodology} will use the security definition to parameterize and constrain the verification methodology presented.
-In a similar manner, the definition and understanding of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{\Abrev{CGKA} Security} will be extensively relied upon in Chapter \ref{sec:justification} when constructing the model encoding of TreeKEM.
-This reliance extends to the discussions in Section \ref{sec:game-adaptations} related to utilizing explicit state model checking when modeling and verifying TreeKEM
-as well as in Section \ref{sec:game-oracles} modeling the translations of the \CGKAsec oracles explicitly for TreeKEM.
-Additionally, the modeling of random \(b\) and adversary advantage will be elaborated on in Section \ref{sec:game-adaptations}.
-Subsequently Section \ref{sec:LTL-security} presents definitions of the predicate \textbf{\texttt{P}} for prohibiting ``trivial attacks'' explicitly related to TreeKEM and the \Abrev{CGKA} game as described by \autocite{alwen2020security}.
+Chapter\ \ref{sec:methodology} will use the security definition to parameterize and constrain the verification methodology presented.
+In a similar manner, the definition and understanding of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{\Abrev{CGKA} Security} will be extensively relied upon in Chapter\ \ref{sec:justification} when constructing the model encoding of TreeKEM.\@
+This reliance extends to the discussions in Section\ \ref{sec:game-adaptations} related to utilizing explicit state model checking when modeling and verifying TreeKEM
+as well as in Section\ \ref{sec:game-oracles} modeling the translations of the \CGKAsec\ oracles explicitly for TreeKEM.\@
+Additionally, the modeling of random \(b\) and adversary advantage will be elaborated on in Section\ \ref{sec:game-adaptations}.
+Subsequently Section\ \ref{sec:LTL-security} presents definitions of the predicate \textbf{\texttt{P}} for prohibiting ``trivial attacks'' explicitly related to TreeKEM and the \Abrev{CGKA} game as described by \autocite{alwen2020security}.
 
 
 \hypertarget{sec:concluding-abstraction}{%
@@ -357,7 +356,7 @@ It is worth noting the relationship between the preliminary definitions explored
 \Abrev{CGKA} is a class of protocols supporting the requisite algorithms, which by definition must facilitate \Abrev{SGM}.
 The \Abrev{MLS} specification is standardization which protocols may conform to and which satisfies the \Abrev{SGM} use case, necessarily maintains continuous group key agreement as defined by \Abrev{CGKA}, as well as provides efficiency and scalability guarantees.
 TreeKEM is a specific cryptographic protocols which conforms to the \Abrev{MLS} specification.
-There is a clear sub-setting relationship between these abstract concepts illustrated in Figure \ref{fig:venn-protocols}, and in future descriptions the layer of abstraction from which a definition was defined may be elided.
+There is a clear sub-setting relationship between these abstract concepts illustrated in Figure\ \ref{fig:venn-protocols}, and in future descriptions the layer of abstraction from which a definition was defined may be elided.
 
 \begin{figure}
 \centering
@@ -365,10 +364,10 @@ There is a clear sub-setting relationship between these abstract concepts illust
 \resizebox{0.5\textwidth}{!}{\subimport{../figures/}{venn-protocols}}
 \end{figure}
 
-The definition of \Abrev{CGKA} and the construction of the \CGKAsec offers an abstraction between the protocol specific implementation and the desired security guarantees of \Abrev{FSU} and \Abrev{PCS} specified by \Abrev{MLS}.
-An equivalence proof of non-adaptive \Abrev{CGKA} security definition \ref{def:CGKA-Security} with \Abrev{FSU} and also with \Abrev{PCS} accompanies its original description \autocite{alwen2020security}.
+The definition of \Abrev{CGKA} and the construction of the \CGKAsec\ offers an abstraction between the protocol specific implementation and the desired security guarantees of \Abrev{FSU} and \Abrev{PCS} specified by \Abrev{MLS}.
+An equivalence proof of non-adaptive \Abrev{CGKA} security definition\ \ref{def:CGKA-Security} with \Abrev{FSU} and also with \Abrev{PCS} accompanies its original description \autocite{alwen2020security}.
 The verification work with follows relies on the equivalence proof in order to soundly use \Abrev{CGKA} as a verifiable abstraction.
-The equivalence proof results in the corollary that an adversary playing the \CGKAsec can only gain advantage by exploiting side-channel attack on the given \Abrev{CGKA}-conforming protocol.
+The equivalence proof results in the corollary that an adversary playing the \CGKAsec\ can only gain advantage by exploiting side-channel attack on the given \Abrev{CGKA}-conforming protocol.
 
 Consider a model \CGKAmod{}{}{} of the \CGKAsec.
 To formulate arbitrary propositions regarding the model, \CGKAmod{}{}{} must be parameterized by a given \Abrev{CGKA}-conforming protocol \(\mathtt{P}\), denoted by \CGKAmod{P}{}{}.
@@ -385,20 +384,20 @@ To produce \CGKAmod{P}{}{}, the interface methods must be instantiated for \(P\)
 After performing these two verification efforts, if a predicate \(\varphi\) is verified for \CGKAmod{P}{}{}, then the predicate \(\varphi\) holds for \(P\).
 
 Even operating without a formal model, the \Abrev{CGKA} abstraction is a powerful tool.
-Accompanying the description of \Abrev{CGKA}, \CGKAdef, and the \CGKAsec the authors also include an application of mathematically analyzing TreeKEM with the \CGKAsec.
+Accompanying the description of \Abrev{CGKA}, \CGKAdef, and the \CGKAsec\ the authors also include an application of mathematically analyzing TreeKEM with the \CGKAsec.
 The result of the analysis was a constructive counter-example demonstrating that TreeKEM, as originally defined, is \emph{not} \Abrev{FS}.
-Following the revelation of TreeKEM's deficiency the same authors present a new definition of TreeKEM, substituting the use of a standard PKE cryptographic primitive with UPKE, which remedies the defect and regains the \Abrev{FSU} security guarantee for TreeKEM.
+Following the revelation of TreeKEM's deficiency the same authors present a new definition of TreeKEM, substituting the use of a standard PKE cryptographic primitive with UPKE, which remedies the defect and regains the \Abrev{FSU} security guarantee for TreeKEM.\@
 
-The proceeding work will perform verification of the two versions of TreeKEM.
+The proceeding work will perform verification of the two versions of TreeKEM.\@
 All results presented by this work assume that the TreeKEM algorithms' implementations are correct.
-Verification of TreeKEM will consider both the original definition of TreeKEM as well as the remedied version of TreeKEM, denoted by \VersionOne and \VersionTwo; respectively.
+Verification of TreeKEM will consider both the original definition of TreeKEM as well as the remedied version of TreeKEM, denoted by \VersionOne\ and \VersionTwo; respectively.
 Using the notation introduced above, the \Abrev{CGKA} abstraction for TreeKEM produces the \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{} models, which will both be verified.
 Verifying the correctness of the \Abrev{CGKA} algorithm implementations for each TreeKEM version is beyond the scope of this work.
 Rather, it is assumed that a given an implementation of the specified TreeKEM version \(\mathtt{P}\) provides defect-free algorithms.
 If the defect-free algorithm assumption holds, then a verification of the \Abrev{FSU} or \Abrev{PCS} security guarantee for \CGKAmod{P}{}{} also verifies the security guarantee for corresponding TreeKEM version implementation.
-The verification hypotheses are depicted in Table \ref{tab:verification-hypotheses}.
+The verification hypotheses are depicted in Table\ \ref{tab:verification-hypotheses}.
 
-\begin{table}[h!]                                                                                                                      
+\begin{table}[ht!]                                                                                                                      
 \caption{%
 \label{tab:verification-hypotheses}%
 Verification Hypotheses of \CGKAmod{P}{}{}.

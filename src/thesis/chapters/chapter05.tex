@@ -2,12 +2,12 @@
 \chapter{Results}\label{sec:results}}
 
 Here the resulting verification observations for the models \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{} are discussed.
-As described above in chapter \ref{sec:model-formalization}, the verification of the models are bounded, and hold only for the protocol prefixes up to \( T_{max} \) with at most \( N_{max }\) group members.
-Verification was performed on each parameter combination for \CGKAmod{P}{T}{N} parameterized by \( \mathtt{P} \in \{\, \VersionOne ,\, \VersionTwo \,\} \), \( T \in [\,4,\, T_{max} \,] \), and \( N \in [\,2,\, N_{max} \,] \).
-The domain of each \CGKAmod{P}{T}{N} model parameter is listed in Table \ref{tab:model-param-domain}.
-All observed verification results are tabulated in Appendix \ref{apx:Observations}.
+As described above in Chapter\ \ref{sec:model-formalization}, the verification of the models are bounded, and hold only for the protocol prefixes up to \Tmax\ with at most \Nmax\ group members.
+Verification was performed on each parameter combination for \CGKAmod{P}{T}{N} parameterized by \( \mathtt{P} \in \{\,\VersionOne,\, \VersionTwo\,\} \), \( T \in [\,4,\, \Tmax\ \,] \), and \( N \in [\,2,\, \Nmax\ \,] \).
+The domain of each \CGKAmod{P}{T}{N} model parameter is listed in Table\ \ref{tab:model-param-domain}.
+All observed verification results are tabulated in Appendix\ \ref{apx:Observations}.
 At the time of submitting this thesis draft, a cursory glance will reveal that not all verification prcoesses have completed.
-These planned but incomplete observations are indicated by a \NA in table entries.
+These planned but incomplete observations are indicated by a \NA\ in table entries.
 
 
 \hypertarget{performance-tuning}{%
@@ -31,8 +31,8 @@ Furthermore, these techniques are equally applicable for verifying LTL propertie
 The specific partial order reduction technique of ``simultaneous reachability'' analysis \autocite{van1997partial} enables the verification of non-executable transitions, absence of deadlock, and buffer overflows.
 The extensive research and engineering effort put into the myriad of partial order reduction techniques have all been incorporated into verification strategies of SPIN, and are enabled by default,requiring manual ``opt-out'' compilation directives in order to disable them.
 SPIN intelligently selects applicable partial order reduction techniques for the concurrency of the model, the LTL properties to be verified, and the topology of the state-space.
-The verification work presented permitted the usage all the partial order reduction technique made available by SPIN.
-No comparative verification(s) were made to observe the run-time difference between explicitly forbidding partial order reduction and permitting the ``enabled by default'' techniques available to SPIN.
+The verification work presented permitted the usage all the partial order reduction technique made available by SPIN.\@
+No comparative verification(s) were made to observe the run-time difference between explicitly forbidding partial order reduction and permitting the ``enabled by default'' techniques available to SPIN.\@
 
 The verification work refrained from from both disabling partial order reduction via the \texttt{NOREDUCE} directive as well as experiment with potential performance gains or regressions introduced by the \texttt{NIBIS} directive.
 Instead this work made use of a single partial order reduction directive:
@@ -52,7 +52,7 @@ No noticeable performance gains were observed by utilizing the \texttt{XUSAFE}, 
 Since version 5.0, SPIN has supported performing model checking on multi-core machines \autocite{holzmann2007design}.
 This support brings with it non-trivial engineering considerations, such as how to ensure partial order reduction remains sound across multiple independent processors, how to exchange search state results between processors, how to share or segregate memory, and how to minimize parallelism overhead.
 There are two primary directives used my SPIN for approximating the optimal multi-core verification strategy at compile-time.
-Both of these are used by this work while verifying TreeKEM.
+Both of these are used by this work while verifying TreeKEM.\@
 
 \begin{itemize}
 \item
@@ -143,10 +143,10 @@ Specifying a number of bytes which is insufficient to represent the state vector
 The \texttt{VECTORSZ} directive is required when the state-vector length exceeds the SPIN default of \(1024\) bytes.
 Likewise, the \texttt{COLLAPSE} directive applies compression the the state-vector representation.
 
-A final two memory related directives are utilized conditionally during the verification of TreeKEM.
-For large values of \(T\) and \(N\), the \texttt{MA} and \texttt{SPACE} directives are utilized in conjunction to increase the tractable values of \(T_{max}\) and \(N_{max}\).
+A final two memory related directives are utilized conditionally during the verification of TreeKEM.\@
+For large values of \(T\) and \(N\), the \texttt{MA} and \texttt{SPACE} directives are utilized in conjunction to increase the tractable values of \Tmax\ and \Nmax.
 The conjunction of these two directives produces a very significant memory reduction, however the usage of \texttt{MA} causes an appreciable increase in verification run-time.
-This time-memory trade-off is necessary to make verification of higher \(T_{max}\) and \(N_{max}\) values tractable, even on modern computing cluster hardware.
+This time-memory trade-off is necessary to make verification of higher \Tmax\ and \Nmax\ values tractable, even on modern computing cluster hardware.
 
 The \texttt{MA} directive is used to specify the maximum number of bytes \(X\) that a state vector can require.
 Spin internally stores several sets of model states.
@@ -162,9 +162,9 @@ This conditional directive usage creates an ``optimization partition'' bifurcati
 An important consequence of this partitioning relates to comparative analysis of the verification run-time characteristics.
 Such comparisons can only soundly be with other verification runs within the same set, utilizing the same directives.
 In the tables presented below, the presence of a checkmark (\cmark) in the column labeled $\MinimizedDFA$ indicates that the associated parameterized model and results were run with this time/memory trade-off strategy enabled.
-Table \ref{tab:state-vector-len} displays the state vector's byte length for each \CGKAmod{\VersionOne}{}{} parameterized model under verification.
+Table\ \ref{tab:state-vector-len} displays the state vector's byte length for each \CGKAmod{\VersionOne}{}{} parameterized model under verification.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \caption[State vector byte length for each model]{%
 \label{tab:state-vector-len}%
 State vector byte length for each model parameterization of \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{}.
@@ -184,8 +184,8 @@ State vector byte length for each model parameterization of \CGKAmod{\VersionOne
 \hypertarget{scalability-limits}{%
 \subsection{Scalability Limits}\label{scalability-limits}}
 
-The state-vector lengths detailed in Table \ref{tab:state-vector-len} and columns observing verification performance within Appendix \ref{apx:Observations} provide an initial basis for interpreting the scalability of the \CGKAmod{P}{T}{N} model.
-The records of all these tables are currently incomplete, missing entries for protocol \VersionOne with larger \(T\) and \(N\) parameters, and missing protocol \VersionTwo entirely.
+The state-vector lengths detailed in Table\ \ref{tab:state-vector-len} and columns observing verification performance within Appendix\ \ref{apx:Observations} provide an initial basis for interpreting the scalability of the \CGKAmod{P}{T}{N} model.
+The records of all these tables are currently incomplete, missing entries for protocol \VersionOne\ with larger \(T\) and \(N\) parameters, and missing protocol \VersionTwo\ entirely.
 Still some scaling information can be gleaned.
 
 It is easy to notice that a progression from \( (\,T,\, N\,) \) to \( (\,T+1,\, N\,) \) is more significant in memory usage than a progression from \( (\,T,\, N\,) \) to \( (\,T,\, N+4\,) \).
@@ -202,20 +202,20 @@ Since the attacker knowledge base and group membership alterations depend on the
 \hypertarget{sec:hypothesis-outcomes}{%
 \section{Hypothesis Testing}\label{sec:hypothesis-outcomes}}
 
-By interpreting the observations collected in Appendix \ref{apx:Observations} one can discern whether the hypotheses enumerated in Table \ref{tab:verification-hypotheses} and described in Chapter \ref{sec:methodology} have been supported or falsified.
+By interpreting the observations collected in Appendix\ \ref{apx:Observations} one can discern whether the hypotheses enumerated in Table\ \ref{tab:verification-hypotheses} and described in Chapter\ \ref{sec:methodology} have been supported or falsified.
 Each hypothesis sill be considered individually, noting the interpretive limitations imposed by the currently incomplete series of observations.
 
 
-\hypertarget{sec:post-compromise-security}{%
-\subsection{Confidence Check}\label{sec:post-compromise-security}}
+\hypertarget{sec:confidence-check}{%
+\subsection{Confidence Check}\label{sec:confidence-check}}
 
-The simplest of the three \Abrev{LTL} predicates defined in Section \ref{sec:LTL-security} is \LTLPredicate{HLT}.
+The simplest of the three \Abrev{LTL} predicates defined in Section\ \ref{sec:LTL-security} is \LTLPredicate{HLT}.
 The verification of \LTLPredicate{HLT} is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
 While \LTLPredicate{HLT} is not truly a security property of \CGKAmod{}{}{}, it is used as a methodology confidence check.
 Failure to verify \LTLPredicate{HLT} would cast serious doubt that the model verification methodology is being performed correctly on more complex \Abrev{LTL} predicates.
-Verification results for \LTLPredicate{HLT} is displayed in Tables \ref{tab:V1-HLT} and \ref{tab:V2-HLT}.
+Verification results for \LTLPredicate{HLT} is displayed in Tables\ \ref{tab:V1-HLT} and\ \ref{tab:V2-HLT}.
 
-All observations in Tables \ref{tab:V1-HLT} and \ref{tab:V2-HLT} report a successful verification of \LTLPredicate{HLT}.
+All observations in Tables\ \ref{tab:V1-HLT} and\ \ref{tab:V2-HLT} report a successful verification of \LTLPredicate{HLT}.
 These observations support the notion \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) and none falsify it.
 From the observations obtained so far, one can conclude that the confidence check which has successfully verified \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) does not introduce any doubt regarding the verification methodology.
 
@@ -223,30 +223,30 @@ From the observations obtained so far, one can conclude that the confidence chec
 \hypertarget{sec:post-compromise-security}{%
 \subsection{Post Compromise Security}\label{sec:post-compromise-security}}
 
-The hypotheses listed in Table \ref{tab:verification-hypotheses} show an expectation that \Abrev{PCS} should be verifiable for both \VersionOne and \VersionTwo protocols.
+The hypotheses listed in Table\ \ref{tab:verification-hypotheses} show an expectation that \Abrev{PCS} should be verifiable for both \VersionOne\ and \VersionTwo\ protocols.
 
-With regards to the first protocol \VersionOne, all observations in Table \ref{tab:V1-PCS} report a either successful verification of \LTLPredicate{PCS} or an ``out of memory'' error (\OutOfMemory).
+With regards to the first protocol \VersionOne, all observations in Table\ \ref{tab:V1-PCS} report a either successful verification of \LTLPredicate{PCS} or an ``out of memory'' error (\OutOfMemory).
 With no observation falsify the hypothesis, these limited observations provide only support for the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
 Thought the hypothesis is supported by the current observations, gathering more observations of increasingly complex \CGKAmod{\VersionOne}{}{} parameterization should be gathered before making security conclusions.
 
-Unfortunately there are no current observations for protocol \VersionTwo shown in Table \ref{tab:V2-PCS} and consequently no support for, or falsification of the hypothesis.
+Unfortunately there are no current observations for protocol \VersionTwo\ shown in Table\ \ref{tab:V2-PCS} and consequently no support for, or falsification of the hypothesis.
 No security conclusions should be derived until the planned observation set can be completely gathered. 
 
 
 \hypertarget{sec:future-secrecy}{%
 \subsection{Future Secrecy}\label{sec:future-secrecy}}
 
-As indicated in Table \ref{tab:verification-hypotheses}, the first protocol \VersionOne is known to have a \Abrev{FSU} security deficiency, so the hypothesis is that verification of \LTLPredicate{FSU} should be fail for \emph{at least} \CGKAmod{\VersionOne}{12}{8}.
+As indicated in Table\ \ref{tab:verification-hypotheses}, the first protocol \VersionOne\ is known to have a \Abrev{FSU} security deficiency, so the hypothesis is that verification of \LTLPredicate{FSU} should be fail for \emph{at least} \CGKAmod{\VersionOne}{12}{8}.
 While prior work \autocite{alwen2020security} indicates \( \CGKAmod{\VersionOne}{12}{8} \not \models \LTLPredicate{FSU} \), it is possible that a simpler model with lower \(T\) and/or \(N\) parameters may exist which also demonstrates the \Abrev{FSU} security deficiency.
 Similarly, there may be many \CGKAmod{\VersionOne}{T}{N} models with simpler \(T\) and \(N\) parameters which verify \LTLPredicate{FSU}.
 The aforementioned single \Abrev{FSU} security deficiency example point does not delineate a boundary at which \((T, C, N)\)-attacker does not demonstrate advantage but a \((T+1, C, N)\)-attacker or a \((T, C, N+1)\)-attacker is able to demonstrate advantage for the original protocol \VersionOne.
 Verification observations related to \LTLPredicate{FSU} ought to be the most intriguing.
 
-Table \ref{tab:V1-FSU} reports only successful verification of \LTLPredicate{FSU}.
+Table\ \ref{tab:V1-FSU} reports only successful verification of \LTLPredicate{FSU}.
 However, the observations are not complete and most importantly, do not include \CGKAmod{\VersionOne}{12}{8}.
 Without knowledge of where in the \CGKAmod{\VersionOne}{T}{N} model parameter space the \Abrev{FSU} security deficiency manifests, the observations do not provide any support for or falsification of the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
 A verification observation for \CGKAmod{\VersionOne}{12}{8} would provide additional context and permit a deduction regarding the models relationship towards the hypothesis.
 The current observations do not reveal any security conclusions.
 
-As with \Abrev{PCS}, there are also currently no \LTLPredicate{FSU} observations for protocol \VersionTwo shown in Table \ref{tab:V2-FSU} and consequently no support for, or falsification of the hypothesis.
+As with \Abrev{PCS}, there are also currently no \LTLPredicate{FSU} observations for protocol \VersionTwo\ shown in Table\ \ref{tab:V2-FSU} and consequently no support for, or falsification of the hypothesis.
 No security conclusions should be derived until the planned observation set can be completely gathered.
