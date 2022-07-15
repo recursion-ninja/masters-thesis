@@ -436,9 +436,11 @@ $$ \normalfont\textbf{Adv}\left\{\mathtt{CGKA}\right\}(\mathcal{A}) \leq \epsilo
 ## Verification Hypotheses
 :::::::::::::: {.columns .s align=top}
 ::: {.column width="65%" align=center}
-  - Original TreeKEM protocol has FSU deficiency [^7]
+  - Original TreeKEM protocol has FSU deficiency [^7]  
+  (for a $(T=12, C=12, N=8)$-adversary)
 
   - Corrected TreeKEM protocol should provide FSU
+
 ::::
 
 ::: {.column width="35%" .s align=center}
@@ -783,6 +785,14 @@ Spin directives
 [^13]: [@holzmann1999minimized]
 
 
+## Future work
+
+- Extending the Observation Set
+
+- Adding LTL Predicates
+
+- Unbounded Verification
+
 
 # Conclusion
 
@@ -798,6 +808,11 @@ Spin directives
 ::: {.column width="40%" align=center}
 **Thank you**
 
+- Subash Shankar
+
+- Sven Dietrich
+
+- Saptarshi Debroy
 ::::
 
 ::: {.column width="60%" .s align=center}
