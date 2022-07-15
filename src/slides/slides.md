@@ -483,7 +483,7 @@ $$ \normalfont\textbf{Adv}\left\{\mathtt{CGKA}\right\}(\mathcal{A}) \leq \epsilo
 ::::::::::::::
 
 
-## Spin
+## Spin [^22]
 
   - Venerable explicit state model-checking tool
 
@@ -491,8 +491,10 @@ $$ \normalfont\textbf{Adv}\left\{\mathtt{CGKA}\right\}(\mathcal{A}) \leq \epsilo
 
   - Configurable for performance tuning
 
+[^22]: [@holzmann1980basic]
 
-## Promela
+
+## Promela [^22]
 :::::::::::::: {.columns .s align=top}
 ::: {.column width="50%" align=center}
 Protocol Meta Language (Promela) [^11]
@@ -534,9 +536,9 @@ od
 - Promela for modeling `CGKA`
 
 
-## Linear Temporal Logic
+## Linear Temporal Logic [^10]
 
-LTL [^10] is a logical system for reasoning about time-based properties.
+LTL is a logical system for reasoning about time-based properties.
 
 LTL possesses all the logical operators of the two-element Boolean algebra with the addition of four temporal operators:        
 
@@ -554,16 +556,41 @@ LTL possesses all the logical operators of the two-element Boolean algebra with 
 - LTL for `CGKA` properties
 
 
+## Linear Temporal Logic
+
+**Termination as LTL:**
+
+$$ \Diamond \texttt{CGKA@end\_of\_game} $$
+
+
+## Linear Temporal Logic
+
+**PCS as LTL:**
+
+$$ \Box \Big(\, ( \texttt{CGKA@start\_of\_epoch} \land \texttt{unsafeIDs} = 0 ) \implies \neg \texttt{learnedKey[epoch]} \Big) $$
+
+
+## Linear Temporal Logic
+
+**FSU as LTL:**
+
+$$ \textbf{Never-Trivial} \implies \bigwedge\limits_{t=0}^{T-1} \;\,\textbf{FSU-Epoch}(t) $$
+
+$$ \textbf{Never-Trivial} = \Box \left( \texttt{CGKA@move\_corrupt} \implies \texttt{hoarding[targetID]} = \texttt{NEVER} \right) $$
+$$ \textbf{FSU-Epoch}\,(t \in T\,) =  
+    \Diamond ( \texttt{CGKA@move\_start\_of\_epoch} \land \texttt{epoch} = t + 1 \land \neg \texttt{learnedKey[$t$]} ) $$
+$$\implies ( \neg \texttt{learnedKey[$t$]} ) \,\;{\mathcal {U}}\;\, \texttt{CGKA@end\_of\_game} $$
+
 # Formalization
 
 
 ## Exhaustiveness Limitations
 
-1. Unique state-vector encoding 
+- Unique state-vector encoding 
 
-2. State-vector’s encoding includes temporal information
+- State-vector’s encoding includes temporal information
 
-3. In an unbounded `CGKA` game, no finite encoding
+- In an unbounded `CGKA` game, no finite encoding
 
 
 ## Exhaustiveness Limitations
@@ -580,12 +607,19 @@ But...
 
 
 ## Exhaustiveness Limitations
-
+:::::::::::::: {.columns .s align=top}
+::: {.column width="50%" align=center}
 Specific solution: 
 
   - For a $(T, C, N)$ adversary $\mathcal{A}$
 
   - Limit $T$ and $N$ to some $T_{\max}$ and $N_{\max}$
+::::
+
+::: {.column width="50%" .s align=center}
+![Secure Group Messaging](./assets/State-Vector-Length.png){ width=100% } \
+::::
+::::::::::::::
 
 
 ## Exhaustiveness Strengths
@@ -732,13 +766,15 @@ of verification domain
 ## Performance
 
 :::::::::::::: {.columns .s align=top}
-::: {.column width="40%" align=center}
+::: {.column width="35%" align=center}
+Empirical impressions
+
 - Exponential scaling
 
 - Time-memory trade-off
 ::::
 
-::: {.column width="60%" .s align=center}
+::: {.column width="65%" .s align=center}
 ![Secure Group Messaging](./assets/fsu-pcs-combined.jpeg){ width=100% } \
 ::::
 ::::::::::::::
@@ -747,29 +783,28 @@ of verification domain
 ## Performance
 
 :::::::::::::: {.columns .s align=top}
-::: {.column width="40%" align=center}
+::: {.column width="35%" align=center}
 Spin directives
 
 - `COLLAPSE`
 
 - `VECTORSZ=`$X$
 
-- `MA=`$X$ [^13]
+- `MA=`$X$
 
 - `SPACE`
 ::::
 
-::: {.column width="60%" .s align=center}
+::: {.column width="65%" .s align=center}
 ![Secure Group Messaging](./assets/fsu-pcs-combined.jpeg){ width=100% } \
 ::::
 ::::::::::::::
-[^13]: [@holzmann1999minimized]
 
 
 ## Performance
 
 :::::::::::::: {.columns .s align=top}
-::: {.column width="40%" align=center}
+::: {.column width="35%" align=center}
 Spin directives
 
 - *Three* order of magnitude memory reduction 
@@ -778,7 +813,7 @@ Spin directives
 
 ::::
 
-::: {.column width="60%" .s align=center}
+::: {.column width="65%" .s align=center}
 ![Secure Group Messaging](./assets/fsu-pcs-combined.jpeg){ width=100% } \
 ::::
 ::::::::::::::
@@ -803,7 +838,7 @@ Spin directives
 - More compute time required for results
 
 
-# Conclusion
+## Conclusion
 :::::::::::::: {.columns .s align=top}
 ::: {.column width="40%" align=center}
 **Thank you**
@@ -816,7 +851,8 @@ Spin directives
 ::::
 
 ::: {.column width="60%" .s align=center}
-**Questions**
+**Questions?**
 ::::
 ::::::::::::::
 
+## References {.allowframebreaks}
