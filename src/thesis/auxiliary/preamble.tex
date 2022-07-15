@@ -14,52 +14,9 @@
 
 \subimport{./}{abbreviations}
 \subimport{./}{copyrights}
+\subimport{./}{figure-styles}
 \subimport{./}{metadata}
 \subimport{./}{shorthand}
-
-%------------------------------------- TikZ figure styles ----------------------
-\usepackage{tikz}
-\usetikzlibrary{tikzmark}
-\usetikzlibrary{shapes,arrows,positioning}
-
-% Boundary / labeling nodes
-\tikzstyle{boxed} = [rectangle, draw, dashed, minimum height=9.5cm, minimum width=16.75cm]
-
-\tikzstyle{label} = [text width=9.5cm, text centered,minimum width=9.5cm, rotate=90 ]
-
-% Actor nodes	
-\tikzstyle{ident} = [circle, draw, fill=green!40, text width=2em, text centered, minimum height=2em, node distance=3cm]
-
-\tikzstyle{invis} = [text width=0em, text centered, minimum height=0em, node distance=3cm]
-
-\tikzstyle{agent} = [ellipse, draw, fill=green!40, text width=6em, text centered, minimum height=2em, node distance=2cm]
-
-% Game/protocol interfaces
-\tikzstyle{oracl} = [rectangle, draw, fill=blue!15, text width=7.5em, text centered, minimum height=2em, node distance=3cm]
-
-\tikzstyle{algor} = [diamond, draw, fill=blue!30, text width=3.75em, text badly centered, node distance=2.5cm, inner sep=0pt]
-
-\tikzstyle{cntrl} = [regular polygon, regular polygon sides=6, draw, fill=red!35, text width=1.2cm, text centered, minimum height=1.4cm, node distance=1cm, inner sep=0.0625mm]
-
-\tikzstyle{ended} = [regular polygon, regular polygon sides=8, draw, fill=red!35, text width=1.2cm, text centered, minimum height=1.4cm, node distance=1cm, inner sep=0.0625mm]
-
-% Transitions
-\tikzstyle{line} = [draw, very thick, color=black!50, -latex']
-
-\tikzstyle{choice} = [draw, thick,dash pattern={on 7pt off 2pt on 1pt off 3pt}, color=black!50, -latex']
-
-\tikzstyle{triangle} = [fill=black!50, regular polygon, regular polygon sides=3, shape border rotate=180]
-
-% DEPRICATED!
-\tikzstyle{blockOLD} = [rectangle, draw, fill=green!40, text width=10em, text centered, minimum height=4em, node distance=3cm]
-
-\tikzstyle{cloudOLD} = [ellipse, draw, fill=yellow!60, text width=10em, text centered, node distance=3cm]
-
-\tikzstyle{lineOLD} = [draw, thick, color=black!50, -latex']
-
-\tikzstyle{choiceOLD} = [draw, thick,dash pattern={on 7pt off 2pt on 1pt off 3pt}, color=black!50, -latex']
-%------------------------------------- TikZ figure styles ----------------------
-
 
 %------------------------------------- Custom definitions ----------------------
 \usepackage{ntheorem}

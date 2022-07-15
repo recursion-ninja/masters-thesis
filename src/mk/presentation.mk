@@ -51,29 +51,33 @@ filepath-dependancies := $(abspath $(addprefix $(dir-make-definitions),$(filenam
 ###
 #######
 
-row-delimiter := $(SPACE)\$(NEWLINE)$(SPACE)$(SPACE)
+row-delimiter := $(SPACE)\$(NEWLINE)$(SPACE)$(SPACE)$(SPACE)$(SPACE)
+
+resource-filepath := $(abspath $(dir-slides-source)assets)/
 
 # Thesis PDF document file path
 presentation-name   := thesis-defense-presentation
-presentation-target := $(abspath $(dir-slides-deck)$(presentation-name).$(extension-portabledoc))
+presentation-latex  := $(abspath $(dir-slides-source)$(presentation-name).$(extension-latex))
+presentation-target := $(abspath   $(dir-slides-deck)$(presentation-name).$(extension-portabledoc))
 
 slides-filename := slides.md
 slides-filepath := $(abspath $(dir-slides-source)$(slides-filename))
 
+latexmk-flag-list = \
+  -output-directory="$(dir $(presentation-target))"
+
 pandoc-flag-list = \
   --columns=50 \
   --dpi=300 \
+  --citeproc \
   --from=markdown \
   --listings \
   --pdf-engine=lualatex \
-  --to=beamer \
   --shift-heading-level=0 \
   --slide-level=2 \
   --standalone \
+  --to=beamer \
   --toc \
-  --metadata=author:"$(thesis-param-author)" \
-  --metadata=date:"$(thesis-param-date)" \
-  --metadata=title:"$(thesis-param-title)" \
   --variable=aspectratio:169 \
   --variable=classoption:"aspectratio=169" \
   --variable=colortheme:"orchid" \
@@ -81,12 +85,14 @@ pandoc-flag-list = \
   --variable=institute:"Hunter College, CUNY" \
   --variable=lang:en-US \
   --variable=linkstyle:bold \
-  --variable=logo:"$(abspath $(dir-slides-source)Hunter_College_logo_small.png)" \
   --variable=section-titles:false \
-  --variable=theme:"Frankfurt" \
+  --variable=theme:"Rochester" \
   --variable=toc:true
 
-pandoc-options = $(subst $(SPACE),$(row-delimiter),$(pandoc-flag-list))
+latexmk-options := $(subst $(SPACE),$(row-delimiter),$(latexmk-flag-list))
+pandoc-options  := $(subst $(SPACE),$(row-delimiter),$(pandoc-flag-list))
+
+artifacts := $(abspath $(addprefix $(dir-slides-source)$(presentation-name).,nav snm))
 
 #######
 ###
@@ -117,7 +123,9 @@ pdf:: $(presentation-target)
 presentation: $(presentation-target)
 
 presentation-clean:
-	-rm -f$(row-delimiter)$(presentation-target)
+	( cd $(dir $(presentation-latex)); latexmk -CA; )
+	-rm -f$(row-delimiter)$(presentation-target)$(row-delimiter)$(presentation-latex)
+	-rm $(artifacts)
 
 #######
 ###
@@ -129,8 +137,30 @@ $(dir $(presentation-target)):
 	@mkdir -p $@
 
 ## Build thesis
-$(presentation-target): $(slides-filepath) $(dir $(presentation-target))
+$(dir $(presentation-latex)):
+	@mkdir -p $@
+
+$(presentation-latex): $(slides-filepath) $(dir $(presentation-latex))
 	( cd $(dir-slides-source); \
+	pandoc \
+	  $(pandoc-options) \
+	  --output=$@ \
+	  $< ; \
+	  sed -i 's/<\.->/<\.->\[frame\]/g' $@; \
+	)
+
+$(presentation-target): $(presentation-latex) $(dir $(presentation-target))
+	( cd $(dir $(presentation-latex)); \
+	  latexmk \
+	    -pdf \
+	    $< ; \
+	  cp \
+	    $(subst $(extension-latex),$(extension-portabledoc),$(presentation-latex)) \
+	    $@ ; \
+	)
+
+#$(presentation-target): $(slides-filepath) $(dir $(presentation-target))
+#	( cd $(dir-slides-source); \
 	pandoc \
 	  $(pandoc-options) \
 	  --output=$@ \

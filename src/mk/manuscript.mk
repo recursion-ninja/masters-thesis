@@ -96,7 +96,7 @@ thesis-param-reader      := Sven Dietrich
 thesis-param-director    := Saptarshi Debroy
 
 # Thesis Metadata
-thesis-param-title       := Formal Verification of TreeKEM
+thesis-param-title       := Formal Verification Applications for the TreeKEM Continuous Group Key Agreement Protocol
 thesis-param-date        := 2022-06-20
 thesis-param-year        := $(firstword $(subst -, ,$(thesis-param-date)))
 thesis-param-department  := Computer Science

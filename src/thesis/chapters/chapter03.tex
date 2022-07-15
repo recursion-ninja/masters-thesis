@@ -111,7 +111,7 @@ It will be clear to an attentive reader that the cardinality of \(q \circ p \get
 
 The concept of idempotency phrased in the context of a stateful protocol modeled as a transition graph, relates an idempotent operation \(q\) as one in which, performing \(q\), then at a later point while in state \(s\) performing \(q\) again, results in a cycle from \(s\) to \(s\).
 This is problematic for an exhaustive search.
-Quite obviously it permits an infinite loop in within \CGKAmod, which in turn makes certain LTL statement impossible to verify as well as increasing the verification run-time
+Quite obviously it permits an infinite loop in within \CGKAmod{}{}{}, which in turn makes certain LTL statement impossible to verify as well as increasing the verification run-time
 The following are examples of permitted idempotency by the informal \CGKAsec\ definition:
 
 \begin{itemize}
@@ -127,7 +127,7 @@ The following are examples of permitted idempotency by the informal \CGKAsec\ de
 Since the verification methodology for \CGKAmod{P}{T}{N} exhaustively explores all possible \CGKAsec\ states, all sequences of operations \(q \circ p \gets q^{*}\) are equivalent.
 Hence we can collapse the cyclical search through the countably infinite number of idempotent sequences, considering them all to be the same unique state without effecting the verification of an LTL property \(\varphi\).
 To disallow the cycles formed by idempotent operations, each operation above is permitted only once per period within which the operation is idempotent.
-Within the \CGKAmod\ Promela encoding, repeated sequences of idempotent operations are tabulated within the global game state and guarded against.
+Within the \CGKAmod{}{}{}\ Promela encoding, repeated sequences of idempotent operations are tabulated within the global game state and guarded against.
 By disallowing idempotency within the game, each query made by the attacker will never result in a return to a previous game state.
 A consequence of this, is that attacker queries necessarily advance the game state towards the next epoch transition, or when within the final epoch, advance towards the query to \Oracle{chall}{}.
 This necessarily progression of the \CGKAsec\ within the model \CGKAmod{P}{T}{N} both reduces the run-time verification as well as permits verification that the model \CGKAmod{P}{T}{N} halts.
