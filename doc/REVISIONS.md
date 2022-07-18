@@ -34,6 +34,12 @@ Revisions
 6.  > I dont know myself but wikipedia says SM must be server based while you dont seem to imply that.
     Spot: Page 9
     Note: Added a comment about mediation services
+    Edit: `6f351e635a1b1b257975c6458d77144cb3f46f56`
+
+
+7.  > Do you mean attack or attack type (or vulnerablity)?
+    Spot: Page 10
+    Note: Standardized language; vulnerability is the most appropriate term
     Edit: ``
 
 

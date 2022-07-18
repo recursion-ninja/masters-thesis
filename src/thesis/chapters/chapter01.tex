@@ -20,21 +20,21 @@ However, generalizing the security guarantees of \Abrev{SM} to communication wit
 
 The production of a secure, multi-party communication protocol is not the only concern.
 Proof and verification of protocol correctness \autocite{kobeissi2017automated, alwen2019double, chen2021anonymous, bienstock2022more} is exremely important.
-An attack on a communication protocol can take many forms.
+A communication protocol vulnerability can take many forms.
 A cryptographic attack may identify weaknesses in one or more of the primitive building blocks from which the protocol is constructed \autocite{al2008comparative}.
 Side channel attacks can glean information regarding the communication from passive observations \autocite{kocher1996timing, molnar2005program, chen2010side}.
 Replay or masquarading attacks \autocite{syverson1994taxonomy, pries2008new, ustun2019novel} permit an adversary to impersonate messages from a sender in a manner which is indistinguishable to the receiver from receiving messages from the legitimate sender.
 While an enormous litany of attacks are documented, exhaustive enumeration of attacks is not possible, as the form an attack might take is limited only by human creativity.
-Still, each of these forms of attack, introduce the communicating parties to unanticipated risk, and hold the possibility for, in extreme cases, loss of life or property \autocite{farwell2011stuxnet, 10.1145/2508701, chung2017critical, kagalwalla2019cybersecurity, gunduz2020cyber}.
+Still, each of these forms of attack represents a communication protocol vulnerability introducing the communicating parties to unanticipated risk, and hold the possibility for, in extreme cases, loss of life or property \autocite{farwell2011stuxnet, 10.1145/2508701, chung2017critical, kagalwalla2019cybersecurity, gunduz2020cyber}.
 
-Given the vast and potentially unknown range of potential attacks, a protocol is designed with a threat model \autocite{salter1998toward} which contextualizes the capabilities of an adversary and consequently defines domain from which attacks must be considered.
-Subsequently, the protocol will be designed to satisfy one or more security guarantees \autocite{rfc3552} within the threat model, an assertion that no advarsary within the threat model has the capability to violate any the protocol's safety guarantees.
-The presence or absence of attacks on secure communication protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption \autocite{clark1997survey}.
-Often attacks are discovered years, if not decades, after a protocol has been in active use \autocite{durumeric2014matter, shaik2015practical, cremers2017comprehensive, basin2018formal}.
-Late discovery of these attacks after widespread adoption of the protocol requires rapid effort to fix the protocol and encourage all systems using the protocol to update to the revised version \autocite{ghafoor2014analysis}.
+Given the vast and potentially unknown range of potential vulnerabilities, a protocol is designed with a threat model \autocite{salter1998toward} which contextualizes the capabilities of an adversary and consequently defines domain from which vulnerabilities must be considered.
+Subsequently, the protocol will be designed to satisfy one or more security guarantees \autocite{rfc3552} within the threat model, an assertion that no advarsary within the threat model has the capability to violate any of the protocol's safety guarantees.
+The presence or absence of  on secure communication protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption \autocite{clark1997survey}.
+Often vulnerabilities are discovered years, if not decades, after a protocol has been in active use \autocite{durumeric2014matter, shaik2015practical, cremers2017comprehensive, basin2018formal}.
+Late discovery of these vulnerabilities after widespread adoption of the protocol requires rapid effort to fix the protocol and encourage all systems using the protocol to update to the revised version \autocite{ghafoor2014analysis}.
 Regretably, this updating process itself takes years of migration work \autocite{markowsky2015scanning} or the migration never occurs.
 This is especially problematic for embedded systems which cannot be easily retrieved and require extra consideration to be securely updated \autocite{yoon2017remote, maroof2022irecover}.
-For these reasons, it is of paramount importance to identify all possible attacks on a new communication protocol as early as possible, so it can be corrected prior to widespread adoption.
+For these reasons, it is of paramount importance to identify all possible vulnerabilities on a new communication protocol as early as possible, so it can be corrected prior to widespread adoption.
 
 The desirable operations and security of multi-party communication protocol is explored below in Chapter\ \ref{sec:preliminaries}, with the threat model and security guarantees are detailed.
 After defining the goals of such a protocol, an existing protocol is identified as the state-of-the-art and selected as the protocol under consideration for this work in Section\ \ref{sec:treekem-protocol}.
