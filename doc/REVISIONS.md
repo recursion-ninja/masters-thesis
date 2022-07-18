@@ -50,7 +50,14 @@ Revisions
 
 9.  > Add qualifier here (currently sounds like a modification of previous sentence)
     Spot: Page 12
+    Edit: `0b837157ae688823555e759b00f452730af137fc`
+
+
+10. > Does IETF say these are the only 5, or the minimum 5, or something else? Later you use the word "update". Which of these ops does that refer to?
+    Spot: Page 12
+    Note: Added missing update requirement
     Edit: ``
+
 
 
 

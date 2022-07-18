@@ -53,8 +53,18 @@ Lastly, a discussion and interpretation of the verification results is presented
 
 The generalization of two-party \Abrev{SM} to multi-party communication is known as \Abrev{SGM} \autocite{cohn2018ends}.
 \Abrev{SGM} describes the \emph{use case} of secure multi-party communication, but not the details of how the use case is achieved.
-To be considered a \Abrev{SGM} protocol \autocite{ietf-mls-protocol-14}, the \Abrev{IETF} states the following operations must exist for each participating member: create a new communication group consisting of a set of known members, broadcast a message to all members in the group, receive a message from a member in the group, add a new member to the group, and remove an existing member from the group.
-One of the interesting features of \Abrev{SGM} is the ability for members to be added and removed from the secure communication channel.
+To be considered a \Abrev{SGM} protocol \autocite{ietf-mls-protocol-14}, the \Abrev{IETF} states the following operations must exist for each participating member: 
+
+\begin{itemize}
+\item Create a new communication group consisting of a set of known members
+\item Broadcast a message to all members in the group
+\item Receive a message from a member in the group
+\item Add a new member to the group
+\item Remove an existing member from the group
+\item Instruct all group members to use a new shared key via an update algorithm
+\end{itemize}
+
+One of the interesting features of \Abrev{SGM}, compared to the better studied \Abrev{SM}, is the ability for members to be added and removed from the secure communication channel.
 In the simpler case when two parties use \Abrev{SM}, additional participants cannot be added nor can participants be removed.
 However ``removing'' a participant can effectively be acheived when the communication channel is simply closed by either party wishing to cease communication.
 The \Abrev{SGM} requirement of adding and removing participants to the secure communication channel poses interesting open challenges in the field of cryptographic protocol design.
