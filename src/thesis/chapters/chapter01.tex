@@ -68,12 +68,23 @@ One of the interesting features of \Abrev{SGM}, compared to the better studied \
 In the simpler case when two parties use \Abrev{SM}, additional participants cannot be added nor can participants be removed.
 However ``removing'' a participant can effectively be acheived when the communication channel is simply closed by either party wishing to cease communication.
 The \Abrev{SGM} requirement of adding and removing participants to the secure communication channel poses interesting open challenges in the field of cryptographic protocol design.
+A contrast of \Abrev{SM} and \Abrev{SGM} is illistratedin Figure \ref{fig:Secure-Messaging-And-Secure-Group-Messaging}.
+
+\begin{figure}[ht!]
+  \centering
+  \caption[Secure Messaging and Secure Group Messaging]{%
+  \label{fig:Secure-Messaging-And-Secure-Group-Messaging}%
+  Visual comparison of \Abrev{SM} and \Abrev{SGM} group sizes.
+  }%
+\resizebox{0.5\textwidth}{!}{\subimport{../figures/}{Secure-Messaging}}%
+\resizebox{0.5\textwidth}{!}{\subimport{../figures/}{Secure-Group-Messaging}}
+\end{figure}
 
 
 \hypertarget{sec:message-layer-security}{%
 \section{Message Layer Security}\label{sec:message-layer-security}}
 
-\Abrev{MLS} \autocite{Omara2020} is a framework for providing secure messages in groups of size two or more parties.
+\Abrev{MLS} \autocite{Omara2020} is a framework for providing secure messages in groups with two or more parties.
 Originally produced in 2018 \autocite{ietf-mls-architecture-02}, \Abrev{MLS} seeks to specify a standardization within which \Abrev{SGM} protocols can be defined.
 Consequently, implementations conforming to the specification of \Abrev{MLS} are a subset of possible \Abrev{SGM} implementations.
 The standardized specification of \Abrev{MLS} is still an area of active development by \Abrev{IETF}.
@@ -81,15 +92,49 @@ However, the core security aspects of \Abrev{MLS} relevant to the work presented
 
 \Abrev{MLS} describes the protocol environment in which protocol agents interact.
 The \Abrev{ITM} of RFC3552 \autocite{rescorla2003rfc3552} is the context within which the \Abrev{MLS} specifies it's security guarantees.
-Simply put, the \Abrev{ITM} assumes that the attacker has complete control of the network.
-There are only a two caveats to consider with regard to the attacker's network control, and these are determined by two network agents with which \Abrev{MLS} participants can interact.
+Simply put, the \Abrev{ITM} assumes that an adversary has complete control of the network.
+There are only two caveats to consider with regard to the adversary's network control, and these are determined by two network agents with which \Abrev{MLS} participants can interact.
 \Abrev{MLS} specifies the existence of an \Abrev{AS} \autocite{perlman1999overview} from which a messenger can request fresh public key for a specified contact which can be immediately used within the \Abrev{MLS} protocol.
 An advantage of using the \Abrev{AS} as described in \Abrev{MLS} is that it allows the contact to asynchronously query the \Abrev{AS} for the corresponding secret key at a later time, ameliorating potential protocol synchronization issues.
+The \Abrev{AS} is a trusted third party which is expected to carry out it's required tasks without failure.
 In addition to the \Abrev{AS}, \Abrev{MLS} specifies the existence of a \Abrev{DS} \autocite{sekiba1998design}.
 The \Abrev{DS} can receive messages addressed to any contact and the \Abrev{DS} stores the messages until the contact queries it for new messages.
-Importantly, the \Abrev{DS} will always deliver messages from all senders to a contact in the order that they were sent by the senders.
+Importantly, the \Abrev{DS} will always deliver messages from all senders to a other group members in a consitent order.
+Consistent ordering of delivery of broadcasted messages allows the \Abrev{DS} some flexibility in resolving concurrency issues which emerge during asynchoronous communication.
+Another important feature of the \Abrev{DS} is the delivering a message back to the original sender after all other group members have received the broadcast message from the \Abrev{DS}.
+An example of this aknowledgement behavior is depicted in Figures \ref{fig:Secure-Messaging-Broadcast} and \ref{fig:Secure-Messaging-Update}.
 The existence of \Abrev{AS} and a \Abrev{DS} are required, though these do not need to be the same provider, nor do they need to be centralized.
-The attacker is assumed to not be able to masquerade as the authentication service nor violate the message authentication codes \autocite{krawczyk1997hmac} within which the message ordering is encoded.
+The adversary is assumed to not be able to masquerade as the authentication service nor violate the message authentication codes \autocite{krawczyk1997hmac} within which the message ordering is encoded.
+
+\begin{figure}[ht!]
+  \centering
+  \caption[Secure Messaging Broadcast with Acknowledgement]{%
+  \label{fig:Secure-Messaging-Broadcast}%
+  Secure Messaging Broadcast with Acknowledgement:
+  \begin{enumerate}
+    \item Alice broadcasts ``Hello''
+    \item Bob polls the \Abrev{DS} and receives ``Hello''
+    \item Alice polls the \Abrev{DS} and receives ``Hello''
+  \end{enumerate}
+  }%
+\resizebox{0.5\textwidth}{!}{\subimport{../figures/}{Secure-Messaging-Send}}
+\end{figure}
+
+\begin{figure}[ht!]
+  \centering
+  \caption[Secure Messaging Update Instruction]{%
+  \label{fig:Secure-Messaging-Update}%
+  Secure Messaging Update Instruction:
+  \begin{enumerate}
+    \item Alice registers a new key with \Abrev{AS}
+    \item Alice broadcasts update instructions using the new secret key $\mathtt{sk}^{Alice}_{1}$
+    \item Bob polls the \Abrev{DS} and receives the update instructions
+    \item Bob request Alice's new public key $\mathtt{pk}^{Alice}_{1}$
+    \item Alice polls the \Abrev{DS} and receives update instrcutions
+  \end{enumerate}
+  }%
+  \includegraphics[width=0.8\textwidth]{./figures/Secure-Messaging-Update.png}
+\end{figure}
 
 The most scrutinized aspect of the \Abrev{MLS} specification involves the provides a set of security guarantees that participants in a conforming a protocol can expect.
 The security guarantees of \Abrev{MLS} includes many ``solved problems'' in the field of cryptography with respect to the \Abrev{ITM}; notably: end-to-end encryption \autocite{padlipsky1978limitations}, message confidentiality \autocite{17715}, message integrity \autocite{voydock1983security}, message authentication \autocite{jueneman1983message}, and membership authentication \autocite{chaum1985showing}.
@@ -183,7 +228,7 @@ Additionally, any group member begins a new encryption ``epoch'' by competing on
   \item add a member to the group
   \item remove a member from the group
   \item reset their continuously agreed upon symmetric encryption key
-  \end{itemize}
+\end{itemize}
 
 Advancing to a new epoch requires the creation of a new symmetric key known to all group members and secret to all other parties.
 \Abrev{FSU} and \Abrev{PCS} for TreeKEM, as well as other \Abrev{SGM} protocols, are delineated in said epochs.
@@ -202,7 +247,7 @@ While the definition of \Abrev{FS} has been explored and made rigorously clear f
 The following is the definition of \Abrev{FSU} in the multi-directional protocol context \autocite{alwen2020security} which has been adopted by \Abrev{MLS}.
 
 \begin{definition}[Forward Secrecy with Updates]
-If the state of any group member is leaked at some point, all previous update secrets remain hidden from the attacker.
+If the state of any group member is leaked at some point, all previous update secrets remain hidden from the adversary.
 \end{definition}
 
 

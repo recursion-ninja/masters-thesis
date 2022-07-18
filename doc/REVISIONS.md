@@ -56,7 +56,16 @@ Revisions
 10. > Does IETF say these are the only 5, or the minimum 5, or something else? Later you use the word "update". Which of these ops does that refer to?
     Spot: Page 12
     Note: Added missing update requirement
+    Edit: `949279cf1f599072dfb2e18179e0db453fda25ec`
+
+
+11. > Do AS/DS have limits (eg, buffer size)?
+    Spot: Page 13
+    Note: Expanding description of AS & DS.
     Edit: ``
+
+
+
 
 
 
