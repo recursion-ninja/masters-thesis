@@ -49,7 +49,7 @@ Transitions in the graph uniquely encode the possible changes in model state.
 The model checker then asserts that one or more properties holds for the protocol by traversing through all combinations of transitions through the graph \autocite{Vardi1986}.
 If a property holds, the model checker will assert that there is no possible set of transitions through states that exist in the protocol which violate the specified property.
 If the property does not hold, the model checker will produce a counter-example sequence of transitions through possible states showing how the specified property can be violated.
-This method of verifying cryptographic protocols is very attractive as the verification result is either an exhaustive proof of security guarantees or a novel cryptographic attack which can be analyzed and corrected.
+This method of verifying cryptographic protocols is very attractive as the verification result is either an exhaustive proof of security guarantees or a cryptographic attack which can be analyzed and corrected.
 This constructive proof methodology offered by explicit state model checking, the guarantee of a falsifying counterexample if and only if one exists, is of paramount important for correcting defects within the modeled protocol.
 
 The principle drawback of explicit state model checking is the immensity of the state-space as the complexity of the model grows.
@@ -62,40 +62,31 @@ However, incrementing the \(N\) parameter while holding \(T\) constant, only inc
 Due to the constraints engineering constraints presented by explicit state model checking, the verification work presented will only consider the combinatorial collection of all models parameterized by \(T\) and \(N\), where \(T \in [1, \Tmax]\) and \(N \in [2, \Nmax]\).
 
 
-\hypertarget{sec:linear-temporal-logic}{%
-\section{Linear Temporal Logic}\label{sec:linear-temporal-logic}}
+\hypertarget{spin}{%
+\section{Spin}\label{spin}}
 
-Correctly specifying the properties which must hold for the cryptographic protocol is one of the most important aspects of model checking techniques.
-Fortunately, \Abrev{LTL} \autocite{4567924} is an almost perfectly tailored language for representing the security guarantees at the CGKA abstraction level.
-Additionally, \Abrev{LTL} usage in conjunction with an explicit state model checker is a well supported and researched technique \autocite{clarke1994another, biere1999symbolic, bloem1999efficient}.
-\Abrev{LTL} possesses all the logical operators of the two-element Boolean algebra with the addition of four temporal operators
-The temporal operators are presented below as a short had reference for formulas described in Section\ \ref{#sec:LTL-security}.
-
-\[
-\begin{aligned}[t]
-                 \bigcirc & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Next''}     & \varphi\textrm{ holds at the next state} \hfill~ &\\
-                 \Diamond & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Finally''}  & \varphi\textrm{ eventually holds, in either the current or future state} \hfill~ &\\
-                 \Box     & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Globally''} & \varphi\textrm{ holds at the current state and all future states} \hfill~ &\\
-  \psi \;{\mathcal {U}}\, & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Until''}    & \varphi\textrm{ eventually holds and $\psi$ holds at every state until then} \hfill~ &\\
-\end{aligned}
-\]
-
-An example of \Abrev{LTL}'s expressive power is that it allows for stating that a property must always hold, eventually hold, hold until another property holds, holds in the next state, never holds, or any combination of these.
-Often, properties are classified as either \emph{safety}, \emph{liveness}, or \emph{fairness}; though more nuanced which do not adhere the these categories are also expressible with \Abrev{LTL}.
-A safety property ensures that an undesirable event never occurs \((\, \Box(\,\neg\varphi \,) \,)\).
-A liveness property requires progress towards an event \((\, \Box(\, \varphi \implies \Diamond(\,\psi \,) \,) \,)\).
-A fairness property ensures that a desirable even continues to happen \((\, \Box(\, \Diamond(\,\varphi \,) \,) \,)\).
-The usage of \Abrev{LTL} allows a precise definition of what must occur in specific segments of time during the the protocol's transition through possible states.
-\Abrev{LTL} possesses just enough expressive power to specify the FS and PCS security guarantees, but no more than that.
-This perfect balance of expressiveness is important, because the more expressive the logical framework we choose to define our security guarantees, the less efficient the available verification techniques will be.
+Among the many options of model checkers, I have chosen use the SPIN model checker \autocite{godefroid1990using, holzmann1997model}.
+SPIN provides several important features for our verification goals.
+The main difficulty with model checking is the size of the number of states and transitions \autocite{burch1992symbolic}.
+Since model checking works by checking every possible combination of states and transitions, the size of the state-space directly impacts the feasibility.
+SPIN provides some solutions to making this problem tractable, the culmination of over three decades of research and development.
+First, SPIN supports ``on-the-fly'' verification \autocite{rudin1987limits}, which means that SPIN does not need to consider the entire set of states and transitions at the same time, but instead can work on just subsets until the whole set is verified.
+Second, SPIN also uses a ``partial ordering'' of the states and transitions \autocite{shannon1958note} to reduce the number of subsets it needs to verify before being certain that a property holds for the whole set of states and transitions.
+Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by default as they can be used in conjunction with minimal drawbacks \autocite{valmari1993fly, peled1994combining, holzmann1995improvement, couvreur1999fly}.
+Consideration was made to use TopSpin \autocite{DonaldsonM_AMAST2006}, a PROMELA pre-processing plugin for SPIN which performs symmetry reduction as well.
+Unfortunately, this theoretically viable technique is not practically usable as the plugin has not been maintained in over a decade.
+Additionally, SPIN supports numerous compile time directive which alter the state-space representation, search trajectories, and time-memory trade-offs.
+Because of these (and many more) techniques, SPIN allows efficiently working with a large state-space that TreeKEM produces when modeled with PROMELA.\@
 
 
 \hypertarget{sec:promela}{%
 \section{Promela}\label{sec:promela}}
 
-Once we decided to use model checking with \Abrev{LTL} as the formal verification methodology, we must then select the appropriate tools to use --- the Protocol Meta Language (PROMELA) \autocite{holzmann1980basic, holzmann1990design}.
+With SPIN selected as the model checker, the obvious modeling language in which to encode the TreeKEM protocol is the Protocol Meta Language (PROMELA) \autocite{holzmann1980basic, holzmann1990design}.
+The key language feature of PROMELA which makes it so conducive to explicit state model checking is that *all* branching -- conditional executaion, looping, and randomness -- are evaluated nondeterministically.
+Heance, PROMELA is used to produce all possible states and transitions of TreeKEM, we must supply that representation to a model checker.
 It exists as a precise and convenient specification for defining all possible states and transitions for TreeKEM.\@
-By specifying the protocol in PROMELA, we can allow the PROMELA ``translator: to take a high-level, human readable description of TreeKEM and produce a much larger machine readable list with all the possible states and transitions in TreeKEM.\@
+By specifying the protocol in PROMELA, one can allow the PROMELA ``translator: to take a high-level, human readable description of TreeKEM and produce a much larger machine readable list with all the possible states and transitions in TreeKEM.\@
 Manually defining all these states and transitions would take an inordinate amount of time and is prone to errors.
 Producing an exhaustive and correct representation of TreeKEM's possible states and transitions is one aspect of the verification process, at which machines are exceptionally reliable, while humans are not.
 
@@ -281,21 +272,31 @@ progress_example: i = i + 1
 end_example: i = prod;
 \end{verbatim}
 \end{figure}
-  
 
-\hypertarget{spin}{%
-\section{Spin}\label{spin}}
 
-Once PROMELA is used to produce all possible states and transitions of TreeKEM, we must supply that representation to a model checker which will verify \Abrev{LTL} specifications.
-Among the many options of model checkers, we will use the SPIN model checker \autocite{godefroid1990using, holzmann1997model}.
-SPIN provides several important features for our verification goals.
-The main difficulty with model checking is the size of the number of states and transitions \autocite{burch1992symbolic}.
-Since model checking works by checking every possible combination of states and transitions, the size of the state-space directly impacts the feasibility.
-SPIN provides some solutions to making this problem tractable, the culmination of over three decades of research and development.
-First, SPIN supports ``on-the-fly'' verification \autocite{rudin1987limits}, which means that SPIN does not need to consider the entire set of states and transitions at the same time, but instead can work on just subsets until the whole set is verified.
-Second, SPIN also uses a ``partial ordering'' of the states and transitions \autocite{shannon1958note} to reduce the number of subsets it needs to verify before being certain that a property holds for the whole set of states and transitions.
-Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by default as they can be used in conjunction with minimal drawbacks \autocite{valmari1993fly, peled1994combining, holzmann1995improvement, couvreur1999fly}.
-Consideration was made to use TopSpin \autocite{DonaldsonM_AMAST2006}, a PROMELA pre-processing plugin for SPIN which performs symmetry reduction as well.
-Unfortunately, this theoretically viable technique is not practically usable as the plugin has not been maintained in over a decade.
-Additionally, SPIN supports numerous compile time directive which alter the state-space representation, search trajectories, and time-memory trade-offs.
-Because of these (and many more) techniques, SPIN allows efficiently working with a large state-space that the novel portions of TreeKEM produce when modeled with PROMELA.\@
+\hypertarget{sec:linear-temporal-logic}{%
+\section{Linear Temporal Logic}\label{sec:linear-temporal-logic}}
+
+Correctly specifying the properties which must hold for the cryptographic protocol is one of the most important aspects of model checking techniques.
+Fortunately, \Abrev{LTL} \autocite{4567924} is an almost perfectly tailored language for representing the security guarantees at the CGKA abstraction level.
+Additionally, \Abrev{LTL} usage in conjunction with an explicit state model checker is a well supported and researched technique \autocite{clarke1994another, biere1999symbolic, bloem1999efficient}.
+\Abrev{LTL} possesses all the logical operators of the two-element Boolean algebra with the addition of four temporal operators.
+The temporal operators are presented below as a short had reference for formulas described in Section\ \ref{#sec:LTL-security}.
+
+\[
+\begin{aligned}[t]
+                 \bigcirc & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Next''}     & \varphi\textrm{ holds at the next state} \hfill~ &\\
+                 \Diamond & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Future''}   & \varphi\textrm{ eventually holds, in either the current or future state} \hfill~ &\\
+                 \Box     & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Globally''} & \varphi\textrm{ holds at the current state and all future states} \hfill~ &\\
+  \psi \;{\mathcal {U}}\, & \varphi & \!\!\!\!\textrm{:} & \;\;\textbf{``Until''}    & \varphi\textrm{ eventually holds and $\psi$ holds at every state until then} \hfill~ &\\
+\end{aligned}
+\]
+
+An example of \Abrev{LTL}'s expressive power is that it allows for stating that a property must always hold, eventually hold, hold until another property holds, holds in the next state, never holds, or any combination of these.
+Often, properties are classified as either \emph{safety}, \emph{liveness}, or \emph{fairness}; though more nuanced which do not adhere the these categories are also expressible with \Abrev{LTL}.
+A safety property ensures that an undesirable event never occurs \((\, \Box(\,\neg\varphi \,) \,)\).
+A liveness property requires progress towards an event \((\, \Box(\, \varphi \implies \Diamond(\,\psi \,) \,) \,)\).
+A fairness property ensures that a desirable even continues to happen \((\, \Box(\, \Diamond(\,\varphi \,) \,) \,)\).
+The usage of \Abrev{LTL} allows a precise definition of what must occur in specific segments of time during the the protocol's transition through possible states.
+\Abrev{LTL} possesses just enough expressive power to specify the FS and PCS security guarantees, but no more than that.
+This perfect balance of expressiveness is important, because the more expressive the logical framework we choose to define our security guarantees, the less efficient the available verification techniques will be.
