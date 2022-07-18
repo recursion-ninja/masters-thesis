@@ -28,6 +28,12 @@ Revisions
 5.  > Many of these seem gratuitous
     Spot: Page 9
     Note: Intelligently pruned
+    Edit: `096c439220bc68b17ce343fbd33392cb1e11f9a6`
+
+
+6.  > I dont know myself but wikipedia says SM must be server based while you dont seem to imply that.
+    Spot: Page 9
+    Note: Added a comment about mediation services
     Edit: ``
 
 
