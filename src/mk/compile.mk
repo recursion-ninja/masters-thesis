@@ -164,12 +164,16 @@ opt-random := \
 
 opt-thread := \
     -DMEMLIM=$(alloc-memory) \
-    -DNCORE=$(param-cores)
+    -DNCORE=$(param-cores) \
+    -DPMAX=2 \
+    -DQMAX=0
 
 opt-timing := \
     -DNOBOUNDCHECK \
     -DNOFAIR \
-    -DXUSAFE
+    -DXUSAFE \
+    -DSEP_STATE \
+#    -DSAFETY
 
 opt-vector := \
     -DCOLLAPSE \
