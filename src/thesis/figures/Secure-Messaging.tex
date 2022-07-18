@@ -1,0 +1,18 @@
+\begin{tikzpicture}
+\node [style=agent] (AS) at (0, 2) {Authentication Service};
+\node [style=agent] (DS) at (8, 2) {Delivery Service};
+\node [style=agent] (A)  at (4, 4) {Alice};
+\node [style=agent] (B)  at (4, 0) {Bob};
+
+\draw [arrow] (A)  to [out=  5,in=110] (DS);
+\draw [arrow] (DS) to [out= 95,in= 15] (A);
+
+\draw [arrow] (B)  to [out=355,in=235] (DS);
+\draw [arrow] (DS) to [out=255,in=345] (B);
+
+\draw [arrow] (A)  to [out=175,in= 70] (AS);
+\draw [arrow] (AS) to [out= 85,in=165] (A);
+
+\draw [arrow] (B)  to [out=185,in=305] (AS);
+\draw [arrow] (AS) to [out=285,in=195] (B);	
+\end{tikzpicture}

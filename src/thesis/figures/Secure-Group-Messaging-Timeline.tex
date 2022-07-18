@@ -1,0 +1,28 @@
+
+
+\begin{tikzpicture}
+\node [style=agent] (A)  at (4, 6) {Alice};
+\node [style=agent] (B)  at (4, 4) {Bob};
+\node [style=agent] (DS) at (7, 8) {Delivery Service};
+\node [style=agent] (AS) at (1, 9) {Authentication Service};
+
+\draw [arrow] (A.north west) -- (AS.east) node [right=5pt, near end, color=black, fill=none] {New Key} node [left=2pt, midway, color=red, fill=none] {1};
+\draw [arrow] (AS.south east)-- (A.west) node [left=-1pt,  near end, color=black, fill=none] {$\mathtt{sk}^{Alice}_{1}$};
+
+\draw [arrow] (A.north east) -- (DS) node [left=10pt, near end, color=black, fill=none] {Update} node [below=2pt, near end, color=red, fill=none] {2};
+
+\node [style=invis, text width=4.5em, below left=0.5cm and -1.7cm of AS] (z) {Get Key};
+
+\node [style=invis, color=red, text width=4.5em, below left=2.9cm and -1.5cm of AS] (z) {4};
+\node [style=invis, color=black, text width=4.5em, below left=4.0cm and -1.5cm of AS] (z) {$\mathtt{pk}^{Alice}_{1}$};
+
+\draw [arrow] (B.north east) -- (DS.south) node [left=5pt, near start, color=black, fill=none] {Poll} node [below=14pt, near end, color=red, fill=none] {3};
+\draw [arrow] (DS.south east) -- (B.east) node [right=5pt, midway, color=black, fill=none] {Update};
+
+\draw [arrow] (B.north west) to[bend left=45 ] (AS.south west);
+\draw [arrow] (AS.west)      to[bend right=45] (B.west) ;
+
+\draw [arrow] (DS.west)      to[bend right=45] (A.north);
+\node [style=invis, color=red, text width=4.5em, above=0.9cm of A] (z) {5};
+
+\end{tikzpicture}

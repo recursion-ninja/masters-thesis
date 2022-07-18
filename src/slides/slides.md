@@ -401,7 +401,7 @@ $(T, C, N)$ parameterizes an adversary $\mathcal{A}$
   - $T \in \left[1, \infty \right]$  
   Limit protocol epochs
 
-  - $C \in \left[0, T \right]$  
+  - $C \in \left[1, T \right]$  
   Limit $\mathcal{A}$ challenge queries
 
   - $N \in \left[2, \infty \right]$  
@@ -415,7 +415,7 @@ $(T, C, N)$ parameterizes an adversary $\mathcal{A}$
 The advantage demonstrated by $\mathcal{A}$ is defined as,
 $$ \normalfont{\textbf{Adv}}\left\{\mathtt{CGKA}\right\}(\mathcal{A})  = \left|\; \Pr\left[ \,\mathcal{A}\text{ wins}\, \right] - \frac{1}{2} \;\right| $$
 
-> Non-adaptive $(T, C, N, \epsilon)$ CGKA Security
+> $(T, C, N, \epsilon)$ CGKA Security
 
 A `CGKA` protocol is said to be secure if and only if for all $(T, C, N)$-adversaries $\mathcal{A}$,
 $$ \normalfont\textbf{Adv}\left\{\mathtt{CGKA}\right\}(\mathcal{A}) \leq \epsilon $$
