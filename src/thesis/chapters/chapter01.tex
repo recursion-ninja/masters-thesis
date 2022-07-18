@@ -55,8 +55,8 @@ The generalization of two-party \Abrev{SM} to multi-party communication is known
 \Abrev{SGM} describes the \emph{use case} of secure multi-party communication, but not the details of how the use case is achieved.
 To be considered a \Abrev{SGM} protocol \autocite{ietf-mls-protocol-14}, the \Abrev{IETF} states the following operations must exist for each participating member: create a new communication group consisting of a set of known members, broadcast a message to all members in the group, receive a message from a member in the group, add a new member to the group, and remove an existing member from the group.
 One of the interesting features of \Abrev{SGM} is the ability for members to be added and removed from the secure communication channel.
-In the simpler case when two parties use \Abrev{SM}, additional participants cannot be added.
-Rather than ``removing'' a participant, the communication channel is simply closed when either party wishes to cease communication.
+In the simpler case when two parties use \Abrev{SM}, additional participants cannot be added nor can participants be removed.
+However ``removing'' a participant can effectively be acheived when the communication channel is simply closed by either party wishing to cease communication.
 The \Abrev{SGM} requirement of adding and removing participants to the secure communication channel poses interesting open challenges in the field of cryptographic protocol design.
 
 

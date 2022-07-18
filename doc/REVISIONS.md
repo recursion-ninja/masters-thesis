@@ -45,6 +45,11 @@ Revisions
 8.  > Is broadcast a better word?
     Spot: Page 12
     Note: Standardized language; Yes, I beleive so
+    Edit: `62f46b8fc7a5570a2ebb59f2914ff14ffa645896`
+
+
+9.  > Add qualifier here (currently sounds like a modification of previous sentence)
+    Spot: Page 12
     Edit: ``
 
 
