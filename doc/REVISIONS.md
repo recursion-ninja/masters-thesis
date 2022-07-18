@@ -40,6 +40,12 @@ Revisions
 7.  > Do you mean attack or attack type (or vulnerablity)?
     Spot: Page 10
     Note: Standardized language; vulnerability is the most appropriate term
+    Edit: `c6d77b3c5a5d24eab0a5bb53ce6e42c51864ad9b`
+
+8.  > Is broadcast a better word?
+    Spot: Page 12
+    Note: Standardized language; Yes, I beleive so
     Edit: ``
+
 
 
