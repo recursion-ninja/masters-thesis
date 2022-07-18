@@ -53,7 +53,7 @@ Lastly, a discussion and interpretation of the verification results is presented
 The generalization of two-party \Abrev{SM} to multi-party communication is known as \Abrev{SGM} \autocite{cohn2018ends}.
 \Abrev{SGM} describes the \emph{use case} of secure multi-party communication, but not the details of how the use case is achieved.
 To be considered a \Abrev{SGM} protocol \autocite{ietf-mls-protocol-14}, the \Abrev{IETF} states the following operations must exist for each participating member: create a new communication group consisting of a set of known members, send a message to all members in the group, receive a message from a member in the group, add a new member to the group, and remove an existing member from the group.
-One of the novel features of \Abrev{SGM} is the ability for members to be added and removed from the secure communication channel.
+One of the interesting features of \Abrev{SGM} is the ability for members to be added and removed from the secure communication channel.
 In the simpler case when two parties use \Abrev{SM}, additional participants cannot be added.
 Rather than ``removing'' a participant, the communication channel is simply closed when either party wishes to cease communication.
 The \Abrev{SGM} requirement of adding and removing participants to the secure communication channel poses interesting open challenges in the field of cryptographic protocol design.
@@ -88,7 +88,7 @@ A popular example is the double-ratchet-based AXOLOTL algorithm \autocite{perrin
 Interestingly, prior definitions of \Abrev{FS} introduced with the development of AXOLOTL were not defined generally enough to be directly used by \Abrev{MLS}.
 \Abrev{MLS} defines a more general security guarantee for the multi-party notion of \Abrev{FS}, included in Section\ \ref{sec:forward-secrecy-with-updates}.
 
-However, the requirement of \Abrev{FS} and \Abrev{PCS} laid out by the \Abrev{MLS} specification for a \Abrev{SGM} protocol has introduced a novel area of research, as the double-ratchet-based algorithms do not directly map to multi-party communication.
+However, the requirement of \Abrev{FS} and \Abrev{PCS} laid out by the \Abrev{MLS} specification for a \Abrev{SGM} protocol has introduced a new area of research, as the double-ratchet-based algorithms do not directly map to multi-party communication.
 Indeed, these \Abrev{MLS} security guarantees have been the chief focus of research related to \Abrev{MLS} and it's iterative development.
 A trivial construction exists by utilizing a bidirectional \Abrev{SM} protocol, and forming a fully connected graph of all \Abrev{SGM} participants.
 However, it is obvious that this trivial construction's control messages scale quadratically in the size of the communication group whenever the key agreement requires an update.
@@ -119,7 +119,7 @@ The TreeKEM secret key material evolves over time in such a way that all group m
 A shared secret key is used to initiate a symmetric hash ratchet which defines a stream of nonce and key pairs for symmetric encryption using an AEAD \autocite{bellare2003conventional, kohno2003cwc}.
 The stream is used until the shared secret key evolves, after which, a new stream is initiated using the evolved key.
 Hash ratchet's produced by TreeKEM are analogous to double-ratchet based protocols in prior work, with the notable difference that, rather than using two ratchets for the two group members, TreeKEM uses a left balanced binary tree structure to define key agreement as a propagation from leaves of the tree to the root node, which supports an arbitrarily large number of group members instead of explicitly two members.
-This novel generalization presented in TreeKEM is at the heart of constructing a protocol implementation satisfying the \Abrev{MLS} specification.
+This generalization presented in TreeKEM is at the heart of constructing a protocol implementation satisfying the \Abrev{MLS} specification.
 Unsurprisingly, this same generalization is appreciably linked to proving and verifying the \Abrev{FS} and \Abrev{PCS} security guarantees of TreeKEM.\@
 
 \begin{figure}[ht!]
