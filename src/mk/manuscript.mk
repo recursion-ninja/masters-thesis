@@ -114,11 +114,20 @@ Finally, I want to acknowledge the support of my partner, Erilia Wu, which both 
 thesis-param-abstract    :=\
 The features of Secure Group Messaging, the security guarantees of Message Layer Security, and the TreeKEM protocol designed to satisfy these guarantees and features are explored. \
 A motivation and methodology for verification via explicit model checking is presented. \
-Subsequently, a translation of the TreeKEM protocol into a Promela reference model is describe, examining the nuances explicit model checking brings. \
+Subsequently, a translation of the TreeKEM protocol into a Promela reference model is described, examining the nuances explicit model checking brings. \
 Finally the results of the formal verifcation methods are discussed.
 
 thesis-param-keywords    :=\
-Formal Verification, Model Checking, Promela, Spin, TreeKEM
+Cryptography, \
+Formal Verification, \
+Linear Temporal Logic, \
+Model Checking, \
+Oracles, \
+Promela, \
+Scalability, \
+Security, \
+Spin, \
+TreeKEM
 
 # File format of chapters (defines ordering)
 format-of-chapters := $(addprefix chapter[0-9][0-9].,$(extension-latex))

@@ -220,8 +220,8 @@ These observations support the notion \( \CGKAmod{}{}{} \models \LTLPredicate{HL
 From the observations obtained so far, one can conclude that the confidence check which has successfully verified \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) does not introduce any doubt regarding the verification methodology.
 
 
-\hypertarget{sec:post-compromise-security}{%
-\subsection{Post Compromise Security}\label{sec:post-compromise-security}}
+\hypertarget{sec:post-compromise-security-results}{%
+\subsection{Post Compromise Security}\label{sec:post-compromise-security-results}}
 
 The hypotheses listed in Table\ \ref{tab:verification-hypotheses} show an expectation that \Abrev{PCS} should be verifiable for both \VersionOne\ and \VersionTwo\ protocols.
 
@@ -233,8 +233,8 @@ Unfortunately there are no current observations for protocol \VersionTwo\ shown 
 No security conclusions should be derived until the planned observation set can be completely gathered. 
 
 
-\hypertarget{sec:future-secrecy}{%
-\subsection{Future Secrecy}\label{sec:future-secrecy}}
+\hypertarget{sec:forward-secrecy-results}{%
+\subsection{Forward Secrecy with Updates}\label{sec:forward-secrecy-results}}
 
 As indicated in Table\ \ref{tab:verification-hypotheses}, the first protocol \VersionOne\ is known to have a \Abrev{FSU} security deficiency, so the hypothesis is that verification of \LTLPredicate{FSU} should be fail for \emph{at least} \CGKAmod{\VersionOne}{12}{8}.
 While prior work \autocite{alwen2020security} indicates \( \CGKAmod{\VersionOne}{12}{8} \not \models \LTLPredicate{FSU} \), it is possible that a simpler model with lower \(T\) and/or \(N\) parameters may exist which also demonstrates the \Abrev{FSU} security deficiency.
