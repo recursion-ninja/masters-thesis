@@ -111,6 +111,12 @@ infinite depending on data structure vs proof?
 19. > You listed 5 in 2.1 (are you conflating CGKA ops?)
     Spot: Page 14
     Note: Fixed above
+    Edit: `8b5c331b4278384b5bba5356703ea6350415f930`
+
+
+20. > This needs to be defined, perhaps earlier, since I think non-crypto people dont know this.
+    Spot: Page 14
+    Note: Introduced ealier in 2.2
     Edit: ``
 
 

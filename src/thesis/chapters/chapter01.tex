@@ -141,6 +141,8 @@ The security guarantees of \Abrev{MLS} includes many ``solved problems'' in the 
 However, \Abrev{MLS} also specifies interesting open problems related to \Abrev{FS} \autocite{gunther1989identity} and \Abrev{PCS} \autocite{cohn2016post} as security guarantees of the group key-agreement protocol.
 Both \Abrev{FS} and \Abrev{PCS} have been researched with respect to \Abrev{SM}, producing provably secure as well as efficient constructions.
 A popular example is the double-ratchet-based AXOLOTL algorithm \autocite{perrin2014axolotl} and its derivatives which are used by most \Abrev{SM} protocols.
+The term ``ratchet,'' in a cryptographic context, refers to key derivation function which can be updated to derive the next key from the current key, but never derive the previous key from the current key.
+Utilizing ratchets in the AXOLOTL and derivative protocols was essential for providing \Abrev{FS} and \Abrev{PCS}.
 Interestingly, prior definitions of \Abrev{FS} introduced with the development of AXOLOTL were not defined generally enough to be directly used by \Abrev{MLS}.
 \Abrev{MLS} defines a more general security guarantee for the multi-party notion of \Abrev{FS}, included in Section\ \ref{sec:forward-secrecy-with-updates}.
 However, the requirement of \Abrev{FS} and \Abrev{PCS} laid out by the \Abrev{MLS} specification for a \Abrev{SGM} protocol has introduced a new area of research, as the double-ratchet-based algorithms do not directly map to multi-party communication.
@@ -165,7 +167,7 @@ Taken in its entirely, the framework provided by \Abrev{MLS} is a foundational p
 The construction of scalable MSL protocols remains an area of open and active research, though the ``openness'' of this area closes each year.
 There currently exist two proposed protocols which meet the definition of \Abrev{MLS} with various levels of security proofs as well as efficiency with respect to group size.
 The first is Asynchronous Ratcheting Tree (ART) \autocite{cohn2018ends} described in 2018.
-The second is TreeKEM \autocite{bhargavan:hal-02425247} similarly conceived in 2018, but formally described in 2019.
+The second is TreeKEM \autocite{bhargavan:hal-02425247} similarly conceived in 2018, but thoroughly described in 2019.
 The Internet Engineering Task Force has put its support behind the TreeKEM protocol along with many other corporate and government sponsors.
 Consequently, research directed towards ART has stalled while developments for TreeKEM and its derivatives have progressed rapidly.
 As the \Abrev{MLS} draft specification has gone through over a dozen revisions in the last half decade, the complimentary development and refinement of the TreeKEM protocol has significantly informed the direction and language of \Abrev{MLS}.
