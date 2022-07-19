@@ -91,12 +91,12 @@ The standardized specification of \Abrev{MLS} is still an area of active develop
 However, the core security aspects of \Abrev{MLS} relevant to the work presented in this thesis have remained constant since the initial draft of \Abrev{MLS}.
 
 \Abrev{MLS} describes the protocol environment in which protocol agents interact.
-The \Abrev{ITM} of RFC3552 \autocite{rescorla2003rfc3552} is the context within which the \Abrev{MLS} specifies it's security guarantees.
+The \Abrev{ITM} of RFC3552 \autocite{rescorla2003rfc3552} is the context within which the \Abrev{MLS} specifies its security guarantees.
 Simply put, the \Abrev{ITM} assumes that an adversary has complete control of the network.
 There are only two caveats to consider with regard to the adversary's network control, and these are determined by two network agents with which \Abrev{MLS} participants can interact.
 \Abrev{MLS} specifies the existence of an \Abrev{AS} \autocite{perlman1999overview} from which a messenger can request fresh public key for a specified contact which can be immediately used within the \Abrev{MLS} protocol.
 An advantage of using the \Abrev{AS} as described in \Abrev{MLS} is that it allows the contact to asynchronously query the \Abrev{AS} for the corresponding secret key at a later time, ameliorating potential protocol synchronization issues.
-The \Abrev{AS} is a trusted third party which is expected to carry out it's required tasks without failure.
+The \Abrev{AS} is a trusted third party which is expected to carry out its required tasks without failure.
 In addition to the \Abrev{AS}, \Abrev{MLS} specifies the existence of a \Abrev{DS} \autocite{sekiba1998design}.
 The \Abrev{DS} can receive messages addressed to any contact and the \Abrev{DS} stores the messages until the contact queries it for new messages.
 Importantly, the \Abrev{DS} will always deliver messages from all senders to a other group members in a consitent order.
@@ -140,19 +140,21 @@ The most scrutinized aspect of the \Abrev{MLS} specification involves the set of
 The security guarantees of \Abrev{MLS} includes many ``solved problems'' in the field of cryptography with respect to the \Abrev{ITM}; notably: end-to-end encryption \autocite{padlipsky1978limitations}, message confidentiality \autocite{17715}, message integrity \autocite{voydock1983security}, message authentication \autocite{jueneman1983message}, and membership authentication \autocite{chaum1985showing}.
 However, \Abrev{MLS} also specifies interesting open problems related to \Abrev{FS} \autocite{gunther1989identity} and \Abrev{PCS} \autocite{cohn2016post} as security guarantees of the group key-agreement protocol.
 Both \Abrev{FS} and \Abrev{PCS} have been researched with respect to \Abrev{SM}, producing provably secure as well as efficient constructions.
-A popular example is the double-ratchet-based AXOLOTL algorithm \autocite{perrin2014axolotl} and it's derivatives which are used by most \Abrev{SM} protocols.
+A popular example is the double-ratchet-based AXOLOTL algorithm \autocite{perrin2014axolotl} and its derivatives which are used by most \Abrev{SM} protocols.
 Interestingly, prior definitions of \Abrev{FS} introduced with the development of AXOLOTL were not defined generally enough to be directly used by \Abrev{MLS}.
 \Abrev{MLS} defines a more general security guarantee for the multi-party notion of \Abrev{FS}, included in Section\ \ref{sec:forward-secrecy-with-updates}.
-
 However, the requirement of \Abrev{FS} and \Abrev{PCS} laid out by the \Abrev{MLS} specification for a \Abrev{SGM} protocol has introduced a new area of research, as the double-ratchet-based algorithms do not directly map to multi-party communication.
-Indeed, these \Abrev{MLS} security guarantees have been the chief focus of research related to \Abrev{MLS} and it's iterative development.
-A trivial construction exists by utilizing a bidirectional \Abrev{SM} protocol, and forming a fully connected graph of all \Abrev{SGM} participants.
-However, it is obvious that this trivial construction's control messages scale quadratically in the size of the communication group whenever the key agreement requires an update.
-Maintaining key agreement with the trivial construction is not efficient.
+Indeed, these \Abrev{MLS} security guarantees have been the chief focus of research related to \Abrev{MLS} and its iterative development.
+
+Security guarantees are not the only concern of the \Abrev{MLS} specification.
+For example, one can utilize a trivial protocol construction for \Abrev{SGM} by utilizing an existing \Abrev{SM} protocol, and forming a fully connected (finite) graph of bidirectional \Abrev{SM} communication channels between all \Abrev{SGM} participants.
+Unsuprisingly, this trivial construction's control messages scale quadratically in the size of the communication group whenever the shared encryption key requires an update.
+Maintaining key agreement with this trivial construction is not efficient.
+Hence both security and efficiency are considerations in protocol construction.
 
 Considering the scope desired protocol constructions, the \Abrev{IETF} includes within \Abrev{MLS} efficiency goals \autocite{ietf-mls-architecture-07} for implementing protocols with respect to the size of the messaging group.
 Three key efficiency distinctions which \Abrev{MLS} requires are that the number of control messages should be linear in group size, the size of control messages should be sub-linear in group size, and that group sizes up to 50,000 should be supported.
-Taken in it's entirely, the framework provided by \Abrev{MLS} is a foundational piece of achieving \Abrev{SGM} with well understood efficiency, security guarantees, and protocol design.
+Taken in its entirely, the framework provided by \Abrev{MLS} is a foundational piece of achieving \Abrev{SGM} with well understood efficiency, security guarantees, and protocol design.
 
 
 \hypertarget{sec:treekem-protocol}{%
@@ -162,8 +164,8 @@ The construction of scalable MSL protocols remains an area of open and active re
 There currently exist two proposed protocols which meet the definition of \Abrev{MLS} with various levels of security proofs as well as efficiency with respect to group size.
 The first is Asynchronous Ratcheting Tree (ART) \autocite{cohn2018ends} described in 2018.
 The second is TreeKEM \autocite{bhargavan:hal-02425247} similarly conceived in 2018, but formally described in 2019.
-The Internet Engineering Task Force has put it's support behind the TreeKEM protocol along with many other corporate and government sponsors.
-Consequently, research directed towards ART has stalled while developments for TreeKEM and it's derivatives have progressed rapidly.
+The Internet Engineering Task Force has put its support behind the TreeKEM protocol along with many other corporate and government sponsors.
+Consequently, research directed towards ART has stalled while developments for TreeKEM and its derivatives have progressed rapidly.
 As the \Abrev{MLS} draft specification has gone through over a dozen revisions in the last half decade, the complimentary development and refinement of the TreeKEM protocol has significantly informed the direction and language of \Abrev{MLS}.
 The verification work presented here will ignore ART and focus exclusively on the TreeKEM protocol.
 
@@ -203,7 +205,7 @@ The root of the tree contains a symmetric key \autocite{rfc4949} known to all gr
 Any member may force the evolution of the shared secret key if and only if they initiate adding a new group member, removing an existing group member, or the key update procedure.
 In each case, the shared secret key at the root node is updated in the same manner.
 The initiating member selects a random seed \autocite{rfc4949} value \(s_0\) and uses it to produce a public/secret key pair \((pk_0,sk_0)\) as well as a new seed value \(s_1\).
-The member then encrypts the \(s_1\) with the public key of it's sister leaf node.
+The member then encrypts the \(s_1\) with the public key of its sister leaf node.
 Iteratively, the member moves up the spine of the tree from their leaf node to the root node, using the seed value \(s_n\) to generate \((pk_n,sk_n,s_n)\) and encrypting \(s_n\) with the public key of the sister node on level \(n\) of the tree.
 When the member has propagated the changes to the root node, the final seed value \(s_r\) is determined to be the new shared secret key.
 Note that each member of the group can derive the seed value required to update their copy of the shared key by decrypting the seed value \(s_n\) on the node prior to where the path from said member and the initiating member intersect.

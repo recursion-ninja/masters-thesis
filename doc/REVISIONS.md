@@ -80,6 +80,14 @@ Revisions
 14. > Earlier, you define SM to be biderectional. Assuming so, do you mean to put () around bidirectional?
     Spot: Page 13
     Note: Yeah, it was meant as a reminder. I just removed it.
+    Edit: `d4b8dc93265fde741239ed58618c7f6d5a533ab2`
+    
+
+15. > I dont understand point of this paragraph. This algo is the data structure for the protocol? Or a way
+to prove its correctness (I think former)? Also, is it really trivial since the graph is arbitrarily large or
+infinite depending on data structure vs proof?
+    Spot: Page 13
+    Note: Reworked the paragraph as an introduction to protocol scalability issues
     Edit: ``
     
 
