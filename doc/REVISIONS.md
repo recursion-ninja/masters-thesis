@@ -197,6 +197,12 @@ infinite depending on data structure vs proof?
 34. > After completion of proc?
     Spot: Page 19
     Note: Yes. Clarified.
+    Edit: `478c192c81932393377e48681c3db65c8610a26f`
+
+
+35. > Are there timing constraints to prevent (for example) every member being in a different epoch? Or some kind of join? If this is enforced by DS, I didnt see anything above that implied it conclusively.
+    Spot: Page 19
+    Note: Yes. Clarified.
     Edit: ``
 
 

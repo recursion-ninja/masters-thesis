@@ -318,6 +318,10 @@ These are ``welcome'' control messages \(w \in W\) for a new member entering the
 The algorithm \(proc\) consumes control messages \(u \in U\) and produces a secret \(i \in I\).
 Each call to \(proc\) by a group member facilitates \emph{processing} a control message.
 Correspondingly, each call to \(proc\) by a group member ushers that user into a new epoch, where the secret \(i\) is the cryptographic secret required for the group member with \(ID\) to maintain \Abrev{CGKA} in the new epoch.
+Group members who are offline, and unable to receive messages from the \Abrev{DS}, may fall an arbitrary number of epochs behind other members of the group.
+However, when the lagging group member next polls the \Abrev{DS}, they will receive messages in a consistent order which instructs them how to incrementally advance to the current epoch while decrypting all broadcast messages which were transmitted during interstitial epochs.
+In essence, the \Abrev{DS} mediates asynchornous epoch continuity among group members.
+
 Because the communication is defined in terms of epochs, \Abrev{CGKA} should satisfy both Forward Secrecy and Post-compromise Security with respect to communication epochs.
 The six requisite algorithms required for \CGKAdef\ can be produced by the functionality of the TreeKEM protocol.
 For a visualization of each \CGKAdef\ algorithm defined using the functionality of TreeKEM, refer to Figure 4 of \autocite{alwen2020security}.
