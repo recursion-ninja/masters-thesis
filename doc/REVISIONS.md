@@ -105,7 +105,12 @@ infinite depending on data structure vs proof?
 
 18. > I think you want a word other than formally (in the context of your thesis)
     Spot: Page 14
-    Note: Commented on upper bound
+    Edit: `c62603d848290bee7115f37207b80ca42dda3cc5`
+
+
+19. > You listed 5 in 2.1 (are you conflating CGKA ops?)
+    Spot: Page 14
+    Note: Fixed above
     Edit: ``
 
 
