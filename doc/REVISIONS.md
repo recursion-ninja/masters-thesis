@@ -231,6 +231,12 @@ infinite depending on data structure vs proof?
 40. > Sounds like intuitively modifies wrappers. Rephrase.
     Spot: Page 21
     Note: Done
+    Edit: `b33d27b7bc513b1e75a7c0a0fb386e6633aab44a`
+
+
+41. > doesnt parse
+    Spot: Page 23
+    Note: Rephrased
     Edit: ``
 
 
