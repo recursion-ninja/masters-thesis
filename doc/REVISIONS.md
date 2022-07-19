@@ -203,6 +203,11 @@ infinite depending on data structure vs proof?
 35. > Are there timing constraints to prevent (for example) every member being in a different epoch? Or some kind of join? If this is enforced by DS, I didnt see anything above that implied it conclusively.
     Spot: Page 19
     Note: Yes. Clarified.
+    Edit: `4c4a4876bd0293a7f189ad76f3bbe1639e549aea`
+
+
+36. > violates or can cause a violation of?
+    Spot: Page 20
     Edit: ``
 
 
