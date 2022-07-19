@@ -222,8 +222,14 @@ infinite depending on data structure vs proof?
     Edit: `e787778225e3c18e626e9aadf4830cbd456e0c46`
 
 
-39. > please add English describing each of these in <10 words (eg, ": send blah message to foo")
+39. > Please add English describing each of these in <10 words (eg, ": send blah message to foo")
     Spot: Page 20
+    Note: Done
+    Edit: `cd201ce4eff5d48dd01c1b3e76ed75c8bbbe13a7`
+
+
+40. > Sounds like intuitively modifies wrappers. Rephrase.
+    Spot: Page 21
     Note: Done
     Edit: ``
 

@@ -394,7 +394,7 @@ Oracles for the \CGKAsec\ for a scheme \CGKAdef\ \(= \small\left(\,\Protocol{ini
 {\CopyrightReuse{alwen2020security}}
 \end{figure}
 
-The first six oracles are intuitively thin wrappers for the corresponding algorithm from the \CGKAdef\ definition.
+The first six oracles are call the \CGKAdef\ algorithms internally and can be intuitively thought of as thin wrappers exposed to \(\mathcal{A}\) for the corresponding algorithms from the \CGKAdef\ definition.
 Importantly, these oracles encapsulate from the adversary the stateful production and consumption of group member state values \(\gamma \in \Gamma\) as well as the emission of secret key material values \(i \in I\).
 Control messages \(w \in W\) and \(u \in U\) are still broadcast across the network and assumed to be intercepted by the adversary.
 The definition of control messages within the TreeKEM protocol dictates that messages are are authenticated by the group members, which justifies the absence of an oracle permitting the adversary to change or replay intercepted control messages in the \Abrev{CGKA} game.
