@@ -62,11 +62,18 @@ Revisions
 11. > Do AS/DS have limits (eg, buffer size)?
     Spot: Page 13
     Note: Expanding description of AS & DS.
+    Edit: `8a977bf3fb47d36d75620ce66be748fef4b72b6b`
+
+
+12. > How about attacker as DS
+    Spot: Page 13
+    Note: Attacker's use of the `deliver` oracle is strong enough
+    Edit: None
+    
+
+13. > Expand
+    Spot: Page 13
+    Note: This was an artifact of using abreviations within figure captions
     Edit: ``
-
-
-
-
-
-
+    
 
