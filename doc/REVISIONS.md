@@ -249,6 +249,11 @@ infinite depending on data structure vs proof?
 43. > What is this?
     Spot: Page 23
     Note: Explained the triviality guard
+    Edit: `86cc0463fee50233abc8c94b11af9415c6a8ce4c`
+
+
+44. > Subject verb agreement
+    Spot: Page 24
     Edit: ``
 
 

@@ -433,10 +433,10 @@ Some security games, \CGKAsec\ included, provide oracles which permit a sequence
 To correct for these sequences of queries, there exists a predicate \textbf{\texttt{P}}, which indicates that a trivial ``attack'' did not occur via oracle queries.
 For security games with no such sequence of queries, the predicate \textbf{\texttt{P}} is always \(\top\).
 More nuanced security games utilize predicate \textbf{\texttt{P}} to guard against a trivial sequence of queries from the adversary.
-The \((T, C, N)\)-adversary \(\mathcal{A}\) demonstrates \emph{advantage} by ending the game via a query to the \Oracle{chall}{} oracle, winning the \CGKAsec, if and only if the \(\mathcal{A}\):
+The \((T, C, N)\)-adversary \(\mathcal{A}\) demonstrates \emph{advantage} by ending the game via a query to the \Oracle{chall}{} oracle, winning the \CGKAsec, if and only if:
 
 \begin{enumerate}
-\item Correctly determines the value random bit \(b\)
+\item \(\mathcal{A}\) correctly determines the value random bit \(b\).
 \item The predicate \textbf{\texttt{P}} evaluates to \(\top\).
 \end{enumerate}
 \vspace{\parsep}
@@ -466,8 +466,8 @@ Subsequently Section\ \ref{sec:LTL-security} presents definitions of the predica
 It is worth noting the relationship between the preliminary definitions explored thus-far.
 \Abrev{SGM} is a description of the high-level use case.
 \Abrev{CGKA} is a class of protocols supporting the requisite algorithms, which by definition must facilitate \Abrev{SGM}.
-The \Abrev{MLS} specification is standardization which protocols may conform to and which satisfies the \Abrev{SGM} use case, necessarily maintains continuous group key agreement as defined by \Abrev{CGKA}, as well as provides efficiency and scalability guarantees.
-TreeKEM is a specific cryptographic protocols which conforms to the \Abrev{MLS} specification.
+The \Abrev{MLS} specification is a standardization of which protocols may conform to and satisfy the \Abrev{SGM} use case, necessarily maintains continuous group key agreement as defined by \Abrev{CGKA}, as well as provides efficiency and scalability guarantees.
+TreeKEM is a specific cryptographic protocol which conforms to the \Abrev{MLS} specification.
 There is a clear sub-setting relationship between these abstract concepts illustrated in Figure\ \ref{fig:venn-protocols}, and in future descriptions the layer of abstraction from which a definition was defined may be elided.
 
 \begin{figure}
