@@ -134,6 +134,12 @@ infinite depending on data structure vs proof?
 23. > are there constraints (eg, timing) on how this update is done? Do removed cousins use their old public keys until whenever?
     Spot: Page 16
     Note: Added concurrency/timing commentary
+    Edit: `95e2925923343053ae881cc95d92d4af49e1649f`
+
+
+24. > Are we assuming 100% reliable (and infinitely fast?) control messages?
+    Spot: Page 16
+    Note: Noting concurrency, adding image
     Edit: ``
 
 

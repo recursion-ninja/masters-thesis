@@ -223,15 +223,25 @@ For a visualization of this process, refer to Figure\ \ref{fig:CGKA-TreeKEM-Secr
 \hypertarget{sec:communication-epochs}{%
 \section{Communication Epochs}\label{sec:communication-epochs}}
 
+\begin{figure}[ht!]
+  \centering
+  \caption[Secure Messaging Epoch Timeline]{%
+  \label{fig:Secure-Messaging-Timeline}%
+  Secure Messaging Epoch Timeline
+  }%
+\resizebox{\textwidth}{!}{\subimport{../figures/}{Secure-Messaging-Timeline}}
+\end{figure}
+
 The temporality of \Abrev{SGM} protocols, as with the \Abrev{SM} protocols which proceeded them, is important to understanding how security of the protocol is defined.
 Delineation of communication into discrete quanta referred to as ``epochs,'' is (generally) the way temporality is discussed when considering protocol security.
+An illustration of epochs for a \Abrev{SM} protocol is included in Figure \ref{fig:Secure-Messaging-Timeline}, though the same deliniation applies to \Abrev{SGM} protocols as well.
 Protocol epochs can be understood in terms of the \Abrev{SGM} usage.
 A communication group is a set of two or more agents using multiple devices to engage in secure communication.
-To initialize a group, members to connect to the \Abrev{AS} and \Abrev{DS} providers which transmit the requisite credentials and values used for authentication of and encryption between the group members.
+To initialize a group, members connect to the \Abrev{AS} and \Abrev{DS} providers which transmit the requisite credentials and values used for authentication of and encryption between the group members.
 Using this initial information, the instigating group member begins the first encryption ``epoch'' by broadcasting control messages to all other group members.
 The control message received by each group member provides instructions from which they can securely derive the initial shared symmetric key.
 Subsequently, group members exchange messages with an enforced total ordering \autocite{halmos1960naive} mediated by the \Abrev{DS} and authenticated via the \Abrev{AS}, allowing for asynchronous communication with offline members while preventing the general sequencing issues and race conditions which arise from concurrency.
-Additionally, any group member begins a new encryption ``epoch'' by competing one of the following are the operations:
+Additionally, any group member inititates a new encryption ``epoch'' by broadcasting a control message for one of the following operations:
 
 \begin{itemize}
   \item add a member to the group
