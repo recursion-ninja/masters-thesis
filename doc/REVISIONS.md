@@ -131,7 +131,7 @@ infinite depending on data structure vs proof?
     Edit: `e110740496c8940f8db2d4b7d9fae550f266ec52`
 
 
-23. > are there constraints (eg, timing) on how this update is done? Do removed cousins use their old public keys until whenever?
+23. > Are there constraints (eg, timing) on how this update is done? Do removed cousins use their old public keys until whenever?
     Spot: Page 16
     Note: Added concurrency/timing commentary
     Edit: `95e2925923343053ae881cc95d92d4af49e1649f`
@@ -143,7 +143,7 @@ infinite depending on data structure vs proof?
     Edit: `948ca5d75779c770b22d4bd2eb43d924296608a3`
 
 
-25. > does completing mean the entire tree has been traversed?
+25. > Does completing mean the entire tree has been traversed?
     Spot: Page 17
     Note: Added in #24
     Edit: `948ca5d75779c770b22d4bd2eb43d924296608a3`
@@ -154,9 +154,15 @@ infinite depending on data structure vs proof?
     Note: Covered in #24/#25
 
 
-27. > minor, but you never expanded FSU before here
+27. > Minor, but you never expanded FSU before here
     Spot: Page 17
     Note: Artifact of abreviation command(s)
+    Edit: `02000c053b02bd2c2c4c580f166cea9a338b7cdc`
+
+
+28. > Is the attacker a group member?
+    Spot: Page 18
+    Note: Added in future work
     Edit: ``
 
 

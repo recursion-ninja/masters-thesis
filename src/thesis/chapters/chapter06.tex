@@ -31,6 +31,11 @@ One particular area where the \CGKAmod{P}{T}{N} model may be particularly well s
 Perhaps fewer requirement can be placed on the \Abrev{DS}, required protocol to assume less from the \Abrev{DS}, while still maintaining all the \Abrev{MLS} security guarantees.
 Pursuing this, or similar inquiries, would require minor modifications to the \CGKAmod{P}{T}{N} model's implementation.
 
+Another avenue of consideration is permitting the adversary to be a group member for some portion of the \CGKAdef protocol.
+After being removed from the group, can the adversary deny message confidentiality for remaining group members?
+This would require carefully defining when and how the adversary enters and exits the communication group.
+The permitted segment of adversary group membership would be different than corrupting a group member and consequently would effect the implication precondition of \Abrev{PCS} encoded as \Abrev{LTL} as in Section \ref{sec:pcs-as-ltl}.
+
 
 \hypertarget{sec:unbounded-verification}{%
 \subsection{Unbounded Verification}\label{sec:unbounded-verification}}
