@@ -100,6 +100,12 @@ infinite depending on data structure vs proof?
 17. > What happens if >50K users?
     Spot: Page 14
     Note: Commented on upper bound
+    Edit: `dcc5c50a86e6b7278d78923ff05ec9b9f5adfc89`
+
+
+18. > I think you want a word other than formally (in the context of your thesis)
+    Spot: Page 14
+    Note: Commented on upper bound
     Edit: ``
 
 
