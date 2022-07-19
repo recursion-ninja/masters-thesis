@@ -237,6 +237,12 @@ infinite depending on data structure vs proof?
 41. > doesnt parse
     Spot: Page 23
     Note: Rephrased
+    Edit: `50ed4b1b023fcb1df2f37f62e418ed51a8d3a7b9`
+
+
+42. > I dont understand use of word proving but you use it later too
+    Spot: Page 23
+    Note: Changed to "demonstrates"
     Edit: ``
 
 
