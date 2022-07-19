@@ -191,6 +191,12 @@ infinite depending on data structure vs proof?
 33. > Are these functions required to be atomic (to ensure FSU/PCS)?
     Spot: Page 19
     Note: Kinda yes. Clarified.
+    Edit: `35ef53897d8d635309a2482852d5b1ca8f59d750`
+
+
+34. > After completion of proc?
+    Spot: Page 19
+    Note: Yes. Clarified.
     Edit: ``
 
 
