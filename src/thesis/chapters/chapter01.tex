@@ -346,20 +346,41 @@ The adversary can query all of the game's oracles, and through the sequence of q
 In the game the adversary is given access to ten oracles to drive the execution of a \Abrev{CGKA} protocol.
 The group members can only call the six \CGKAdef\ algorithms above, while the adversary can only query the ten oracles below.
 However, there exists one oracle which corresponds to each of the six \CGKAdef\ algorithms, effectively giving the attacker comparable options to any group member in addition to the options provided by the remaining four oracles.
-For a visualization of each oracles' semantics, refer to Figure\ \ref{fig:CGKA-Oracles} of \autocite{alwen2020security}.
+For a visualization of each oracles' semantics, refer to Figure\ \ref{fig:CGKA-Oracles}, reproduced from \autocite{alwen2020security}.
 The \CGKAsec\ defines the following oracles:
 
 \begin{itemize}
+
 \item \Oracle{init}{}
+Begins the \CGKAsec\ security game, initializing game and protocol state. Must be queried first.
+
 \item \Oracle{create-group}{ID_0,\, ID_1,\, \dots,\, ID_n}
+Creates an initial communication group to start the \CGKAsec\ game. Must be queried second.
+
 \item \Oracle{add-user}{ID,\, ID^{'}}
+\(mathcal{A}\) forces \(mathtt{ID}\) to initiate adding \(mathtt{ID}^{'}\) to the communication group.
+
 \item \Oracle{remove-user}{ID,\, ID^{'}}
+\(mathcal{A}\) forces \(mathtt{ID}\) to initiate removing \(mathtt{ID}^{'}\) from the communication group.
+
 \item \Oracle{send-update}{ID}
+\(mathcal{A}\) forces \(mathtt{ID}\) to initiate updating the shared key of the communication group.
+
 \item \Oracle{deliver}{t,\, ID,\, ID^{'}}
+\(mathcal{A}\) permits the \Abrev{DS} to deliver a message to \(mathtt{ID}^{'}\) which \(mathtt{ID}\) previously broadcast in epoch \(\mathtt{t}\).
+
 \item \Oracle{no-del}{ID}
+\(mathcal{A}\) forces \(mathtt{ID}\) to \emph{not} delete \(i \ in I\) values from this epoch and future epochs.
+
 \item \Oracle{corr}{ID}
+\(mathcal{A}\) learns the current state \(\gamma in \Gamma\) of \(mathtt{ID}\).
+
 \item \Oracle{reveal}{t}
+\(mathcal{A}\) learns the current shared key \(i in I\) of the communication group.
+
 \item \Oracle{chall}{t}
+\(mathcal{A}\) ends the \CGKAsec\ security game. Must be queried last.
+
 \end{itemize}
 
 \begin{figure}[ht!]

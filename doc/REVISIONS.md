@@ -213,6 +213,18 @@ infinite depending on data structure vs proof?
 
 37. > Rephrase entire sentence
     Spot: Page 20
+    Edit: `40bc04b37c57e9286946b984c4ab96ea7b96666a`
+
+
+38. > I think you are saying the adversary (but not a member) can use any of these 10 ops?
+    Spot: Page 20
+    Note: Yes
+    Edit: `e787778225e3c18e626e9aadf4830cbd456e0c46`
+
+
+39. > please add English describing each of these in <10 words (eg, ": send blah message to foo")
+    Spot: Page 20
+    Note: Done
     Edit: ``
 
 
