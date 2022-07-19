@@ -149,3 +149,8 @@ infinite depending on data structure vs proof?
     Edit: `948ca5d75779c770b22d4bd2eb43d924296608a3`
 
 
+26. > What if member 2 wants to add a member before getting the control message that member 1 wants to (and 1's add is still being processed)?
+    Spot: Page 17
+    Note: Covered in #24/#25
+
+
