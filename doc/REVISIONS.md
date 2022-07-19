@@ -177,3 +177,14 @@ infinite depending on data structure vs proof?
     Edit: `0c0ab312d74ba45902e647793cc509609772a50c`
 
 
+31. > OK but I would probably define/list \Gamma (and all sets). Some (like U/W) arent obvious til later.
+    Spot: Page 18
+    Edit: `865d613d6b1e8ca82f6c96a688ff6e59f87350d7`
+
+
+32. > Do you mean notably or "in particular"
+    Spot: Page 19
+    Note: Rephrased
+    Edit: ``
+
+

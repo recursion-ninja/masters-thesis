@@ -309,7 +309,7 @@ Additionally, a continuous group key-agreement scheme is require to define the f
 \end{itemize}
 
 The abstract collection of algorithms \CGKAdef\ is used to maintain secure communications between a group of two or more participants.
-Notably, a protocol which includes these algorithms can be used by a group to maintain continuous group key agreement of a shared secret key.
+In particular, any protocol which includes these algorithms can be used by a group to maintain continuous group key agreement of a shared secret key.
 
 Any group member can call any algorithm from \CGKAdef, producing new states \(\gamma \in \Gamma\) and either none, one, or both control messages \(w \in W,\; u \in U\).
 These are ``welcome'' control messages \(w \in W\) for a new member entering the group and ``update'' control messages \(u \in U\) for existing members in the group instructing them how to update the shared symmetric key and advance to the next epoch.
