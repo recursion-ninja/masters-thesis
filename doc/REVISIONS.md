@@ -254,6 +254,11 @@ infinite depending on data structure vs proof?
 
 44. > Subject verb agreement
     Spot: Page 24
+    Edit: `a9a1570de091126f8e4f725c8a8d825432018433`
+
+
+45. > Somewhere towards the beginning of 2, it would be nice to outline point of it all. eg, 'prove that an attacker cant use oracle ops to violate some MLS guarantees' and section 2.X will give ..., section 2.x will give oracle ops, ... I needed to take notes to figure it all out (I hope, correctly) - 2.9 helped a bit but too late (and in more detail); I really mean more of an outline to the chapter and why I care about the sections.
+    Spot: Page 26
     Edit: ``
 
 

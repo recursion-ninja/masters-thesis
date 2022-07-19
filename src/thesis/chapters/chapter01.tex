@@ -36,17 +36,28 @@ Regretably, this updating process itself takes years of migration work \autocite
 This is especially problematic for embedded systems which cannot be easily recouperated and require extra consideration to be securely updated \autocite{yoon2017remote, maroof2022irecover}.
 For these reasons, it is of paramount importance to identify all possible vulnerabilities on a new communication protocol as early as possible, so it can be corrected prior to widespread adoption.
 
-The desirable operations and security of multi-party communication protocol is explored below in Chapter\ \ref{sec:preliminaries}, with the threat model and security guarantees are detailed.
-After defining the goals of such a protocol, an existing protocol is identified as the state-of-the-art and selected as the protocol under consideration for this work in Section\ \ref{sec:treekem-protocol}.
-A verification methodology is laid out for the selected protocol in Chapter\ \ref{sec:methodology}.
-The verification performed assumes the correctness of cryptographic primitives and determines the validity of the protocol via modeling a security game framework described in Section\ \ref{sec:security-games}.
-An overview given in Chapter\ \ref{sec:model-encoding} describes the salient details of encoding the protocol model.
-Lastly, a discussion and interpretation of the verification results is presented in Chapter\ \ref{sec:results} along with and avenues of future work in Chapter\ \ref{sec:conclusion}.
+The topic of this thesis is the formal verificiation of the TreeKEM protocol (see Section \ref{sec:treekem-protocol}) and the security properties described by Message Layer Security (see Section \ref{sec:message-layer-security}).
+Specifically, the Forward Secrecy with Updates (see Section \ref{sec:forward-secrecy-with-updates}) and Post-compromise Security (see Section \ref{sec:post-compromise-security}) security properties are scrutinized under verification.
+Relevant topics, concepts, and definitions are introduced, providing the requisite context for grappling with formal verification of a multi-party communication protocol.
+The desirable operations and security of TreeKEM, with the threat model and security guarantees are detailed.
+The verification methodology of explicit state model checking is laid out for verifying the TreeKEM protocol (see Section \ref{sec:explicit-state-model-checking}).
+Notably, all verifications performed assume the correctness of cryptographic primitives.
+
+The main contributions presented by this thesis are several abstractions used to tractably encode a parameterized model for TreeKEM.
+First and foremost, \CGKAdef\ (see Section \ref{sec:CGKA}) as described in prior work \autocite{alwen2020security} is used as a foundational absraction for any secure group messaging protocol (see Section \ref{sec:secure-group-messaging}).
+This primary abstraction is built upon in several ways within the context of exhaustive, nondeterminitstic computation, each revealing an additional simplifying abstraction.
+An initial model parameter is capable of being removed with a simple abstraction extension of \CGKAdef\ (see Section \ref{sec:exhaustiveness}).
+Similarly, applying the concept of idempotency provides an additional abstraction which necessarily causes the model to progress towards the end state (see Section \ref{sec:idempotence}).
+Finally, the nondeterministic computation allows, without loss of generally, group members to be removed from the model as process agents, dramatically reducing the model's state-space (see Section \ref{sec:elided-group-members}).
+Applying these three abstractions in conjunction simplifies the complexity of the model by orders of magnitude, permiting verificiation for small model parameters.
+
+The thesis culminates in presenting the verification results of the constructed model and comparing the verification results with prior work related to TreeKEM security.
+Furthermore, a presentation of the model's scalability is illustrated and discussed (see Section \ref{sec:scalability-limits}).
+Commentary on avenues for future work (see Section \ref{sec:future-work}) are left as the conclusion.
 
 
 \hypertarget{sec:preliminaries}{%
 \chapter{Preliminaries}\label{sec:preliminaries}}
-
 
 \hypertarget{sec:secure-group-messaging}{%
 \section{Secure Group Messaging}\label{sec:secure-group-messaging}}
