@@ -429,7 +429,10 @@ The goal of the adversary is to demonstrate advantage by discriminating the valu
 An adversary demonstrating \emph{advantage} is defined by the \CGKAsec\ as a parameterized expression involving oracles of the game.
 A tuple \((T, C, N)\) parameterizes the adversary \(\mathcal{A}\), with \(T \in \left[1, \infty \right]\), \(C \in \left[0, T \right]\), and \(N \in \left[2, \infty \right]\).
 The \(T\) value indicates that the protocol runs in at most \(T\) epochs, during which time the \(\mathcal{A}\) can make at most \(C\) challenge queries, and the total unique group members of the protocol can never exceed \(N\).
-Furthermore there exists a predicate \textbf{\texttt{P}} (potentially always true), which indicates that a trivial attack did not occur.
+Some security games, \CGKAsec\ included, provide oracles which permit a sequence of queries that can quite obviously and trivially allow an adversary to deduce the value of \(b\).
+To correct for these sequences of queries, there exists a predicate \textbf{\texttt{P}}, which indicates that a trivial ``attack'' did not occur via oracle queries.
+For security games with no such sequence of queries, the predicate \textbf{\texttt{P}} is always \(\top\).
+More nuanced security games utilize predicate \textbf{\texttt{P}} to guard against a trivial sequence of queries from the adversary.
 The \((T, C, N)\)-adversary \(\mathcal{A}\) demonstrates \emph{advantage} by ending the game via a query to the \Oracle{chall}{} oracle, winning the \CGKAsec, if and only if the \(\mathcal{A}\):
 
 \begin{enumerate}

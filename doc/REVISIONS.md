@@ -243,6 +243,12 @@ infinite depending on data structure vs proof?
 42. > I dont understand use of word proving but you use it later too
     Spot: Page 23
     Note: Changed to "demonstrates"
+    Edit: `ec32a47097ede4ff1eaff169ad0b381fc2466930`
+
+
+43. > What is this?
+    Spot: Page 23
+    Note: Explained the triviality guard
     Edit: ``
 
 
