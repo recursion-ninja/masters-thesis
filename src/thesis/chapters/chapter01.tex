@@ -338,6 +338,7 @@ The winning condition(s) for \(\mathcal{A}\) within the security game are define
 Often a security game includes one or more oracles.
 An oracle is an agent in the game the adversary can query and to receive information or have an action performed on their behalf.
 Oracles provide utility to an adversary, but imporantly, the oracle does not explicitly inform the adversary how any querried information was produced nor how any querried action was performed.
+The adversary must infer the effects of querying an oracle by observing messages broadcast to and from the \Abrev{DS}.
 
 The same work which defines \Abrev{CGKA} also defines an oracle-based security game for \Abrev{CGKA}.
 Each oracle is defined in terms of one or more of the algorithms from the \CGKAdef\ definition.

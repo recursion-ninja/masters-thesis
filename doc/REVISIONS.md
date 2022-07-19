@@ -208,6 +208,11 @@ infinite depending on data structure vs proof?
 
 36. > violates or can cause a violation of?
     Spot: Page 20
+    Edit: `14448880827c33e81e64fdaac30c026479708bad`
+
+
+37. > Rephrase entire sentence
+    Spot: Page 20
     Edit: ``
 
 
