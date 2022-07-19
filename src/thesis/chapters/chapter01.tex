@@ -215,6 +215,8 @@ Iteratively, member $v_{0}$ moves up the spine of the tree from their leaf node 
 When member $v_{0}$ has propagated the changes to the root node, the final seed value \(s_r\) is determined to be the new shared secret key.
 Note that each member of the group can derive the seed value required to update their copy of the shared key by decrypting the seed value \(s_n\) on the node prior to where the path from said member and the initiating member intersect.
 Once each member has the requisite seed value, they each locally resume the iterative process of updating the tree and arrive at the same construction as that of the initiating member.
+Note that each member updates their copy of the tree concurrently after receiving member $v_{0}$'s update instruction message from the \Abrev{DS}.
+Concurrency issues and race conditions are obviated by the \Abrev{DS}'s guarantee of delivering messages to all group members in a consistent order.
 For a visualization of this process, refer to Figure\ \ref{fig:CGKA-TreeKEM-Secrets}.
 
 

@@ -128,6 +128,12 @@ infinite depending on data structure vs proof?
 22. > replace "the member" with "member pk_0"
     Spot: Page 16
     Note: Done, but with v_0
+    Edit: `e110740496c8940f8db2d4b7d9fae550f266ec52`
+
+
+23. > are there constraints (eg, timing) on how this update is done? Do removed cousins use their old public keys until whenever?
+    Spot: Page 16
+    Note: Added concurrency/timing commentary
     Edit: ``
 
 
