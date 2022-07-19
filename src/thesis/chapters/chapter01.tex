@@ -337,13 +337,15 @@ Security games are designed with respect to a protocol, or class of protocols, a
 The winning condition(s) for \(\mathcal{A}\) within the security game are defined, by design, to occur if and only if \(\mathcal{A}\) can cause a violation of one or more security guarantees.
 Often a security game includes one or more oracles.
 An oracle is an agent in the game the adversary can query and to receive information or have an action performed on their behalf.
-Oracles provide utility to an adversary, but imporantly, the oracle does not explicitly inform the adversary how any querried information was produced nor how any querried action was performed.
+Oracles provide utility to an adversary, but importantly, the oracle does not explicitly inform the adversary how any queried information was produced nor how any queried action was performed.
 The adversary must infer the effects of querying an oracle by observing messages broadcast to and from the \Abrev{DS}.
 
 The same work which defines \Abrev{CGKA} also defines an oracle-based security game for \Abrev{CGKA}.
 Each oracle is defined in terms of one or more of the algorithms from the \CGKAdef\ definition.
 The adversary can query all of the game's oracles, and through the sequence of query's, the adversary uses the oracles to direct the execution of the \Abrev{CGKA} protocol.
-In the game the adversary is given access to various oracles to drive the execution of a \Abrev{CGKA} protocol.
+In the game the adversary is given access to ten oracles to drive the execution of a \Abrev{CGKA} protocol.
+The group members can only call the six \CGKAdef\ algorithms above, while the adversary can only query the ten oracles below.
+However, there exists one oracle which corresponds to each of the six \CGKAdef\ algorithms, effectively giving the attacker comparable options to any group member in addition to the options provided by the remaining four oracles.
 For a visualization of each oracles' semantics, refer to Figure\ \ref{fig:CGKA-Oracles} of \autocite{alwen2020security}.
 The \CGKAsec\ defines the following oracles:
 
