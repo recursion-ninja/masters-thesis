@@ -286,8 +286,8 @@ After every group member whose state was leaked inititates an epoch update, and 
 \hypertarget{sec:CGKA}{%
 \section{Continuous Group Key Agreement}\label{sec:CGKA}}
 
-In the two party case, a general notion of Continuous Key Agreement \autocite{alwen2019double} has been used to provide robust security guarantees such as forward secrecy and post-compromise security.
-For \Abrev{SGM}, this general definition has been extended to \Abrev{CGKA} \autocite{alwen2020security} which is used as lemma to derive proofs for some of \Abrev{MLS} security guarantees.
+In the two-party case, a general notion of Continuous Key Agreement \autocite{alwen2019double} has been used to provide robust security guarantees such as forward secrecy and post-compromise security.
+For \Abrev{SGM}, this same notion has been extended to \Abrev{CGKA} \autocite{alwen2020security} which is used as an abstraction reason about the \Abrev{MLS} security guarantees.
 A continuous group key-agreement scheme is defined by the following collection of algorithms:
 
 \[ \CGKAdef = \left(\,\Protocol{init},\, \Protocol{create},\, \Protocol{add},\, \Protocol{rem},\, \Protocol{upd},\, \Protocol{proc}\,\right) \]

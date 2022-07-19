@@ -169,6 +169,11 @@ infinite depending on data structure vs proof?
 29. > Whats an update (see earlier comment)
     Spot: Page 18
     Note: Changed language to "shared key" and "update instructions"
+    Edit: `fc0e36e4fe3077de5e278167fb132a2b28edde00`
+
+
+30. > I dont understand this sentence. Doesnt sec depend on how you use these, rather than the existence of these? How can some function signatures be a lemma?
+    Spot: Page 18
     Edit: ``
 
 
