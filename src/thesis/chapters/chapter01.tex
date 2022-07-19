@@ -250,7 +250,7 @@ Additionally, any group member inititates a new encryption ``epoch'' by broadcas
 \end{itemize}
 
 Advancing to a new epoch requires the creation of a new symmetric key known to all group members and secret to all other parties.
-\Abrev{FSU} and \Abrev{PCS} for TreeKEM, as well as other \Abrev{SGM} protocols, are delineated in said epochs.
+FSU (see Section \ref{sec:forward-secrecy-with-updates}) and \Abrev{PCS} for TreeKEM, as well as other \Abrev{SGM} protocols, are delineated in said epochs.
 The inputs for a group member to generate the new symmetric key is referred to as an update secret.
 An update secret is an intentionally abstract concept, defined as any cryptographic material stored by the group member required to process a control message which advanced the protocol from one epoch to the next, permitting the member to successfully generate the shared group key of the next epoch.
 Each protocol may have a different specific form that update secret(s) take for a group member, but the interaction of group member update secrets with protocol control messages are the main focus of verifying security guarantees.
@@ -261,8 +261,8 @@ Each protocol may have a different specific form that update secret(s) take for 
 
 \Abrev{FS} is a desirable security guarantee which offers protection in the case that a protocol's long-term secret key(s) are compromised.
 The idea behind \Abrev{FS} is that even when all of a group member's current key material is compromised, messages delivered prior to the compromise are still secret.
-\Abrev{FS} has been used in bidirectional key agreement communication protocols, including Transport Layer Security (TLS) \autocite{rfc2246, rfc4346, rfc5246, rfc8446} such as OpenSSL \autocite{openssl}, as well as \Abrev{SM} protocols such as the Signal Protocol \autocite{cohn2020formal}.
-While the definition of \Abrev{FS} has been explored and made rigorously clear for bidirectional key agreement protocols, the notion of \Abrev{FS} requires extension in the multi-directional \Abrev{MLS} specification.
+\Abrev{FS} has been used in two-party key agreement communication protocols, including Transport Layer Security (TLS) \autocite{rfc2246, rfc4346, rfc5246, rfc8446} such as OpenSSL \autocite{openssl}, as well as \Abrev{SM} protocols such as the Signal Protocol \autocite{cohn2020formal}.
+While the definition of \Abrev{FS} has been explored and made rigorously clear for two-party key agreement protocols, the notion of \Abrev{FS} requires extension in the multi-directional \Abrev{MLS} specification.
 The following is the definition of \Abrev{FSU} in the multi-directional protocol context \autocite{alwen2020security} which has been adopted by \Abrev{MLS}.
 
 \begin{definition}[Forward Secrecy with Updates]

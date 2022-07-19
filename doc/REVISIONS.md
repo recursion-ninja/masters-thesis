@@ -154,3 +154,9 @@ infinite depending on data structure vs proof?
     Note: Covered in #24/#25
 
 
+27. > minor, but you never expanded FSU before here
+    Spot: Page 17
+    Note: Artifact of abreviation command(s)
+    Edit: ``
+
+
