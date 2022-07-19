@@ -185,6 +185,12 @@ infinite depending on data structure vs proof?
 32. > Do you mean notably or "in particular"
     Spot: Page 19
     Note: Rephrased
+    Edit: `0728c3ba073d3c719068bdb622e3df3b039068c8`
+
+
+33. > Are these functions required to be atomic (to ensure FSU/PCS)?
+    Spot: Page 19
+    Note: Kinda yes. Clarified.
     Edit: ``
 
 
