@@ -259,6 +259,13 @@ infinite depending on data structure vs proof?
 
 45. > Somewhere towards the beginning of 2, it would be nice to outline point of it all. eg, 'prove that an attacker cant use oracle ops to violate some MLS guarantees' and section 2.X will give ..., section 2.x will give oracle ops, ... I needed to take notes to figure it all out (I hope, correctly) - 2.9 helped a bit but too late (and in more detail); I really mean more of an outline to the chapter and why I care about the sections.
     Spot: Page 26
+    Note: I rewrote the last paragraph of the Introduction section, expanding it to describe the thesis trajectory
+    Edit: `78931a208720e99b496cb8c09feaca9c9065959d`
+
+
+46. > Hoa69 is about Hoare logic, not theorem proving. The SPIN world (not SMV) is the origin of MC
+    Spot: Page 27
+    Note: Updated to more appropriate citations
     Edit: ``
 
 
