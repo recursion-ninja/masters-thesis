@@ -163,6 +163,12 @@ infinite depending on data structure vs proof?
 28. > Is the attacker a group member?
     Spot: Page 18
     Note: Added in future work
+    Edit: `20b3c8b8e40ae8da929a5075b9b1f939ea7c2019`
+
+
+29. > Whats an update (see earlier comment)
+    Spot: Page 18
+    Note: Changed language to "shared key" and "update instructions"
     Edit: ``
 
 

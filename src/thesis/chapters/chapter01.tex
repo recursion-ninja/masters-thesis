@@ -266,7 +266,7 @@ While the definition of \Abrev{FS} has been explored and made rigorously clear f
 The following is the definition of \Abrev{FSU} in the multi-directional protocol context \autocite{alwen2020security} which has been adopted by \Abrev{MLS}.
 
 \begin{definition}[Forward Secrecy with Updates]
-If the state of any group member is leaked at some point, all previous update secrets remain hidden from the adversary.
+If the state of any group member is leaked at some point, all previous shared keys remain hidden from the adversary.
 \end{definition}
 
 
@@ -279,7 +279,7 @@ The idea behind \Abrev{PCS} is that no matter how many compromises of key materi
 The following definition of \Abrev{PCS} in the multi-directional protocol context \autocite{alwen2020security} which has been adopted by \Abrev{MLS}.
 
 \begin{definition}[Post-compromise Security]
-After every group member whose state was leaked performs an update, and that update is processed by the group, update secrets become confidential again.
+After every group member whose state was leaked inititates an epoch update, and that update instruction message is processed by all group members, the shared key becomes confidential again.
 \end{definition}
 
 
