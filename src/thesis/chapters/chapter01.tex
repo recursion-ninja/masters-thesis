@@ -154,6 +154,8 @@ Hence both security and efficiency are considerations in protocol construction.
 
 The \Abrev{IETF} includes within \Abrev{MLS} efficiency goals \autocite{ietf-mls-architecture-07} for protocol constructions with respect to the size of the (finite) messaging group.
 Three key efficiency distinctions which \Abrev{MLS} requires are that the number of control messages should be linear in group size, the size of control messages should be sub-linear in group size, and that group sizes up to 50,000 should be supported.
+While efficient scaling up to a group comtaining 50,000 member is the target of all \Abrev{MLS} protocols, no guidance is given for larger groups.
+One can assume that protocol efficiency may degrade above the target bound of 50,000 group members, but continued efficient scaling past this bound is preferable.
 Taken in its entirely, the framework provided by \Abrev{MLS} is a foundational piece of achieving \Abrev{SGM} with well understood efficiency, security guarantees, and protocol design.
 
 

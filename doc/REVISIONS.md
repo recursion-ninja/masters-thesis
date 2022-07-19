@@ -94,6 +94,12 @@ infinite depending on data structure vs proof?
 16. > commas? or rephrase
     Spot: Page 14
     Note: Reworked the sentance
+    Edit: `b1088cb3a2a9eba5f4586f4d044ab0dfd5f851bd`
+
+
+17. > What happens if >50K users?
+    Spot: Page 14
+    Note: Commented on upper bound
     Edit: ``
 
 
