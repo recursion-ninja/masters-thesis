@@ -74,6 +74,12 @@ Revisions
 13. > Expand
     Spot: Page 13
     Note: This was an artifact of using abreviations within figure captions
+    Edit: `678096f9a8fd3083bb03099c6a0710b226361a36`
+    
+
+14. > Earlier, you define SM to be biderectional. Assuming so, do you mean to put () around bidirectional?
+    Spot: Page 13
+    Note: Yeah, it was meant as a reminder. I just removed it.
     Edit: ``
     
 

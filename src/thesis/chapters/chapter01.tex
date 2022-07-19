@@ -139,7 +139,7 @@ The adversary is assumed to not be able to masquerade as the authentication serv
 The most scrutinized aspect of the \Abrev{MLS} specification involves the set of security guarantees that participants in a conforming a protocol can expect.
 The security guarantees of \Abrev{MLS} includes many ``solved problems'' in the field of cryptography with respect to the \Abrev{ITM}; notably: end-to-end encryption \autocite{padlipsky1978limitations}, message confidentiality \autocite{17715}, message integrity \autocite{voydock1983security}, message authentication \autocite{jueneman1983message}, and membership authentication \autocite{chaum1985showing}.
 However, \Abrev{MLS} also specifies interesting open problems related to \Abrev{FS} \autocite{gunther1989identity} and \Abrev{PCS} \autocite{cohn2016post} as security guarantees of the group key-agreement protocol.
-Both \Abrev{FS} and \Abrev{PCS} have been researched with respect to two-party \Abrev{SM}, producing provably secure as well as efficient constructions.
+Both \Abrev{FS} and \Abrev{PCS} have been researched with respect to \Abrev{SM}, producing provably secure as well as efficient constructions.
 A popular example is the double-ratchet-based AXOLOTL algorithm \autocite{perrin2014axolotl} and it's derivatives which are used by most \Abrev{SM} protocols.
 Interestingly, prior definitions of \Abrev{FS} introduced with the development of AXOLOTL were not defined generally enough to be directly used by \Abrev{MLS}.
 \Abrev{MLS} defines a more general security guarantee for the multi-party notion of \Abrev{FS}, included in Section\ \ref{sec:forward-secrecy-with-updates}.
