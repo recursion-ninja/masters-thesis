@@ -152,7 +152,7 @@ Unsuprisingly, this trivial construction's control messages scale quadratically 
 Maintaining key agreement with this trivial construction is not efficient.
 Hence both security and efficiency are considerations in protocol construction.
 
-Considering the scope desired protocol constructions, the \Abrev{IETF} includes within \Abrev{MLS} efficiency goals \autocite{ietf-mls-architecture-07} for implementing protocols with respect to the size of the messaging group.
+The \Abrev{IETF} includes within \Abrev{MLS} efficiency goals \autocite{ietf-mls-architecture-07} for protocol constructions with respect to the size of the (finite) messaging group.
 Three key efficiency distinctions which \Abrev{MLS} requires are that the number of control messages should be linear in group size, the size of control messages should be sub-linear in group size, and that group sizes up to 50,000 should be supported.
 Taken in its entirely, the framework provided by \Abrev{MLS} is a foundational piece of achieving \Abrev{SGM} with well understood efficiency, security guarantees, and protocol design.
 

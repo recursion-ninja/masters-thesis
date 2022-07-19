@@ -88,6 +88,12 @@ to prove its correctness (I think former)? Also, is it really trivial since the 
 infinite depending on data structure vs proof?
     Spot: Page 13
     Note: Reworked the paragraph as an introduction to protocol scalability issues
+    Edit: `75ae80176add4303cb5ad51cc3709e36c36549ad`
+
+
+16. > commas? or rephrase
+    Spot: Page 14
+    Note: Reworked the sentance
     Edit: ``
-    
+
 
