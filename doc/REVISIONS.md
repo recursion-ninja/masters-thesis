@@ -174,6 +174,6 @@ infinite depending on data structure vs proof?
 
 30. > I dont understand this sentence. Doesnt sec depend on how you use these, rather than the existence of these? How can some function signatures be a lemma?
     Spot: Page 18
-    Edit: ``
+    Edit: `0c0ab312d74ba45902e647793cc509609772a50c`
 
 

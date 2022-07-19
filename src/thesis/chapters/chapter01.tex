@@ -288,23 +288,24 @@ After every group member whose state was leaked inititates an epoch update, and 
 
 In the two-party case, a general notion of Continuous Key Agreement \autocite{alwen2019double} has been used to provide robust security guarantees such as forward secrecy and post-compromise security.
 For \Abrev{SGM}, this same notion has been extended to \Abrev{CGKA} \autocite{alwen2020security} which is used as an abstraction reason about the \Abrev{MLS} security guarantees.
-A continuous group key-agreement scheme is defined by the following collection of algorithms:
+A continuous group key-agreement scheme is defined over a set of local member states $\gamma \in \Gamma$, a set welcome instruction messages for adding a member to a group $w \in W$, a set of update instruction messages $u \in U$, and a set of cryptographic secrets $i \in I$.
+Additionally, a continuous group key-agreement scheme is require to define the following collection of algorithms:
 
-\[ \CGKAdef = \left(\,\Protocol{init},\, \Protocol{create},\, \Protocol{add},\, \Protocol{rem},\, \Protocol{upd},\, \Protocol{proc}\,\right) \]
+\[ \CGKAdef = \left\{\,\Protocol{init},\, \Protocol{create},\, \Protocol{add},\, \Protocol{rem},\, \Protocol{upd},\, \Protocol{proc}\,\right\} \]
 
 \begin{itemize}
 \item \Protocol{init}   \(: ID \to \Gamma\)\\
-  Given an \(ID\), outputs initial state \(\gamma\).
+  Given an \(ID\), output initial state \(\gamma\).
 \item \Protocol{create} \(: \Gamma \times \overrightarrow{ID} \to (\Gamma, W)\)\\
-  From state \(\gamma\) and list of \(ID\)s, outputs new state \(\gamma'\) and control message \(w\).
+  From state \(\gamma\) and list of \(ID\)s, output new state \(\gamma'\) and control message \(w\).
 \item \Protocol{add}    \(: \Gamma \times ID \to (\Gamma, W, U)\)\\
-  From state \(\gamma\) and \(ID\), outputs new state \(\gamma'\), control message \(w\) and control message \(u\).
+  From state \(\gamma\) and \(ID\), output new state \(\gamma'\), control message \(w\) and control message \(u\).
 \item \Protocol{rem}    \(: \Gamma \times ID \to (\Gamma, U)\)\\
-  From state \(\Gamma\) and \(ID\), outputs new state \(\gamma'\) and a control message \(u\).
+  From state \(\Gamma\) and \(ID\), output new state \(\gamma'\) and a control message \(u\).
 \item \Protocol{upd}    \(: \Gamma \to (\Gamma, U)\)\\
-  From state \(\gamma\), outputs new state \(\gamma'\) and control message \(u\).
+  From state \(\gamma\), output new state \(\gamma'\) and control message \(u\).
 \item \Protocol{proc}   \(: \Gamma \times U \to (\Gamma, I)\)\\
-  From state \(\gamma\) and control message \(u\), outputs new state \(\gamma'\) and update secret \(I\).
+  From state \(\gamma\) and control message \(u\), output new state \(\gamma'\) and update secret \(I\).
 \end{itemize}
 
 The abstract collection of algorithms \CGKAdef\ is used to maintain secure communications between a group of two or more participants.
