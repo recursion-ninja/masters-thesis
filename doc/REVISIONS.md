@@ -117,6 +117,11 @@ infinite depending on data structure vs proof?
 20. > This needs to be defined, perhaps earlier, since I think non-crypto people dont know this.
     Spot: Page 14
     Note: Introduced ealier in 2.2
+    Edit: `0911d08e89a9658a4f00195627c998a05279d53e`
+
+
+21. > expand/define
+    Spot: Page 15
     Edit: ``
 
 

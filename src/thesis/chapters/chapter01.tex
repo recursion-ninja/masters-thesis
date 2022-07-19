@@ -178,7 +178,8 @@ Additionally TreeKEM aims to satisfy both the efficiency goals and security guar
 Conformance with both of these definitions are a result of TreeKEM's construction.
 The essence of TreeKEM is a protocol to generate continuous, fresh, shared, and secret random keys for use by group members.
 The TreeKEM secret key material evolves over time in such a way that all group members maintain continuous agreement of the shared secret key.
-A shared secret key is used to initiate a symmetric hash ratchet which defines a stream of nonce and key pairs for symmetric encryption using an AEAD \autocite{bellare2003conventional, kohno2003cwc}.
+A shared secret key is used to initiate a symmetric hash ratchet which defines a stream of nonce and key pairs for symmetric encryption using an \Abrev{AEAD} algorithm \autocite{bellare2003conventional, kohno2003cwc}.
+Messages broadcast to the group are encrypted with an \Abrev{AEAD} algorithm using the the most recent nonce and key pair.
 The stream is used until the shared secret key evolves, after which, a new stream is initiated using the evolved key.
 Hash ratchet's produced by TreeKEM are analogous to double-ratchet based protocols in prior work, with the notable difference that, rather than using two ratchets for the two group members, TreeKEM uses a left balanced binary tree structure to define key agreement as a propagation from leaves of the tree to the root node, which supports an arbitrarily large number of group members instead of explicitly two members.
 This generalization presented in TreeKEM is at the heart of constructing a protocol implementation satisfying the \Abrev{MLS} specification.
