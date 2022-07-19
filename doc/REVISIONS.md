@@ -122,6 +122,12 @@ infinite depending on data structure vs proof?
 
 21. > expand/define
     Spot: Page 15
+    Edit: `9dfade771525350565fad709c3563380cb953a57`
+
+
+22. > replace "the member" with "member pk_0"
+    Spot: Page 16
+    Note: Done, but with v_0
     Edit: ``
 
 

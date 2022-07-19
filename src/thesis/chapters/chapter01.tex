@@ -209,10 +209,10 @@ Internal nodes of the tree contain a constructed public key, such that the priva
 The root of the tree contains a symmetric key \autocite{rfc4949} known to all group members.
 Any member may force the evolution of the shared secret key if and only if they initiate adding a new group member, removing an existing group member, or the key update procedure.
 In each case, the shared secret key at the root node is updated in the same manner.
-The initiating member selects a random seed \autocite{rfc4949} value \(s_0\) and uses it to produce a public/secret key pair \((pk_0,sk_0)\) as well as a new seed value \(s_1\).
-The member then encrypts the \(s_1\) with the public key of its sister leaf node.
-Iteratively, the member moves up the spine of the tree from their leaf node to the root node, using the seed value \(s_n\) to generate \((pk_n,sk_n,s_n)\) and encrypting \(s_n\) with the public key of the sister node on level \(n\) of the tree.
-When the member has propagated the changes to the root node, the final seed value \(s_r\) is determined to be the new shared secret key.
+The initiating member $v_{0}$ selects a random seed \autocite{rfc4949} value \(s_0\) and uses it to produce a public/secret key pair \((pk_0,sk_0)\) as well as a new seed value \(s_1\).
+Member $v_{0}$ then encrypts the \(s_1\) with the public key of its sister leaf node.
+Iteratively, member $v_{0}$ moves up the spine of the tree from their leaf node to the root node, using the seed value \(s_n\) to generate \((pk_n,sk_n,s_n)\) and encrypting \(s_n\) with the public key of the sister node on level \(n\) of the tree.
+When member $v_{0}$ has propagated the changes to the root node, the final seed value \(s_r\) is determined to be the new shared secret key.
 Note that each member of the group can derive the seed value required to update their copy of the shared key by decrypting the seed value \(s_n\) on the node prior to where the path from said member and the initiating member intersect.
 Once each member has the requisite seed value, they each locally resume the iterative process of updating the tree and arrive at the same construction as that of the initiating member.
 For a visualization of this process, refer to Figure\ \ref{fig:CGKA-TreeKEM-Secrets}.
