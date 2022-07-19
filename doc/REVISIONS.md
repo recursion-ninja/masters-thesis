@@ -140,6 +140,12 @@ infinite depending on data structure vs proof?
 24. > Are we assuming 100% reliable (and infinitely fast?) control messages?
     Spot: Page 16
     Note: Noting concurrency, adding image
-    Edit: ``
+    Edit: `948ca5d75779c770b22d4bd2eb43d924296608a3`
+
+
+25. > does completing mean the entire tree has been traversed?
+    Spot: Page 17
+    Note: Added in #24
+    Edit: `948ca5d75779c770b22d4bd2eb43d924296608a3`
 
 
