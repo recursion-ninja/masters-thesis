@@ -20,16 +20,16 @@ Contrasted with theorem provers, model checkers are highly valued for the automa
 
 This work presents the verification of the TreeKEM protocol's \Abrev{FSU} and \Abrev{PCS} security guarantees.
 To verify these security guarantees, the \CGKAsec\ is used as an abstraction of the TreeKEM protocol, as well as all other \CGKAdef-conforming protocols.
-The \CGKAsec\ will be modeled as an explicit finite state machine, representing all possible TreeKEM execution states.
-More precisely \CGKAsec\ will be modeled as a label transition system \autocite{keller1976formal}, which includes informational labels for each state in the finite state machine.
-However, much of the literature related to the chosen model checker uses the nomenclature of finite state machine in stead of label transition system, so this work will follow suit.
+The \CGKAsec\ will be modeled as an explicit \Abrev{FSM}, representing all possible TreeKEM execution states.
+More precisely \CGKAsec\ will be modeled as a \Abrev{LTS} \autocite{keller1976formal}, which includes informational labels for each state in the \Abrev{FSM}.
+However, much of the literature related to the chosen model checker uses the nomenclature of \Abrev{FSM} instead of \Abrev{LTS}, and this work will follow suit.
 The security guarantees will be encoded as \Abrev{LTL} statements \autocite{4567924}.
 Then explicit state model checking techniques will be applied to verify that the \Abrev{LTL} encodings of \Abrev{FSU} and \Abrev{PCS} are maintained in every possible state of the \CGKAsec.
 
 There is one last important detail the verification.
 Recall that what differentiates \Abrev{SM} from \Abrev{SGM} is that \Abrev{SGM} involves two or more parties.
 There is no theoretical limit to the number of parties the TreeKEM protocol supports.
-However, we also stated that model checking represents all possible states of protocol as a finite diagram of transitions.
+However, we also stated that model checking represents all possible states of protocol as a finite graph of transitions.
 Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while our model checker requires a finite number of states.
 The IETF states that MLS in practice should support approximately $50,000$ participants \autocite{Omara2020}, which is a finite, yet this very large number is problematic for the chosen methodology explicit state model checking.
 This work parameterizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
@@ -48,7 +48,7 @@ The observed verification results are tabulated in Appendix\ \ref{apx:Observatio
 \section{Explicit state model checking}\label{sec:explicit-state-model-checking}}
 
 Model checking exists as the preferred alternative to \Abrev{BAN logic} techniques for verifying cryptographic protocols \autocite{kacprzak2006comparing, lomuscio2007verification, van2004symbolic}.
-Model checking represents all possible states of protocol as a finite graph of transitions \autocite{clarke1981design}.
+Model checking represents all possible states of protocol as an \Abrev{FSM} \autocite{clarke1981design}.
 There exist one or more start states in the transition graph representing possible starting condiitions.
 Transitions in the graph uniquely encode the possible changes in model state.
 The model checker then asserts that one or more properties holds for the protocol by traversing through all combinations of transitions through the graph \autocite{Vardi1986}.

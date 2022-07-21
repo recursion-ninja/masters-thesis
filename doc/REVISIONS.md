@@ -287,6 +287,11 @@ infinite depending on data structure vs proof?
 
 50. > OK, but not really true strictly speaking. Its an LTS, which is one specific type of FSM
     Spot: Page 27
+    Edit: `24855cacb8ee522e02a3feb9096189ff2a807f20`
+
+
+51. > 
+    Spot: Page 27
     Edit: ``
 
 
