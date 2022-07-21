@@ -29,9 +29,9 @@ Then explicit state model checking techniques will be applied to verify that the
 There is one last important detail the verification.
 Recall that what differentiates \Abrev{SM} from \Abrev{SGM} is that \Abrev{SGM} involves two or more parties.
 There is no theoretical limit to the number of parties the TreeKEM protocol supports.
-However, we also stated that model checking represents all possible states of protocol as a finite graph of transitions.
-Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while our model checker requires a finite number of states.
-The IETF states that MLS in practice should support approximately $50,000$ participants \autocite{Omara2020}, which is a finite, yet this very large number is problematic for the chosen methodology explicit state model checking.
+However, we also stated that model checking represents all possible states of a protocol as a finite graph of transitions.
+Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while model checkers require a finite number of states.
+The IETF states that MLS in practice should support approximately $50,000$ participants \autocite{Omara2020}, which is a finite, yet this very large number is problematic for the chosen methodology of explicit state model checking.
 This work parameterizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
 In practice, this means the results presented for a specified \Tmax\ and \Nmax\ only provide verification of security against \((T, C, N)\)-attackers for all \(T \in [1, \Tmax]\), \(C \in [1, T]\) and \(N \in [2, \Nmax]\).
 
@@ -40,6 +40,8 @@ If a counter-example is produced violating \Abrev{PCS} for either version of the
 If a counter-example is produced violating \Abrev{FSU} for the revised \VersionTwo, this also discovers a security defect.
 The original \VersionOne\ has been shown to have a \Abrev{FSU} deficiency for a \((12, 12, 8)\)-attacker \(\mathcal{A}\) \autocite{alwen2020security}.
 Hence a successful \Abrev{FSU} verification for the original \VersionOne\ with parameters corresponding to \(\mathcal{A}\) indicates either an in the model.
+It has not been stated whether the example provided by \autocite{alwen2020security} does not state that this example is minimal.
+Locating the minimal \(T\), \(C\), and \(N\) values for which the vulnerability manifests in the \VersionOne version.
 In order to ensure at least one observation of the \Abrev{FSU} deficiency of the original \VersionOne, the bounds are set to \(12 = \Tmax\) and \(8 = \Nmax\).
 The observed verification results are tabulated in Appendix\ \ref{apx:Observations} and discussed in Chapter\ \ref{results}.
 

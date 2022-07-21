@@ -290,8 +290,9 @@ infinite depending on data structure vs proof?
     Edit: `24855cacb8ee522e02a3feb9096189ff2a807f20`
 
 
-51. > 
-    Spot: Page 27
+51. > Is (12,12,8) the min size or just the size they found? Clarify
+    Spot: Page 28
+    Note: Elaborated
     Edit: ``
 
 
