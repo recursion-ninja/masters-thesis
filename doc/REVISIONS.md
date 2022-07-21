@@ -322,9 +322,26 @@ infinite depending on data structure vs proof?
     Edit: `87b0efda7c8cc3908fda5a910ca0ce96810b5cd7`
 
 
-57. >  Is this saying anything different from end of previous subsection?
+57. > Is this saying anything different from end of previous subsection?
     Spot: Page 29
     Note: Not really, backreferenced
+    Edit: `aeb9b001afefa260bc64b3ff7617539588e8c6f8`
+
+
+58. > I'm fine with this, but others may request more explanation
+    Spot: Page 30
+    Note: Got it
+    Edit: None
+
+
+59. > You dont mention the major reason for promela - spin!
+    Spot: Page 30
+    Note: Reordered sections
+    Edit: Prior
+
+
+60. > Rephrase. Several ambiguous readings exist depending on what "only" modifies
+    Spot: Page 31
     Edit: ``
 
 

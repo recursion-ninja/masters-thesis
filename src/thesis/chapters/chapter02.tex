@@ -95,9 +95,9 @@ The language of PROMELA is similar to the venerable C programming language.
 The similarity is not accidental, as it allows for the clear translation between a (perhaps the most) popular systems programming language and the modeling language.
 PROMELA supports mutable variable assignment, treating all variables as a finite and linearly ordered collection of bits.
 Assignments mutate an implicit global state.
-Variables can take the form of Boolean values, signed or unsigned numbers of varying bit widths, type-checked enumerations, or multi-dimensional arrays.
+Variables can take the form of Boolean values, signed or unsigned integers of varying bit widths, type-checked enumerations, or multi-dimensional arrays.
 PROMELA also provides looping constructs and an inlining of definition, similar to an inlined function call in C, allowing for code reuse.
-Examples of usages is dipicted in Figure\ \ref{fig:determinism}.
+Example usages are depicted in Figure\ \ref{fig:determinism}.
 These familiar C-like features of PROMELA are evaluated deterministically and linearly within the execution of a model defined in PROMELA.\@
 However, PROMELA also differs from C in important ways which facilitate explicit state graph construction and exhaustive search.
 
@@ -131,7 +131,7 @@ CodeReuse( NonNeg );
 \end{figure}
 
 
-PROMELA only provides non-deterministic conditional constructs.
+The primary differentiating factor between PROMELA and the C programming language is that all conditional constructs provided by PROMELA are non-deterministic.
 An \texttt{if} statement, shown in Figure\ \ref{fig:choice}, is supplied with one or more logical guards containing PROMELA expression which evaluates to a Boolean value and an associated (possibly empty) sequence PROMELA expressions for each guard.
 The model non-deterministically selects a guard which evaluates to \texttt{true} and follows the code path of the associated sequence of expressions.
 Once a the non-deterministically selected code path completes execution, execution resumes at the end of the \texttt{if} statement.
@@ -282,7 +282,7 @@ Correctly specifying the properties which must hold for the cryptographic protoc
 Fortunately, \Abrev{LTL} \autocite{4567924} is an almost perfectly tailored language for representing the security guarantees at the CGKA abstraction level.
 Additionally, \Abrev{LTL} usage in conjunction with an explicit state model checker is a well supported and researched technique \autocite{clarke1994another, biere1999symbolic, bloem1999efficient}.
 \Abrev{LTL} possesses all the logical operators of the two-element Boolean algebra with the addition of four temporal operators.
-The temporal operators are presented below as a short had reference for formulas described in Section\ \ref{#sec:LTL-security}.
+The temporal operators are presented below as a short hand reference for formulas described in Section\ \ref{sec:LTL-security}.
 
 \[
 \begin{aligned}[t]
@@ -294,7 +294,7 @@ The temporal operators are presented below as a short had reference for formulas
 \]
 
 An example of \Abrev{LTL}'s expressive power is that it allows for stating that a property must always hold, eventually hold, hold until another property holds, holds in the next state, never holds, or any combination of these.
-Often, properties are classified as either \emph{safety}, \emph{liveness}, or \emph{fairness}; though more nuanced which do not adhere the these categories are also expressible with \Abrev{LTL}.
+Often, properties are classified as either \emph{safety}, \emph{liveness}, or \emph{fairness}; though more nuances which do not adhere the these categories are also expressible with \Abrev{LTL}.
 A safety property ensures that an undesirable event never occurs \((\, \Box(\,\neg\varphi \,) \,)\).
 A liveness property requires progress towards an event \((\, \Box(\, \varphi \implies \Diamond(\,\psi \,) \,) \,)\).
 A fairness property ensures that a desirable even continues to happen \((\, \Box(\, \Diamond(\,\varphi \,) \,) \,)\).
