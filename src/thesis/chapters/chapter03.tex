@@ -101,10 +101,10 @@ Instead, it was defined in a manner which made existential proofs easy to descri
 Proofs and counterexamples from previous works \autocite{alwen2019double, alwen2020security} take the form of scrutinizing the existence of a sequence of queries made by the attacker.
 This existential focus permits leniency for redundancy within the \CGKAsec\ definition.
 Conversely, modeling the \CGKAsec\ such that it is amenable to explicit state model checking demands absolute parsimony within definition.
-Considering the CGKA games definition through the lens an exhaustive state-space search, both conveniently and surprisingly, leads to many possible game simplifications.
+Considering the CGKA games definition through the lens of an exhaustive state-space search, both conveniently and surprisingly, leads to many possible game simplifications.
 Because all states are considered, equivalent or superfluous sequences can be reasoned about, identified, and collapsed.
 
-Consider the parameter \(C\) for a \((T, C, N)\)-attacker \(\mathcal{A}\).
+Consider the parameter \(C\) for a \((T, C, N)\)-attacker \(\mathcal{A}\) and recall from Section \ref{sec:game-adaptations} the constraints on \(\mathcal{A}\) regarding querying \Oracle{reveal}{} and \Oracle{chall}{}.
 As defined, in each epoch \(\mathcal{A}\) must perform exactly one of the following:
 
 \begin{itemize}

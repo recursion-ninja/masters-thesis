@@ -399,9 +399,14 @@ infinite depending on data structure vs proof?
     Edit: `c9d3ddeb0bc3a357b17f9d177e36eeda980512e6`
 
 
-71. > 
+71. > Depends on LTL property, but wouldnt the verification of the t+1 case need to verify the t case anyway? If so, memoization wont help.
     Spot: Page 38
-    Note: 
+    Note: Elaborated on memoization possibility
+    Edit: `9b26bae107b4c97ab81faa91edf308d0b1684768`
+
+
+72. > I'm not following something. How can you restrict what \cal A does?
+    Spot: Page 39
     Edit: ``
 
 
