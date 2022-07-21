@@ -379,6 +379,11 @@ infinite depending on data structure vs proof?
 67. > I assume real systems only have bounded queues? If so, what are bounds and why not use that?
     Spot: Page 37
     Note: Yes, added a note
+    Edit: `e98a4c13d51fe7c0ad268c22f55354a8fd0f1aa8`
+
+
+68. > What is ordering relation of DS, given timing issues across agents
+    Spot: Page 37
     Edit: ``
 
 

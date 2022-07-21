@@ -348,7 +348,7 @@ Security games are designed with respect to a protocol, or class of protocols, a
 The winning condition(s) for \(\mathcal{A}\) within the security game are defined, by design, to occur if and only if \(\mathcal{A}\) can cause a violation of one or more security guarantees.
 Often a security game includes one or more oracles.
 An oracle is an agent in the game the adversary can query and to receive information or have an action performed on their behalf.
-Oracles provide utility to an adversary, but importantly, the oracle does not explicitly inform the adversary how any queried information was produced nor how any queried action was performed.
+Oracles provide utility to an a2.2dversary, but importantly, the oracle does not explicitly inform the adversary how any queried information was produced nor how any queried action was performed.
 The adversary must infer the effects of querying an oracle by observing messages broadcast to and from the \Abrev{DS}.
 
 The same work which defines \Abrev{CGKA} also defines an oracle-based security game for \Abrev{CGKA}.
@@ -465,9 +465,8 @@ A \Abrev{CGKA} protocol is said to be secure if and only if for all $(T, C, N)$-
 The \Abrev{CGKA} algorithms, security game, and \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{\Abrev{CGKA} Security} definition are integral to the verification work presented in the subsequent chapters.
 Chapter\ \ref{sec:methodology} will use the security definition to parameterize and constrain the verification methodology presented.
 In a similar manner, the definition and understanding of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{\Abrev{CGKA} Security} will be extensively relied upon in Chapter\ \ref{sec:model-formalization} when constructing the model encoding of TreeKEM.\@
-This reliance extends to the discussions in Section\ \ref{sec:game-adaptations} related to utilizing explicit state model checking when modeling and verifying TreeKEM
-as well as in Section\ \ref{sec:game-oracles} modeling the translations of the \CGKAsec\ oracles explicitly for TreeKEM.\@
-Additionally, the modeling of random \(b\) and adversary advantage will be elaborated on in Section\ \ref{sec:game-adaptations}.
+This reliance extends to the discussions in Section\ \ref{sec:game-prefixes} related to utilizing explicit state model checking when modeling and verifying TreeKEM as well as in Section\ \ref{sec:game-oracles} modeling the translations of the \CGKAsec\ oracles explicitly for TreeKEM.\@
+Additionally, the modeling of random \(b\) and adversary advantage will be elaborated on in Section\ \ref{sec:game-prefixes}.
 Subsequently Section\ \ref{sec:LTL-security} presents definitions of the predicate \textbf{\texttt{P}} for prohibiting ``trivial attacks'' explicitly related to TreeKEM and the \Abrev{CGKA} game as described by \autocite{alwen2020security}.
 
 

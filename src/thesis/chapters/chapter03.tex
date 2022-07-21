@@ -1,6 +1,10 @@
 \hypertarget{sec:model-formalization}{%
 \chapter{Model Formalization}\label{sec:model-formalization}}
 
+
+\hypertarget{sec:game-adaptations}{%
+\section{CGKA game formalization}\label{sec:game-adaptations}}
+
 The verification results of a model have no bearing on TreeKEM unless the model is a faithful and equivalent translation of the protocol.
 To verify the TreeKEM protocol, the \CGKAsec\ is used to derive the model for verification.
 Proof that the TreeKEM protocol is a \Abrev{CGKA} protocol, as well as proof that results of the \CGKAsec\ for any \Abrev{CGKA} protocol are valid for \Abrev{FSU} and \Abrev{PCS}, have already been produced \autocite{alwen2020security}.
@@ -34,14 +38,16 @@ In order to reduce the complexity of the \CGKAsec\ security game, and efficientl
   \resizebox{\textwidth}{!}{\subimport{../figures/}{CGKA-Informal}}
 \end{figure}
 
-\hypertarget{sec:game-adaptations}{%
-\section{CGKA game formalization}\label{sec:game-adaptations}}
+\hypertarget{sec:game-prefixes}{%
+\subsection{CGKA game prefixes}\label{sec:game-prefixes}}
 
 Within the CGKA game the attacker makes a series of queries to the available oracles.
 Queries to oracles drive the \Abrev{CGKA} protocol's state over time, however, when playing the game as originally defined there are no guaranteed limits on total attacker queries to all oracles.
 Furthermore, while the attacker decides exactly which order to query which oracles, all group members of the \Abrev{CGKA} protocol concurrently broadcast an unlimited number of messages, both informational and control.
-A direct modeling of the CGKA game with a \((T, C, N)\)-attacker would require \(N+1\) concurrent processes, accounting for the attacker and the maximum possible group members, along with \(N\) infinite queues of messages to be received by participants, and crucially monotonically increasing epoch and message counters representing the total ordering enforced by the delivery service.
-Spin only supports message queues of fixed capacaity, presenting an immediate probelm for a direct model encoding.
+A direct modeling of the CGKA game with a \((T, C, N)\)-attacker would require \(N+1\) concurrent processes, accounting for the attacker and the maximum possible group members, along with \(N\) infinite queues of messages to be received by participants, and crucially monotonically increasing epoch and message counters.
+Recall from Section \ref{sec:message-layer-security} that the \Abrev{DS} is guaranteed to provide all group members with a consistent view of message ordering.
+This guarantee imposes a total ordering on messages delivered by the \Abrev{DS}, with the monotonically increasing epoch and message counters as the ordering key.
+Spin only supports message queues of fixed capacaity, but even attempting to cirumvent the problem by establishing large capacaity bounds for the message queues, a problem emerges for attempting a direct model encoding.
 A single state in the state-space would constitute the unique combination of all actor processes' internal states, all message queue states, and the global protocol state.
 Unfortunately, because of the monotonically increasing counters, there can be no finite representation of the infinite game.
 
