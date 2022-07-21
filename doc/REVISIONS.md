@@ -384,6 +384,12 @@ infinite depending on data structure vs proof?
 
 68. > What is ordering relation of DS, given timing issues across agents
     Spot: Page 37
+    Edit: `f9bdbde41a61b3f7939b209d20d6ae3ce837625c`
+
+
+69. > what is your goal in this ref? This is old and not generally used for timed systems (timed automata is 'the answer'
+    Spot: Page 37
+    Note: Added reference and introduction to timed automata
     Edit: ``
 
 

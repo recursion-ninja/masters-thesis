@@ -65,7 +65,8 @@ This follows from the following three facts.
 
 While explicit state model checking is sophisticated, it ultimate reduces to an exhaustive search which uses a myriad of techniques to cleverly reduce the search space.
 There does not exist an general technique for reducing an unbounded, potentially infinite, search space to a finite one, as this would yield a solution to the halting problem.
-State-space dependence on temporality is a long-known difficulty with model checking \autocite{henzinger1994symbolic}.
+State-space dependence on temporality is a long-known difficulty with explicit state model checking, with a venerable solution is the application of timed automata \autocite{@alur1994theory}.
+Spin however does not support timed automata, requiring a different soulution.
 Considerable thought was given towards identifying a specific unbounded-to-finite reduction for the \CGKAsec, but the author is unable to present such a technique in this work.
 Instead, different techniques are presented to ``truncate'' an equivalent finite ``prefix'' of the \CGKAsec.
 In terms of a \((T, C, N)\)-attacker \(\mathcal{A}\), verification is performed from epochs $0$ to \Tmax, truncating the \CGKAsec\ to all prefix sequences containing at most \Tmax\ epochs.
