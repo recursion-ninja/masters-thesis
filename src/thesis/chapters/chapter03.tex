@@ -173,7 +173,7 @@ This necessarily progression of the \CGKAsec\ within the model \CGKAmod{P}{T}{N}
 The complexity of the asynchronous, multi-party communication described by the informal \CGKAsec\ definition is illustrated within Figure\ \ref{fig:CGKA-informal}.
 However, exhaustiveness can once again reduce model complexity.
 Consider a \((T, C, N)\)-attacker \(\mathcal{A}\).
-As defined, in each epoch $t < T$ the transition from epoch $t$ to epoch $t+1$ can only occur in one of the following ways:
+As informally defined in \autocite{alwen2020security}, in each epoch $t < T$ the transition from epoch $t$ to epoch $t+1$ can only occur in one of the following ways:
 
 \begin{itemize}
   \item For some \(i\),\\~\hspace{4em}\(\mathtt{ID_i}\) calls \Protocol{add} and subsequently \(\mathcal{A}\) queries \Oracle{deliver}{t,\, ID_i,\, ID_{*} }
@@ -202,9 +202,24 @@ This final abstraction further removes global state variables from the model \CG
 We arrive at a formalized and reduced \CGKAmod{P}{T}{N} model for a$( \textbf{T}, \textbf{C}, \textbf{N} )$-attacker depicted in Figure\ \ref{fig:CGKA-old-flowchart}.
 Within the depiction, yellow nodes make nondeterministic choices, and dashed lines represent a nondeterministic path chosen by the origin node.
 \begin{figure}
-  \centering
-  \caption{\label{fig:CGKA-old-flowchart}Flowchart of formalized CGKA security game.}
-  \resizebox{\textwidth}{!}{\subimport{../figures/}{flow-chart}}
+\centering
+\caption[Flowchart of formalized CGKA security game.]{%
+\label{fig:CGKA-old-flowchart}%
+Flowchart of formalized CGKA security game.\\%
+``Advances Epoch'' options involve querying:%
+\begin{itemize}
+\item \Oracle{add-user}{}
+\item \Oracle{remove-user}{}
+\item \Oracle{send-update}{}
+\end{itemize}
+``Gains Information'' options involve querying:
+\begin{itemize}
+\item \Oracle{corr}{}
+\item \Oracle{no-del}{}
+\item \Oracle{reveal}{}
+\end{itemize}
+}
+\resizebox{\textwidth}{!}{\subimport{../figures/}{flow-chart}}
 \end{figure}
 
 %\hypertarget{decidability}{%

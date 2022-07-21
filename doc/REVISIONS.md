@@ -412,16 +412,22 @@ infinite depending on data structure vs proof?
 
 73. > Bad notation, doesnt make sense as written (also, any constraints on i,j?)
     Spot: Page 40
-    Edit: ``
+    Edit: `9eca95b351aa1fd9e2028a38cc93077e1abbe039`
 
 
 74. > Is this your notation or a standard?
     Spot: Page 40
-    Edit: ``
+    Edit: `9eca95b351aa1fd9e2028a38cc93077e1abbe039`
 
 
 75. > I need to re-review above paragraph (maybe all 4.1.2) after rewrite. I see potential issues.
     Spot: Page 40
+    Edit: `9eca95b351aa1fd9e2028a38cc93077e1abbe039`
+
+
+76. > What does it mean to corrupt a group member?
+    Spot: Page 43
+    Note: Clarified in caption
     Edit: ``
 
 
