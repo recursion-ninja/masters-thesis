@@ -137,7 +137,7 @@ The model non-deterministically selects a guard which evaluates to \texttt{true}
 Once a the non-deterministically selected code path completes execution, execution resumes at the end of the \texttt{if} statement.
 Another similar non-deterministic conditional construct is provided by PROMELA.\@
 A \texttt{do} statement,statement, shown in Figure\ \ref{fig:repetition}, is also supplied with one or more pairs of logical guards and expression sequences.
-However, once a the non-deterministically selected code path of the \texttt{do} statement completes execution, execution resumes at the beginning of the \texttt{do} statement.
+However, once the non-deterministically selected code path of the \texttt{do} statement completes execution, execution resumes at the beginning of the \texttt{do} statement.
 Execution only resumes at the end of a \texttt{do} block when one of the non-deterministically selected code paths contains a \texttt{break} statement.
 This definition of the \texttt{do} statement provides nondeterministic looping behavior.
 The \texttt{if} statement permits identical behavior to C \texttt{if/else} statements if all guards are mutually exclusive.
@@ -183,7 +183,7 @@ This replaces the notion of a random number generator within the model.
 Explicit state model checking requires that all possible states within the model be explicitly enumerated.
 Randomness is replaced by a range of nondeterministic values.
 During model checking all possible branches of the \texttt{if}, \texttt{do}, and \texttt{select} constructs are explored, creating a wide array of state transitions for exhaustive search.
-The expressive power provided by PROMELA's \texttt{if}, \texttt{do}, and \texttt{select} statements allows for conveniently modeling randomness and alternation in verifiably sound manner.
+The expressive power provided by PROMELA's \texttt{if}, \texttt{do}, and \texttt{select} statements allows for conveniently modeling randomness and logical choice in verifiably sound manner.
 
 \begin{figure}
 \centering
@@ -201,7 +201,7 @@ for ( i : 0 .. 15 ) {
 \end{verbatim}
 \end{figure}
 
-A major difference from other C-like languages is PROMELA's support of concurrency.
+Another major difference from other C-like languages is PROMELA's support of concurrency.
 A model may include multiple processes, with no restrictions as to when and how the processes are created or terminated.
 The model of multiple processes considers the state transitions through each process being interleaved in any permissible permutation during the execution of the model.
 To further support modeling concurrency, PROMELA provides an \texttt{atomic} block, shown in Figure\ \ref{fig:atomic}, for indicating that a sequence of expressions cannot be interleaved between processes.
