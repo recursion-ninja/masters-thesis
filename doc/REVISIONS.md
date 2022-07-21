@@ -357,6 +357,11 @@ infinite depending on data structure vs proof?
 
 63. > SPIN has a book too. Not sure if you want to use that instead of Hol97, you decide. But why is God90 an appropriate ref in this context?
     Spot: Page 34
+    Edit: `80fdf5e0b0dd751656616f07b75f77beab62bdc2`
+
+
+64. > I have no idea whether shannon did this, but why not the MC partial order reduction papers here?
+    Spot: Page 35
     Edit: ``
 
 
