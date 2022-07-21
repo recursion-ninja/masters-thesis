@@ -266,6 +266,12 @@ infinite depending on data structure vs proof?
 46. > Hoa69 is about Hoare logic, not theorem proving. The SPIN world (not SMV) is the origin of MC
     Spot: Page 27
     Note: Updated to more appropriate citations
+    Edit: `6bbc20d51f1984bd0c323d3b28b5c0b82bb59cdf`
+
+
+47. > Cite the false positives and/or incorrectly verified work.
+    Spot: Page 27
+    Note: Updated citations
     Edit: ``
 
 
