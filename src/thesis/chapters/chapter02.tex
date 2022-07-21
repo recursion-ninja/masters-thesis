@@ -20,7 +20,9 @@ Contrasted with theorem provers, model checkers are highly valued for the automa
 
 This work presents the verification of the TreeKEM protocol's \Abrev{FSU} and \Abrev{PCS} security guarantees.
 To verify these security guarantees, the \CGKAsec\ is used as an abstraction of the TreeKEM protocol, as well as all other \CGKAdef-conforming protocols.
-The \CGKAsec\ will be modeled as an explicit finite state transition machine \autocite{rabin1959finite}, representing all possible TreeKEM execution states.
+The \CGKAsec\ will be modeled as an explicit finite state machine, representing all possible TreeKEM execution states.
+More precisely \CGKAsec\ will be modeled as a label transition system \autocite{keller1976formal}, which includes informational labels for each state in the finite state machine.
+However, much of the literature related to the chosen model checker uses the nomenclature of finite state machine in stead of label transition system, so this work will follow suit.
 The security guarantees will be encoded as \Abrev{LTL} statements \autocite{4567924}.
 Then explicit state model checking techniques will be applied to verify that the \Abrev{LTL} encodings of \Abrev{FSU} and \Abrev{PCS} are maintained in every possible state of the \CGKAsec.
 

@@ -280,3 +280,13 @@ infinite depending on data structure vs proof?
     Edit: `3810710b881b1cc25be2ee9ff9d297e6a2aa71c1`
 
 
+49. > Too strong. MC is certainly more automated, but many would argue that its only used for easy problems. I would weaken statement.
+    Spot: Page 27
+    Edit: `d7f95ac15ffe57381fd761f7b3d9886c2e9e5404`
+
+
+50. > OK, but not really true strictly speaking. Its an LTS, which is one specific type of FSM
+    Spot: Page 27
+    Edit: ``
+
+
