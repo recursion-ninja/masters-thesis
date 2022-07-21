@@ -373,6 +373,12 @@ infinite depending on data structure vs proof?
 66. > Fig 4.1 needs explanation. I doubt readers can understand it.
     Spot: Page 36
     Note: Figure moved and contextualized in a new paragraph
+    Edit: `2a00c7c655b33aa0ef93713eae610b288e7eaeb7`
+
+
+67. > I assume real systems only have bounded queues? If so, what are bounds and why not use that?
+    Spot: Page 37
+    Note: Yes, added a note
     Edit: ``
 
 

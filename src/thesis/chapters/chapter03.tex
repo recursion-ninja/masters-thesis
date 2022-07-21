@@ -41,6 +41,7 @@ Within the CGKA game the attacker makes a series of queries to the available ora
 Queries to oracles drive the \Abrev{CGKA} protocol's state over time, however, when playing the game as originally defined there are no guaranteed limits on total attacker queries to all oracles.
 Furthermore, while the attacker decides exactly which order to query which oracles, all group members of the \Abrev{CGKA} protocol concurrently broadcast an unlimited number of messages, both informational and control.
 A direct modeling of the CGKA game with a \((T, C, N)\)-attacker would require \(N+1\) concurrent processes, accounting for the attacker and the maximum possible group members, along with \(N\) infinite queues of messages to be received by participants, and crucially monotonically increasing epoch and message counters representing the total ordering enforced by the delivery service.
+Spin only supports message queues of fixed capacaity, presenting an immediate probelm for a direct model encoding.
 A single state in the state-space would constitute the unique combination of all actor processes' internal states, all message queue states, and the global protocol state.
 Unfortunately, because of the monotonically increasing counters, there can be no finite representation of the infinite game.
 
