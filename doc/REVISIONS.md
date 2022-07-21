@@ -346,7 +346,17 @@ infinite depending on data structure vs proof?
 
 
 61. > Do you mean interleaving?
-    Spot: Page 31
+    Spot: Page 33
+    Edit: `a34d9828b855f4f29ed20ec62bf8172564af8000`
+
+
+62. > General stylistic comment: you use lots of gerunds throughout section; I personally think it sounds better minimizing them.
+    Spot: Page 33
+    Edit: None
+
+
+63. > SPIN has a book too. Not sure if you want to use that instead of Hol97, you decide. But why is God90 an appropriate ref in this context?
+    Spot: Page 34
     Edit: ``
 
 

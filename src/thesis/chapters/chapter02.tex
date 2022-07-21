@@ -66,14 +66,14 @@ As mentioned at the end of Section \ref{sec:methodology-overview}, due the engin
 \hypertarget{spin}{%
 \section{Spin}\label{spin}}
 
-Among the many options of model checkers, I have chosen use the SPIN model checker \autocite{godefroid1990using, holzmann1997model}.
+Among the many options of model checkers, I have chosen use the SPIN model checker \autocite{HolzmannSpinBook2003}.
 SPIN provides several important features for our verification goals.
 The main difficulty with model checking is the size of the number of states and transitions \autocite{burch1992symbolic}.
 Since model checking works by checking every possible combination of states and transitions, the size of the state-space directly impacts the feasibility.
 SPIN provides some solutions to making this problem tractable, the culmination of over three decades of research and development.
 First, SPIN supports ``on-the-fly'' verification \autocite{rudin1987limits}, which means that SPIN does not need to consider the entire set of states and transitions at the same time, but instead can work on just subsets until the whole set is verified.
 Second, SPIN also uses a ``partial ordering'' of the states and transitions \autocite{shannon1958note} to reduce the number of subsets it needs to verify before being certain that a property holds for the whole set of states and transitions.
-Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by default as they can be used in conjunction with minimal drawbacks \autocite{valmari1993fly, peled1994combining, holzmann1995improvement, couvreur1999fly}.
+Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by default as they can be used in conjunction with minimal drawbacks \autocite{godefroid1990using, valmari1993fly, peled1994combining, holzmann1995improvement, couvreur1999fly}.
 Consideration was made to use TopSpin \autocite{DonaldsonM_AMAST2006}, a PROMELA pre-processing plugin for SPIN which performs symmetry reduction as well.
 Unfortunately, this theoretically viable technique is not practically usable as the plugin has not been maintained in over a decade.
 Additionally, SPIN supports numerous compile time directive which alter the state-space representation, search trajectories, and time-memory trade-offs.
