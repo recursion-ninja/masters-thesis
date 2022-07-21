@@ -428,6 +428,11 @@ infinite depending on data structure vs proof?
 76. > What does it mean to corrupt a group member?
     Spot: Page 43
     Note: Clarified in caption
+    Edit: `df08e0c30707f66495607db26b9743e8a1603e5f`
+
+
+77. > is this a technical term or just informal
+    Spot: Page 44
     Edit: ``
 
 
