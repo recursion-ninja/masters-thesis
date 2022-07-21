@@ -431,8 +431,21 @@ infinite depending on data structure vs proof?
     Edit: `df08e0c30707f66495607db26b9743e8a1603e5f`
 
 
-77. > is this a technical term or just informal
+77. > Is this a technical term or just informal
     Spot: Page 44
+    Edit: `b6b27fbc389cef67618af74979354676a9b60b69`
+
+
+78. > Are these independent or dictated by other considerations?
+    Spot: Page 45
+    Note: Used for unsigned values in Spin require a bit-width specification.
+    Edit: None
+
+
+79. > Is this still true given what you found about Spins state space encoding?
+    Spot: Page 45
+    Note: Yes, using unsigned values is helpful and having explicit missing values are neccissary for comparisons
     Edit: ``
+
 
 

@@ -24,7 +24,7 @@ The evolution of execution is guided by the main control loop within the \texttt
 The global state variables of the \CGKAmod{P}{T}{N} are important to understand in detail.
 Their importance follows from the fact that only global variable within the \CGKAmod{P}{T}{N} model can be referenced in the \Abrev{LTL} predicates.
 Many of these global variables are directly dependent on parameters \(T\) and \(N\).
-Notably, a series of ``C-like'' constant macro definitions
+Notably, a series of ``C-like'' constant macro definitions are used to pre-define these variables.
 These constants are ``hard-coded'' when compiling a parameterized model, and referenced throughout the model's PROMELA encoding.
 
 The constants are described in Table\ \ref{tab:constants-from-parameters} and depicted in Figure\ \ref{fig:Encoded-Constants}.
@@ -43,6 +43,8 @@ Generally, the unsigned types are represent either an epoch, a user ID, or a \Ab
 When representing an epoch or user ID, one additional ``sentinel'' value is added to the representation space, allowing for the absence of an epoch or user ID to be represented int he same type.
 Careful consideration of PROMELA \texttt{unsigned} type's specified bit width must be taken into account when defining the representation.
 For example \(N=7\) requires only 3 bits to represent all possible values \([0,7]\), but to represent a possibly missing user ID an extra value of \((7 + 1 = 8)\) is added to the range, and 4 bits are required to represent all possible user ID values in the range \([0,\, 8]\).
+The inclusion of a ``sentinal values'' for a missing user ID or epoch is critical, as it permits safely and clearly distinguishing between a value and the absence of a value.
+The absence of value is checked for throughout the model encoding and also within the \Abrev{LTL} statement representing \Abrev{PCS} in Subsection \ref{sec:pcs-as-ltl}.
 
 \begin{table}[ht!]
 \centering
