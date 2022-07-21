@@ -407,6 +407,21 @@ infinite depending on data structure vs proof?
 
 72. > I'm not following something. How can you restrict what \cal A does?
     Spot: Page 39
+    Edit: `ea7f6ad3bb91ac0b981672db1260a1544ba1ee36`
+
+
+73. > Bad notation, doesnt make sense as written (also, any constraints on i,j?)
+    Spot: Page 40
+    Edit: ``
+
+
+74. > Is this your notation or a standard?
+    Spot: Page 40
+    Edit: ``
+
+
+75. > I need to re-review above paragraph (maybe all 4.1.2) after rewrite. I see potential issues.
+    Spot: Page 40
     Edit: ``
 
 

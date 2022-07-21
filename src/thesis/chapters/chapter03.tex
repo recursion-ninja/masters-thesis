@@ -124,33 +124,46 @@ Similar reductions will follow while formalizing \CGKAmod{P}{T}{N} from the info
 \subsection{Idempotence}\label{sec:idempotence}}
 
 A literal interpretation of the informal \CGKAsec\ definition permits many redundant state transitions.
-Importantly idempotent operations are permitted.
-For a sequence of operations \( \{ o_0 \circ o_{1} \circ \ldots \circ o_{m-1} \circ o_{m} \} \), and idempotent operation \(q\) is one in which \(q = q \circ q = q \circ p \circ q\) for all sub-sequences \(p = \{o_i \ldots o_j \} \in \{ o_0 \circ o_{1} \circ \ldots \circ o_{m-1} \circ o_{m} \} \).
-Similarly, for all sequences of operations containing an idempotent operation \(q\), between every operand in the sequence after the first occurrence of \(q\), an additional occurrence of \(q\) can be inserted without effecting the result of the operations.
-As shorthand, we will denote \(q \circ p \gets q^{*}\) to represent the expansion of a sequence \(p\) containing an idempotent operation \(q\) into the set of all sequences \(p\) with possible insertions of additional \(q\) operations into \(p\).
-It will be clear to an attentive reader that the cardinality of \(q \circ p \gets q^{*}\) is countably infinite, as it follows the same logical construction of the rational numbers.
+Redundant in this context means the formation of cycles or ``non-progressing'' states.
+For example, Suppose \(\mathcal{A}\) in state \(s_i\) queries \Oracle{no-del}{ID} transitioning to state \(s_{i+1}\), and then immediately performs an identical query to \Oracle{no-del}{ID} transitioning to \(s_{i+2}\).
+This sequence of queries is not forbidden by the informal description of \CGKAsec.
+However, it is apparent that the protocol states \(s_{i+1} = s_{i+2}\) as the second, identical query has not changed the protocol state.
+Furthermore, if there were intervening queries made between states \(s_{i+1}\) and \(s_{i+2}\), it would still be the case that \(s_{i+1} = s_{i+2}\).
+The effect these redundant transitions have on the model state is intuitively similar to an idempotent operation \(\ostar\), where \(a \ostar b \ostar b = a \ostar b\).
+Hence an ``idempotency-like'' abstraction is applied to the model encoding forbidding the follow operations:
 
-The concept of idempotency phrased in the context of a stateful protocol modeled as a transition graph, relates an idempotent operation \(q\) as one in which, performing \(q\), then at a later point while in state \(s\) performing \(q\) again, results in a cycle from \(s\) to \(s\).
-This is problematic for an exhaustive search.
-Quite obviously it permits an infinite loop in within \CGKAmod{}{}{}, which in turn makes certain LTL statement impossible to verify as well as increasing the verification run-time
-The following are examples of permitted idempotency by the informal \CGKAsec\ definition:
+\begin{equation} \label{eq:7}
+  \begin{split}
+&\text{Let } \mathcal{Q} \text{ be a sequence of query and model state pairs.}\\
+&\text{Let } (q_i, s_i) \text{ be the pair at index } i \text{ of } \mathcal{Q}.\\
+&\text{Then forbid all } q_j \text{ such that:}\\
+&\quad\quad\quad  (q_i = q_j \land i < j) \implies s_j = s_{j-1}
+\end{split}
+\end{equation}
+
+More examples of permitted idempotency by the informal \CGKAsec\ definition (for some \(i\), and some \(t\)) are listed below:
 
 \begin{itemize}
-  \item For some \(t\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{reveal}{t}    two or more times throughout the \CGKAsec.  
-  \item For some \(i\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{no-del}{ID_i} two or more times throughout the \CGKAsec.
-  \item For some \(i\), and some \(t\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{corr}{ID_i}        two or more times during epoch \(t\).
-  \item For some \(i\), and some \(t\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{add-user}{ID_i}    two or more times during epoch \(t\).
-  \item For some \(i\), and some \(t\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{remove-user}{ID_i} two or more times during epoch \(t\).
-  \item For some \(i\), and some \(t\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{send-update}{ID_i} two or more times during epoch \(t\).
-
+  \item \(\mathcal{A}\) queries \Oracle{reveal}{t}         two or more times throughout the \CGKAsec.  
+  \item \(\mathcal{A}\) queries \Oracle{no-del}{ID_i}      two or more times throughout the \CGKAsec.
+  \item \(\mathcal{A}\) queries \Oracle{corr}{ID_i}        two or more times during epoch \(t\).
+  \item \(\mathcal{A}\) queries \Oracle{add-user}{ID_i}    two or more times during epoch \(t\).
+  \item \(\mathcal{A}\) queries \Oracle{remove-user}{ID_i} two or more times during epoch \(t\).
+  \item \(\mathcal{A}\) queries \Oracle{send-update}{ID_i} two or more times during epoch \(t\).
 \end{itemize}
 
-Since the verification methodology for \CGKAmod{P}{T}{N} exhaustively explores all possible \CGKAsec\ states, all sequences of operations \(q \circ p \gets q^{*}\) are equivalent.
-Hence we can collapse the cyclical search through the countably infinite number of idempotent sequences, considering them all to be the same unique state without effecting the verification of an LTL property \(\varphi\).
+Since the verification methodology for \CGKAmod{P}{T}{N} exhaustively explores all possible \CGKAsec\ states, all sequences which includea an ``idempotency-like'' query, and all sequences which exclude the same query are equivalent computations within the encoded model.
+Hence we can collapse the cyclical search through the countably infinite number of sequences including ``idempotency-like'' queries, considering them all to be the same unique state without effecting the verification of an LTL property \(\varphi\).
 To disallow the cycles formed by idempotent operations, each operation above is permitted only once per period within which the operation is idempotent.
-Within the \CGKAmod{}{}{}\ Promela encoding, repeated sequences of idempotent operations are tabulated within the global game state and guarded against.
-By disallowing idempotency within the game, each query made by the attacker will never result in a return to a previous game state.
-A consequence of this, is that attacker queries necessarily advance the game state towards the next epoch transition, or when within the final epoch, advance towards the query to \Oracle{chall}{}.
+Within the \CGKAmod{}{}{}\ Promela encoding, repeated sequences of idempotent operations are tabulated and guarded against.
+This has two important effects.
+
+While these ``idempotency-like'' transitions can be detected and collapsed by Spin, but explicitly forbidding them allows removing some variables from the global state of the model.
+With less information stored in the global state, each state-vector can be encoded using fewer bits.
+The smaller state-vectors both reduce memory usage and improve verification runtime, though the former mouh more than the latter.
+
+Additionally, by disallowing idempotency within the game, each query made by the adversary will never result in a return to a previous game state.
+A consequence of this, is that adversary queries necessarily advance the game state towards the next epoch transition, or when within the final epoch, advance towards the query to \Oracle{chall}{}.
 This necessarily progression of the \CGKAsec\ within the model \CGKAmod{P}{T}{N} both reduces the run-time verification as well as permits verification that the model \CGKAmod{P}{T}{N} halts.
 
 
@@ -171,11 +184,20 @@ As defined, in each epoch $t < T$ the transition from epoch $t$ to epoch $t+1$ c
   \item For some \(i\),\\~\hspace{4em}\(\mathcal{A}\) queries \Oracle{send-update}{ID_i} and subsequently queries \Oracle{deliver}{t,\, ID_i,\, ID_{*}}
 \end{itemize}
 
-Note that in each possible epoch transition, \(\mathcal{A}\) decides which control message is delivered defining the next epoch.
+While applying the ``idempotency-like'' abstraction described in \ref{sec:idempotence}, each of the six possible epoch inititation can occur inedepentantly in each epoch.
+Prior to the next epoch inititation message being prcoessed by the entire group, any possible combination of the six possibilities above can accumulate as options for \(\mathcal{A}\) to eventually select.
+A consequence of nondeterministic computation, is that for an epoch containing \(n\) group members, each of the \(2^{6*n} - 1\) epoch transitions must be considered.
+Only one epoch inititation message can be selected by \(\mathcal{A}\) via a query to \Oracle{deliver}{}, but the combinatorics of accumulated messages prior to selection still influence the search-space and state-vectors.
+Removing this baggage on the state-vector encoding, similar to the ``idempotency-like'' abstraction, improving both memory usage and verification runtime.
+
+The abstraction to acheive further model efficiency and scalability relies on the ability of \(\mathcal{A}\) to query \Oracle{deliver}{}.
+In each epoch, \(\mathcal{A}\) decides which control message is delivered defining the next epoch.
 Furthermore, note that \(\mathcal{A}\) querying \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i} results in the same control message being sent to the \Abrev{DS} as \(\mathtt{ID_i}\) calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}; respectively.
 Both the sequences originating with either \(\mathcal{A}\) querying an oracle or \(\mathtt{ID_i}\) calling an algorithm result in the same epoch transition once \Oracle{deliver}{t,\, ID_i,\, ID_{*}} is queried, without any other effect on the protocol state.
 Due to the exhaustively methodology in verifying \CGKAmod{P}{T}{N}, both initiating epoch transitions options are explored, resulting in duplicate paths to the same epoch transition state.
 Hence, we can omit the group members from calling calling \Protocol{add}, \Protocol{rmv}, or \Protocol{upd}, and without loss of generality, have \(\mathcal{A}\) query \Oracle{add-user}{ID_i}, \Oracle{remove-user}{ID_i}, or \Oracle{send-update}{ID_i}; respectively.
+This final abstraction further removes global state variables from the model \CGKAmod{P}{T}{N}, the impact of which is reducing the memory usage by two orders of magnitude.
+
 
 We arrive at a formalized and reduced \CGKAmod{P}{T}{N} model for a$( \textbf{T}, \textbf{C}, \textbf{N} )$-attacker depicted in Figure\ \ref{fig:CGKA-old-flowchart}.
 Within the depiction, yellow nodes make nondeterministic choices, and dashed lines represent a nondeterministic path chosen by the origin node.
