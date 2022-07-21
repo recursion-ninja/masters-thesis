@@ -33,9 +33,13 @@ This is not always problematic for explicit state model checking, but regrettabl
 In order to reduce the complexity of the \CGKAsec\ security game, and efficiently produce an encoded model, formalization and subsequent abstraction of the \CGKAsec\ security game is required.
 
 \begin{figure}[ht!]
-  \centering
-  \caption{\label{fig:CGKA-informal}Transition graph of informal CGKA definition}
-  \resizebox{\textwidth}{!}{\subimport{../figures/}{CGKA-Informal}}
+\centering
+\caption[Transition graph of informal CGKA definition]{%
+\label{fig:CGKA-informal}%
+High-level illustration of the informal CGKA definition's \Abrev{FSM}.%
+Each depicted node represents a subcomponent of the \Abrev{FSM}, with significant transitions displayed between the subcomponents.
+}%
+\resizebox{\textwidth}{!}{\subimport{../figures/}{CGKA-Informal}}
 \end{figure}
 
 \hypertarget{sec:game-prefixes}{%

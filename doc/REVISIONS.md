@@ -387,9 +387,15 @@ infinite depending on data structure vs proof?
     Edit: `f9bdbde41a61b3f7939b209d20d6ae3ce837625c`
 
 
-69. > what is your goal in this ref? This is old and not generally used for timed systems (timed automata is 'the answer'
+69. > What is your goal in this ref? This is old and not generally used for timed systems (timed automata is 'the answer'
     Spot: Page 37
     Note: Added reference and introduction to timed automata
+    Edit: `957caddb084d9130ed1fc47f36477817f0334b54`
+
+
+69. > Is this a transition graph or a system architecture?
+    Spot: Page 38
+    Note: High-level view of components of the transition graph. Improved figure description.
     Edit: ``
 
 
