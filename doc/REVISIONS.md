@@ -272,6 +272,11 @@ infinite depending on data structure vs proof?
 47. > Cite the false positives and/or incorrectly verified work.
     Spot: Page 27
     Note: Updated citations
+    Edit: `ef41db72e7b759c4f1d539422060cbd7cad44856`
+
+
+48. > Reference tamerin somewhere
+    Spot: Page 27
     Edit: ``
 
 
