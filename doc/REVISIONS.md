@@ -293,6 +293,16 @@ infinite depending on data structure vs proof?
 51. > Is (12,12,8) the min size or just the size they found? Clarify
     Spot: Page 28
     Note: Elaborated
-    Edit: ``
+    Edit: `22f82187a690d5eedd1b260b1b7f4e86a6f66b46`
 
+
+52. > What is the key magic that happens for (12,12,8) to cause problems?
+    Spot: Page 28
+    Note: The precise magic is not apparent to me.
+    Edit: None
+
+53. > doesnt parse
+    Spot: Page 28
+    Note: Sentance fragment got cut out at some point...
+    Edit: ``
 
