@@ -393,9 +393,15 @@ infinite depending on data structure vs proof?
     Edit: `957caddb084d9130ed1fc47f36477817f0334b54`
 
 
-69. > Is this a transition graph or a system architecture?
+70. > Is this a transition graph or a system architecture?
     Spot: Page 38
     Note: High-level view of components of the transition graph. Improved figure description.
+    Edit: `c9d3ddeb0bc3a357b17f9d177e36eeda980512e6`
+
+
+71. > 
+    Spot: Page 38
+    Note: 
     Edit: ``
 
 

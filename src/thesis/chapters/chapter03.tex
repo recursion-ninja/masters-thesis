@@ -80,12 +80,10 @@ Model parameterization by $t$ means that the \CGKAsec\ is played until epoch $t$
 Verification for the finite \CGKAsec\ prefixes less than or equal to \Tmax\ requires $|\{ 0, \Tmax \}|$ separate verification runs, one for verifying the CGKA model parameterized by each possible $t$ value with $t \in \{ 0, \Tmax \}$.
 While simple and effective, this approach does involve duplicate verification work, with the verification of the model for $t$ being an optimal substructure for verifying the model parameterized by $t+1$.
 The work presented here does not attempt memoization of sub-problems, though this is theoretically and practically possible with additional engineering effort.
-
-\begin{figure}
-  \centering
-  \caption{\label{fig:CGKA-informal}Transition graph of informal CGKA definition}
-  \resizebox{\textwidth}{!}{\subimport{../figures/}{CGKA-Informal}}
-\end{figure}
+For example of portential memoization, note that verifying the \(t+1\) epoch case requires also verifing the \(t\) epoch case.
+So a model \CGKAmod{P}{T}{N} could be encoded to verify all an \Abrev{LTL} property for all \(t \le \T\) by considering the possibility that the adversary queries \Oracle{chall} in each epoch \(t\).
+However, the model encoding produced for this thesis instead forbids the adversary from querying \Oracle{chall} in any epoch \(t < T - 1 \), and requires that the adversary query \Oracle{chall} in epoch \(t = T\).
+The encoding used, while simpler in construction, requires seperate verification runs for all parameters \(T \in \{ 0, \Tmax \}\), rather than a single verification run with the parameter \Tmax.
 
 %\begin{figure}
 %  \centering
