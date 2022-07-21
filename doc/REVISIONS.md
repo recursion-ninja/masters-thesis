@@ -314,5 +314,12 @@ infinite depending on data structure vs proof?
 55. > Not correct term, but not sure what you mean to say
     Spot: Page 29
     Note: I meant "constructive" in the mathematical sense as opposed to "exeistential," i.e. the verification failure produces an interpretable counter-example instead of just stateing that one exists
+    Edit: `8ee8a316b32480b07a29b47ac86845e1a3d1b997`
+
+
+56. > 
+    Spot: Page 29
+    Note: 
     Edit: ``
+
 

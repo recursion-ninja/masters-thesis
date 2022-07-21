@@ -46,7 +46,9 @@ The model checker then asserts that one or more properties holds for the protoco
 If a property holds, the model checker will assert that there is no possible set of transitions through states that exist in the protocol which violate the specified property.
 If the property does not hold, the model checker will produce a counter-example sequence of transitions through possible states showing how the specified property can be violated.
 This method of verifying cryptographic protocols is very attractive as the verification result is either an exhaustive proof of security guarantees or a cryptographic attack which can be analyzed and corrected.
-This proof methodology offered by explicit state model checking, the guarantee of a falsifying counterexample if and only if one exists, is of paramount important for correcting vulnerabilities and defects within the modeled protocol.
+This proof methodology offered by explicit state model checking, the guarantee of a falsifying counterexample if one exists, is of paramount important for correcting vulnerabilities within the modeled protocol.
+Discernment must be applied however, to interpret whether the counter example describes a protocol vulnerability or reveals a model encoding deficieny, likely an artifact of abstraction.
+Regardless, scrutinizing the counterexample provides valuable information for refinement.
 
 The principle drawback of explicit state model checking is the immensity of the state-space as the complexity of the model grows.
 Each possible state in the model is uniquely represented and all transitions for all states are computed during verification.
