@@ -518,12 +518,4 @@ Using the notation introduced above, the \Abrev{CGKA} abstraction for TreeKEM pr
 Verifying the correctness of the \Abrev{CGKA} algorithm implementations for each TreeKEM version is beyond the scope of this work.
 Rather, it is assumed that a given an implementation of the specified TreeKEM version \(\mathtt{P}\) provides defect-free algorithms.
 If the defect-free algorithm assumption holds, then a verification of the \Abrev{FSU} or \Abrev{PCS} security guarantee for \CGKAmod{P}{}{} also verifies the security guarantee for corresponding TreeKEM version implementation.
-The verification hypotheses are depicted in Table\ \ref{tab:verification-hypotheses}.
-
-\begin{table}[ht!]                                                                                                                      
-\caption{%
-\label{tab:verification-hypotheses}%
-Verification Hypotheses of \CGKAmod{P}{}{}.
-}%
-\subimport{../tables/}{verification-hypotheses}
-\end{table}
+Verification results are discussed later in Section \ref{sec:hypothesis-outcomes}.

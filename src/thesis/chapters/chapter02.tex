@@ -35,17 +35,6 @@ The IETF states that MLS in practice should support approximately $50,000$ parti
 This work parameterizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
 In practice, this means the results presented for a specified \Tmax\ and \Nmax\ only provide verification of security against \((T, C, N)\)-attackers for all \(T \in [1, \Tmax]\), \(C \in [1, T]\) and \(N \in [2, \Nmax]\).
 
-Referring back to the verification hypotheses in Table\ \ref{tab:verification-hypotheses}, any outcome which falsifies a hypothesis is an interesting result.
-If a counter-example is produced violating \Abrev{PCS} for either version of the protocol, then a previously unknown security defect for TreeKEM has been discovered.
-If a counter-example is produced violating \Abrev{FSU} for the revised \VersionTwo, this also discovers a security defect.
-The original \VersionOne\ has been shown to have a \Abrev{FSU} deficiency for a \((12, 12, 8)\)-attacker \(\mathcal{A}\) \autocite{alwen2020security}.
-Hence a successful \Abrev{FSU} verification for the original \VersionOne\ with parameters corresponding to \(\mathcal{A}\) indicates either an error in the vulnerability provided by \autocite{alwen2020security} or, more likely, an error the TreeKEM model encoding.
-It has not been stated whether the example provided by \autocite{alwen2020security} does not state that this example is minimal.
-Locating the minimal \(T\), \(C\), and \(N\) values for which the vulnerability manifests in the \VersionOne version.
-In order to ensure at least one observation of the \Abrev{FSU} deficiency of the original \VersionOne, the bounds are set to \(12 = \Tmax\) and \(8 = \Nmax\).
-The observed verification results are tabulated in Appendix\ \ref{apx:Observations} and discussed in Chapter\ \ref{results}.
-
-
 \hypertarget{sec:explicit-state-model-checking}{%
 \section{Explicit state model checking}\label{sec:explicit-state-model-checking}}
 

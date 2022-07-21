@@ -202,6 +202,25 @@ Since the attacker knowledge base and group membership alterations depend on the
 \hypertarget{sec:hypothesis-outcomes}{%
 \section{Hypothesis Testing}\label{sec:hypothesis-outcomes}}
 
+\begin{table}[ht!]                                                                                                                      
+\caption{%
+\label{tab:verification-hypotheses}%
+Verification Hypotheses of \CGKAmod{P}{}{}.
+}%
+\subimport{../tables/}{verification-hypotheses}
+\end{table}
+
+The verification hypotheses are depicted in Table\ \ref{tab:verification-hypotheses}.
+Any outcome which falsifies a hypothesis is an interesting result.
+If a counter-example is produced violating \Abrev{PCS} for either version of the protocol, then a previously unknown security defect for TreeKEM has been discovered.
+If a counter-example is produced violating \Abrev{FSU} for the revised \VersionTwo, this also discovers a security defect.
+The original \VersionOne\ has been shown to have a \Abrev{FSU} deficiency for a \((12, 12, 8)\)-attacker \(\mathcal{A}\) \autocite{alwen2020security}.
+Hence a successful \Abrev{FSU} verification for the original \VersionOne\ with parameters corresponding to \(\mathcal{A}\) indicates either an error in the vulnerability provided by \autocite{alwen2020security} or, more likely, an error the TreeKEM model encoding.
+It has not been stated whether the example provided by \autocite{alwen2020security} does not state that this example is minimal.
+Locating the minimal \(T\), \(C\), and \(N\) values for which the vulnerability manifests in the \VersionOne version.
+In order to ensure at least one observation of the \Abrev{FSU} deficiency of the original \VersionOne, the bounds are set to \(12 = \Tmax\) and \(8 = \Nmax\).
+The observed verification results are tabulated in Appendix\ \ref{apx:Observations} and discussed in Chapter\ \ref{results}.
+
 By interpreting the observations collected in Appendix\ \ref{apx:Observations} one can discern whether the hypotheses enumerated in Table\ \ref{tab:verification-hypotheses} and described in Chapter\ \ref{sec:methodology} have been supported or falsified.
 Each hypothesis sill be considered individually, noting the interpretive limitations imposed by the currently incomplete series of observations.
 

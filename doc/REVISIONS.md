@@ -304,5 +304,10 @@ infinite depending on data structure vs proof?
 53. > doesnt parse
     Spot: Page 28
     Note: Sentance fragment got cut out at some point...
+    Edit: `e9d284b8e9a9693cf73976e41cee990f574d61bb`
+
+54. > Is the current App B table the updated version? If so, need more justification/discussion since you dont get to T=12
+    Spot: Page 28
+    Note: Moving to results section
     Edit: ``
 
