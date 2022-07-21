@@ -362,6 +362,17 @@ infinite depending on data structure vs proof?
 
 64. > I have no idea whether shannon did this, but why not the MC partial order reduction papers here?
     Spot: Page 35
+    Edit: `c1558fb64f855d3a17f5e4fb5719c6202d7c59f6`
+
+
+65. > Which portion is that?
+    Spot: Page 35
+    Note: Previously rephrased
+
+
+66. > Fig 4.1 needs explanation. I doubt readers can understand it.
+    Spot: Page 36
+    Note: Figure moved and contextualized in a new paragraph
     Edit: ``
 
 

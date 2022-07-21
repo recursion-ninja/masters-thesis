@@ -19,12 +19,23 @@ For a given LTL predicate $\varphi$ we define \CGKAmod{P}{T}{N} as follows:
 \]
 
 
+Recall from Section \ref{sec:security-games} that group members can only call the six \CGKAdef\ algorithms, while the adversary can only query the ten oracles of the \CGKAsec\ security game.
+The informal description of the \CGKAsec\ security game defined by \autocite{alwen2020security} places very few constraints on the queries an adversary can make.
+These constraints are only related to the \(C\) parameter, limiting the total number of queries to \Oracle{reveal}{} and \Oracle{chall}{} to be less than or equal to \(C\).
+Furthermore, the adversary is limited to making at most \emph{one} query to either \Oracle{reveal}{} or \Oracle{chall}{} per epoch.
+Besides these constraints, the adversary is free to query \CGKAsec\ oracles and group members are free to call \CGKAdef\ algorithms concurrently.
+Figure \ref{fig:CGKA-informal} depicts the complexities of this unconstrained, informal \CGKAsec\ security game, notably that the description yeilds a massively concurrent game, without a bounded win condition.
+This is not always problematic for explicit state model checking, but regrettably it is with regards to \CGKAsec.
+In order to reduce the complexity of the \CGKAsec\ security game, and efficiently produce an encoded model, formalization and subsequent abstraction of the \CGKAsec\ security game is required.
+
+\begin{figure}[ht!]
+  \centering
+  \caption{\label{fig:CGKA-informal}Transition graph of informal CGKA definition}
+  \resizebox{\textwidth}{!}{\subimport{../figures/}{CGKA-Informal}}
+\end{figure}
+
 \hypertarget{sec:game-adaptations}{%
 \section{CGKA game formalization}\label{sec:game-adaptations}}
-
-Many techniques were used when formalizing the abstractly defined \CGKAsec\ to a rigorous and model suitable for explicit state model checking.
-The \CGKAsec\ is originally defined informally as a massively concurrent game, without a bounded win condition as shown in Figure\ \ref{fig:CGKA-informal}.
-This is not always problematic for explicit state model checking, but regrettably it is with regards to \CGKAsec.
 
 Within the CGKA game the attacker makes a series of queries to the available oracles.
 Queries to oracles drive the \Abrev{CGKA} protocol's state over time, however, when playing the game as originally defined there are no guaranteed limits on total attacker queries to all oracles.
