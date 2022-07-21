@@ -277,6 +277,6 @@ infinite depending on data structure vs proof?
 
 48. > Reference tamerin somewhere
     Spot: Page 27
-    Edit: ``
+    Edit: `3810710b881b1cc25be2ee9ff9d297e6a2aa71c1`
 
 

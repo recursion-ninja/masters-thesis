@@ -15,7 +15,8 @@ Generally, modern protocols are constructed in too complex a manner for a theore
 When defining a protocol in terms compatible with modern theorem provers issues of termination checking, proof tactic selection, and SMT limitations greatly impede computer automated verification \autocite{hassan2021automated}.
 Human guidance is still required to direct theorem provers towards the verification goal.
 Some domain specific theroem provers, such as Tamarin \autocite{basin2017symbolically}, exist for cyrptography and communication protocols to reduce the required human effort.
-The specialized and time-consuming nature of human effort required when utilizing a theorem prover is the chief reason model checking has been generally favored, with the work presented here being no exception.
+The specialized and time-consuming nature of human effort required is a major consideration when deciding between utilizing a theorem prover and a model checker.
+Contrasted with theorem provers, model checkers are highly valued for the automation and reduced human effort they provide, with the work presented here being no exception.
 
 This work presents the verification of the TreeKEM protocol's \Abrev{FSU} and \Abrev{PCS} security guarantees.
 To verify these security guarantees, the \CGKAsec\ is used as an abstraction of the TreeKEM protocol, as well as all other \CGKAdef-conforming protocols.
