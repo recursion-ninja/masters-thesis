@@ -500,13 +500,16 @@ An additional predicate checking for model termination is included as a methodol
 \[
     \Diamond \texttt{CGKA@end\_of\_game}
 \]
+\begin{quotation}
+``Eventually the model reaches the end of the \CGKAsec security game''
+\end{quotation}\\
 \end{LTL}
 
 We consider the \Abrev{LTL} predicate \LTLPredicate{HLT}, which indicates that the \CGKAmod{P}{T}{N} model always terminates.
 To support this verification, a state label \texttt{end\_of\_game} has been included in the PROMELA model indicating the final state of the \CGKAsec. 
 The model has a single control process for the \CGKAsec\ named \texttt{CGKA}.
 An \Abrev{LTL} atom \texttt{CGKA@end\_of\_game} is true if an only if the process \texttt{CGKA} is at state \texttt{end\_of\_game}.
-With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \models \LTLPredicate{HLT} \) is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
+With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \models \LTLPredicate{HLT}\) is successful if and only if every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
 
 
 \hypertarget{sec:pcs-as-ltl}{%
@@ -516,6 +519,9 @@ With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \model
 \[
     \Box \Big(\, ( \texttt{CGKA@start\_of\_epoch} \land \texttt{unsafeIDs} = 0 ) \implies \neg \texttt{learnedKey[epoch]} \Big)
 \]
+\begin{quotation}
+``It is always the case that, when a new epoch begins and there are no users \(\mathtt{ID_{i}}\) corrupted via querying \Oracle{corr}{ID_{i}} which have not also suqsequently been involoved in a query to \Oracle{send-update}{ID_{i}} or \Oracle{remove-user}{ID_{*}}{ID_{i}}, then \(\mathcal{A}\) has not learned the shared secret key for the current epoch.''
+\end{quotation}\\
 \end{LTL}
 
 
@@ -526,20 +532,29 @@ With these syntactic definitions, the verification of \(\CGKAmod{P}{T}{N} \model
 \[
     \Box \left( \texttt{CGKA@move\_corrupt} \implies \texttt{hoarding[targetID]} = \texttt{NEVER} \right)
 \]
+\begin{quotation}
+``It is always the case that, when \(\mathcal{A}\) corrupts a \(\mathtt{ID_{i}}\) via querying \Oracle{corr}{ID_{i}}, then \(\mathtt{ID_{i}}\) has not been previously instructed to keep secret key material via querying \Oracle{no-del}{ID_{i}}.''
+\end{quotation}\\
 \end{LTL}
 
 
 \begin{LTL}[\;FSU-Epoch\,(\,\textnormal{\normalfont$t \in T$}\,)\;]
-    \begin{equation*}
-    \begin{split}
-    \Diamond ( & \texttt{CGKA@move\_start\_of\_epoch} \land \texttt{epoch} = t + 1 \land \neg \texttt{learnedKey[$t$]} ) \\
-    & \implies ( \neg \texttt{learnedKey[$t$]} ) \,\;{\mathcal {U}}\;\, \texttt{CGKA@end\_of\_game}
-    \end{split}
-    \end{equation*}
+\begin{equation*}
+\begin{split}
+    \Diamond ( & \texttt{CGKA@start\_of\_epoch} \land \texttt{epoch} = t + 1 \land \neg \texttt{learnedKey[$t$]} ) \\
+               & \implies ( \neg \texttt{learnedKey[$t$]} ) \,\;{\mathcal {U}}\;\, \texttt{CGKA@end\_of\_game}
+\end{split}
+\end{equation*}
+\begin{quotation}
+``Eventually it will be the case that, when a new epoch begins and \(\mathcal{A}\) does not know the secret key of the previous epoch, then \(\mathcal{A}\) will not the secret key of the previous epoch until the end of the \CGKAsec security game.''
+\end{quotation}\\
 \end{LTL}
 
 \begin{LTL}[\,\LTLPredicate{FSU}\,]
 \[
     \textbf{Never-Trivial} \implies \bigwedge\limits_{t=0}^{T-1} \;\,\textbf{FSU-Epoch}(t)
 \]
+\begin{quotation}
+``If \textbf{Never-Trivial} holds, then for all epochs \(t\), \(\mathcal{A}\) does learn the secret key of epoch \(t\).''
+\end{quotation}\\
 \end{LTL}

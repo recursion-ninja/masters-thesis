@@ -445,7 +445,7 @@ infinite depending on data structure vs proof?
 79. > Is this still true given what you found about Spins state space encoding?
     Spot: Page 45
     Note: Yes, using unsigned values is helpful and having explicit missing values are neccissary for comparisons
-    Edit: ``
+    Edit: `c53cdf0e2300d2047e7b1eb869c5efba38edd18a`
 
 
 
