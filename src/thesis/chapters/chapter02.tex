@@ -1,6 +1,9 @@
 \hypertarget{sec:methodology}{%
 \chapter{Verification Methodology}\label{sec:methodology}}
 
+\hypertarget{sec:methodology-overview}{%
+\section{Methodology Overview}\label{sec:methodology-overview}}
+
 Formal verification takes many forms, with many techniques and tools at our disposal, and choosing the correct verification tool is of utmost importance.
 In the past, \Abrev{BAN logic} \autocite{burrows1989logic} was the tool of choice for verifying cryptographic protocols.
 Unfortunately, protocol components verified by \Abrev{BAN logic} were later found to have undiscovered vunlerabilities \autocite{snekkenes1991exploring}.
@@ -56,8 +59,8 @@ Controlling memory usage to represent and traverse the search-space without grea
 For TreeKEM, the parameters \(T\) and \(N\) are supplied to the model.
 The model is then verified by exhaustively searching all possible protocol states over \(T\) epochs and with the total unique group members ranging from \(2\) to \(N\).
 Incrementing the \(T\) parameter while holding \(N\) constant, generally, increases the state-space by \(2\) orders of magnitude.
-However, incrementing the \(N\) parameter while holding \(T\) constant, only increases the state-space by \(\frac{1}{2}\) an orders of magnitude.
-Due to the constraints engineering constraints presented by explicit state model checking, the verification work presented will only consider the combinatorial collection of all models parameterized by \(T\) and \(N\), where \(T \in [1, \Tmax]\) and \(N \in [2, \Nmax]\).
+However, incrementing the \(N\) parameter while holding \(T\) constant, only increases the state-space by \(\frac{1}{2}\) an order of magnitude.
+As mentioned at the end of Section \ref{sec:methodology-overview}, due the engineering constraints presented by explicit state model checking, the verification work presented will only consider the combinatorial collection of all models parameterized by \(T\) and \(N\), where \(T \in [1, \Tmax]\) and \(N \in [2, \Nmax]\).
 
 
 \hypertarget{spin}{%

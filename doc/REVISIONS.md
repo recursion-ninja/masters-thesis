@@ -317,9 +317,14 @@ infinite depending on data structure vs proof?
     Edit: `8ee8a316b32480b07a29b47ac86845e1a3d1b997`
 
 
-56. > 
+56. > Not true, could also be artifact of abstraction
     Spot: Page 29
-    Note: 
+    Edit: `87b0efda7c8cc3908fda5a910ca0ce96810b5cd7`
+
+
+57. >  Is this saying anything different from end of previous subsection?
+    Spot: Page 29
+    Note: Not really, backreferenced
     Edit: ``
 
 
