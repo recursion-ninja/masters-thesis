@@ -301,7 +301,7 @@ infinite depending on data structure vs proof?
     Note: The precise magic is not apparent to me.
     Edit: None
 
-53. > doesnt parse
+53. > Doesnt parse
     Spot: Page 28
     Note: Sentance fragment got cut out at some point...
     Edit: `e9d284b8e9a9693cf73976e41cee990f574d61bb`
@@ -309,5 +309,10 @@ infinite depending on data structure vs proof?
 54. > Is the current App B table the updated version? If so, need more justification/discussion since you dont get to T=12
     Spot: Page 28
     Note: Moving to results section
+    Edit: `8a4e134f52cd391e07b103ac32cd308787b03536`
+
+55. > Not correct term, but not sure what you mean to say
+    Spot: Page 29
+    Note: I meant "constructive" in the mathematical sense as opposed to "exeistential," i.e. the verification failure produces an interpretable counter-example instead of just stateing that one exists
     Edit: ``
 
