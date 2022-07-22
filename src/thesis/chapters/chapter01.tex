@@ -30,7 +30,7 @@ Still, each of these forms of attack represents a communication protocol vulnera
 Given the vast and potentially unknown range of potential vulnerabilities, a protocol is designed with a threat model \autocite{salter1998toward} which contextualizes the capabilities of an adversary and consequently defines domain from which vulnerabilities must be considered.
 Subsequently, the protocol will be designed to satisfy one or more security guarantees \autocite{rfc3552} within the threat model, an assertion that no advarsary within the threat model has the capability to violate any of the protocol's safety guarantees.
 The presence or absence of  on secure communication protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption \autocite{clark1997survey}.
-Often vulnerabilities are discovered years, if not decades, after a protocol has been in active use \autocite{durumeric2014matter, shaik2015practical, cremers2017comprehensive, basin2018formal}.
+Often vulnerabilities are discovered years, if not decades, after a protocol has been in active use \autocite{CERVESATO2008402, durumeric2014matter, shaik2015practical, cremers2017comprehensive, basin2018formal}.
 Late discovery of these vulnerabilities after widespread adoption of the protocol requires rapid effort to fix the protocol and encourage all systems using the protocol to update to the revised version \autocite{ghafoor2014analysis}.
 Regretably, this updating process itself takes years of migration work \autocite{markowsky2015scanning} or the migration never occurs.
 This is especially problematic for embedded systems which cannot be easily recouperated and require extra consideration to be securely updated \autocite{yoon2017remote, maroof2022irecover}.
@@ -344,6 +344,7 @@ Using the six algorithms of \CGKAdef, the security guarantees in for TreeKEM are
 
 A security game, in the context of cryptography and information security, involves an adversary \(\mathcal{A}\) which is permitted to perform some actions to observe or interact with a communication protocol.
 The adversary \(\mathcal{A}\) ``wins'' the security game if they can acquire some information which is undesirable for the communicating parties.
+Such security games rely on the cryptography concept of indistinguishability in order to produce proofs of security as described in \autocite{Maurer2007}.
 Security games are designed with respect to a protocol, or class of protocols, and one or more security guarantees the protocol ought to preserve.
 The winning condition(s) for \(\mathcal{A}\) within the security game are defined, by design, to occur if and only if \(\mathcal{A}\) can cause a violation of one or more security guarantees.
 Often a security game includes one or more oracles.

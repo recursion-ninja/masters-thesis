@@ -3,20 +3,25 @@ Revisions
 
 ##  Dietrich
 
-1. The bibliography needs some editing, so please make some effort to fix this. There are way too many occurrences to list here, but I'll mention a few examples/types of what is off
+1.  > The bibliography needs some editing, so please make some effort to fix this. There are way too many occurrences to list here, but I'll mention a few examples/types of what is off
 
-    a) There are duplicate/incomplete entries
+    a)  > There are duplicate/incomplete entries
         Note: I located and removed duplicate entries. I also retreived more BibTex information to remedy incomplete entries.
-        Edit: ``
+        Edit: `3aeb27c31b64f55a64e2b9f9256e032a10d54904`
     
 
-    b) Conference and workshop papers should be properly cited
+    b)  > Conference and workshop papers should be properly cited
         Note: Added "in Proceedings of" prefix to confrence and workshop citations.
-        Edit: ``
+        Edit: `3aeb27c31b64f55a64e2b9f9256e032a10d54904`
 
-    c) Capitalization should be honored and set properly: pki->PKI, iot->IoT and similar.
+    c)  > Capitalization should be honored and set properly: pki->PKI, iot->IoT and similar.
         Note: Corrected formating issue which broke capitalization
-        Edit: ``
+        Edit: `3aeb27c31b64f55a64e2b9f9256e032a10d54904`
+
+
+2.  > New/introduced concepts should be cited/referenced at the beginning of the paragraph. For example, you introduce the idea of a 'Security Game' on page 19. Where does this terminology come from? There should be a citation right then and there. You then even spend an entire paragraph/section on Security Games without any such citations.
+    Edit: ``
+
     
 
 
