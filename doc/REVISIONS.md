@@ -1,6 +1,25 @@
 Revisions
 =========
 
+##  Dietrich
+
+1. The bibliography needs some editing, so please make some effort to fix this. There are way too many occurrences to list here, but I'll mention a few examples/types of what is off
+
+    a) There are duplicate/incomplete entries
+        Note: I located and removed duplicate entries. I also retreived more BibTex information to remedy incomplete entries.
+        Edit: ``
+    
+
+    b) Conference and workshop papers should be properly cited
+        Note: Added "in Proceedings of" prefix to confrence and workshop citations.
+        Edit: ``
+
+    c) Capitalization should be honored and set properly: pki->PKI, iot->IoT and similar.
+        Note: Corrected formating issue which broke capitalization
+        Edit: ``
+    
+
+
 ##  Shankar
 
 1.  > Some say that one should not use "novel" on themselves.
@@ -484,7 +503,17 @@ infinite depending on data structure vs proof?
 
 86. > [20] needs to be tagged differently.
     Spot: Page 75
-    Edit: ``
+    Edit: `472438e07f1dac78bd105610d058abe60074e2e0`
 
 
+86. > Tags aren't sorted here. Use different bibtex option (I actually thought it sorted on tags)?
+    Spot: Page 75
+    Edit: `021d7c8f2cedb18264111c62f7e0bdd8a75f9835`
+    Repo: `https://github.com/recursion-ninja/hunter-thesis-class`
+
+
+87. > Your reverse citations are not standard. Check if this is allowed.
+    Spot: Page 75
+    Edit: `421b42a0fd80ecac7c32d52c0c75474ec72e7e08`
+    Repo: `https://github.com/recursion-ninja/hunter-thesis-class`
 

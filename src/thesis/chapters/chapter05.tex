@@ -25,7 +25,7 @@ Still, with these restrictions in mind, the careful selection of compile-time di
 \hypertarget{sec:partial-order-reduction}{%
 \subsection{Partial Order Reduction}\label{sec:partial-order-reduction}}
 
-Partial-order reduction methods represent a well understood collection of state exploration techniques \autocite{godefroid1990using, godefroid1991using, godefroid1994partial, holzmann1995improvement, katz1992verification, peled1993all, valmari1989stubborn, valmari1992stubborn} whose combined usage can greatly reduce the model checking search-space.
+Partial-order reduction methods represent a well understood collection of state exploration techniques \autocite{godefroid1990using, godefroid1991using, godefroid1994partial, holzmann1995improvement, katz1992verification, peled1993all, valmari1989stubborn, valmari1991stubborn} whose combined usage can greatly reduce the model checking search-space.
 Such techniques are applicable for verifying local and termination of concurrent models.
 Furthermore, these techniques are equally applicable for verifying LTL properties, even reducing the state-space when verifying liveness and safety properties within concurrent models \autocite{wolper1983reasoning}.
 The specific partial order reduction technique of ``simultaneous reachability'' analysis \autocite{van1997partial} enables the verification of non-executable transitions, absence of deadlock, and buffer overflows.
@@ -221,7 +221,7 @@ Hence a successful \Abrev{FSU} verification for the original \VersionOne\ with p
 It has not been stated whether the example provided by \autocite{alwen2020security} does not state that this example is minimal.
 Locating the minimal \(T\), \(C\), and \(N\) values for which the vulnerability manifests in the \VersionOne version.
 In order to ensure at least one observation of the \Abrev{FSU} deficiency of the original \VersionOne, the bounds are set to \(12 = \Tmax\) and \(8 = \Nmax\).
-The observed verification results are tabulated in Appendix\ \ref{apx:Observations} and discussed in Chapter\ \ref{results}.
+The observed verification results are tabulated in Appendix\ \ref{apx:Observations}.
 
 By interpreting the observations collected in Appendix\ \ref{apx:Observations} one can discern whether the hypotheses enumerated in Table\ \ref{tab:verification-hypotheses} and described in Chapter\ \ref{sec:methodology} have been supported or falsified.
 Each hypothesis still be considered individually, noting the interpretive limitations imposed by the currently incomplete series of observations.
@@ -234,9 +234,9 @@ The simplest of the three \Abrev{LTL} predicates defined in Section\ \ref{sec:LT
 The verification of \LTLPredicate{HLT} is successful if and only if in every possible execution of the model \CGKAmod{}{}{}, the program reaches the state \texttt{CGKA@start\_of\_epoch}.
 While \LTLPredicate{HLT} is not truly a security property of \CGKAmod{}{}{}, it is used as a methodology confidence check.
 Failure to verify \LTLPredicate{HLT} would cast serious doubt that the model verification methodology is being performed correctly on more complex \Abrev{LTL} predicates.
-Verification results for \LTLPredicate{HLT} is displayed in Tables\ \ref{tab:V1-HLT} and\ \ref{tab:V2-HLT}.
+Verification results for \LTLPredicate{HLT} is displayed in Table\ \ref{tab:V1-HLT}.
 
-All observations in Tables\ \ref{tab:V1-HLT} and\ \ref{tab:V2-HLT} report a successful verification of \LTLPredicate{HLT}.
+All observations in Table\ \ref{tab:V1-HLT} report a successful verification of \LTLPredicate{HLT}.
 These observations support the notion \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) and none falsify it.
 From the observations obtained so far, one can conclude that the confidence check which has successfully verified \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) does not introduce any doubt regarding the verification methodology.
 
@@ -249,9 +249,6 @@ The hypotheses listed in Table\ \ref{tab:verification-hypotheses} show an expect
 With regards to the first protocol \VersionOne, all observations in Table\ \ref{tab:V1-PCS} report a either successful verification of \LTLPredicate{PCS} or an ``out of memory'' error (\OutOfMemory).
 With no observation falsify the hypothesis, these limited observations provide only support for the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
 Thought the hypothesis is supported by the current observations, gathering more observations of increasingly complex \CGKAmod{\VersionOne}{}{} parameterization should be gathered before making security conclusions.
-
-Unfortunately there are no current observations for protocol \VersionTwo\ shown in Table\ \ref{tab:V2-PCS} and consequently no support for, or falsification of the hypothesis.
-No security conclusions should be derived until the planned observation set can be completely gathered. 
 
 
 \hypertarget{sec:forward-secrecy-results}{%
@@ -268,6 +265,3 @@ However, the observations are not complete and most importantly, do not include 
 Without knowledge of where in the \CGKAmod{\VersionOne}{T}{N} model parameter space the \Abrev{FSU} security deficiency manifests, the observations do not provide any support for or falsification of the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
 A verification observation for \CGKAmod{\VersionOne}{12}{8} would provide additional context and permit a deduction regarding the models relationship towards the hypothesis.
 The current observations do not reveal any security conclusions.
-
-As with \Abrev{PCS}, there are also currently no \LTLPredicate{FSU} observations for protocol \VersionTwo\ shown in Table\ \ref{tab:V2-FSU} and consequently no support for, or falsification of the hypothesis.
-No security conclusions should be derived until the planned observation set can be completely gathered.

@@ -10,7 +10,7 @@ Unfortunately, protocol components verified by \Abrev{BAN logic} were later foun
 BAN was subsequently critiqued \autocite{boyd1993limitation} for not being able to fully verify crucial aspects of cryptographic protocols.
 Because of such concerns, results and conclusions from verification techniques using \Abrev{BAN logic} stating that no attacks exist can be a false-positive.
 The kind false-positive verification of security that \Abrev{BAN logic} provided could cause the very lapses in post-adoption security that the verification had attempted to preempt.
-\Abrev{BAN logic} has since fallen out of favor and instead been replaced by model checking techniques \autocite{holzmann1991design} and theorem proving \autocite{andrews1980axiomatic}, which have been able to produce attacks on cryptographic protocols which BAN techniques incorrectly verified as secure.
+\Abrev{BAN logic} has since fallen out of favor and instead been replaced by model checking techniques \autocite{holzmann1990design} and theorem proving \autocite{andrews1980axiomatic}, which have been able to produce attacks on cryptographic protocols which BAN techniques incorrectly verified as secure.
 
 Theorem proving, when possible, is the preferred method of cryptographic protocol verification \autocite{kobeissi2020verifpal}.
 Simple communication protocols have had success with verificiation via formal description and theroem prover \autocite{berry1987towards, cheng1990formal}.
@@ -83,7 +83,7 @@ Because of these (and many more) techniques, SPIN allows efficiently working wit
 \hypertarget{sec:promela}{%
 \section{Promela}\label{sec:promela}}
 
-With SPIN selected as the model checker, the obvious modeling language in which to encode the TreeKEM protocol is the Protocol Meta Language (PROMELA) \autocite{holzmann1980basic, holzmann1990design}.
+With SPIN selected as the model checker, the obvious modeling language in which to encode the TreeKEM protocol is the Protocol Meta Language (PROMELA) \autocite{HolzmannSpinBook2003, holzmann1990design}.
 The key language feature of PROMELA which makes it so conducive to explicit state model checking is that *all* branching -- conditional executaion, looping, and randomness -- are evaluated nondeterministically.
 Heance, PROMELA is used to produce all possible states and transitions of TreeKEM, we must supply that representation to a model checker.
 It exists as a precise and convenient specification for defining all possible states and transitions for TreeKEM.\@

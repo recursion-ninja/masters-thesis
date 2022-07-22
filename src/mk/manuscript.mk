@@ -31,10 +31,6 @@ extension-markdown    ?= md
 extension-portabledoc ?= pdf
 extension-postscript  ?= ps
 dir-thesis-source     ?= ./
-dir-thesis-auxiliary  ?= $(dir-thesis-source)auxiliary/
-dir-thesis-chapters   ?= $(dir-thesis-source)chapters/
-dir-thesis-figures    ?= $(dir-thesis-source)figures/
-dir-thesis-tables     ?= $(dir-thesis-source)tables/
 dir-thesis-manuscript ?= ./
 
 #######
@@ -42,6 +38,12 @@ dir-thesis-manuscript ?= ./
 #   Custom function definitions for MANUSCRIPT
 ###
 #######
+
+# Paths
+dir-thesis-auxiliary  ?= $(dir-thesis-source)auxiliary/
+dir-thesis-chapters   ?= $(dir-thesis-source)chapters/
+dir-thesis-figures    ?= $(dir-thesis-source)figures/
+dir-thesis-tables     ?= $(dir-thesis-source)tables/
 
 define markdown
 $(addprefix $(dir-thesis-chapters),$(addsuffix .$(extension-markdown),$(1)))
@@ -158,7 +160,7 @@ manuscript-target := \
     $(abspath $(dir-thesis-manuscript)$(manuscript-name).$(extension-portabledoc))
 
 artifact-extension :=\
-    $(sort aux bbl bcf blg dvi fdb_latexmk fls lof log lot out ps run.xml synctex\(busy\) thm toc)
+    $(sort aux bbl bcf blg dvi fdb_latexmk fls lof log lot out ps run.xml synctex.gz synctex\(busy\) thm toc xml)
 artifact-directory :=\
     $(sort $(dir-thesis-source) $(dir-thesis-auxiliary) $(dir-thesis-chapters) $(dir-thesis-figures) $(dir-thesis-tables))
 artifact-filepaths :=\
@@ -218,11 +220,10 @@ $(thesis-class-path):
 
 ## Build thesis
 $(manuscript-target): $(thesis-template)  $(thesis-chapters) $(thesis-class-path) $(thesis-bib-path) $(thesis-class-path) $(thesis-preamble) $(list-figures) $(list-tables)
-	( latexmk \
-	    -cd \
+	( cd $(dir $<); \
+	    latexmk \
 	    -pdf \
-	    -pdflatex="pdflatex -interaction=nonstopmode" \
-	    -use-make $<; \
+	    $<; \
 	  mv $(subst $(extension-latex),$(extension-portabledoc),$<) $@; \
 	)
 
