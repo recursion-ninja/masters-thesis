@@ -363,10 +363,10 @@ The \CGKAsec\ defines the following oracles:
 \begin{itemize}
 
 \item \Oracle{init}{}
-Begins the \CGKAsec\ security game, initializing game and protocol state. Must be queried first.
+Begins the \CGKAsec, initializing game and protocol state. Must be queried first.
 
 \item \Oracle{create-group}{ID_0,\, ID_1,\, \dots,\, ID_n}
-Creates an initial communication group to start the \CGKAsec\ game. Must be queried second.
+Creates an initial communication group to start the \CGKAsec. Must be queried second.
 
 \item \Oracle{add-user}{ID,\, ID^{'}}
 \(mathcal{A}\) forces \(mathtt{ID}\) to initiate adding \(mathtt{ID}^{'}\) to the communication group.
@@ -390,7 +390,7 @@ Creates an initial communication group to start the \CGKAsec\ game. Must be quer
 \(mathcal{A}\) learns the current shared key \(i in I\) of the communication group.
 
 \item \Oracle{chall}{t}
-\(mathcal{A}\) ends the \CGKAsec\ security game. Must be queried last.
+\(mathcal{A}\) ends the \CGKAsec\ . Must be queried last.
 
 \end{itemize}
 

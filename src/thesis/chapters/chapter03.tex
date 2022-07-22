@@ -23,14 +23,14 @@ For a given LTL predicate $\varphi$ we define \CGKAmod{P}{T}{N} as follows:
 \]
 
 
-Recall from Section \ref{sec:security-games} that group members can only call the six \CGKAdef\ algorithms, while the adversary can only query the ten oracles of the \CGKAsec\ security game.
-The informal description of the \CGKAsec\ security game defined by \autocite{alwen2020security} places very few constraints on the queries an adversary can make.
+Recall from Section \ref{sec:security-games} that group members can only call the six \CGKAdef\ algorithms, while the adversary can only query the ten oracles of the \CGKAsec.
+The informal description of the \CGKAsec\ defined by \autocite{alwen2020security} places very few constraints on the queries an adversary can make.
 These constraints are only related to the \(C\) parameter, limiting the total number of queries to \Oracle{reveal}{} and \Oracle{chall}{} to be less than or equal to \(C\).
 Furthermore, the adversary is limited to making at most \emph{one} query to either \Oracle{reveal}{} or \Oracle{chall}{} per epoch.
 Besides these constraints, the adversary is free to query \CGKAsec\ oracles and group members are free to call \CGKAdef\ algorithms concurrently.
-Figure \ref{fig:CGKA-informal} depicts the complexities of this unconstrained, informal \CGKAsec\ security game, notably that the description yeilds a massively concurrent game, without a bounded win condition.
+Figure \ref{fig:CGKA-informal} depicts the complexities of this unconstrained, informal \CGKAsec, notably that the description yeilds a massively concurrent game, without a bounded win condition.
 This is not always problematic for explicit state model checking, but regrettably it is with regards to \CGKAsec.
-In order to reduce the complexity of the \CGKAsec\ security game, and efficiently produce an encoded model, formalization and subsequent abstraction of the \CGKAsec\ security game is required.
+In order to reduce the complexity of the \CGKAsec, and efficiently produce an encoded model, formalization and subsequent abstraction of the \CGKAsec\ is required.
 
 \begin{figure}[ht!]
 \centering

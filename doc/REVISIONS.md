@@ -448,4 +448,14 @@ infinite depending on data structure vs proof?
     Edit: `c53cdf0e2300d2047e7b1eb869c5efba38edd18a`
 
 
+80. > State each LTL wff as one English phrase/sentence too
+    Spot: Page 55
+    Edit: `265ad31d99fa7ff980a81063b0ea655223020c2b`
+
+
+81. > What does validity checks have to do with partial order reduction?
+    Spot: Page 57
+    Edit: ``
+
+
 

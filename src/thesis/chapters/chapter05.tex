@@ -34,7 +34,7 @@ SPIN intelligently selects applicable partial order reduction techniques for the
 The verification work presented permitted the usage all the partial order reduction technique made available by SPIN.\@
 No comparative verification(s) were made to observe the run-time difference between explicitly forbidding partial order reduction and permitting the ``enabled by default'' techniques available to SPIN.\@
 
-The verification work refrained from from both disabling partial order reduction via the \texttt{NOREDUCE} directive as well as experiment with potential performance gains or regressions introduced by the \texttt{NIBIS} directive.
+The verification work refrained from from both disabling partial order reduction via the \texttt{NOREDUCE} directive as well as experimenting with potential performance gains or regressions introduced by the \texttt{NIBIS} directive.
 Instead this work made use of a single partial order reduction directive:
 
 \begin{itemize}
@@ -43,6 +43,7 @@ Instead this work made use of a single partial order reduction directive:
 
 The \texttt{XUSAFE} directive disables validity checks of the strictly synchronizing message passing queues.
 The encoded model of TreeKEM does not utilize these queues, hence any check related to them would be superfluous.
+Strict validity checks effects concurrency within the model, which in turn effects opportunities for partial order reduction.
 No noticeable performance gains were observed by utilizing the \texttt{XUSAFE}, but it's usage was retained regardless.
 
 
@@ -150,9 +151,9 @@ This time-memory trade-off is necessary to make verification of higher \Tmax\ an
 
 The \texttt{MA} directive is used to specify the maximum number of bytes \(X\) that a state vector can require.
 Spin internally stores several sets of model states.
-Using the information regarding the upper bound \(X\) for state-vector bytes, the \texttt{MA} directive enables a method of storing a set of states is a binary decision tree (BDD) \autocite{holzmann1999minimized}.
-To determine if the state is in the set, Spin treated the state vector as a bit-sting and feeds it to the BDD, with BDD accepting the string treating the state is in the set, the BDD rejecting the string representing state is not being in the set.
-Further steps are taken to reduce the BDD into a minimal DFA representation of a 256-ary decision tree.
+Using the information regarding the upper bound \(X\) for state-vector bytes, the \texttt{MA} directive enables a method of storing a set of states is a \Abrev{BDD} \autocite{holzmann1999minimized}.
+To determine if the state is in the set, Spin treated the state vector as a bit-sting and feeds it to the \Abrev{BDD}, with \Abrev{BDD} accepting the string treating the state is in the set, the \Abrev{BDD} rejecting the string representing state is not being in the set.
+Further steps are taken to reduce the \Abrev{BDD} into a minimal DFA representation of a 256-ary decision tree.
 Insertion, deletion, and membership queries take linear time in the length of the state-vector.
 The translation alone between DFA representation represents a stark time/memory trade-off, as linear time set membership is a stark difference between Spin's default hash-set storage method, resulting in reducing memory requirements while increasing verification run-time.
 
