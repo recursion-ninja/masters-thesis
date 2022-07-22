@@ -34,3 +34,21 @@ Legend of symbols appearing in tables.
 \ObservationTable{1}{\VersionOne}{HLT}
 \ObservationTable{1}{\VersionOne}{PCS}
 \ObservationTable{1}{\VersionOne}{FSU}
+
+\begin{table}[ht!]
+\centering
+\caption[State vector byte length for each model]{%
+\label{tab:state-vector-len}%
+State vector byte length for each model parameterization of \CGKAmod{\VersionOne}{}{}.
+}%
+\subimport{../tables/}{lengths-V1-state-vector-PRELIM}
+\end{table}
+
+\begin{table}[ht!]                                                                        
+\centering
+\caption[Run-time predictions for \CGKAmod{\VersionOne}{T}{N}]{%
+\label{tab:predicted-run-times}%
+Run-time (wall clock) predictions for \CGKAmod{\VersionOne}{T}{N} using $T \in [4, 7]$ as predictors for $T \in [8, 12]$.
+}%
+\subimport{../tables/}{runtime-prediction-V1}
+\end{table}

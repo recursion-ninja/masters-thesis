@@ -166,85 +166,18 @@ Such comparisons can only soundly be compared with other verification runs withi
 In the tables presented below, the presence of a checkmark (\cmark) in the column labeled $\MinimizedDFA$ indicates that the associated parameterized model and results were run with this time/memory trade-off strategy enabled.
 Table\ \ref{tab:state-vector-len} displays the state vector's byte length for each \CGKAmod{\VersionOne}{}{} parameterized model under verification.
 
-\begin{table}[ht!]
-\caption[State vector byte length for each model]{%
-\label{tab:state-vector-len}%
-State vector byte length for each model parameterization of \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{}.
-}%
-\hfill
-\begin{minipage}{0.45\textwidth}
-  \centering
-  \subimport{../tables/}{lengths-V1-state-vector-PRELIM}
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-  \centering
-  \subimport{../tables/}{lengths-V2-state-vector-PRELIM}
-\end{minipage}
-\hfill
-\end{table}
 
-\hypertarget{sec:scalability-limits}{%
-\subsection{Scalability Limits}\label{sec:scalability-limits}}
+\hypertarget{sec:verification-observations}{%
+\section{Verification Observations}\label{sec:verification-observations}}
 
-The state-vector lengths detailed in Table\ \ref{tab:state-vector-len} and columns observing verification performance within Appendix\ \ref{apx:Observations} provide an initial basis for interpreting the scalability of the \CGKAmod{P}{T}{N} model.
-The records of all these tables are currently incomplete, missing entries for protocol \VersionOne\ with larger \(T\) and \(N\) parameters, and missing protocol \VersionTwo\ entirely.
-Still some scaling information can be gleaned.
-
-It is easy to notice that a progression from \( (\,T,\, N\,) \) to \( (\,T+1,\, N\,) \) is more significant in memory usage than a progression from \( (\,T,\, N\,) \) to \( (\,T,\, N+4\,) \).
-The large jump in state-space and transition count between modeling successive epochs provides a secondary metric demonstrating this characteristic.
-Hence the number of epoch the model is verified for drives the memory usage.
-This intuitively makes sense, as each new epoch multiplicatively expands the diameter of the state-space.
-
-Interestingly, the verification run-time for \LTLPredicate{HLT} and \LTLPredicate{FSU} does not appear strongly correlated with the \(T\) and \(N\) parameters.
-The author does not have a definitive explanation for this behavior.
-One postulate is that the group membership size limited to at most \(N\) has a strange combinatorial relationship with the distribution of membership states in TreeKEM's left balanced binary tree of secret keys.
-Since the attacker knowledge base and group membership alterations depend on the tree topologies permitted by the parameter \(N\), this may create a ``far-from-uniform'' distribution of state-spaces for different \(N\) values.
-
-\begin{figure}[ht!]
-\centering
-\caption[Runtime projections for \CGKAmod{\VersionOne}{T}{N}]{%
-\label{fig:runtime-projections}%
-Run-time (wall clock) projections for \CGKAmod{\VersionOne}{T}{N} using $T \in [4, 7]$ run-time observations as predictors for $T \in [8, 12]$ run-time.
-}%
-\includegraphics[width=0.8\textwidth]{./figures/fsu-pcs-runtime-combined-preidcted.png}
-\end{figure}
-
-\begin{table}[ht!]                                                                                                                      
-\caption[Run-time predictions for \CGKAmod{\VersionOne}{T}{N}]{%
-\label{tab:predicted-run-times}%
-Run-time (wall clock) predictions for \CGKAmod{\VersionOne}{T}{N} using $T \in [4, 7]$ as predictors for $T \in [8, 12]$.
-}%
-\subimport{../tables/}{runtime-prediction-V1}
-\end{table}
-
-
-
-
-\hypertarget{sec:hypothesis-outcomes}{%
-\section{Hypothesis Testing}\label{sec:hypothesis-outcomes}}
-
-\begin{table}[ht!]                                                                                                                      
-\caption{%
-\label{tab:verification-hypotheses}%
-Verification Hypotheses of \CGKAmod{P}{}{}.
-}%
-\subimport{../tables/}{verification-hypotheses}
-\end{table}
-
-The verification hypotheses are depicted in Table\ \ref{tab:verification-hypotheses}.
-Any outcome which falsifies a hypothesis is an interesting result.
-If a counter-example is produced violating \Abrev{PCS} for either version of the protocol, then a previously unknown security defect for TreeKEM has been discovered.
-If a counter-example is produced violating \Abrev{FSU} for the revised \VersionTwo, this also discovers a security defect.
-The original \VersionOne\ has been shown to have a \Abrev{FSU} deficiency for a \((12, 12, 8)\)-attacker \(\mathcal{A}\) \autocite{alwen2020security}.
-Hence a successful \Abrev{FSU} verification for the original \VersionOne\ with parameters corresponding to \(\mathcal{A}\) indicates either an error in the vulnerability provided by \autocite{alwen2020security} or, more likely, an error the TreeKEM model encoding.
-It has not been stated whether the example provided by \autocite{alwen2020security} does not state that this example is minimal.
-Locating the minimal \(T\), \(C\), and \(N\) values for which the vulnerability manifests in the \VersionOne version.
-In order to ensure at least one observation of the \Abrev{FSU} deficiency of the original \VersionOne, the bounds are set to \(12 = \Tmax\) and \(8 = \Nmax\).
-The observed verification results are tabulated in Appendix\ \ref{apx:Observations}.
-
-By interpreting the observations collected in Appendix\ \ref{apx:Observations} one can discern whether the hypotheses enumerated in Table\ \ref{tab:verification-hypotheses} and described in Chapter\ \ref{sec:methodology} have been supported or falsified.
-Each hypothesis still be considered individually, noting the interpretive limitations imposed by the currently incomplete series of observations.
-
+The model \CGKAmod{\VersionOne}{T}{N} was verified with as many possible parameters as time permitted.
+The parameter space is listed in  Table \ref{tab:model-param-domain}.
+Verification runs were perfromed on the American Museum of Natural History's Scientific Computing cluster.
+The cluster job queue utilized, provides 1 TiB RAM and \(64\) AMD Opteron Processor 6380 core operating at 2500MHz.
+Each verification run utilized 12 cores and up to 128 MiB of RAM.
+Typically between five and six verification runs were performed concurrently by the culster.
+The observations of each \CGKAmod{\VersionOne}{T}{N} verification are depicted in Tables \ref{tab:V1-HLT}, \ref{tab:V1-FSU}, and \ref{tab:V1-PCS}.
+Note that all run-times are ``wall clock'' time not ``CPU time.''
 
 \hypertarget{sec:confidence-check}{%
 \subsection{Confidence Check}\label{sec:confidence-check}}
@@ -254,33 +187,54 @@ The verification of \LTLPredicate{HLT} is successful if and only if in every pos
 While \LTLPredicate{HLT} is not truly a security property of \CGKAmod{}{}{}, it is used as a methodology confidence check.
 Failure to verify \LTLPredicate{HLT} would cast serious doubt that the model verification methodology is being performed correctly on more complex \Abrev{LTL} predicates.
 Verification results for \LTLPredicate{HLT} is displayed in Table\ \ref{tab:V1-HLT}.
-
 All observations in Table\ \ref{tab:V1-HLT} report a successful verification of \LTLPredicate{HLT}.
-These observations support the notion \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) and none falsify it.
 From the observations obtained so far, one can conclude that the confidence check which has successfully verified \( \CGKAmod{}{}{} \models \LTLPredicate{HLT} \) does not introduce any doubt regarding the verification methodology.
 
 
 \hypertarget{sec:post-compromise-security-results}{%
-\subsection{Post Compromise Security}\label{sec:post-compromise-security-results}}
+\subsection{Security Guarantees}\label{sec:post-compromise-security-results}}
 
-The hypotheses listed in Table\ \ref{tab:verification-hypotheses} show an expectation that \Abrev{PCS} should be verifiable for both \VersionOne\ and \VersionTwo\ protocols.
+The verification run observations for \LTLPredicate{FSU} are listed in Table\ \ref{tab:V1-FSU} and the verification run observations for \LTLPredicate{PCS} are listed in Table\ \ref{tab:V1-PCS}.
+All observations in both Table\ \ref{tab:V1-FSU} and Table\ \ref{tab:V1-PCS} report a either successful verification of corresponding security guarantee or an ``out of memory'' error (\OutOfMemory).
+These results are expected and consisten with prior literature regarding TreeKEM.
+However, the confidence drawn from these verification results is limited by the size of the observation set.
+Unserstanding the possibility of expanding the observation set is of great interest.
 
-With regards to the first protocol \VersionOne, all observations in Table\ \ref{tab:V1-PCS} report a either successful verification of \LTLPredicate{PCS} or an ``out of memory'' error (\OutOfMemory).
-With no observation falsify the hypothesis, these limited observations provide only support for the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
-Thought the hypothesis is supported by the current observations, gathering more observations of increasingly complex \CGKAmod{\VersionOne}{}{} parameterization should be gathered before making security conclusions.
+
+\hypertarget{sec:scalability-limits}{%
+\section{Scalability Limits}\label{sec:scalability-limits}}
+
+The state-vector lengths detailed in Table\ \ref{tab:state-vector-len} and columns observing verification performance within Appendix\ \ref{apx:Observations} provide an initial basis for interpreting the scalability of the \CGKAmod{P}{T}{N} model.
+Considering the state-vector lengths alone, without considering the observed bemory usage, a stark increase can be seen.
+It is easy to notice that a progression from \( (\,T,\, N\,) \) to \( (\,T+1,\, N\,) \) is more significant in memory usage than a progression from \( (\,T,\, N\,) \) to \( (\,T,\, N+4\,) \).
+The large jump in state-space and transition count between modeling successive epochs provides a secondary metric demonstrating this characteristic.
+Hence the number of epoch the model is verified for drives the memory usage.
+This intuitively makes sense, as each new epoch multiplicatively expands the diameter of the state-space.
+
+While referencing Table\ \ref{tab:state-vector-len} and holding \(N = 8\) as a constant with \(T\) incresing, one can see that each incrementation of \(T\) required roughly an additional \(16\) bytes in state-vector length.
+The increase in state-vector length by \(16\) bytes, or \(128\) bits, equates to potenital increase of the states-space by \(2^{128}\)!
+With absolute certainty, the verification problem increases exponentially.
+Though much engineering effort has been taken to simplify the model encoding and adequately tune the performance via Spin directives, an exponential problem can only yield a small amount of tractablility.
+
+For each model, generally speaking, \(T = 7\) was the maximum value with resulted in a complete set of observations for all \(n \in [4, 8]\).
+It is immeidately clear from the set of boservations that both memory usage and verification run-time scales exponentially with increasing \(T\) and \(N\) parameters.
+The runtime observations for \(T \in [4, 7]\) were used as predictors to extrapolate an estimated for run-time for \(T \in [8, 12]\).
+The projected run-times are depicted in Figure \ref{fig:runtime-projections} and tabulated in Table \ref{tab:predicted-run-times}.
+
+\begin{figure}[ht!]
+\centering
+\caption[Runtime projections for \CGKAmod{\VersionOne}{T}{N}]{%
+\label{fig:runtime-projections}%
+Run-time (wall clock) projections for \CGKAmod{\VersionOne}{T}{N} using $T \in [4, 7]$ run-time observations as predictors for $T \in [8, 12]$ run-time.
+}%
+\includegraphics[width=\textwidth]{./figures/fsu-pcs-runtime-combined-preidcted.png}
+\end{figure}
+
+To estimate the required run-time to complete the observation set for the parameter space \(\forall T \in [8, 12], N \in [4, 8], P \in \{ \LTLPredicate{FSU}, \LTLPredicate{PCS} \}\), one onely needs to take the summation of the run-time estimates listed in Table \ref{tab:predicted-run-times}.
+The summation ammounts to an estimated \(1639073974176\) seconds of run-time.
+Given the extremely optimistic case that six verifications can run concurrently and that the totaled verification run-time is perfectly divisible, one can divide the estimated seconds by six before concluding the estimated number of days required.
+The divided summation yeilds an estimated \(273178995696\) seconds of run-time.
+Unfortunately, \(273178995696\) seconds is equivalent to roughly \(8657\) Gregorian years.
+In order to complete the observation set, further engineering improvements are required.
 
 
-\hypertarget{sec:forward-secrecy-results}{%
-\subsection{Forward Secrecy with Updates}\label{sec:forward-secrecy-results}}
-
-As indicated in Table\ \ref{tab:verification-hypotheses}, the first protocol \VersionOne\ is known to have a \Abrev{FSU} security deficiency, so the hypothesis is that verification of \LTLPredicate{FSU} should fail for \emph{at least} \CGKAmod{\VersionOne}{12}{8}.
-While prior work \autocite{alwen2020security} indicates \( \CGKAmod{\VersionOne}{12}{8} \not \models \LTLPredicate{FSU} \), it is possible that a simpler model with lower \(T\) and/or \(N\) parameters may exist which also demonstrates the \Abrev{FSU} security deficiency.
-Similarly, there may be many \CGKAmod{\VersionOne}{T}{N} models with simpler \(T\) and \(N\) parameters which verify \LTLPredicate{FSU}.
-The aforementioned single \Abrev{FSU} security deficiency example point does not delineate a boundary at which \((T, C, N)\)-attacker does not demonstrate advantage but a \((T+1, C, N)\)-attacker or a \((T, C, N+1)\)-attacker is able to demonstrate advantage for the original protocol \VersionOne.
-Verification observations related to \LTLPredicate{FSU} ought to be the most intriguing.
-
-Table\ \ref{tab:V1-FSU} reports only successful verification of \LTLPredicate{FSU}.
-However, the observations are not complete and most importantly, do not include \CGKAmod{\VersionOne}{12}{8}.
-Without knowledge of where in the \CGKAmod{\VersionOne}{T}{N} model parameter space the \Abrev{FSU} security deficiency manifests, the observations do not provide any support for or falsification of the hypothesis \( \CGKAmod{\VersionOne}{}{} \models \LTLPredicate{PCS} \).
-A verification observation for \CGKAmod{\VersionOne}{12}{8} would provide additional context and permit a deduction regarding the models relationship towards the hypothesis.
-The current observations do not reveal any security conclusions.

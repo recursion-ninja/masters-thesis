@@ -39,7 +39,7 @@ For these reasons, it is of paramount importance to identify all possible vulner
 The topic of this thesis is the formal verification of the TreeKEM protocol (see Section \ref{sec:treekem-protocol}) and the security properties described by Message Layer Security (see Section \ref{sec:message-layer-security}).
 Specifically, the Forward Secrecy with Updates (see Section \ref{sec:forward-secrecy-with-updates}) and Post-compromise Security (see Section \ref{sec:post-compromise-security}) security properties are scrutinized under verification.
 Relevant topics, concepts, and definitions are introduced, providing the requisite context for grappling with formal verification of a multi-party communication protocol.
-The desirable operations and security of TreeKEM, with the threat model and security guarantees are detailed.
+This includes desirable operations and security of TreeKEM, with the threat model and security guarantees are detailed.
 The verification methodology of explicit state model checking is laid out for verifying the TreeKEM protocol (see Section \ref{sec:explicit-state-model-checking}).
 Notably, all verifications performed assume the correctness of cryptographic primitives.
 
@@ -50,6 +50,7 @@ An initial model parameter is capable of being removed with a simple abstraction
 Similarly, applying the concept of idempotency provides an additional abstraction which necessarily causes the model to progress towards the end state (see Section \ref{sec:idempotence}).
 Finally, the nondeterministic computation allows, without loss of generally, group members to be removed from the model as process agents, dramatically reducing the model's state-space (see Section \ref{sec:elided-group-members}).
 Applying these three abstractions in conjunction simplifies the complexity of the model by orders of magnitude, permitting verification for small model parameters.
+The resulting model encoding of TreeKEM is capable of verifying Forward Secrecy with Updates and Post-compromise Security for any supplied parameters, with availability of memory and run-time being the only verification constraints.
 
 The thesis culminates in presenting the verification results of the constructed model and comparing the verification results with prior work related to TreeKEM security.
 Furthermore, a presentation of the model's scalability is illustrated and discussed (see Section \ref{sec:scalability-limits}).
@@ -507,16 +508,9 @@ The parameterizable model \CGKAmod{}{}{} produced during and described within th
 To produce \CGKAmod{P}{}{}, the interface methods must be instantiated for \(P\) as well an encapsulated representation of the adversary knowledge which is maintained via the interface.
 After performing these two verification efforts, if a predicate \(\varphi\) is verified for \CGKAmod{P}{}{}, then the predicate \(\varphi\) holds for \(P\).
 
-Even operating without a formal model, the \Abrev{CGKA} abstraction is a powerful tool.
-Accompanying the description of \Abrev{CGKA}, \CGKAdef, and the \CGKAsec\ the authors also include an application of mathematically analyzing TreeKEM with the \CGKAsec.
-The result of the analysis was a constructive counter-example demonstrating that TreeKEM, as originally defined, is \emph{not} \Abrev{FS}.
-Following the revelation of TreeKEM's deficiency the same authors present a new definition of TreeKEM, substituting the use of a standard PKE cryptographic primitive with UPKE, which remedies the defect and regains the \Abrev{FSU} security guarantee for TreeKEM.\@
-
-The proceeding work will perform verification of the two versions of TreeKEM.\@
 All results presented by this work assume that the TreeKEM algorithms' implementations are correct.
-Verification of TreeKEM will consider both the original definition of TreeKEM as well as the remedied version of TreeKEM, denoted by \VersionOne\ and \VersionTwo; respectively.
-Using the notation introduced above, the \Abrev{CGKA} abstraction for TreeKEM produces the \CGKAmod{\VersionOne}{}{} and \CGKAmod{\VersionTwo}{}{} models, which will both be verified.
-Verifying the correctness of the \Abrev{CGKA} algorithm implementations for each TreeKEM version is beyond the scope of this work.
+Using the notation introduced above, the \Abrev{CGKA} abstraction for TreeKEM produces the \CGKAmod{\VersionOne}{}{} model which will be verified.
+Verifying the correctness of the \Abrev{CGKA} algorithm implementations TreeKEM is beyond the scope of this work.
 Rather, it is assumed that a given an implementation of the specified TreeKEM version \(\mathtt{P}\) provides defect-free algorithms.
 If the defect-free algorithm assumption holds, then a verification of the \Abrev{FSU} or \Abrev{PCS} security guarantee for \CGKAmod{P}{}{} also verifies the security guarantee for corresponding TreeKEM version implementation.
 Verification results are discussed later in Section \ref{sec:hypothesis-outcomes}.

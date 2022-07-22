@@ -2,10 +2,12 @@
 \chapter{Conclusion}\label{sec:conclusion}}
 
 The main contribution of this work is the formalization of the \CGKAsec\ as well as presenting an accompanying parametric and protocol-polymorphic \CGKAmod{P}{}{} model.
-This \CGKAmod{}{}{} model incorporates a variety of sound reductions from the informal \CGKAsec\ definition, leading to dramatically simplifies model encoding.
-Furthermore, performance tuning of the model along with performance observations are documented in detail.
-Regrettably, the number of verification observations is insufficient to confidently declare support of, or falsification of any stated security hypotheses.
-
+At the time of writing, there are no other known formalizations or explicit modeling of the TreeKEM protocol, making this work an important step in the formal verification of TreeKEM.
+The resulting \CGKAmod{}{}{} model incorporates a variety of sound reductions from the informal \CGKAsec\ definition, leading to dramatically simplifies model encoding.
+The presented \CGKAmod{}{}{} model is capable of verifying TreeKEM for any parameters provided, limited only by the available hardware.
+Performance tuning of the model along with performance observations are documented in detail.
+Furthermore, scalability is scrutinized by estimating the run-time of increasingly large \(T\) and \(N\) parameters for the \CGKAmod{}{}{} model.
+Regrettably, without further improvements to the model encoding, there is very little space for increasing the \(T\) and \(N\) parameter values.
 
 \hypertarget{sec:future-work}{%
 \section{Future Work}\label{sec:future-work}}
@@ -14,11 +16,42 @@ Publication of this thesis is far from the terminus of the work herein
 Continued research building upon the contents of this thesis are numerous.
 
 
-\hypertarget{sec:more-observations}{%
-\subsection{Extending the Observation Set}\label{sec:more-observations}}
+\hypertarget{sec:hypothesis-outcomes}{%
+\section{Hypothesis Testing}\label{sec:hypothesis-outcomes}}
 
-The most obvious avenue of future work is to continue verifying different parameterization of \CGKAmod{P}{T}{N} models in order to increase the tabulated observations.
-Most importantly is the observation of the model \CGKAmod{\VersionOne}{12}{8}, as this will determine the verification methodology's relationship with prior work and known security issues.
+Accompanying the description of \Abrev{CGKA}, \CGKAdef, and the \CGKAsec\ the authors also include an application of mathematically analyzing TreeKEM with the \CGKAsec.
+The result of the analysis was a constructive counter-example demonstrating that TreeKEM, as originally defined, is \emph{not} \Abrev{FS}.
+Following the revelation of TreeKEM's deficiency the same authors present a new definition of TreeKEM, substituting the use of a standard PKE cryptographic primitive with UPKE, which remedies the defect and regains the \Abrev{FSU} security guarantee for TreeKEM.\@
+
+Future work will explore verification of the both versions of TreeKEM.\@
+Verification of TreeKEM will consider both the original definition of TreeKEM as well as the remedied version of TreeKEM, denoted by \VersionOne\ and \VersionTwo; respectively.
+With the knowledge of \VersionOne posessing a \Abrev{FS} deficiency, this informs our expectation of the verification results.
+These expectations can form a series of verification hypotheses which are depicted in Table\ \ref{tab:verification-hypotheses}.
+
+\begin{table}[ht!]                                                                                                                      
+\caption{%
+\label{tab:verification-hypotheses}%
+Verification Hypotheses of \CGKAmod{P}{}{}.
+}%
+\subimport{../tables/}{verification-hypotheses}
+\end{table}
+
+With these verification hypotheses in mind, any verification outcome which falsifies a hypothesis is an interesting result.
+If a counter-example is produced violating \Abrev{PCS} for either version of the protocol, then a previously unknown security defect for TreeKEM has been discovered.
+If a counter-example is produced violating \Abrev{FSU} for the revised \VersionTwo, this also discovers a security defect.
+
+The original \VersionOne\ has been shown to have a \Abrev{FSU} deficiency for a \((12, 12, 8)\)-attacker \(\mathcal{A}\) \autocite{alwen2020security}.
+Hence a successful \Abrev{FSU} verification for the original \VersionOne\ with parameters corresponding to \(\mathcal{A}\) indicates either an error in the vulnerability provided by \autocite{alwen2020security} or, more likely, an error the TreeKEM model encoding.
+While prior work \autocite{alwen2020security} indicates \( \CGKAmod{\VersionOne}{12}{8} \not \models \LTLPredicate{FSU} \), it is possible that a simpler model with lower \(T\) and/or \(N\) parameters may exist which also demonstrates the \Abrev{FSU} security deficiency.
+Similarly, there may be many \CGKAmod{\VersionOne}{T}{N} models with simpler \(T\) and \(N\) parameters which verify \LTLPredicate{FSU}.
+The aforementioned single \Abrev{FSU} security deficiency example point does not delineate a boundary at which \((T, C, N)\)-attacker does not demonstrate advantage but a \((T+1, C, N)\)-attacker or a \((T, C, N+1)\)-attacker is able to demonstrate advantage for the original protocol \VersionOne.
+Locating the minimal \(T\), \(C\), and \(N\) values for which the vulnerability manifests in the \VersionOne version.
+In order to ensure at least one observation of the \Abrev{FSU} deficiency of the original \VersionOne, the bounds are set to \(12 = \Tmax\) and \(8 = \Nmax\).
+Verification observations related to \LTLPredicate{FSU} ought to be the most intriguing.
+
+Completing this future work requires continued verification of different parameterizations of \CGKAmod{P}{T}{N} models in order to increase the tabulated observations.
+Most importantly will be the observation of the model \CGKAmod{\VersionOne}{12}{8}, as this will determine the verification methodology's relationship with prior work and known security issues.
+By interpreting the hypotheically complete observations collected in an expanded Appendix\ \ref{apx:Observations} one can discern whether the hypotheses enumerated in Table\ \ref{tab:verification-hypotheses} and described in Chapter\ \ref{sec:methodology} have been supported or falsified.
 The author intends to pursue this work in the immediate future.
 
 
