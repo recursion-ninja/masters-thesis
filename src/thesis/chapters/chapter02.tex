@@ -5,32 +5,32 @@
 \section{Methodology Overview}\label{sec:methodology-overview}}
 
 Formal verification takes many forms, with many techniques and tools at one's disposal, and choosing the correct verification tool is of utmost importance.
-There are generally three classses of verification techinques which can be applied; logical systems, theorem proving, and model checking \autocite{kemmerer1994three}.
+There are generally three classes of verification techniques which can be applied; logical systems, theorem proving, and model checking \autocite{kemmerer1994three}.
 Each general technique has multiple specification languages and tools with varying degrees of specificity and usability.
 Comparing the applicability of these classes of techniques will guide the selection of methodology and tooling.
 
-Logical systems for defining and reasoning about protocols, such as Linear Logic Framework \autocite{CERVESATO200219}, can produce increadibly strong verification results.
+Logical systems for defining and reasoning about protocols, such as Linear Logic Framework \autocite{CERVESATO200219}, can produce incredibly strong verification results.
 However, a balancing act exists between the complexity of the protocol specification within the logical system, and the specificity which the logical system permits.
-In the past, \Abrev{BAN logic} \autocite{burrows1989logic} was the tool of choice for verifying cryptographic protocols due to acheiving such a desireable balance.
-Unfortunately, protocol components verified by \Abrev{BAN logic} were later found to have undiscovered vunlerabilities \autocite{snekkenes1991exploring}.
+In the past, \Abrev{BAN logic} \autocite{burrows1989logic} was the tool of choice for verifying cryptographic protocols due to achieving such a desirable balance.
+Unfortunately, protocol components verified by \Abrev{BAN logic} were later found to have undiscovered vulnerabilities \autocite{snekkenes1991exploring}.
 BAN was subsequently critiqued \autocite{boyd1993limitation} for not being able to fully verify crucial aspects of cryptographic protocols.
 Because of such concerns, results and conclusions from verification techniques using \Abrev{BAN logic} stating that no attacks exist can be a false-positive.
 The kind false-positive verification of security that \Abrev{BAN logic} provided could cause the very lapses in post-adoption security that the verification had attempted to preempt.
 \Abrev{BAN logic} has since fallen out of favor and instead been replaced by model checking techniques \autocite{holzmann1990design} and theorem proving \autocite{andrews1980axiomatic}, which have been able to produce attacks on cryptographic protocols which BAN techniques incorrectly verified as secure.
 
 Theorem proving, when possible, is the preferred method of cryptographic protocol verification \autocite{kobeissi2020verifpal}.
-Simple communication protocols have had success with verificiation via formal description and theroem prover \autocite{berry1987towards, cheng1990formal}.
+Simple communication protocols have had success with verification via formal description and theorem prover \autocite{berry1987towards, cheng1990formal}.
 Generally, modern protocols are constructed in too complex a manner for a theorem prover to verify, with automated theorem proving still being an area of active research \autocite{xiong2020smartverif, bhargavan2021text}.
 When defining a protocol in terms compatible with modern theorem provers issues of termination checking, proof tactic selection, and SMT limitations greatly impede computer automated verification \autocite{hassan2021automated}.
 Human guidance is still required to direct theorem provers towards the verification goal.
-Some domain specific theroem provers, such as Tamarin \autocite{basin2017symbolically}, exist for cryptography and communication protocols to reduce the required human effort.
+Some domain specific theorem provers, such as Tamarin \autocite{basin2017symbolically}, exist for cryptography and communication protocols to reduce the required human effort.
 The specialized and time-consuming nature of human effort required is a major consideration when deciding between utilizing a theorem prover and a model checker.
 Contrasted with theorem provers, model checkers are highly valued for the automation and reduced human effort they provide, with the work presented here being no exception.
 
 Model checking exists in many forms and has a proven track record for protocol verification.
 An abstract machine can be used to model interactions between an system and an adversary, with static analysis revealing system vulnerabilities \autocite{lowe1999towards}.
-Symbolic model checking via prcocess algebras, such as the communication between sequential proccess (CSP) algebra \autocite{Hoare1978}, has been use to great effect \autocite{roscoe1994model, Ryan1999, ryan2001modelling} and influenced the development of subsequent model checking approaches.
-Explicit state model checking, contrastingly, enumerates the entire protocol state-space rather than cleverly applying abstract or algebreic transformations to derive verification proofs.
+Symbolic model checking via process algebras, such as the communication between sequential process (CSP) algebra \autocite{Hoare1978}, has been use to great effect \autocite{roscoe1994model, Ryan1999, ryan2001modelling} and influenced the development of subsequent model checking approaches.
+Explicit state model checking, contrastingly, enumerates the entire protocol state-space rather than cleverly applying abstract or algebraic transformations to derive verification proofs.
 All these model checking techniques, once specified, are largely automated whereas logical systems and theorem proving relies on much more heavily human interaction.
 
 This work presents the verification of the TreeKEM protocol's \Abrev{FSU} and \Abrev{PCS} security guarantees.
@@ -55,14 +55,14 @@ In practice, this means the results presented for a specified \Tmax\ and \Nmax\ 
 
 Model checking exists as the preferred alternative to \Abrev{BAN logic} techniques for verifying cryptographic protocols \autocite{kacprzak2006comparing, lomuscio2007verification, van2004symbolic}.
 Model checking represents all possible states of protocol as an \Abrev{FSM} \autocite{clarke1981design}.
-There exist one or more start states in the transition graph representing possible starting condiitions.
+There exist one or more start states in the transition graph representing possible starting conditions.
 Transitions in the graph uniquely encode the possible changes in model state.
 The model checker then asserts that one or more properties holds for the protocol by traversing through all combinations of transitions through the graph \autocite{Vardi1986}.
 If a property holds, the model checker will assert that there is no possible set of transitions through states that exist in the protocol which violate the specified property.
 If the property does not hold, the model checker will produce a counter-example sequence of transitions through possible states showing how the specified property can be violated.
 This method of verifying cryptographic protocols is very attractive as the verification result is either an exhaustive proof of security guarantees or a cryptographic attack which can be analyzed and corrected.
 This proof methodology offered by explicit state model checking, the guarantee of a falsifying counterexample if one exists, is of paramount important for correcting vulnerabilities within the modeled protocol.
-Discernment must be applied however, to interpret whether the counter example describes a protocol vulnerability or reveals a model encoding deficieny, likely an artifact of abstraction.
+Discernment must be applied however, to interpret whether the counter example describes a protocol vulnerability or reveals a model encoding deficiency, likely an artifact of abstraction.
 Regardless, scrutinizing the counterexample provides valuable information for refinement.
 
 The principle drawback of explicit state model checking is the immensity of the state-space as the complexity of the model grows.
@@ -96,8 +96,8 @@ Because of these (and many more) techniques, SPIN allows efficiently working wit
 \section{Promela}\label{sec:promela}}
 
 With SPIN selected as the model checker, the obvious modeling language in which to encode the TreeKEM protocol is the Protocol Meta Language (PROMELA) \autocite{HolzmannSpinBook2003, holzmann1990design}.
-The key language feature of PROMELA which makes it so conducive to explicit state model checking is that *all* branching -- conditional executaion, looping, and randomness -- are evaluated nondeterministically.
-Heance, PROMELA is used to produce all possible states and transitions of TreeKEM, we must supply that representation to a model checker.
+The key language feature of PROMELA which makes it so conducive to explicit state model checking is that *all* branching -- conditional execution, looping, and randomness -- are evaluated non-deterministically.
+Hence, PROMELA is used to produce all possible states and transitions of TreeKEM, we must supply that representation to a model checker.
 It exists as a precise and convenient specification for defining all possible states and transitions for TreeKEM.\@
 By specifying the protocol in PROMELA, one can allow the PROMELA ``translator: to take a high-level, human readable description of TreeKEM and produce a much larger machine readable list with all the possible states and transitions in TreeKEM.\@
 Manually defining all these states and transitions would take an inordinate amount of time and is prone to errors.
@@ -266,7 +266,7 @@ Labels prefixed with \texttt{end} identify the set of valid end states in which 
 Labels prefixed with \texttt{accept} identify states which the program cannot transition through infinitely often if it executes infinitely.
 Labels prefixed with \texttt{progress} identify states which the program must transition through infinitely often if it executes infinitely.
 Finally, a labeled state may be referenced in an \Abrev{LTL} predicate.
-Examples usages of state labels are illistrated in Figure\ \ref{fig:state-label}.
+Examples usages of state labels are illustrated in Figure\ \ref{fig:state-label}.
 
 \begin{figure}
 \caption{\label{fig:state-label}PROMELA example --- state labels}

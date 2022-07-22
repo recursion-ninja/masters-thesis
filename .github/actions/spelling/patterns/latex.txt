@@ -1,3 +1,5 @@
+\\autocite\{\w+\}
+\\usepackage(\[\w+\])?\{\w+\}
 \\zeta
 yshift
 xshift

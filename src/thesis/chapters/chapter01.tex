@@ -15,28 +15,28 @@ Secure, accessible, and intuitive communication between two parties has become u
 Such secure bidirectional, two party communication channels are known as \Abrev{SM} \autocite{unger2015sok}.
 Secure Messaging is supported by a variety of services \autocite{mujaj2017comparison} including ChatSecure, CryptoCat, Cyber Dust, Cyphr, Facebook Messenger, G Data Secure Chat, Gajim, GNOME Fractal, Google Allo, Haven, Kakao Talk, Line, Element, Signal, Silence, Silent Phone, Skype, Telegram, Viber, WhatsApp, and Wickr, Wire.
 The utility that these two party protocols provide to the communicating users is undeniable.
-Much of this utility comes from the incorperation third party mediation services which aid in authentication, delivery, and aynchronisity of communication.
+Much of this utility comes from the incorporation third party mediation services which aid in authentication, delivery, and asynchronicity of communication.
 However, generalizing the security guarantees of \Abrev{SM} to communication with more than two parties, multi-party communication, is still an area of active research.
 
 The production of a secure, multi-party communication protocol is not the only concern.
-Proof and verification of protocol correctness \autocite{kobeissi2017automated, alwen2019double, chen2021anonymous, bienstock2022more} is exremely important.
+Proof and verification of protocol correctness \autocite{kobeissi2017automated, alwen2019double, chen2021anonymous, bienstock2022more} is extremely important.
 A communication protocol vulnerability can take many forms.
 A cryptographic attack may identify weaknesses in one or more of the primitive building blocks from which the protocol is constructed \autocite{al2008comparative}.
 Side channel attacks can glean information regarding the communication from passive observations \autocite{kocher1996timing, molnar2005program, chen2010side}.
-Replay or masquarading attacks \autocite{syverson1994taxonomy, pries2008new, ustun2019novel} permit an adversary to impersonate messages from a sender in a manner which is indistinguishable to the receiver from receiving messages from the legitimate sender.
+Replay or masquerading attacks \autocite{syverson1994taxonomy, pries2008new, ustun2019novel} permit an adversary to impersonate messages from a sender in a manner which is indistinguishable to the receiver from receiving messages from the legitimate sender.
 While an enormous litany of attacks are documented, exhaustive enumeration of attacks is not possible, as the form an attack might take is limited only by human creativity.
 Still, each of these forms of attack represents a communication protocol vulnerability introducing the communicating parties to unanticipated risk, and hold the possibility for, in extreme cases, loss of life or property \autocite{farwell2011stuxnet, 10.1145/2508701, chung2017critical, kagalwalla2019cybersecurity, gunduz2020cyber}.
 
 Given the vast and potentially unknown range of potential vulnerabilities, a protocol is designed with a threat model \autocite{salter1998toward} which contextualizes the capabilities of an adversary and consequently defines domain from which vulnerabilities must be considered.
-Subsequently, the protocol will be designed to satisfy one or more security guarantees \autocite{rfc3552} within the threat model, an assertion that no advarsary within the threat model has the capability to violate any of the protocol's safety guarantees.
+Subsequently, the protocol will be designed to satisfy one or more security guarantees \autocite{rfc3552} within the threat model, an assertion that no adversary within the threat model has the capability to violate any of the protocol's safety guarantees.
 The presence or absence of  on secure communication protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption \autocite{clark1997survey}.
 Often vulnerabilities are discovered years, if not decades, after a protocol has been in active use \autocite{CERVESATO2008402, durumeric2014matter, shaik2015practical, cremers2017comprehensive, basin2018formal}.
 Late discovery of these vulnerabilities after widespread adoption of the protocol requires rapid effort to fix the protocol and encourage all systems using the protocol to update to the revised version \autocite{ghafoor2014analysis}.
-Regretably, this updating process itself takes years of migration work \autocite{markowsky2015scanning} or the migration never occurs.
-This is especially problematic for embedded systems which cannot be easily recouperated and require extra consideration to be securely updated \autocite{yoon2017remote, maroof2022irecover}.
+Regrettably, this updating process itself takes years of migration work \autocite{markowsky2015scanning} or the migration never occurs.
+This is especially problematic for embedded systems which cannot be easily recuperated and require extra consideration to be securely updated \autocite{yoon2017remote, maroof2022irecover}.
 For these reasons, it is of paramount importance to identify all possible vulnerabilities on a new communication protocol as early as possible, so it can be corrected prior to widespread adoption.
 
-The topic of this thesis is the formal verificiation of the TreeKEM protocol (see Section \ref{sec:treekem-protocol}) and the security properties described by Message Layer Security (see Section \ref{sec:message-layer-security}).
+The topic of this thesis is the formal verification of the TreeKEM protocol (see Section \ref{sec:treekem-protocol}) and the security properties described by Message Layer Security (see Section \ref{sec:message-layer-security}).
 Specifically, the Forward Secrecy with Updates (see Section \ref{sec:forward-secrecy-with-updates}) and Post-compromise Security (see Section \ref{sec:post-compromise-security}) security properties are scrutinized under verification.
 Relevant topics, concepts, and definitions are introduced, providing the requisite context for grappling with formal verification of a multi-party communication protocol.
 The desirable operations and security of TreeKEM, with the threat model and security guarantees are detailed.
@@ -44,12 +44,12 @@ The verification methodology of explicit state model checking is laid out for ve
 Notably, all verifications performed assume the correctness of cryptographic primitives.
 
 The main contributions presented by this thesis are several abstractions used to tractably encode a parameterized model for TreeKEM.
-First and foremost, \CGKAdef\ (see Section \ref{sec:CGKA}) as described in prior work \autocite{alwen2020security} is used as a foundational absraction for any secure group messaging protocol (see Section \ref{sec:secure-group-messaging}).
-This primary abstraction is built upon in several ways within the context of exhaustive, nondeterminitstic computation, each revealing an additional simplifying abstraction.
+First and foremost, \CGKAdef\ (see Section \ref{sec:CGKA}) as described in prior work \autocite{alwen2020security} is used as a foundational abstraction for any secure group messaging protocol (see Section \ref{sec:secure-group-messaging}).
+This primary abstraction is built upon in several ways within the context of exhaustive, nondeterministic computation, each revealing an additional simplifying abstraction.
 An initial model parameter is capable of being removed with a simple abstraction extension of \CGKAdef\ (see Section \ref{sec:exhaustiveness}).
 Similarly, applying the concept of idempotency provides an additional abstraction which necessarily causes the model to progress towards the end state (see Section \ref{sec:idempotence}).
 Finally, the nondeterministic computation allows, without loss of generally, group members to be removed from the model as process agents, dramatically reducing the model's state-space (see Section \ref{sec:elided-group-members}).
-Applying these three abstractions in conjunction simplifies the complexity of the model by orders of magnitude, permiting verificiation for small model parameters.
+Applying these three abstractions in conjunction simplifies the complexity of the model by orders of magnitude, permitting verification for small model parameters.
 
 The thesis culminates in presenting the verification results of the constructed model and comparing the verification results with prior work related to TreeKEM security.
 Furthermore, a presentation of the model's scalability is illustrated and discussed (see Section \ref{sec:scalability-limits}).
@@ -77,9 +77,9 @@ To be considered a \Abrev{SGM} protocol \autocite{ietf-mls-protocol-14}, the \Ab
 
 One of the interesting features of \Abrev{SGM}, compared to the better studied \Abrev{SM}, is the ability for members to be added and removed from the secure communication channel.
 In the simpler case when two parties use \Abrev{SM}, additional participants cannot be added nor can participants be removed.
-However ``removing'' a participant can effectively be acheived when the communication channel is simply closed by either party wishing to cease communication.
+However ``removing'' a participant can effectively be achieved when the communication channel is simply closed by either party wishing to cease communication.
 The \Abrev{SGM} requirement of adding and removing participants to the secure communication channel poses interesting open challenges in the field of cryptographic protocol design.
-A contrast of \Abrev{SM} and \Abrev{SGM} is illistratedin Figure \ref{fig:Secure-Messaging-And-Secure-Group-Messaging}.
+A contrast of \Abrev{SM} and \Abrev{SGM} is illustrated in Figure \ref{fig:Secure-Messaging-And-Secure-Group-Messaging}.
 
 \begin{figure}[ht!]
   \centering
@@ -110,18 +110,18 @@ An advantage of using the \Abrev{AS} as described in \Abrev{MLS} is that it allo
 The \Abrev{AS} is a trusted third party which is expected to carry out its required tasks without failure.
 In addition to the \Abrev{AS}, \Abrev{MLS} specifies the existence of a \Abrev{DS} \autocite{sekiba1998design}.
 The \Abrev{DS} can receive messages addressed to any contact and the \Abrev{DS} stores the messages until the contact queries it for new messages.
-Importantly, the \Abrev{DS} will always deliver messages from all senders to a other group members in a consitent order.
-Consistent ordering of delivery of broadcasted messages allows the \Abrev{DS} some flexibility in resolving concurrency issues which emerge during asynchoronous communication.
+Importantly, the \Abrev{DS} will always deliver messages from all senders to a other group members in a consistent order.
+Consistent ordering of delivery of broadcasted messages allows the \Abrev{DS} some flexibility in resolving concurrency issues which emerge during asynchronous communication.
 Another important feature of the \Abrev{DS} is the delivering a message back to the original sender after all other group members have received the broadcast message from the \Abrev{DS}.
-An example of this aknowledgement behavior is depicted in Figures \ref{fig:Secure-Messaging-Broadcast} and \ref{fig:Secure-Messaging-Update}.
+An example of this acknowledgment behavior is depicted in Figures \ref{fig:Secure-Messaging-Broadcast} and \ref{fig:Secure-Messaging-Update}.
 The existence of \Abrev{AS} and a \Abrev{DS} are required, though these do not need to be the same provider, nor do they need to be centralized.
 The adversary is assumed to not be able to masquerade as the authentication service nor violate the message authentication codes \autocite{krawczyk1997hmac} within which the message ordering is encoded.
 
 \begin{figure}[ht!]
   \centering
-  \caption[Secure Messaging Broadcast with Acknowledgement]{%
+  \caption[Secure Messaging Broadcast with Acknowledgment]{%
   \label{fig:Secure-Messaging-Broadcast}%
-  Secure Messaging Broadcast with Acknowledgement:
+  Secure Messaging Broadcast with Acknowledgment:
   \begin{enumerate}
     \item Alice broadcasts ``Hello''
     \item Bob polls the \Abrev{DS} and receives ``Hello''
@@ -141,7 +141,7 @@ The adversary is assumed to not be able to masquerade as the authentication serv
     \item Alice broadcasts update instructions using the new secret key $\mathtt{sk}^{Alice}_{1}$
     \item Bob polls the \Abrev{DS} and receives the update instructions
     \item Bob request Alice's new public key $\mathtt{pk}^{Alice}_{1}$
-    \item Alice polls the \Abrev{DS} and receives update instrcutions
+    \item Alice polls the \Abrev{DS} and receives update instructions
   \end{enumerate}
   }%
   \includegraphics[width=0.8\textwidth]{./figures/Secure-Messaging-Update.png}
@@ -161,13 +161,13 @@ Indeed, these \Abrev{MLS} security guarantees have been the chief focus of resea
 
 Security guarantees are not the only concern of the \Abrev{MLS} specification.
 For example, one can utilize a trivial protocol construction for \Abrev{SGM} by utilizing an existing \Abrev{SM} protocol, and forming a fully connected (finite) graph of bidirectional \Abrev{SM} communication channels between all \Abrev{SGM} participants.
-Unsuprisingly, this trivial construction's control messages scale quadratically in the size of the communication group whenever the shared encryption key requires an update.
+Unsurprisingly, this trivial construction's control messages scale quadratically in the size of the communication group whenever the shared encryption key requires an update.
 Maintaining key agreement with this trivial construction is not efficient.
 Hence both security and efficiency are considerations in protocol construction.
 
 The \Abrev{IETF} includes within \Abrev{MLS} efficiency goals \autocite{ietf-mls-architecture-07} for protocol constructions with respect to the size of the (finite) messaging group.
 Three key efficiency distinctions which \Abrev{MLS} requires are that the number of control messages should be linear in group size, the size of control messages should be sub-linear in group size, and that group sizes up to 50,000 should be supported.
-While efficient scaling up to a group comtaining 50,000 member is the target of all \Abrev{MLS} protocols, no guidance is given for larger groups.
+While efficient scaling up to a group containing 50,000 member is the target of all \Abrev{MLS} protocols, no guidance is given for larger groups.
 One can assume that protocol efficiency may degrade above the target bound of 50,000 group members, but continued efficient scaling past this bound is preferable.
 Taken in its entirely, the framework provided by \Abrev{MLS} is a foundational piece of achieving \Abrev{SGM} with well understood efficiency, security guarantees, and protocol design.
 
@@ -205,7 +205,7 @@ Unsurprisingly, this same generalization is appreciably linked to proving and ve
   (i) a PKE secret key \(sk_i\) for that level (from which a public key can be computed using the key generation algorithm) and
   (ii) a seed \(s_{i+1}\) for the next level.
   Every seed \(s_i\) is encrypted using the public key of the corresponding co-path node \(v_{i-1}\).
-  Sometimes, such a node can be blank, in which case \(s_i\) must be encrypted using the public keys of each node in the resolution, which is the smallest set of nodes covering all leaves in the subtree of \(v_{i-1}\).
+  Sometimes, such a node can be blank, in which case \(s_i\) must be encrypted using the public keys of each node in the resolution, which is the smallest set of nodes covering all leaves in the sub-tree of \(v_{i-1}\).
   This ensures that all these nodes are able to compute the keys from \(v_i\) upward.
   The update secret \(I\) produced by such an update is the seed value \(s_d\) at the root.
   }%
@@ -245,14 +245,14 @@ For a visualization of this process, refer to Figure\ \ref{fig:CGKA-TreeKEM-Secr
 
 The temporality of \Abrev{SGM} protocols, as with the \Abrev{SM} protocols which proceeded them, is important to understanding how security of the protocol is defined.
 Delineation of communication into discrete quanta referred to as ``epochs,'' is (generally) the way temporality is discussed when considering protocol security.
-An illustration of epochs for a \Abrev{SM} protocol is included in Figure \ref{fig:Secure-Messaging-Timeline}, though the same deliniation applies to \Abrev{SGM} protocols as well.
+An illustration of epochs for a \Abrev{SM} protocol is included in Figure \ref{fig:Secure-Messaging-Timeline}, though the same delineation applies to \Abrev{SGM} protocols as well.
 Protocol epochs can be understood in terms of the \Abrev{SGM} usage.
 A communication group is a set of two or more agents using multiple devices to engage in secure communication.
 To initialize a group, members connect to the \Abrev{AS} and \Abrev{DS} providers which transmit the requisite credentials and values used for authentication of and encryption between the group members.
 Using this initial information, the instigating group member begins the first encryption ``epoch'' by broadcasting control messages to all other group members.
 The control message received by each group member provides instructions from which they can securely derive the initial shared symmetric key.
 Subsequently, group members exchange messages with an enforced total ordering \autocite{halmos1960naive} mediated by the \Abrev{DS} and authenticated via the \Abrev{AS}, allowing for asynchronous communication with offline members while preventing the general sequencing issues and race conditions which arise from concurrency.
-Additionally, any group member inititates a new encryption ``epoch'' by broadcasting a control message for one of the following operations:
+Additionally, any group member initiates a new encryption ``epoch'' by broadcasting a control message for one of the following operations:
 
 \begin{itemize}
   \item add a member to the group
@@ -290,7 +290,7 @@ The idea behind \Abrev{PCS} is that no matter how many compromises of key materi
 The following definition of \Abrev{PCS} in the multi-directional protocol context \autocite{alwen2020security} which has been adopted by \Abrev{MLS}.
 
 \begin{definition}[Post-compromise Security]
-After every group member whose state was leaked inititates an epoch update, and that update instruction message is processed by all group members, the shared key becomes confidential again.
+After every group member whose state was leaked initiates an epoch update, and that update instruction message is processed by all group members, the shared key becomes confidential again.
 \end{definition}
 
 
@@ -331,7 +331,7 @@ Each call to \(proc\) by a group member facilitates \emph{processing} a control 
 Correspondingly, each call to \(proc\) by a group member ushers that user into a new epoch, where the secret \(i\) is the cryptographic secret required for the group member with \(ID\) to maintain \Abrev{CGKA} in the new epoch.
 Group members who are offline, and unable to receive messages from the \Abrev{DS}, may fall an arbitrary number of epochs behind other members of the group.
 However, when the lagging group member next polls the \Abrev{DS}, they will receive messages in a consistent order which instructs them how to incrementally advance to the current epoch while decrypting all broadcast messages which were transmitted during interstitial epochs.
-In essence, the \Abrev{DS} mediates asynchornous epoch continuity among group members.
+In essence, the \Abrev{DS} mediates asynchronous epoch continuity among group members.
 
 Because the communication is defined in terms of epochs, \Abrev{CGKA} should satisfy both Forward Secrecy and Post-compromise Security with respect to communication epochs.
 The six requisite algorithms required for \CGKAdef\ can be produced by the functionality of the TreeKEM protocol.
@@ -349,7 +349,7 @@ Security games are designed with respect to a protocol, or class of protocols, a
 The winning condition(s) for \(\mathcal{A}\) within the security game are defined, by design, to occur if and only if \(\mathcal{A}\) can cause a violation of one or more security guarantees.
 Often a security game includes one or more oracles.
 An oracle is an agent in the game the adversary can query and to receive information or have an action performed on their behalf.
-Oracles provide utility to an a2.2dversary, but importantly, the oracle does not explicitly inform the adversary how any queried information was produced nor how any queried action was performed.
+Oracles provide utility to an adversary, but importantly, the oracle does not explicitly inform the adversary how any queried information was produced nor how any queried action was performed.
 The adversary must infer the effects of querying an oracle by observing messages broadcast to and from the \Abrev{DS}.
 
 The same work which defines \Abrev{CGKA} also defines an oracle-based security game for \Abrev{CGKA}.

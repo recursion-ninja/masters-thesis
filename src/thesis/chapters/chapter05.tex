@@ -6,7 +6,7 @@ As described above in Chapter\ \ref{sec:model-formalization}, the verification o
 Verification was performed on each parameter combination for \CGKAmod{P}{T}{N} parameterized by \( \mathtt{P} \in \{\,\VersionOne,\, \VersionTwo\,\} \), \( T \in [\,4,\, \Tmax\ \,] \), and \( N \in [\,2,\, \Nmax\ \,] \).
 The domain of each \CGKAmod{P}{T}{N} model parameter is listed in Table\ \ref{tab:model-param-domain}.
 All observed verification results are tabulated in Appendix\ \ref{apx:Observations}.
-At the time of submitting this thesis draft, a cursory glance will reveal that not all verification prcoesses have completed.
+At the time of submitting this thesis draft, a cursory glance will reveal that not all verification processes have completed.
 These planned but incomplete observations are indicated by a \NA\ in table entries.
 
 
@@ -44,7 +44,7 @@ Instead this work made use of a single partial order reduction directive:
 The \texttt{XUSAFE} directive disables validity checks of the strictly synchronizing message passing queues.
 The encoded model of TreeKEM does not utilize these queues, hence any check related to them would be superfluous.
 Strict validity checks effects concurrency within the model, which in turn effects opportunities for partial order reduction.
-No noticeable performance gains were observed by utilizing the \texttt{XUSAFE}, but it's usage was retained regardless.
+No noticeable performance gains were observed by utilizing the \texttt{XUSAFE}, but its usage was retained regardless.
 
 
 \hypertarget{sec:multi-core-tuning}{%
@@ -62,7 +62,7 @@ Both of these are used by this work while verifying TreeKEM.\@
   \texttt{NCORE=}\(Y\)
 \end{itemize}
 
-The \texttt{MEMLIM} directive specifies the upper limit of memory usable by the model checker to be \(X\) mebibytes for the duration it's verification.
+The \texttt{MEMLIM} directive specifies the upper limit of memory usable by the model checker to be \(X\) Mebibytes for the duration its verification.
 Specifying this has the important effect of preventing the verification process from thrashing by utilizing more virtual memory than real memory exists on the verification machine(s).
 Moreover, the \texttt{NCORE} directive informs the model checker at compile-time the maximum number of usable processors is \(Y\), permitting the compiler to make informed approximations to minimize parallelism overhead and maximize multi-core throughput.
 The verification work's utilization of both \texttt{MEMLIM} and \texttt{NCORE} directives when utilizing a multi-core computing cluster had notable impact on the overall ``states per second'' processing performance.
@@ -199,6 +199,25 @@ Interestingly, the verification run-time for \LTLPredicate{HLT} and \LTLPredicat
 The author does not have a definitive explanation for this behavior.
 One postulate is that the group membership size limited to at most \(N\) has a strange combinatorial relationship with the distribution of membership states in TreeKEM's left balanced binary tree of secret keys.
 Since the attacker knowledge base and group membership alterations depend on the tree topologies permitted by the parameter \(N\), this may create a ``far-from-uniform'' distribution of state-spaces for different \(N\) values.
+
+\begin{figure}[ht!]
+\centering
+\caption[Runtime projections for \CGKAmod{\VersionOne}{T}{N}]{%
+\label{fig:runtime-projections}%
+Run-time (wall clock) projections for \CGKAmod{\VersionOne}{T}{N} using $T \in [4, 7]$ run-time observations as predictors for $T \in [8, 12]$ run-time.
+}%
+\includegraphics[width=0.8\textwidth]{./figures/fsu-pcs-runtime-combined-preidcted.png}
+\end{figure}
+
+\begin{table}[ht!]                                                                                                                      
+\caption[Run-time predictions for \CGKAmod{\VersionOne}{T}{N}]{%
+\label{tab:predicted-run-times}%
+Run-time (wall clock) predictions for \CGKAmod{\VersionOne}{T}{N} using $T \in [4, 7]$ as predictors for $T \in [8, 12]$.
+}%
+\subimport{../tables/}{runtime-prediction-V1}
+\end{table}
+
+
 
 
 \hypertarget{sec:hypothesis-outcomes}{%

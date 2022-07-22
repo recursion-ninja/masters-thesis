@@ -1,6 +1,26 @@
 Revisions
 =========
 
+## Committee
+
+1.  > Rephrase problem to better reflect what was achieved, and not just the current lofty goals.
+    Edit: ``
+
+
+2.  > Be more explicit on what you did, your contribution in the big picture, what you would do next in this regard, where you are going with this.
+    Edit: ``
+
+
+3.  > Projections on the gap between what was done and what would be needed for the lofty goals. Where possible, include estimates of resources that would be needed.
+    Edit: ``
+
+
+4.  > There was a concern about why you used AMNH instead of a more public source. I see the mention in the acknowledgements, but make sure you also explicitly say that you used their cluster and what the specs are.
+    Edit: ``
+
+
+
+
 ##  Dietrich
 
 1.  > The bibliography needs some editing, so please make some effort to fix this. There are way too many occurrences to list here, but I'll mention a few examples/types of what is off
@@ -24,7 +44,10 @@ Revisions
 
 
 3.  > A better/quick summary of other modeling/analysis approaches, as in it's not just BAN Logic and then Model Checking. There should at least be short references to classic approaches beyond BAN, i.e. works by Catherine Meadows, Gavin Lowe, Bill Roscoe, and Peter YA Ryan, or even Iliano Cervesato.
-    Edit: ``
+    Edit: `bed960d154ef5999e8aa316904d61d0fe78527b7`
+
+4.  > An editorial pass: too many of "it's" -> "its" instances at first glance in the main text. Spelling and grammar checks would be great, too.
+    Edit: `c1bcd1dd720496ff08db503429ff956edfa7f2d2`
 
 
 
