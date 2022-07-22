@@ -100,6 +100,7 @@ Originally produced in 2018, \Abrev{MLS} seeks to specify a standardization with
 Consequently, implementations conforming to the specification of \Abrev{MLS} are a subset of possible \Abrev{SGM} implementations.
 The standardized specification of \Abrev{MLS} is still an area of active development by \Abrev{IETF}.
 However, the core security aspects of \Abrev{MLS} relevant to the work presented in this thesis have remained constant since the initial draft of \Abrev{MLS}.
+The \Abrev{MLS} development has recently experiance conceptual adoption, with core notions being referenced and expanded upon in new works \autocite{Boyd2020}.
 
 \Abrev{MLS} describes the protocol environment in which protocol agents interact.
 The \Abrev{ITM} of RFC3552 \autocite{rescorla2003rfc3552} is the context within which the \Abrev{MLS} specifies its security guarantees.
@@ -270,7 +271,7 @@ Each protocol may have a different specific form that update secret(s) take for 
 \hypertarget{sec:forward-secrecy-with-updates}{%
 \section{Forward Secrecy with Updates}\label{sec:forward-secrecy-with-updates}}
 
-\Abrev{FS} is a desirable security guarantee which offers protection in the case that a protocol's long-term secret key(s) are compromised.
+\Abrev{FS} is a desirable security guarantee which offers protection in the case that a protocol's long-term secret key(s) are compromised \autocite{boyd2021modern}.
 The idea behind \Abrev{FS} is that even when all of a group member's current key material is compromised, messages delivered prior to the compromise are still secret.
 \Abrev{FS} has been used in two-party key agreement communication protocols, including Transport Layer Security (TLS) \autocite{rfc2246, rfc4346, rfc5246, rfc8446} such as OpenSSL \autocite{openssl}, as well as \Abrev{SM} protocols such as the Signal Protocol \autocite{cohn2020formal}.
 While the definition of \Abrev{FS} has been explored and made rigorously clear for two-party key agreement protocols, the notion of \Abrev{FS} requires extension in the multi-directional \Abrev{MLS} specification.

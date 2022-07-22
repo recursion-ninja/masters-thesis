@@ -47,8 +47,11 @@ Revisions
     Edit: `bed960d154ef5999e8aa316904d61d0fe78527b7`
 
 4.  > An editorial pass: too many of "it's" -> "its" instances at first glance in the main text. Spelling and grammar checks would be great, too.
-    Edit: `c1bcd1dd720496ff08db503429ff956edfa7f2d2`
+    Edit: `aae5f94f0b86352914edf205463a07fcc40a105d`
 
+
+5.  > Some more references you should consider
+    Edit: ``
 
 
 
