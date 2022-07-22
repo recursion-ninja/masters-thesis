@@ -20,9 +20,13 @@ Revisions
 
 
 2.  > New/introduced concepts should be cited/referenced at the beginning of the paragraph. For example, you introduce the idea of a 'Security Game' on page 19. Where does this terminology come from? There should be a citation right then and there. You then even spend an entire paragraph/section on Security Games without any such citations.
+    Edit: `d0d1cd830458cd40553796971ddb677a876e72fe`
+
+
+3.  > A better/quick summary of other modeling/analysis approaches, as in it's not just BAN Logic and then Model Checking. There should at least be short references to classic approaches beyond BAN, i.e. works by Catherine Meadows, Gavin Lowe, Bill Roscoe, and Peter YA Ryan, or even Iliano Cervesato.
     Edit: ``
 
-    
+
 
 
 ##  Shankar

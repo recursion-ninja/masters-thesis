@@ -4,8 +4,14 @@
 \hypertarget{sec:methodology-overview}{%
 \section{Methodology Overview}\label{sec:methodology-overview}}
 
-Formal verification takes many forms, with many techniques and tools at our disposal, and choosing the correct verification tool is of utmost importance.
-In the past, \Abrev{BAN logic} \autocite{burrows1989logic} was the tool of choice for verifying cryptographic protocols.
+Formal verification takes many forms, with many techniques and tools at one's disposal, and choosing the correct verification tool is of utmost importance.
+There are generally three classses of verification techinques which can be applied; logical systems, theorem proving, and model checking \autocite{kemmerer1994three}.
+Each general technique has multiple specification languages and tools with varying degrees of specificity and usability.
+Comparing the applicability of these classes of techniques will guide the selection of methodology and tooling.
+
+Logical systems for defining and reasoning about protocols, such as Linear Logic Framework \autocite{CERVESATO200219}, can produce increadibly strong verification results.
+However, a balancing act exists between the complexity of the protocol specification within the logical system, and the specificity which the logical system permits.
+In the past, \Abrev{BAN logic} \autocite{burrows1989logic} was the tool of choice for verifying cryptographic protocols due to acheiving such a desireable balance.
 Unfortunately, protocol components verified by \Abrev{BAN logic} were later found to have undiscovered vunlerabilities \autocite{snekkenes1991exploring}.
 BAN was subsequently critiqued \autocite{boyd1993limitation} for not being able to fully verify crucial aspects of cryptographic protocols.
 Because of such concerns, results and conclusions from verification techniques using \Abrev{BAN logic} stating that no attacks exist can be a false-positive.
@@ -17,9 +23,15 @@ Simple communication protocols have had success with verificiation via formal de
 Generally, modern protocols are constructed in too complex a manner for a theorem prover to verify, with automated theorem proving still being an area of active research \autocite{xiong2020smartverif, bhargavan2021text}.
 When defining a protocol in terms compatible with modern theorem provers issues of termination checking, proof tactic selection, and SMT limitations greatly impede computer automated verification \autocite{hassan2021automated}.
 Human guidance is still required to direct theorem provers towards the verification goal.
-Some domain specific theroem provers, such as Tamarin \autocite{basin2017symbolically}, exist for cyrptography and communication protocols to reduce the required human effort.
+Some domain specific theroem provers, such as Tamarin \autocite{basin2017symbolically}, exist for cryptography and communication protocols to reduce the required human effort.
 The specialized and time-consuming nature of human effort required is a major consideration when deciding between utilizing a theorem prover and a model checker.
 Contrasted with theorem provers, model checkers are highly valued for the automation and reduced human effort they provide, with the work presented here being no exception.
+
+Model checking exists in many forms and has a proven track record for protocol verification.
+An abstract machine can be used to model interactions between an system and an adversary, with static analysis revealing system vulnerabilities \autocite{lowe1999towards}.
+Symbolic model checking via prcocess algebras, such as the communication between sequential proccess (CSP) algebra \autocite{Hoare1978}, has been use to great effect \autocite{roscoe1994model, Ryan1999, ryan2001modelling} and influenced the development of subsequent model checking approaches.
+Explicit state model checking, contrastingly, enumerates the entire protocol state-space rather than cleverly applying abstract or algebreic transformations to derive verification proofs.
+All these model checking techniques, once specified, are largely automated whereas logical systems and theorem proving relies on much more heavily human interaction.
 
 This work presents the verification of the TreeKEM protocol's \Abrev{FSU} and \Abrev{PCS} security guarantees.
 To verify these security guarantees, the \CGKAsec\ is used as an abstraction of the TreeKEM protocol, as well as all other \CGKAdef-conforming protocols.
