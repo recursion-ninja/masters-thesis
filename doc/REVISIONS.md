@@ -455,6 +455,18 @@ infinite depending on data structure vs proof?
 
 81. > What does validity checks have to do with partial order reduction?
     Spot: Page 57
+    Edit: `02e0cfb5ac4e6226fdc0c3f1f8b97b2605f49744`
+
+
+
+82. > Not sure, but I thought this was only for Spin's statistical model checking (ie, simulation)? Can you tell me where to look (I googled but dont see it at first glance).
+    Spot: Page 59
+    Note: See changelog on GitHub: https://github.com/nimble-code/Spin/blob/master/Doc/V5.Updates#L185
+    Edit: None
+
+
+83. > doesnt parse
+    Spot: Page 60
     Edit: ``
 
 

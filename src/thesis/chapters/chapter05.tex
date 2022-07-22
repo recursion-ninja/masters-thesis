@@ -129,8 +129,8 @@ Y = \texttt{1155727349} = & \bigg | \, \frac{\pi}{e} \!\!\!\! & * \, 10^9 \, \bi
 Each state within the model's state-space is encoded as a ``state-vector.''
 The state vectors uniquely map to each state within the model.
 Given that the main memory requirements of model checking lies in exhaustive state-space search, it is unsurprising that specifying the encoding of the state-vectors has a pronounced impact on memory usage.
-There are to relevant directives used to influence the model checker's representation of state-vectors.
-Note that all four directives can be used in conjunction for compounding effects.
+There are many relevant directives used to influence the model checker's representation of state-vectors.
+Note that all four directives listed below can be used in conjunction for compounding effects.
 
 \begin{itemize}
 \item \texttt{COLLAPSE}
@@ -152,7 +152,8 @@ This time-memory trade-off is necessary to make verification of higher \Tmax\ an
 The \texttt{MA} directive is used to specify the maximum number of bytes \(X\) that a state vector can require.
 Spin internally stores several sets of model states.
 Using the information regarding the upper bound \(X\) for state-vector bytes, the \texttt{MA} directive enables a method of storing a set of states is a \Abrev{BDD} \autocite{holzmann1999minimized}.
-To determine if the state is in the set, Spin treated the state vector as a bit-sting and feeds it to the \Abrev{BDD}, with \Abrev{BDD} accepting the string treating the state is in the set, the \Abrev{BDD} rejecting the string representing state is not being in the set.
+To determine if the state is in the set, Spin treated the state vector as a bit-string and feeds it to the \Abrev{BDD}.
+The state is contained within the set if the \Abrev{BDD} accepts the bit-string, and the state is not contained in the set if the \Abrev{BDD} rejects the bit-string.
 Further steps are taken to reduce the \Abrev{BDD} into a minimal DFA representation of a 256-ary decision tree.
 Insertion, deletion, and membership queries take linear time in the length of the state-vector.
 The translation alone between DFA representation represents a stark time/memory trade-off, as linear time set membership is a stark difference between Spin's default hash-set storage method, resulting in reducing memory requirements while increasing verification run-time.
