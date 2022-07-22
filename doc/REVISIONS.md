@@ -465,8 +465,25 @@ infinite depending on data structure vs proof?
     Edit: None
 
 
-83. > doesnt parse
+83. > Doesnt parse
     Spot: Page 60
+    Edit: `ad12a311bad8fa280ea09f310204a3a705b62857`
+
+
+84. > OK, I guess you answer here what I asked earlier, but I think you should still state earlier what was claimed
+    Spot: Page 64
+    Note: Moving entired hypothesis testing discussion to Conclusion Chapter, no prior mention
+    Edit: None
+
+
+85. > I think giving a conclusive proof of this is paper worthy?
+    Spot: Page 64
+    Note: I beleive it would be publishable
+    Edit: None
+
+
+86. > [20] needs to be tagged differently.
+    Spot: Page 75
     Edit: ``
 
 
