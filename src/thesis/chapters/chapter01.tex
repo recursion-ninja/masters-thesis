@@ -30,7 +30,7 @@ Still, each of these forms of attack represents a communication protocol vulnera
 Given the vast and potentially unknown range of potential vulnerabilities, a protocol is designed with a threat model \autocite{salter1998toward} which contextualizes the capabilities of an adversary and consequently defines domain from which vulnerabilities must be considered.
 Subsequently, the protocol will be designed to satisfy one or more security guarantees \autocite{rfc3552} within the threat model, an assertion that no adversary within the threat model has the capability to violate any of the protocol's safety guarantees.
 The presence or absence of  on secure communication protocols which violate one or more of the security guarantees are exceedingly difficult for humans to catch before widespread adoption \autocite{clark1997survey}.
-Often vulnerabilities are discovered years, if not decades, after a protocol has been in active use \autocite{CERVESATO2008402, durumeric2014matter, shaik2015practical, cremers2017comprehensive, basin2018formal}.
+Often vulnerabilities are discovered years, if not decades, after a protocol has been in active use \autocite{CERVESATO2008402, durumeric2014matter}.
 Late discovery of these vulnerabilities after widespread adoption of the protocol requires rapid effort to fix the protocol and encourage all systems using the protocol to update to the revised version \autocite{ghafoor2014analysis}.
 Regrettably, this updating process itself takes years of migration work \autocite{markowsky2015scanning} or the migration never occurs.
 This is especially problematic for embedded systems which cannot be easily recuperated and require extra consideration to be securely updated \autocite{yoon2017remote, maroof2022irecover}.
@@ -101,7 +101,7 @@ Originally produced in 2018, \Abrev{MLS} seeks to specify a standardization with
 Consequently, implementations conforming to the specification of \Abrev{MLS} are a subset of possible \Abrev{SGM} implementations.
 The standardized specification of \Abrev{MLS} is still an area of active development by \Abrev{IETF}.
 However, the core security aspects of \Abrev{MLS} relevant to the work presented in this thesis have remained constant since the initial draft of \Abrev{MLS}.
-The \Abrev{MLS} development has recently experiance conceptual adoption, with core notions being referenced and expanded upon in new works \autocite{Boyd2020}.
+The \Abrev{MLS} development has recently experienced conceptual adoption, with core notions being referenced and expanded upon in new works \autocite{Boyd2020}.
 
 \Abrev{MLS} describes the protocol environment in which protocol agents interact.
 The \Abrev{ITM} of RFC3552 \autocite{rescorla2003rfc3552} is the context within which the \Abrev{MLS} specifies its security guarantees.
@@ -110,7 +110,7 @@ There are only two caveats to consider with regard to the adversary's network co
 \Abrev{MLS} specifies the existence of an \Abrev{AS} \autocite{perlman1999overview} from which a messenger can request fresh public key for a specified contact which can be immediately used within the \Abrev{MLS} protocol.
 An advantage of using the \Abrev{AS} as described in \Abrev{MLS} is that it allows the contact to asynchronously query the \Abrev{AS} for the corresponding secret key at a later time, ameliorating potential protocol synchronization issues.
 The \Abrev{AS} is a trusted third party which is expected to carry out its required tasks without failure.
-In addition to the \Abrev{AS}, \Abrev{MLS} specifies the existence of a \Abrev{DS} \autocite{sekiba1998design}.
+In addition to the \Abrev{AS}, \Abrev{MLS} specifies the existence of a \Abrev{DS}.
 The \Abrev{DS} can receive messages addressed to any contact and the \Abrev{DS} stores the messages until the contact queries it for new messages.
 Importantly, the \Abrev{DS} will always deliver messages from all senders to a other group members in a consistent order.
 Consistent ordering of delivery of broadcasted messages allows the \Abrev{DS} some flexibility in resolving concurrency issues which emerge during asynchronous communication.
@@ -150,7 +150,7 @@ The adversary is assumed to not be able to masquerade as the authentication serv
 \end{figure}
 
 The most scrutinized aspect of the \Abrev{MLS} specification involves the set of security guarantees that participants in a conforming a protocol can expect.
-The security guarantees of \Abrev{MLS} includes many ``solved problems'' in the field of cryptography with respect to the \Abrev{ITM}; notably: end-to-end encryption \autocite{padlipsky1978limitations}, message confidentiality \autocite{17715}, message integrity \autocite{voydock1983security}, message authentication \autocite{jueneman1983message}, and membership authentication \autocite{chaum1985showing}.
+The security guarantees of \Abrev{MLS} includes many ``solved problems'' in the field of cryptography with respect to the \Abrev{ITM}; notably: end-to-end encryption, message confidentiality, message integrity, message authentication, and membership authentication \autocite{rfc4949}.
 However, \Abrev{MLS} also specifies interesting open problems related to \Abrev{FS} \autocite{gunther1989identity} and \Abrev{PCS} \autocite{cohn2016post} as security guarantees of the group key-agreement protocol.
 Both \Abrev{FS} and \Abrev{PCS} have been researched with respect to \Abrev{SM}, producing provably secure as well as efficient constructions.
 A popular example is the double-ratchet-based AXOLOTL algorithm \autocite{perrin2014axolotl} and its derivatives which are used by most \Abrev{SM} protocols.

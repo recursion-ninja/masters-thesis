@@ -25,9 +25,9 @@ Still, with these restrictions in mind, the careful selection of compile-time di
 \hypertarget{sec:partial-order-reduction}{%
 \subsection{Partial Order Reduction}\label{sec:partial-order-reduction}}
 
-Partial-order reduction methods represent a well understood collection of state exploration techniques \autocite{godefroid1990using, godefroid1991using, godefroid1994partial, holzmann1995improvement, katz1992verification, peled1993all, valmari1989stubborn, valmari1991stubborn} whose combined usage can greatly reduce the model checking search-space.
+Partial-order reduction methods represent a well understood collection of state exploration techniques \autocite{godefroid1990using, godefroid1991using, godefroid1994partial} whose combined usage can greatly reduce the model checking search-space.
 Such techniques are applicable for verifying local and termination of concurrent models.
-Furthermore, these techniques are equally applicable for verifying LTL properties, even reducing the state-space when verifying liveness and safety properties within concurrent models \autocite{wolper1983reasoning}.
+Furthermore, these techniques are equally applicable for verifying LTL properties, even reducing the state-space when verifying liveness and safety properties within concurrent models.
 The specific partial order reduction technique of ``simultaneous reachability'' analysis \autocite{van1997partial} enables the verification of non-executable transitions, absence of deadlock, and buffer overflows.
 The extensive research and engineering effort put into the myriad of partial order reduction techniques have all been incorporated into verification strategies of SPIN, and are enabled by default,requiring manual ``opt-out'' compilation directives in order to disable them.
 SPIN intelligently selects applicable partial order reduction techniques for the concurrency of the model, the LTL properties to be verified, and the topology of the state-space.
@@ -172,10 +172,10 @@ Table\ \ref{tab:state-vector-len} displays the state vector's byte length for ea
 
 The model \CGKAmod{\VersionOne}{T}{N} was verified with as many possible parameters as time permitted.
 The parameter space is listed in  Table \ref{tab:model-param-domain}.
-Verification runs were perfromed on the American Museum of Natural History's Scientific Computing cluster.
+Verification runs were performed on the American Museum of Natural History's Scientific Computing cluster.
 The cluster job queue utilized, provides 1 TiB RAM and \(64\) AMD Opteron Processor 6380 core operating at 2500MHz.
 Each verification run utilized 12 cores and up to 128 MiB of RAM.
-Typically between five and six verification runs were performed concurrently by the culster.
+Typically between five and six verification runs were performed concurrently by the cluster.
 The observations of each \CGKAmod{\VersionOne}{T}{N} verification are depicted in Tables \ref{tab:V1-HLT}, \ref{tab:V1-FSU}, and \ref{tab:V1-PCS}.
 Note that all run-times are ``wall clock'' time not ``CPU time.''
 
@@ -196,29 +196,29 @@ From the observations obtained so far, one can conclude that the confidence chec
 
 The verification run observations for \LTLPredicate{FSU} are listed in Table\ \ref{tab:V1-FSU} and the verification run observations for \LTLPredicate{PCS} are listed in Table\ \ref{tab:V1-PCS}.
 All observations in both Table\ \ref{tab:V1-FSU} and Table\ \ref{tab:V1-PCS} report a either successful verification of corresponding security guarantee or an ``out of memory'' error (\OutOfMemory).
-These results are expected and consisten with prior literature regarding TreeKEM.
+These results are expected and consistent with prior literature regarding TreeKEM.
 However, the confidence drawn from these verification results is limited by the size of the observation set.
-Unserstanding the possibility of expanding the observation set is of great interest.
+Understanding the possibility of expanding the observation set is of great interest.
 
 
 \hypertarget{sec:scalability-limits}{%
 \section{Scalability Limits}\label{sec:scalability-limits}}
 
 The state-vector lengths detailed in Table\ \ref{tab:state-vector-len} and columns observing verification performance within Appendix\ \ref{apx:Observations} provide an initial basis for interpreting the scalability of the \CGKAmod{P}{T}{N} model.
-Considering the state-vector lengths alone, without considering the observed bemory usage, a stark increase can be seen.
+Considering the state-vector lengths alone, without considering the observed memory usage, a stark increase can be seen.
 It is easy to notice that a progression from \( (\,T,\, N\,) \) to \( (\,T+1,\, N\,) \) is more significant in memory usage than a progression from \( (\,T,\, N\,) \) to \( (\,T,\, N+4\,) \).
 The large jump in state-space and transition count between modeling successive epochs provides a secondary metric demonstrating this characteristic.
 Hence the number of epoch the model is verified for drives the memory usage.
 This intuitively makes sense, as each new epoch multiplicatively expands the diameter of the state-space.
 
-While referencing Table\ \ref{tab:state-vector-len} and holding \(N = 8\) as a constant with \(T\) incresing, one can see that each incrementation of \(T\) required roughly an additional \(16\) bytes in state-vector length.
-The increase in state-vector length by \(16\) bytes, or \(128\) bits, equates to potenital increase of the states-space by \(2^{128}\)!
+While referencing Table\ \ref{tab:state-vector-len} and holding \(N = 8\) as a constant with \(T\) increasing, one can see that each incrementing of \(T\) required roughly an additional \(16\) bytes in state-vector length.
+The increase in state-vector length by \(16\) bytes, or \(128\) bits, equates to potential increase of the states-space by \(2^{128}\)!
 With absolute certainty, the verification problem increases exponentially.
-Though much engineering effort has been taken to simplify the model encoding and adequately tune the performance via Spin directives, an exponential problem can only yield a small amount of tractablility.
+Though much engineering effort has been taken to simplify the model encoding and adequately tune the performance via Spin directives, an exponential problem can only yield a small amount of tractability.
 
 For each model, generally speaking, \(T = 7\) was the maximum value with resulted in a complete set of observations for all \(n \in [4, 8]\).
-It is immeidately clear from the set of boservations that both memory usage and verification run-time scales exponentially with increasing \(T\) and \(N\) parameters.
-The runtime observations for \(T \in [4, 7]\) were used as predictors to extrapolate an estimated for run-time for \(T \in [8, 12]\).
+It is immediately clear from the set of observations that both memory usage and verification run-time scales exponentially with increasing \(T\) and \(N\) parameters.
+The run-time observations for \(T \in [4, 7]\) were used as predictors to extrapolate an estimated for run-time for \(T \in [8, 12]\).
 The projected run-times are depicted in Figure \ref{fig:runtime-projections} and tabulated in Table \ref{tab:predicted-run-times}.
 
 \begin{figure}[ht!]
@@ -230,10 +230,10 @@ Run-time (wall clock) projections for \CGKAmod{\VersionOne}{T}{N} using $T \in [
 \includegraphics[width=\textwidth]{./figures/fsu-pcs-runtime-combined-preidcted.png}
 \end{figure}
 
-To estimate the required run-time to complete the observation set for the parameter space \(\forall T \in [8, 12], N \in [4, 8], P \in \{ \LTLPredicate{FSU}, \LTLPredicate{PCS} \}\), one onely needs to take the summation of the run-time estimates listed in Table \ref{tab:predicted-run-times}.
-The summation ammounts to an estimated \(1639073974176\) seconds of run-time.
+To estimate the required run-time to complete the observation set for the parameter space \(\forall T \in [8, 12], N \in [4, 8], P \in \{ \LTLPredicate{FSU}, \LTLPredicate{PCS} \}\), one only needs to take the summation of the run-time estimates listed in Table \ref{tab:predicted-run-times}.
+The summation amounts to an estimated \(1639073974176\) seconds of run-time.
 Given the extremely optimistic case that six verifications can run concurrently and that the totaled verification run-time is perfectly divisible, one can divide the estimated seconds by six before concluding the estimated number of days required.
-The divided summation yeilds an estimated \(273178995696\) seconds of run-time.
+The divided summation yields an estimated \(273178995696\) seconds of run-time.
 Unfortunately, \(273178995696\) seconds is equivalent to roughly \(8657\) Gregorian years.
 In order to complete the observation set, further engineering improvements are required.
 

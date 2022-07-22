@@ -53,7 +53,7 @@ In practice, this means the results presented for a specified \Tmax\ and \Nmax\ 
 \hypertarget{sec:explicit-state-model-checking}{%
 \section{Explicit state model checking}\label{sec:explicit-state-model-checking}}
 
-Model checking exists as the preferred alternative to \Abrev{BAN logic} techniques for verifying cryptographic protocols \autocite{kacprzak2006comparing, lomuscio2007verification, van2004symbolic}.
+Model checking exists as an appealing alternative to \Abrev{BAN logic} or theorem proving techniques for verifying cryptographic protocols.
 Model checking represents all possible states of protocol as an \Abrev{FSM} \autocite{clarke1981design}.
 There exist one or more start states in the transition graph representing possible starting conditions.
 Transitions in the graph uniquely encode the possible changes in model state.
@@ -85,7 +85,7 @@ Since model checking works by checking every possible combination of states and 
 SPIN provides some solutions to making this problem tractable, the culmination of over three decades of research and development.
 First, SPIN supports ``on-the-fly'' verification \autocite{rudin1987limits}, which means that SPIN does not need to consider the entire set of states and transitions at the same time, but instead can work on just subsets until the whole set is verified.
 Second, SPIN also uses a ``partial ordering'' of the states and transitions \autocite{godefroid1990using} to reduce the number of subsets it needs to verify before being certain that a property holds for the whole set of states and transitions.
-Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by default as they can be used in conjunction with minimal drawbacks \autocite{valmari1993fly, peled1994combining, holzmann1995improvement, couvreur1999fly}.
+Both ``on-the-fly'' verification and ``partial order'' reduction are enabled by default as they can be used in conjunction with minimal drawbacks \autocite{valmari1993fly, peled1994combining, couvreur1999fly}.
 Consideration was made to use TopSpin \autocite{DonaldsonM_AMAST2006}, a PROMELA pre-processing plugin for SPIN which performs symmetry reduction as well.
 Unfortunately, this theoretically viable technique is not practically usable as the plugin has not been maintained in over a decade.
 Additionally, SPIN supports numerous compile time directive which alter the state-space representation, search trajectories, and time-memory trade-offs.

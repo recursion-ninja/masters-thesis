@@ -1,26 +1,27 @@
 Revisions
 =========
 
+
 ## Committee
 
 1.  > Rephrase problem to better reflect what was achieved, and not just the current lofty goals.
     Note: Reworked Introduction, Results, and Conclusion to contextualize work acheived, not work attempted.
-    Edit: ``
+    Edit: `b3fb1229293ce3e0d889cb98c55ea9dace3d23ea`
 
 
 2.  > Be more explicit on what you did, your contribution in the big picture, what you would do next in this regard, where you are going with this.
     Note: Moved all hypothesis verification language to conclusion
-    Edit: ``
+    Edit: `b3fb1229293ce3e0d889cb98c55ea9dace3d23ea`
 
 
 3.  > Projections on the gap between what was done and what would be needed for the lofty goals. Where possible, include estimates of resources that would be needed.
     Note: Expanded scalability section, adding table and figure of extrapolated run-time projections
-    Edit: ``
+    Edit: `b3fb1229293ce3e0d889cb98c55ea9dace3d23ea`
 
 
 4.  > There was a concern about why you used AMNH instead of a more public source. I see the mention in the acknowledgements, but make sure you also explicitly say that you used their cluster and what the specs are.
     Note: Added culster specifications within Verification Observations
-    Edit: ``
+    Edit: `b3fb1229293ce3e0d889cb98c55ea9dace3d23ea`
 
 
 
