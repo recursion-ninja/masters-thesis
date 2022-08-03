@@ -11,6 +11,8 @@ Revisions
     > "Secure Messaging is supported by a variety of services [Muj17] including ChatSecure, CryptoCat, Cyber Dust, Cyphr, Facebook Messenger, G Data Secure Chat, Gajim, GNOME Fractal, Google Allo, Haven, Kakao Talk, Line, Element, Signal, Silence, Silent Phone, Skype, Telegram, Viber, WhatsApp, and Wickr, Wire."
     >
     > For every single one of them.
+	Note: Added citations
+	Edit: 
 
 
 2.  > Comparison to Broadcast Encryption, just for proper context, as discussed during the defense.
@@ -21,7 +23,7 @@ Revisions
 	> What would be needed? 
 	> Where is that described, in scientific (or even engineering) terms?
     Note: Expanded Section 6.3 "Scalability Limits," added Table B.8
-	Edit: 
+	Edit: a87b2d4ba5788dfc220897f83dc8a5c14fd2b8cd
 
 
 ---
