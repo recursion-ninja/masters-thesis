@@ -59,9 +59,9 @@ Revisions
     > BCCZ99 is the paper that introduced BMC (we talked about it), not about explicit state model checking as conventionally refered to.
     > BRS is conversion algorithms.
     > Use SPIN or Ed Clarke etal book on MC (covers all types of MCs).
-    Spot: Page 32
+    Spot: Page 39
     Note: Substituted references with Edmund Clarke's "Model Checking" book
-    Edit: 
+    Edit: 9998c5fb177f6cad50b3050d253659f52bfd3e20
 
 
 ---

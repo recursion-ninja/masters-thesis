@@ -55,7 +55,7 @@ Spin only supports message queues of fixed capacity, but even attempting to circ
 A single state in the state-space would constitute the unique combination of all actor processes' internal states, all message queue states, and the global protocol state.
 Unfortunately, because of the monotonically increasing counters, there can be no finite representation of the infinite game.
 
-To construct a finite model of an unbounded game, the states of the model must not have depend on any monotonically increasing temporal information.
+To construct a finite model of an unbounded game, the states of the model must not depend on any monotonically increasing temporal information.
 Temporal information which converges to a limit in finitely many steps or converges to a to a finite cycle in finitely many steps can all be finitely modeled.
 If a model's state depends on non-converging temporal information, it necessitates that the state-vector length and search-space are unbounded.
 This follows from the following three facts.

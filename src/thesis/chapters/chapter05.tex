@@ -227,18 +227,19 @@ Similarly, the projected CPU clock cycle requirements are tabulated in Table\ \r
 
 \begin{figure}[ht!]
 \centering
-\caption[Runtime projections for \CGKAmod{\VersionOne}{T}{N}]{%
+\caption[Run-time projections for \CGKAmod{\VersionOne}{T}{N}]{%
 \label{fig:runtime-projections}%
-Run-time (wall clock) projections for \CGKAmod{\VersionOne}{T}{N} using $T \in [4, 7]$ run-time observations as predictors for $T \in [8, 12]$ run-time.
+Wall clock run-time projections for \CGKAmod{\VersionOne}{T}{N}\\%
+$\forall\; N \in [4, 8]$ using $T \in [4, 7]$ as predictors for $T \in [8, 12]$.
 }%
 \includegraphics[width=\textwidth]{./figures/fsu-pcs-runtime-combined-preidcted.png}
 \end{figure}
 
 To estimate the required (wall clock) run-time, given the same computational hardware used for observations \(T \in [4, 7]\), to complete the observation set for the \CGKAmod{\VersionOne}{T}{N} parameter space \(\forall\; T \in [8, 12],\, N \in [4, 8],\, P \in \{ \LTLPredicate{FSU}, \LTLPredicate{PCS} \}\), one only needs to take the summation of the run-time estimates listed in Table \ref{tab:predicted-run-times}.
-The summation amounts to an estimated \(1639073974176\) seconds of run-time.
+The summation amounts to an estimated \(1,639,073,974,176\) seconds of run-time.
 Given the extremely optimistic case that six verifications can run concurrently and that the totaled verification run-time is perfectly divisible, one can divide the estimated seconds by six before concluding the estimated number of days required.
-The divided summation yields an estimated \(273178995696\) seconds of run-time.
-Unfortunately, \(273178995696\) seconds is equivalent to roughly \(8657\) Gregorian years.
+The divided summation yields an estimated \(273,178,995,696\) seconds of run-time.
+Unfortunately, \(273,178,995,696\) seconds is equivalent to roughly \(8,657\) Gregorian years.
 In order to complete the observation set by continuing with the same cluster hardware, further engineering improvements would be required with regard to performance tuning and model simplification.
 
 Alternatively, if given sufficient additional cores and RAM matching the computational hardware used for observations \(T \in [4, 7]\) to run \emph{in parallel} the remaining observation set for the parameter space \(\forall T \in [8, 12], N \in [4, 8], P \in \{ \LTLPredicate{FSU}, \LTLPredicate{PCS} \}\), the (wall clock) runtime projection becomes much simpler to calculate.
