@@ -92,6 +92,15 @@ A contrast of \Abrev{SM} and \Abrev{SGM} is illustrated in Figure \ref{fig:Secur
 \resizebox{0.5\textwidth}{!}{\subimport{../figures/}{Secure-Group-Messaging}}
 \end{figure}
 
+Similarly, \Abrev{SGM} differs in interesting ways from broadcast encryption \autocite{fiat1993broadcast}.
+Both \Abrev{SGM} and broadcast encryption are multi-party communication protocols, but the communication conducted via the protocols are quite different.
+In the case of broadcast encryption, a single ``broadcaster'' wishes to communicate encrypted content to which can be only decrypted by a group of intended recipients.
+A classic example of broadcast encryption is the transmitting television programs to only paying subscribers of the transmission.
+There is a notable communication asymmetry between the single broadcaster and large number of recipients.
+However, in the case of \Abrev{SGM} \emph{all} group members can send and receive communications as well as add or remove group members.
+Broadcast encryption can be thought of as a form of \Abrev{SGM} where only one group member broadcasts messages, adds group members, removes group members, and instructs group members to update their encryption keys; with all other group members only receiving messages.
+Given that \Abrev{SGM} provides equal privilege to each group member, security proofs are more complicated when compared to broadcast encryption. 
+
 
 \hypertarget{sec:message-layer-security}{%
 \section{Message Layer Security}\label{sec:message-layer-security}}

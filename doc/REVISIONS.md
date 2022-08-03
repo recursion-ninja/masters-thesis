@@ -12,10 +12,12 @@ Revisions
     >
     > For every single one of them.
 	Note: Added citations
-	Edit: 
+	Edit: 5f43fc9463e450185bfc5e2dc885cce3cedba323
 
 
 2.  > Comparison to Broadcast Encryption, just for proper context, as discussed during the defense.
+    Note: Added paragraph in Section 2.1 "Secure Group Messaging"
+	Edit: 
 
 
 3.  > It's still not obvious to me why AMNH computing resources were used for this project, rather than any at CUNY.
