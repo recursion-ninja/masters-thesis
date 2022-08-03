@@ -43,8 +43,11 @@ Revisions
 3.  > Still doesnt parse to me
     Spot: Page 29
 	Note: Rephrased sentance, forming an explicit list. 
-    Edit:
+    Edit: 5e91ba2be1533cf7401ac35bd7ad390c4ac2a02e
 
+4.  > (thats what CSP stands for)
+    Spot: Page 32
+    Edit: 
 
 ---
 
