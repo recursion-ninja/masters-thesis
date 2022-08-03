@@ -38,7 +38,12 @@ Revisions
    
 2.  > Doesnt parse (to me)
     Spot: Page 24
-    Edit: 
+    Edit: 0cbdcd894c2370ade72254801956fd2244fa778e
+
+3.  > Still doesnt parse to me
+    Spot: Page 29
+	Note: Rephrased sentance, forming an explicit list. 
+    Edit:
 
 
 ---
