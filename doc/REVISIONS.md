@@ -47,9 +47,16 @@ Revisions
 
 4.  > (thats what CSP stands for)
     Spot: Page 32
+    Edit: 1d52a57842a29750c27c5302d4231ff428f80323
+
+5.  > Dont open up this can of worms (in case an external person reads it), unless its important somewhere
+    Spot: Page 32
+    Note: I omitted the indicated sentance.
     Edit: 
 
+
 ---
+
 
 # Round 1
 

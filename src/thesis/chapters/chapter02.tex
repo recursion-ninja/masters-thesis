@@ -37,16 +37,15 @@ This work presents the verification of the TreeKEM protocol's \Abrev{FSU} and \A
 To verify these security guarantees, the \CGKAsec\ is used as an abstraction of the TreeKEM protocol, as well as all other \CGKAdef-conforming protocols.
 The \CGKAsec\ will be modeled as an explicit \Abrev{FSM}, representing all possible TreeKEM execution states.
 More precisely \CGKAsec\ will be modeled as a \Abrev{LTS} \autocite{keller1976formal}, which includes informational labels for each state in the \Abrev{FSM}.
-However, much of the literature related to the chosen model checker uses the nomenclature of \Abrev{FSM} instead of \Abrev{LTS}, and this work will follow suit.
 The security guarantees will be encoded as \Abrev{LTL} statements \autocite{4567924}.
 Then explicit state model checking techniques will be applied to verify that the \Abrev{LTL} encodings of \Abrev{FSU} and \Abrev{PCS} are maintained in every possible state of the \CGKAsec.
 
-There is one last important detail the verification.
+There is one last important detail of the verification.
 Recall that what differentiates \Abrev{SM} from \Abrev{SGM} is that \Abrev{SGM} involves two or more parties.
 There is no theoretical limit to the number of parties the TreeKEM protocol supports.
 However, we also stated that model checking represents all possible states of a protocol as a finite graph of transitions.
 Here we have a potential problem, where TreeKEM allows an unbounded number of participants, producing an infinite number of possible states, while model checkers require a finite number of states.
-The IETF states that MLS in practice should support approximately $50,000$ participants \autocite{Omara2020}, which is a finite, yet this very large number is problematic for the chosen methodology of explicit state model checking.
+The IETF states that MLS in practice should support approximately $50,000$ participants \autocite{Omara2020}, which is finite; yet this very large number is problematic for the chosen methodology of explicit state model checking.
 This work parameterizes the model in terms of \(T\) and \(N\) from the definition of \emph{Non-adaptive} \((T, C, N, \textbf{\texttt{P}}, \epsilon)\) \emph{CGKA Security}and limits the scope of verification to within the selected parameters.
 In practice, this means the results presented for a specified \Tmax\ and \Nmax\ only provide verification of security against \((T, C, N)\)-attackers for all \(T \in [1, \Tmax]\), \(C \in [1, T]\) and \(N \in [2, \Nmax]\).
 
@@ -78,7 +77,7 @@ As mentioned at the end of Section \ref{sec:methodology-overview}, due the engin
 \hypertarget{spin}{%
 \section{Spin}\label{spin}}
 
-Among the many options of model checkers, I have chosen use the SPIN model checker \autocite{HolzmannSpinBook2003}.
+Among the many options of explicit state model checkers, the SPIN model checker \autocite{HolzmannSpinBook2003} was chosen as the verification tool for this work.
 SPIN provides several important features for our verification goals.
 The main difficulty with model checking is the size of the number of states and transitions \autocite{burch1992symbolic}.
 Since model checking works by checking every possible combination of states and transitions, the size of the state-space directly impacts the feasibility.
