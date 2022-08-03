@@ -48,7 +48,7 @@ First and foremost, \CGKAdef\ (see Section \ref{sec:CGKA}) as described in prior
 This primary abstraction is built upon in several ways within the context of exhaustive, nondeterministic computation, each revealing an additional simplifying abstraction.
 An initial model parameter is capable of being removed with a simple abstraction extension of \CGKAdef\ (see Section \ref{sec:exhaustiveness}).
 Similarly, applying the concept of idempotency provides an additional abstraction which necessarily causes the model to progress towards the end state (see Section \ref{sec:idempotence}).
-Finally, the nondeterministic computation allows, without loss of generally, group members to be removed from the model as process agents, dramatically reducing the model's state-space (see Section \ref{sec:elided-group-members}).
+Finally, the nondeterministic computation allows, without loss of generality, group members to be removed from the model as process agents, dramatically reducing the model's state-space (see Section \ref{sec:elided-group-members}).
 Applying these three abstractions in conjunction simplifies the complexity of the model by orders of magnitude, permitting verification for small model parameters.
 The resulting model encoding of TreeKEM is capable of verifying Forward Secrecy with Updates and Post-compromise Security for any supplied parameters, with availability of memory and run-time being the only verification constraints.
 
@@ -309,8 +309,8 @@ After every group member whose state was leaked initiates an epoch update, and t
 \section{Continuous Group Key Agreement}\label{sec:CGKA}}
 
 In the two-party case, a general notion of Continuous Key Agreement \autocite{alwen2019double} has been used to provide robust security guarantees such as forward secrecy and post-compromise security.
-For \Abrev{SGM}, this same notion has been extended to \Abrev{CGKA} \autocite{alwen2020security} which is used as an abstraction reason about the \Abrev{MLS} security guarantees.
-A continuous group key-agreement scheme is defined over a set of local member states $\gamma \in \Gamma$, a set welcome instruction messages for adding a member to a group $w \in W$, a set of update instruction messages $u \in U$, and a set of cryptographic secrets $i \in I$.
+For \Abrev{SGM}, this same notion has been extended to \Abrev{CGKA} \autocite{alwen2020security} which is used as an abstraction for reasoning about the \Abrev{MLS} security guarantees.
+A continuous group key-agreement scheme is defined over a set of local member states $\gamma \in \Gamma$, a set of welcome instruction messages for adding a member to a group $w \in W$, a set of update instruction messages $u \in U$, and a set of cryptographic secrets $i \in I$.
 Additionally, a continuous group key-agreement scheme is require to define the following collection of algorithms:
 
 \[ \CGKAdef = \left\{\,\Protocol{init},\, \Protocol{create},\, \Protocol{add},\, \Protocol{rem},\, \Protocol{upd},\, \Protocol{proc}\,\right\} \]
@@ -359,7 +359,7 @@ Such security games rely on the cryptography concept of indistinguishability in 
 Security games are designed with respect to a protocol, or class of protocols, and one or more security guarantees the protocol ought to preserve.
 The winning condition(s) for \(\mathcal{A}\) within the security game are defined, by design, to occur if and only if \(\mathcal{A}\) can cause a violation of one or more security guarantees.
 Often a security game includes one or more oracles.
-An oracle is an agent in the game the adversary can query and to receive information or have an action performed on their behalf.
+An oracle is an agent in the game which the adversary can query to receive information or have an action performed on their behalf.
 Oracles provide utility to an adversary, but importantly, the oracle does not explicitly inform the adversary how any queried information was produced nor how any queried action was performed.
 The adversary must infer the effects of querying an oracle by observing messages broadcast to and from the \Abrev{DS}.
 
@@ -417,7 +417,7 @@ Oracles for the \CGKAsec\ for a scheme \CGKAdef\ \(= \small\left(\,\Protocol{ini
 {\CopyrightReuse{alwen2020security}}
 \end{figure}
 
-The first six oracles are call the \CGKAdef\ algorithms internally and can be intuitively thought of as thin wrappers exposed to \(\mathcal{A}\) for the corresponding algorithms from the \CGKAdef\ definition.
+The first six oracles call the \CGKAdef\ algorithms internally and can be intuitively thought of as thin wrappers exposed to \(\mathcal{A}\) for the corresponding algorithms from the \CGKAdef\ definition.
 Importantly, these oracles encapsulate from the adversary the stateful production and consumption of group member state values \(\gamma \in \Gamma\) as well as the emission of secret key material values \(i \in I\).
 Control messages \(w \in W\) and \(u \in U\) are still broadcast across the network and assumed to be intercepted by the adversary.
 The definition of control messages within the TreeKEM protocol dictates that messages are are authenticated by the group members, which justifies the absence of an oracle permitting the adversary to change or replay intercepted control messages in the \Abrev{CGKA} game.

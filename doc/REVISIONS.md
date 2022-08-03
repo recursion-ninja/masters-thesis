@@ -17,7 +17,7 @@ Revisions
 
 2.  > Comparison to Broadcast Encryption, just for proper context, as discussed during the defense.
     Note: Added paragraph in Section 2.1 "Secure Group Messaging"
-	Edit: 
+	Edit: 57786585b82e64dbd5f7d09f4c13a9fc44ef9007
 
 
 3.  > It's still not obvious to me why AMNH computing resources were used for this project, rather than any at CUNY.
@@ -26,6 +26,19 @@ Revisions
 	> Where is that described, in scientific (or even engineering) terms?
     Note: Expanded Section 6.3 "Scalability Limits," added Table B.8
 	Edit: a87b2d4ba5788dfc220897f83dc8a5c14fd2b8cd
+
+
+##  Shankar
+
+
+1.  > I remember talking about this but not the conclusion. Is there a reason why you didnt explicitly say whether the attacker can be a group member? Its OK if you had a reason, but just checking.
+    Spot: Page 21
+	Note: Yes, there is a reason to forbid an attacker from being a group member, but it's a bit nuanced. Essentially, the CGKA security game assumes the adversary is not a group member and uses that assumption in the way it defines the FSU property. It can be finnesed to allow the adversary to be a group member, but I'd rather keep things simple (at this point).
+    Edit: None
+   
+2.  > Doesnt parse (to me)
+    Spot: Page 24
+    Edit: 
 
 
 ---
