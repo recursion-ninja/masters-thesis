@@ -52,6 +52,15 @@ Revisions
 5.  > Dont open up this can of worms (in case an external person reads it), unless its important somewhere
     Spot: Page 32
     Note: I omitted the indicated sentance.
+    Edit: 737cc89793585e948f101538f6c34a75184b9566
+
+6.  > None of these are appropriate.
+    > CGH is about LTL MC using a CTL symbolic model checker.
+    > BCCZ99 is the paper that introduced BMC (we talked about it), not about explicit state model checking as conventionally refered to.
+    > BRS is conversion algorithms.
+    > Use SPIN or Ed Clarke etal book on MC (covers all types of MCs).
+    Spot: Page 32
+    Note: Substituted references with Edmund Clarke's "Model Checking" book
     Edit: 
 
 
