@@ -200,18 +200,8 @@ Within the depiction, yellow nodes make nondeterministic choices, and dashed lin
 \caption[Flowchart of formalized CGKA security game.]{%
 \label{fig:CGKA-old-flowchart}%
 Flowchart of formalized CGKA security game.\\%
-``Advances Epoch'' options involve querying:%
-\begin{itemize}
-\item \Oracle{add-user}{}
-\item \Oracle{remove-user}{}
-\item \Oracle{send-update}{}
-\end{itemize}
-``Gains Information'' options involve querying:
-\begin{itemize}
-\item \Oracle{corr}{}
-\item \Oracle{no-del}{}
-\item \Oracle{reveal}{}
-\end{itemize}
+``Advances Epoch'' options involve querying \Oracle{add-user}{}, \Oracle{remove-user}{}, or \Oracle{send-update}{}\\%
+``Gains Information'' options involve querying \Oracle{corr}{}, \Oracle{no-del}{}, or \Oracle{reveal}{}%
 }
 \resizebox{\textwidth}{!}{\subimport{../figures/}{flow-chart}}
 \end{figure}

@@ -2,7 +2,34 @@ Revisions
 =========
 
 
+# Round 2
+
+##  Dietrich
+
+1.  > This requires a reference for each secure messaging program:
+    >
+    > "Secure Messaging is supported by a variety of services [Muj17] including ChatSecure, CryptoCat, Cyber Dust, Cyphr, Facebook Messenger, G Data Secure Chat, Gajim, GNOME Fractal, Google Allo, Haven, Kakao Talk, Line, Element, Signal, Silence, Silent Phone, Skype, Telegram, Viber, WhatsApp, and Wickr, Wire."
+    >
+    > For every single one of them.
+
+
+2.  > Comparison to Broadcast Encryption, just for proper context, as discussed during the defense.
+
+
+3.  > It's still not obvious to me why AMNH computing resources were used for this project, rather than any at CUNY.
+    > And what about projections for hardware resources and scalability to the original goals, as we discussed?
+	> What would be needed? 
+	> Where is that described, in scientific (or even engineering) terms?
+    Note: Expanded Section 6.3 "Scalability Limits," added Table B.8
+	Edit: 
+
+
+---
+
+# Round 1
+
 ## Committee
+
 
 1.  > Rephrase problem to better reflect what was achieved, and not just the current lofty goals.
     Note: Reworked Introduction, Results, and Conclusion to contextualize work acheived, not work attempted.

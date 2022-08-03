@@ -216,10 +216,14 @@ The increase in state-vector length by \(16\) bytes, or \(128\) bits, equates to
 With absolute certainty, the verification problem increases exponentially.
 Though much engineering effort has been taken to simplify the model encoding and adequately tune the performance via Spin directives, an exponential problem can only yield a small amount of tractability.
 
-For each model, generally speaking, \(T = 7\) was the maximum value with resulted in a complete set of observations for all \(n \in [4, 8]\).
+For each model, generally speaking, \(T = 7\) was the maximum value with resulted in a complete set of observations for all \(N \in [4, 8]\).
+When \(T = 8\) and verification of both \LTLPredicate{FSU} and \LTLPredicate{PCS} properties was attempted with 128 MiB of RAM allotted, the verification prematurely terminated with an ``out of memory'' error (\OutOfMemory) for all \(N \in [4, 8]\)
 It is immediately clear from the set of observations that both memory usage and verification run-time scales exponentially with increasing \(T\) and \(N\) parameters.
+Additional computational resources and time will be required to extend the observation set to the desired range in Table\ \ref{tab:model-param-domain}.
+
 The run-time observations for \(T \in [4, 7]\) were used as predictors to extrapolate an estimated for run-time for \(T \in [8, 12]\).
 The projected run-times are depicted in Figure \ref{fig:runtime-projections} and tabulated in Table \ref{tab:predicted-run-times}.
+Similarly, the projected CPU clock cycle requirements are tabulated in Table\ \ref{tab:predicted-cpu-ticks}.
 
 \begin{figure}[ht!]
 \centering
@@ -230,11 +234,20 @@ Run-time (wall clock) projections for \CGKAmod{\VersionOne}{T}{N} using $T \in [
 \includegraphics[width=\textwidth]{./figures/fsu-pcs-runtime-combined-preidcted.png}
 \end{figure}
 
-To estimate the required run-time to complete the observation set for the parameter space \(\forall T \in [8, 12], N \in [4, 8], P \in \{ \LTLPredicate{FSU}, \LTLPredicate{PCS} \}\), one only needs to take the summation of the run-time estimates listed in Table \ref{tab:predicted-run-times}.
+To estimate the required (wall clock) run-time, given the same computational hardware used for observations \(T \in [4, 7]\), to complete the observation set for the \CGKAmod{\VersionOne}{T}{N} parameter space \(\forall\; T \in [8, 12],\, N \in [4, 8],\, P \in \{ \LTLPredicate{FSU}, \LTLPredicate{PCS} \}\), one only needs to take the summation of the run-time estimates listed in Table \ref{tab:predicted-run-times}.
 The summation amounts to an estimated \(1639073974176\) seconds of run-time.
 Given the extremely optimistic case that six verifications can run concurrently and that the totaled verification run-time is perfectly divisible, one can divide the estimated seconds by six before concluding the estimated number of days required.
 The divided summation yields an estimated \(273178995696\) seconds of run-time.
 Unfortunately, \(273178995696\) seconds is equivalent to roughly \(8657\) Gregorian years.
-In order to complete the observation set, further engineering improvements are required.
+In order to complete the observation set by continuing with the same cluster hardware, further engineering improvements would be required with regard to performance tuning and model simplification.
 
+Alternatively, if given sufficient additional cores and RAM matching the computational hardware used for observations \(T \in [4, 7]\) to run \emph{in parallel} the remaining observation set for the parameter space \(\forall T \in [8, 12], N \in [4, 8], P \in \{ \LTLPredicate{FSU}, \LTLPredicate{PCS} \}\), the (wall clock) runtime projection becomes much simpler to calculate.
+The maximum predicted run-time estimate listed in Table \ref{tab:predicted-run-times} would indicate the total time required for all observations to be completed in parallel.
+Given sufficient hardware for full parallelization of the remaining model parameters, completing the verification observation set would require only between 29 and 30 days.
 
+In either case, more than 128 GiB of RAM would need to be allocated for each model verification with \(T \geq 8\).
+From the observations for \(T \in [4, 7]\), it is difficult to confidently fit an exponential curve for projected memory usage of \(T \in [8, 12]\).
+However, some preliminary scaling tests suggest that the requisite memory would exceed 512 GiB RAM for \(T = 12\).
+Similarly, as shown in Table\ \ref{tab:predicted-cpu-ticks}, the projected CPU clock cycles required for \(T = 12\) would exceed \(62 \times 10^{15}\).
+The conclusion of these hardware projections is that completion of the observation set within a reasonable time table will necessitate a large procurement of memory resources or further engineering efforts to reduce the memory footprint.
+Specifically, parallel verification of 40 model parameterizations, each with 512 GiB to 1 TiB of RAM allocation and multiple CPU cores providing up to \(62 \times 10^{15}\) clock cycles.
