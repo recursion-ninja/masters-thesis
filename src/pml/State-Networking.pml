@@ -54,8 +54,8 @@ inline messaging_move ( e, inviter, insert, remove )
     unsigned subject : BITS_USERID = NONE;
     leadership[e] = inviter;
     if
-    :: insert != NONE -> d_step { subject = insert; membership[insert] = true  }
-    :: remove != NONE -> d_step { subject = remove; membership[remove] = false }
+    :: insert != NONE -> d_step { subject = insert; StampBit( membership, insert ) }
+    :: remove != NONE -> d_step { subject = remove; ClearBit( membership, remove ) }
     :: else
     fi
     take_attendance ( );
@@ -83,7 +83,7 @@ inline post_play_poll ( e )
             unsigned n : BITS_USERID;
             for ( n : FIRST_USERID .. FINAL_USERID ) {
                 if
-                :: unsafe[n] -> recoveriesRequired++;
+                :: CheckBit( unsafe, n ) -> recoveriesRequired++;
                 :: else
                 fi
             }
@@ -130,7 +130,7 @@ inline take_attendance ( )
             unsigned n : BITS_USERID;
             for ( n : FIRST_USERID .. FINAL_USERID ) {
                  if
-                 :: membership[n] -> included++; largestID = n
+                 :: CheckBit( membership, n ) -> included++; largestID = n
                  :: else
                  fi
             }
@@ -178,8 +178,8 @@ inline candidate_corruption ( id )
 {
     // The corrupted user must not previously been instructed to hoard!
     // Violates the "Safety Predicate SAFE" described in Alwen 2020.
-//    candidateCorruption = hoarding[id] == NEVER && membership[id] && attackerKnowledge[epoch].node[LEAF+id] == NodeUnknown
-    candidateCorruption = membership[id] && attackerKnowledge[epoch].node[LEAF+id] != NodeIsKnown
+//    candidateCorruption = hoarding[id] == NEVER && CheckBit( membership, id ) && attackerKnowledge[epoch].node[LEAF+id] == NodeUnknown
+    candidateCorruption = CheckBit( membership, id ) && attackerKnowledge[epoch].node[LEAF+id] != NodeIsKnown
 }
 
 
@@ -213,7 +213,7 @@ inline candidates_for_hoarding ( )
 ****/
 inline candidate_hoarder ( id )
 {
-    candidateHoarder = hoarding[id] == NEVER && membership[id]
+    candidateHoarder = hoarding[id] == NEVER && CheckBit( membership, id )
 }
 
 

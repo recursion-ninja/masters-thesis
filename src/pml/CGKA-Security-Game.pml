@@ -197,7 +197,10 @@ inline CGKA_create_group ( )
         unsigned n      : BITS_USERID;
         for ( n : FIRST_USERID .. FINAL_USERID )
         {
-            membership[n] = n < sample;
+            if
+            :: n < sample -> StampBit( membership, n )
+            :: else       -> ClearBit( membership, n )
+            fi
         };
     };
     printf( "\n***********************\n* CGKA: Create Group! *\n***********************\n" );

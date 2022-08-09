@@ -53,7 +53,7 @@ move_corrupt: skip;
     for ( peek : lowerBound .. upperBound )
     {
         if
-        :: !(membership[memberID]) -> skip
+        :: !( CheckBit( membership, memberID) ) -> skip
         :: else -> atomic
             {
                 attacker_learn_leaf      ( peek, memberID );
@@ -61,8 +61,7 @@ move_corrupt: skip;
             }
         fi
     };
-    unsafe[memberID] = true;
-    unsafe[memberID] = true;
+    StampBit( unsafe, memberID );
     attacker_check_knowledge ( epoch );
 }
 
@@ -112,7 +111,7 @@ inline insert_member ( memberID, inviteeID )
         printf ( "\n> > >\n> CGKA: Move Name\t( ADD : + %d <- %d )\n> > >\n", inviteeID, memberID );
         assert (  memberID < N );
         assert ( inviteeID < N );
-        assert ( !(membership[inviteeID]) );
+        assert ( !( CheckBit( membership, inviteeID) ) );
 
         originID =  memberID;
         targetID = inviteeID;
@@ -120,6 +119,19 @@ inline insert_member ( memberID, inviteeID )
 
 move_insert: skip;
     messaging_move ( epoch + 1, memberID, inviteeID, NONE )
+}
+
+
+inline restore_safety ( id )
+{
+    d_step
+    {
+        if
+        :: CheckBit( unsafe, id ) -> unsafeIDs--
+        :: else
+        fi
+        ClearBit( unsafe, id );
+    }
 }
 
 
@@ -131,21 +143,14 @@ inline remove_member ( memberID, evicteeID )
         printf ( "\n> > >\n> CGKA: Move Name\t( RMV : - %d <- %d )\n> > >\n", evicteeID, memberID );
         assert (  memberID < N );
         assert ( evicteeID < N );
-        assert ( membership[evicteeID] );
+        assert ( CheckBit( membership, evicteeID ) );
 
         originID =  memberID;
         targetID = evicteeID;
     };
 
 move_remove: skip;
-    d_step
-    {
-        if
-        :: unsafe[evicteeID] -> unsafeIDs--
-        :: else
-        fi
-        unsafe[evicteeID] = false;
-    };
+    restore_safety ( evicteeID )
     messaging_move ( epoch + 1, memberID, NONE, evicteeID )
 }
 
@@ -162,14 +167,7 @@ inline oblige_update ( memberID )
     };
 
 move_update: skip;
-    d_step
-    {
-        if
-        :: unsafe[memberID] -> unsafeIDs--
-        :: else
-        fi
-        unsafe[memberID] = false;
-    };
+    restore_safety ( memberID )
     messaging_move ( epoch + 1, memberID, NONE, NONE )
 }
 

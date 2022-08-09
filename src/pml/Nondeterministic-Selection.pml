@@ -164,7 +164,7 @@ inline select_invitee ( )
                 select ( sample : 0 .. candidateInvitees - 1 );
                 for ( n : FIRST_USERID .. FINAL_USERID ) {
                     if
-                    :: selection != NONE || membership[n] -> skip
+                    :: selection != NONE || CheckBit( membership, n ) -> skip
                     :: else ->
                         if
                         :: sample != 0 -> sample--
@@ -263,7 +263,7 @@ inline candidates_for_invitee ( )
         for ( n : 0 .. groupMost - 1 )
         {
             if
-            :: !(membership[n]) -> candidates++
+            :: !( CheckBit( membership, n ) ) -> candidates++
             :: else
             fi
         }
@@ -315,7 +315,7 @@ inline candidates_from_members ( banned )
 ****/
 inline candidate_member ( banned, id )
 {
-    candidateMember = membership[id] && ( banned != id );
+    candidateMember = CheckBit( membership, id ) && ( banned != id );
 }
 
 

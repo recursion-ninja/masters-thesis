@@ -39,16 +39,18 @@ inline print_challenges ( )
 inline print_membership ( )
 {
     d_step {
-        printf ( "\n\tMembership:" );
+        printf ( "\n\tMembership (val): %d", membership );
+        printf ( "\n\tMembership (arr):" );
         unsigned p : BITS_USERID;
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: membership[p] -> printf ( "\n\t  %d [\tTrue\t]",  p );
-            :: else          -> printf ( "\n\t  %d [\tFalse\t]", p );
+            :: CheckBit( membership, p ) -> printf ( "\n\t  %d [\tTrue\t]",  p );
+            :: else                      -> printf ( "\n\t  %d [\tFalse\t]", p );
             fi
         };
         printf ( "\n" );
+        
     }
 }
 
@@ -78,8 +80,8 @@ inline print_user_unsafe ( )
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: unsafe[p] -> printf ( "\n\t  %d [\tTrue\t]" , p );
-            :: else      -> printf ( "\n\t  %d [\tFalse\t]", p );
+            :: CheckBit( unsafe, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p );
+            :: else                  -> printf ( "\n\t  %d [\tFalse\t]", p );
             fi
         }
         printf ( "\n" );

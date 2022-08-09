@@ -349,8 +349,8 @@ inline attacker_init_epoch_knowledge ( e )
                     :: height == 0 ->
                         if
                         // No knowledge from excluded group members
-                        :: n >= N || !(membership[n]) -> info = Uninhabited
-                        :: else                       -> info = NodeUnknown
+                        :: n >= N || !( CheckBit ( membership, n ) ) -> info = Uninhabited
+                        :: else -> info = NodeUnknown
                         fi
                     // Internal node case(s)
                     :: else ->
