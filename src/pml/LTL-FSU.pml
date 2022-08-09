@@ -20,12 +20,12 @@
         && \
             ( epoch == (t + 1) ) \
         && \
-            ( !(learnedKey[t]) ) \
+            ( !( CheckBit( learnedKey, t) ) ) \
         )  \
     ) \
 -> \
     (  \
-        ( !(learnedKey[t]) ) \
+        ( !( CheckBit( learnedKey, t) ) ) \
     U  \
         ( CGKA@end_of_game ) \
     )  \

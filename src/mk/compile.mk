@@ -232,7 +232,7 @@ show-directives:
 	@printf "%s" "$(directives-list)"
 
 verification: $(filepath-verifier) backup
-	$(filepath-verifier) -a -i -v -x > $(filepath-record)
+	$(filepath-verifier) -a -v -x > $(filepath-record)
 
 #######
 ###

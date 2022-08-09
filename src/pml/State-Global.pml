@@ -16,6 +16,7 @@
   *
 ********/
 
+#include "Bit-Array.pml"
 #include "Parameterized-Constants.pml"
 
 
@@ -25,10 +26,10 @@
   *
 ****/
 
-local unsigned challenge : T; // Has the attacker challenged in an epoch?
-//local bool  challenge[T]; // Has the attacker challenged in an epoch?
+local unsigned challenge  : T; // Has the attacker challenged in an epoch?
+local unsigned learnedKey : T; // Attacker knows the group key of current epoch?
+//   local bool learnedKey[T]; // Attacker knows the group key of current epoch?
 local byte leadership[T]; // Which member initiated the epoch?
-local bool learnedKey[T]; // Attacker knows the group key of current epoch?
 
 local bool membership[N]; // Group membership of current epoch
 local byte   hoarding[N]; // Epoch from which the user saves secrets

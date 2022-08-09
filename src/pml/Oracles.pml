@@ -87,7 +87,7 @@ inline reveal ( )
 
 move_reveal: skip;
     d_step {
-        stampBit( challenge, epoch);
+        StampBit( challenge, epoch );
         attacker_learn_root ( epoch );
     }
 }

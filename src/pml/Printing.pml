@@ -26,10 +26,9 @@ inline print_challenges ( )
         unsigned p : BITS_EPOCH;
         for ( p : FIRST_EPOCH .. FINAL_EPOCH )
         {
-            checkBit( challenge, p);
             if
-            :: bitSet -> printf ( "\n\t  %d [\tTrue\t]" , p );
-            :: else   -> printf ( "\n\t  %d [\tFalse\t]", p );
+            :: CheckBit( challenge, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p );
+            :: else                     -> printf ( "\n\t  %d [\tFalse\t]", p );
             fi
         }
         printf ( "\n" );

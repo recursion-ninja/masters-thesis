@@ -118,7 +118,7 @@ inline play_move_without_commitment ( )
         select_hoarder   ( );
     };
 
-    bool canReveal = epoch != FINAL_EPOCH && !(learnedKey[epoch]);
+    bool canReveal = epoch != FINAL_EPOCH && !( CheckBit( learnedKey, epoch ) );
 
     d_step
     {
@@ -173,7 +173,7 @@ inline CGKA_initialize()
             unsigned t : BITS_EPOCH;
             for ( t : FIRST_EPOCH .. FINAL_EPOCH )
             {
-                clearBit( challenge, t );
+                ClearBit( challenge, t );
                 leadership[t] = NONE;
             };
         };

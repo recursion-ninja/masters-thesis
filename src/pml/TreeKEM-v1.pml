@@ -157,7 +157,10 @@ inline attacker_check_knowledge ( named_epoch )
         unsigned e : BITS_EPOCH;
         for ( e : FIRST_EPOCH .. named_epoch )
         {
-            learnedKey[named_epoch] = attackerKnowledge[e].node[ROOT] == NodeIsKnown;
+            if
+            :: attackerKnowledge[e].node[ROOT] == NodeIsKnown -> StampBit( learnedKey, e )
+            :: else -> skip
+            fi
         }
     }
 }
@@ -178,7 +181,7 @@ inline attacker_initialize ( )
                     attackerKnowledge[t].node[v] = Uninhabited
                 }
             }
-            learnedKey[t] = false;
+            ClearBit( learnedKey, t )
         }
     }
 }
@@ -187,7 +190,7 @@ inline attacker_initialize ( )
 inline attacker_learn_root ( named_epoch )
 {
     attackerKnowledge[named_epoch].node[ROOT] -> NodeIsKnown;
-    learnedKey[named_epoch] = true;
+    StampBit ( learnedKey, named_epoch );
 }
 
 

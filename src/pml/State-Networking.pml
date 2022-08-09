@@ -90,7 +90,8 @@ inline post_play_poll ( e )
         }
         unsafeIDs  = recoveriesRequired;
 
-        bool canRevealRoot = e != FINAL_EPOCH && !(learnedKey[e])
+        
+        bool canRevealRoot = e != FINAL_EPOCH && !( CheckBit( learnedKey, e ) );
 
         // Refresh "commitmentRequired"
         bool canHoardMember = false;
