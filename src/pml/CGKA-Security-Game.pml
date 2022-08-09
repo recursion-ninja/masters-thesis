@@ -1,6 +1,7 @@
 #ifndef IMPORT_SPEC_CGKAGAME
 #define IMPORT_SPEC_CGKAGAME
 
+#include "Bit-Array.pml"
 #include "Nondeterministic-Selection.pml"
 #include "Oracles.pml"
 #include "Parameterized-Constants.pml"
@@ -172,7 +173,7 @@ inline CGKA_initialize()
             unsigned t : BITS_EPOCH;
             for ( t : FIRST_EPOCH .. FINAL_EPOCH )
             {
-                challenge[t]  = false;
+                clearBit( challenge, t );
                 leadership[t] = NONE;
             };
         };

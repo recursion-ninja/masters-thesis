@@ -25,7 +25,8 @@
   *
 ****/
 
-local bool  challenge[T]; // Has the attacker challenged in an epoch?
+local unsigned challenge : T; // Has the attacker challenged in an epoch?
+//local bool  challenge[T]; // Has the attacker challenged in an epoch?
 local byte leadership[T]; // Which member initiated the epoch?
 local bool learnedKey[T]; // Attacker knows the group key of current epoch?
 

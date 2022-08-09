@@ -1,6 +1,7 @@
 #ifndef IMPORT_SPEC_PRINTING
 #define IMPORT_SPEC_PRINTING
 
+#include "Bit-Array.pml"
 #include "Parameterized-Constants.pml"
 #include "State-Global.pml"
 #include "State-Networking.pml"
@@ -25,9 +26,10 @@ inline print_challenges ( )
         unsigned p : BITS_EPOCH;
         for ( p : FIRST_EPOCH .. FINAL_EPOCH )
         {
+            checkBit( challenge, p);
             if
-            :: challenge[p] -> printf ( "\n\t  %d [\tTrue\t]" , p );
-            :: else         -> printf ( "\n\t  %d [\tFalse\t]", p );
+            :: bitSet -> printf ( "\n\t  %d [\tTrue\t]" , p );
+            :: else   -> printf ( "\n\t  %d [\tFalse\t]", p );
             fi
         }
         printf ( "\n" );
