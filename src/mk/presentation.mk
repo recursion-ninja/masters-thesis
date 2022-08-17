@@ -92,7 +92,12 @@ pandoc-flag-list = \
 latexmk-options := $(subst $(SPACE),$(row-delimiter),$(latexmk-flag-list))
 pandoc-options  := $(subst $(SPACE),$(row-delimiter),$(pandoc-flag-list))
 
-artifacts := $(abspath $(addprefix $(dir-slides-source)$(presentation-name).,nav snm))
+artifact-list := \
+  $(abspath $(addprefix $(dir-slides-source)$(presentation-name).,nav snm)) \
+  $(presentation-target) \
+  $(presentation-latex)
+artifact-rows := $(subst $(SPACE),$(row-delimiter),$(artifact-list))
+
 
 #######
 ###
@@ -123,9 +128,8 @@ pdf:: $(presentation-target)
 presentation: $(presentation-target)
 
 presentation-clean:
-	( cd $(dir $(presentation-latex)); latexmk -CA; )
-	-rm -f$(row-delimiter)$(presentation-target)$(row-delimiter)$(presentation-latex)
-	-rm $(artifacts)
+#	( cd $(dir $(presentation-latex)); latexmk -CA; )
+	-rm -f$(row-delimiter)$(artifact-rows)
 
 #######
 ###

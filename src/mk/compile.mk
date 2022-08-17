@@ -149,8 +149,9 @@ param-memory := $(param-memory-encoded)
 ###
 #######
 
-opt-properties := #\
-    -DREACH
+opt-properties := \
+#    -DPRINTF \
+#    -DREACH
 
 ifeq ("$(param-min-dfa)","Yes")
 opt-memory := \
