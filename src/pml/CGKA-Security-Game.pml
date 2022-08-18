@@ -153,7 +153,7 @@ inline play_move_without_commitment ( )
 ********/
 
 
-inline CGKA_initialize()
+inline CGKA_initialize ( )
 {   atomic {
     d_step
     {
@@ -194,7 +194,7 @@ inline CGKA_create_group ( )
     d_step 
     {
         select ( sample : 2 .. N );
-        unsigned n      : BITS_USERID;
+        unsigned n : BITS_USERID;
         for ( n : FIRST_USERID .. FINAL_USERID )
         {
             if
@@ -203,19 +203,24 @@ inline CGKA_create_group ( )
             fi
         };
     };
+    groupMost = sample;
+    attendees = sample;
+    absentees = N - attendees;
+
     printf( "\n***********************\n* CGKA: Create Group! *\n***********************\n" );
 
-    d_step
-    {
-        unsigned id0 : BITS_USERID = 0;
-        unsigned ep0 : BITS_EPOCH  = 0;
-        messaging_move ( ep0, id0, NONE, NONE );
-    };
+    unsigned id0 : BITS_USERID = 0;
+    unsigned ep0 : BITS_EPOCH  = 0;
+
+    leadership[ep0] = id0;
+//    attacker_updates_knowledge    ( ep0 );
+//    attacker_check_knowledge      ( ep0 );
+
     print_membership ( );
 }
 
 
-inline CGKA_security_game()
+inline CGKA_security_game ( )
 {
     printf( "\n***********************\n* CGKA: Begin Play!   *\n***********************\n" );
     printf( "\nEpoch: %d\n", epoch );
@@ -262,15 +267,11 @@ progress_epoch:
     }
 
 end_of_game:
-    d_step
-    {
-        epoch = FINAL_EPOCH;
-        print_entire_state ( );
-    }
+    print_entire_state ( );
 }
 
 
-active proctype CGKA ()
+active proctype CGKA ( )
 {
     CGKA_initialize    ( );
     CGKA_create_group  ( );

@@ -7,7 +7,7 @@
   * Security game's parameters' valid ranges:
   *   - T <- [3, 254]
   *   - C <- [1,   T]
-  *   - N <- [3, 254] 
+  *   - N <- [3,  16]
   *
   * Parameters (`t`, `c` `n`) defined as constants below:
   *

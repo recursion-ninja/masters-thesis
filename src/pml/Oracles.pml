@@ -43,7 +43,7 @@ inline corrupt ( memberID )
     };
 
 move_corrupt: skip;
-    printf ( "Corrupting from: %d -- %d\n", lowerBound, upperBound );
+    printf ( "Learning secrets from epochs: [ %d, %d ]\n", lowerBound, upperBound );
 
     // For each epoch which the member has secrets
     // (this implies that the user was a member)
@@ -53,12 +53,12 @@ move_corrupt: skip;
     for ( peek : lowerBound .. upperBound )
     {
         if
-        :: !( CheckBit( membership, memberID) ) -> skip
-        :: else -> atomic
+        :: CheckBit( membership, memberID ) -> atomic
             {
                 attacker_learn_leaf      ( peek, memberID );
                 attacker_amend_knowledge ( peek );
             }
+        :: else
         fi
     };
     StampBit( unsafe, memberID );
@@ -118,20 +118,9 @@ inline insert_member ( memberID, inviteeID )
     };
 
 move_insert: skip;
-    messaging_move ( epoch + 1, memberID, inviteeID, NONE )
-}
-
-
-inline restore_safety ( id )
-{
-    d_step
-    {
-        if
-        :: CheckBit( unsafe, id ) -> unsafeIDs--
-        :: else
-        fi
-        ClearBit( unsafe, id );
-    }
+    StampBit( membership, inviteeID )
+    take_attendance ( );
+    messaging_move ( epoch + 1, memberID )
 }
 
 
@@ -150,8 +139,10 @@ inline remove_member ( memberID, evicteeID )
     };
 
 move_remove: skip;
-    restore_safety ( evicteeID )
-    messaging_move ( epoch + 1, memberID, NONE, evicteeID )
+    restore_safety ( evicteeID );
+    ClearBit( membership, evicteeID );
+    take_attendance ( );
+    messaging_move ( epoch + 1, memberID )
 }
 
 
@@ -167,8 +158,8 @@ inline oblige_update ( memberID )
     };
 
 move_update: skip;
-    restore_safety ( memberID )
-    messaging_move ( epoch + 1, memberID, NONE, NONE )
+    restore_safety ( memberID );
+    messaging_move ( epoch + 1, memberID );
 }
 
 

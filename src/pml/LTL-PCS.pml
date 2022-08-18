@@ -64,7 +64,7 @@ ltl PCS
         && ( targetID == id ) \
         ) \
     -> \
-        ( attackerKnowledge[epoch].node[ROOT] != NodeIsKnown ) \
+        ( !( CheckBit( attackerKnowledge[epoch], ROOT ) ) ) \
     )  \
 )
 */

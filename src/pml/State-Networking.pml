@@ -40,26 +40,33 @@ local bool commitmentRequired = false;
   *   - oblige_update (Oracle UPD)
   *
   * Modifies global variable(s):
-  *   - membership
   *   - abstract "attacker knowledgebase"
   *
-  * External result variable(s):
-  *   - absentees
-  *   - attendees
-  *   - groupMost
+****/
+inline messaging_move ( e, inviter )
+{
+    leadership[e] = inviter;
+    attacker_study_message ( e );
+}
+
+
+/****
+  *
+  * The inline definition is used by the security game moves:
+  *   - remove_member (Oracle RMV)
+  *   - oblige_update (Oracle UPD)
   *
 ****/
-inline messaging_move ( e, inviter, insert, remove )
+inline restore_safety ( id )
 {
-    unsigned subject : BITS_USERID = NONE;
-    leadership[e] = inviter;
-    if
-    :: insert != NONE -> d_step { subject = insert; StampBit( membership, insert ) }
-    :: remove != NONE -> d_step { subject = remove; ClearBit( membership, remove ) }
-    :: else
-    fi
-    take_attendance ( );
-    attacker_study_message ( e, inviter, subject );
+    d_step
+    {
+        if
+        :: CheckBit( unsafe, id ) -> unsafeIDs--
+        :: else
+        fi
+        ClearBit( unsafe, id );
+    }
 }
 
 
@@ -88,8 +95,7 @@ inline post_play_poll ( e )
                 fi
             }
         }
-        unsafeIDs  = recoveriesRequired;
-
+        unsafeIDs = recoveriesRequired;
         
         bool canRevealRoot = e != FINAL_EPOCH && !( CheckBit( learnedKey, e ) );
 
@@ -178,8 +184,7 @@ inline candidate_corruption ( id )
 {
     // The corrupted user must not previously been instructed to hoard!
     // Violates the "Safety Predicate SAFE" described in Alwen 2020.
-//    candidateCorruption = hoarding[id] == NEVER && CheckBit( membership, id ) && attackerKnowledge[epoch].node[LEAF+id] == NodeUnknown
-    candidateCorruption = CheckBit( membership, id ) && attackerKnowledge[epoch].node[LEAF+id] != NodeIsKnown
+    candidateCorruption = CheckBit( membership, id ) && !( CheckBit( attackerKnowledge[epoch], LEAF + id ) )
 }
 
 
