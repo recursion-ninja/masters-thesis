@@ -51,7 +51,8 @@ con-pair := $(COMMA)
 con-pref := const-
 con-temp := breif-
 
-$(con-pref)debug := $(EMPTY)
+#$(con-pref)debug := $(EMPTY)
+$(con-pref)debug := YES
 
 #######
 ###
@@ -60,13 +61,15 @@ $(con-pref)debug := $(EMPTY)
 #######
 
 define amend_definitions_within
+	$(info $(amendment-mapping))
 	@if [ -n "$(amendment-mapping)" ]; then \
 	    printf $(if $($(con-pref)debug),"\nAmending constants within:\n\t%s\n\nAmendments:\n" "$(1)",""); \
 	fi
-	@for kvp in $(amendment-mapping); do \
+	for kvp in $(amendment-mapping); do \
 	    key=$${kvp%,*}; \
 	    val=$${kvp#*,}; \
 	    rep="/^#define/s/\\s+$${key}(\\s+)[[:digit:]]+\\s*$$/ $${key}\\1$${val}/"; \
+	    printf $(if $($(con-pref)debug),"\tREP:\t%s\n" "$${rep}", ""); \
 	    printf $(if $($(con-pref)debug),"\t%-13s-->%4s\n" "$${key}" "$${val}",""); \
 	    sed -E -i "$${rep}" $(1); \
 	done
@@ -113,6 +116,8 @@ $(con-pref)FIRST_USERID := 0
 $(con-pref)FINAL_USERID := $(shell expr $($(con-pref)N) - 1)
 $(con-pref)FIRST_VERTEX := 0
 $(con-pref)FINAL_VERTEX := $(shell expr $($(con-pref)TREE_ORDER) - 1)
+$(con-pref)LEAF_LEVEL   := 0
+$(con-pref)ROOT_LEVEL   := $(shell expr $($(con-pref)BITS_VERTEX) - 1)
 
 # Collect all defined constant variables and construct a key-value pair mapping
 defined-constants := $(sort $(filter $(con-pref)%,$(.VARIABLES)))

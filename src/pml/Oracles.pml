@@ -23,7 +23,7 @@ inline corrupt ( memberID )
     d_step
     {
         printf ( "\n> > >\n> CGKA: Move Name\t( COR : @ %d <- _ )\n> > >\n", memberID );
-        assert ( memberID < N );
+//        assert ( memberID < N );
         targetID = memberID;
     };
 
@@ -71,7 +71,7 @@ inline hoard ( memberID )
     d_step
     {
         printf ( "\n> > >\n> CGKA: Move Name\t( HRD : @ %d <- _ )\n> > >\n", memberID );
-        assert ( memberID < N );
+//        assert ( memberID < N );
         targetID = memberID;
     };
 
@@ -109,9 +109,9 @@ inline insert_member ( memberID, inviteeID )
     d_step
     {
         printf ( "\n> > >\n> CGKA: Move Name\t( ADD : + %d <- %d )\n> > >\n", inviteeID, memberID );
-        assert (  memberID < N );
-        assert ( inviteeID < N );
-        assert ( !( CheckBit( membership, inviteeID) ) );
+//        assert (  memberID < N );
+//        assert ( inviteeID < N );
+//        assert ( !( CheckBit( membership, inviteeID) ) );
 
         originID =  memberID;
         targetID = inviteeID;
@@ -130,9 +130,9 @@ inline remove_member ( memberID, evicteeID )
     d_step
     {
         printf ( "\n> > >\n> CGKA: Move Name\t( RMV : - %d <- %d )\n> > >\n", evicteeID, memberID );
-        assert (  memberID < N );
-        assert ( evicteeID < N );
-        assert ( CheckBit( membership, evicteeID ) );
+//        assert (  memberID < N );
+//        assert ( evicteeID < N );
+//        assert ( CheckBit( membership, evicteeID ) );
 
         originID =  memberID;
         targetID = evicteeID;
@@ -151,7 +151,7 @@ inline oblige_update ( memberID )
     d_step
     {
         printf ( "\n> > >\n> CGKA: Move Name\t( UPD : @ _ <- %d )\n> > >\n", memberID );
-        assert ( memberID < N );
+//        assert ( memberID < N );
 
         originID = memberID;
         targetID = NONE;

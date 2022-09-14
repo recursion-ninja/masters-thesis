@@ -36,9 +36,9 @@ inline select_corrupted ( )
         unsigned selection : BITS_USERID = NONE;
         d_step
         {
-            unsigned n      : BITS_USERID;
-            unsigned sample : BITS_USERID;
+            unsigned sample    : BITS_USERID;
             select ( sample : 0 .. candidateCorruptibles - 1 );
+            unsigned n : BITS_USERID;
             for ( n : FIRST_USERID .. FINAL_USERID )
             {
                 d_step
@@ -113,9 +113,9 @@ inline select_hoarder ( )
         unsigned selection : BITS_USERID = NONE;
         d_step
         {
-            unsigned n      : BITS_USERID;
             unsigned sample : BITS_USERID;
             select ( sample : 0 .. candidateHoarders - 1 );
+            unsigned n : BITS_USERID;
             for ( n : FIRST_USERID .. FINAL_USERID )
             {
                 d_step
@@ -159,9 +159,10 @@ inline select_invitee ( )
             unsigned selection : BITS_USERID = NONE;
             d_step
             {
-                unsigned n      : BITS_USERID;
                 unsigned sample : BITS_USERID;
                 select ( sample : 0 .. candidateInvitees - 1 );
+                skip;
+                unsigned n : BITS_USERID;
                 for ( n : FIRST_USERID .. FINAL_USERID ) {
                     if
                     :: selection != NONE || CheckBit( membership, n ) -> skip
@@ -207,13 +208,14 @@ inline select_updater ( )
 }
 
 
+
 /****
   * External result variable(s):
   *   - selectedID
 ****/
 inline select_member_constrained ( banned )
 {   atomic {
-    unsigned candidateMembers : BITS_USERID = 0;
+    unsigned candidateMembers : N = 0;
     candidates_from_members ( banned )
 
     if
@@ -222,9 +224,9 @@ inline select_member_constrained ( banned )
         unsigned selection : BITS_USERID = NONE;
         d_step
         {
-            unsigned n      : BITS_USERID;
-            unsigned sample : BITS_USERID;
+            unsigned sample    : BITS_USERID;
             select ( sample : 0 .. candidateMembers - 1 );
+            unsigned n      : BITS_USERID;
             for ( n : FIRST_USERID .. FINAL_USERID ) {
                 d_step
                 {
@@ -288,7 +290,19 @@ inline candidates_for_invitee ( )
 ****/
 inline candidates_from_members ( banned )
 {
-    unsigned candidates : BITS_USERID = 0;
+/**/
+    d_step
+    {
+        PopCount ( membership, candidateMembers );
+        assert (  attendees == candidateMembers );
+        if
+        :: (banned != NONE) && CheckBit( membership, banned ) -> candidateMembers--
+        :: else
+        fi
+    }
+/**/
+/**
+    unsigned candidates : N = 0;
     d_step
     {
         unsigned n : BITS_USERID;
@@ -306,6 +320,7 @@ inline candidates_from_members ( banned )
         }
     }
     candidateMembers = candidates
+**/
 }
 
 

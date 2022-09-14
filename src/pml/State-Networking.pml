@@ -146,7 +146,7 @@ inline take_attendance ( )
     }
 
     if
-    :: largestID + 1 > groupMost -> groupMost = largestID + 1;
+    :: largestID > groupMost -> groupMost = largestID;
     :: else
     fi
 }

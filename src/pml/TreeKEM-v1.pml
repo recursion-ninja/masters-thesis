@@ -199,7 +199,7 @@ inline attacker_learn_leaf ( named_epoch, memberID )
         unsigned height : BITS_VERTEX;
         unsigned offset : BITS_VERTEX = LEAF;
         unsigned spine  : BITS_VERTEX = LEAF + memberID;
-        for ( height : 0 .. BITS_VERTEX - 1 )
+        for ( height : LEAF_LEVEL .. ROOT_LEVEL )
         {
             d_step
             {
@@ -293,7 +293,7 @@ inline attacker_relay_knowledge ( e )
         unsigned height : BITS_VERTEX;
         unsigned offset : BITS_VERTEX = LEAF / 2;
         unsigned width  : BITS_VERTEX = ( ( TREE_ORDER / 2 ) + 1 ) / 2;
-        for ( height : 1 .. BITS_VERTEX - 1 )
+        for ( height : LEAF_LEVEL + 1 .. ROOT_LEVEL )
         {
             d_step
             {

@@ -67,14 +67,12 @@ inline play_move_with_commitment ( )
              inviteeID : BITS_USERID, 
              inviterID : BITS_USERID,
              updaterID : BITS_USERID;
-    atomic
-    {
-        select_evictee ( );
-        select_evictor ( evicteeID );
-        select_invitee ( );
-        select_inviter ( );
-        select_updater ( );
-    };
+
+    select_evictee ( );
+    select_evictor ( evicteeID );
+    select_invitee ( );
+    select_inviter ( );
+    select_updater ( );
 
     d_step
     {
@@ -112,11 +110,9 @@ inline play_move_without_commitment ( )
 {
     unsigned corruptedID : BITS_USERID, 
                hoarderID : BITS_USERID;
-    atomic
-    {
-        select_corrupted ( );
-        select_hoarder   ( );
-    };
+
+    select_corrupted ( );
+    select_hoarder   ( );
 
     bool canReveal = epoch != FINAL_EPOCH && !( CheckBit( learnedKey, epoch ) );
 
@@ -191,21 +187,19 @@ inline CGKA_create_group ( )
 {
     // Number of members to add
     unsigned sample : BITS_USERID;
+    select ( sample : 2 .. N );
+    skip;
     d_step 
     {
-        select ( sample : 2 .. N );
         unsigned n : BITS_USERID;
-        for ( n : FIRST_USERID .. FINAL_USERID )
+        for ( n : FIRST_USERID .. sample - 1 )
         {
-            if
-            :: n < sample -> StampBit( membership, n )
-            :: else       -> ClearBit( membership, n )
-            fi
+            StampBit( membership, n )
         };
+        groupMost = sample - 1;
+        attendees = sample;
+        absentees = N - attendees;
     };
-    groupMost = sample;
-    attendees = sample;
-    absentees = N - attendees;
 
     printf( "\n***********************\n* CGKA: Create Group! *\n***********************\n" );
 
@@ -213,8 +207,6 @@ inline CGKA_create_group ( )
     unsigned ep0 : BITS_EPOCH  = 0;
 
     leadership[ep0] = id0;
-//    attacker_updates_knowledge    ( ep0 );
-//    attacker_check_knowledge      ( ep0 );
 
     print_membership ( );
 }

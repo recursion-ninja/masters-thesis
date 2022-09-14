@@ -118,15 +118,16 @@
 /********
   *
   * The model must often iterate over the entire domain of valid (non-missing)
-  * Epochs, UserIDs, or Vertices. To facilate these traversals, constants are
-  * defined indicating the upper and lower bounds of the contiguous, discrete
-  * domains.
+  * Epochs, UserIDs, Vertices, or post-order tree levels. To facilate these
+  * traversals, constants are defined indicating the upper and lower bounds of
+  * the contiguous, discrete domains.
   *
   * Constants defined as:
-  *   - FIRST_EPOCH  = FIRST_USERID = FIRST_VERTEX = 0
+  *   - FIRST_EPOCH  = FIRST_USERID = FIRST_VERTEX = LEAF_LEVEL = 0
   *   - FINAL_EPOCH  = ( T - 1 )
   *   - FINAL_USERID = ( N - 1 )
   *   - FINAL_VERTEX = ( TREE_ORDER - 1 )
+  *   - ROOT_LEVEL   = ( BITS_VERTEX -  1)
   *
 ********/
 #define FIRST_EPOCH  0
@@ -138,5 +139,7 @@
 #define FIRST_VERTEX 0
 #define FINAL_VERTEX 6
 
+#define LEAF_LEVEL 0
+#define ROOT_LEVEL 2
 
 #endif /* IMPORT_SPEC_CONSTANTS */
