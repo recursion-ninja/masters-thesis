@@ -32,7 +32,9 @@ local byte leadership[T]; // Which member initiated the epoch?
 
 // 'Unsigned' variables whose values are interpreted as 'Bit-Arrays'
 local unsigned challenge  : T; // Has the attacker challenged in an epoch?
-local unsigned learnedKey : T; // Attacker knows the group key of current epoch?
+local unsigned learnedKey  : T; // Attacker knows the group's shared secret key of current epoch?
+//local unsigned secretKey  : T; // Attacker knows the group's shared secret key of current epoch?
+//local unsigned memberKey  : N; // Attacker knows the group member's current epoch
 local unsigned membership : N; // Group membership of current epoch
 local unsigned unsafe     : N; // Members which require a change to update
 

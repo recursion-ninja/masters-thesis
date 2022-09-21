@@ -158,6 +158,7 @@ inline take_attendance ( )
 ****/
 inline candidates_for_corruption ( )
 {
+#ifdef SELECT_VIA_LOOP
     unsigned candidates : BITS_USERID = 0;
     d_step
     {
@@ -173,6 +174,18 @@ inline candidates_for_corruption ( )
         }
     }
     candidateCorruptibles = candidates
+#else
+    d_step
+    {
+        printf ( "\nCorruption Check:    unsafe                = 0x2%x\n"  ,    unsafe                );
+        printf (   "Corruption Check: ( ~unsafe )              = 0x2%x\n"  , ( ~unsafe )              );
+        printf (   "Corruption Check:               membership = 0x2%x\n"  ,               membership );
+        printf (   "Corruption Check: ( ~unsafe ) & membership = 0x2%x\n\n", ( ~unsafe ) & membership );
+        unsigned buffer : N = ( ~unsafe ) & membership;
+        PopCount ( buffer, buffer );
+        candidateCorruptibles = buffer;
+    }
+#endif
 }
 
 

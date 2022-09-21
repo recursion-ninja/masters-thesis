@@ -1,6 +1,7 @@
 #ifndef IMPORT_SPEC_CONSTANTS
 #define IMPORT_SPEC_CONSTANTS
 
+//  #define SELECT_VIA_LOOP
 
 /********
   *

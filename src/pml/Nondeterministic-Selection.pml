@@ -151,7 +151,7 @@ inline select_invitee ( )
     if
     :: attendees == N -> inviteeID = NONE;
     :: else ->
-        unsigned candidateInvitees : BITS_USERID;
+        unsigned candidateInvitees : N;
         candidates_for_invitee ( );
         if
         :: candidateInvitees == 0 -> inviteeID = NONE;
@@ -258,6 +258,7 @@ inline select_member_constrained ( banned )
 ****/
 inline candidates_for_invitee ( )
 {
+#ifdef SELECT_VIA_LOOP
     unsigned candidates : BITS_USERID = 0;
     d_step
     {
@@ -281,6 +282,17 @@ inline candidates_for_invitee ( )
         fi
     }
     candidateInvitees = candidates
+#else
+    d_step
+    {
+        PopCount ( membership, candidateInvitees );
+        candidateInvitees = (groupMost + 1) - candidateInvitees;
+        if
+        :: groupMost == N -> skip
+        :: else -> candidateInvitees++
+        fi
+    }
+#endif
 }
 
 
@@ -290,18 +302,7 @@ inline candidates_for_invitee ( )
 ****/
 inline candidates_from_members ( banned )
 {
-/**/
-    d_step
-    {
-        PopCount ( membership, candidateMembers );
-        assert (  attendees == candidateMembers );
-        if
-        :: (banned != NONE) && CheckBit( membership, banned ) -> candidateMembers--
-        :: else
-        fi
-    }
-/**/
-/**
+#ifdef SELECT_VIA_LOOP
     unsigned candidates : N = 0;
     d_step
     {
@@ -320,7 +321,17 @@ inline candidates_from_members ( banned )
         }
     }
     candidateMembers = candidates
-**/
+#else
+    d_step
+    {
+        PopCount ( membership, candidateMembers );
+        assert (  attendees == candidateMembers );
+        if
+        :: (banned != NONE) && CheckBit( membership, banned ) -> candidateMembers--
+        :: else
+        fi
+    }
+#endif
 }
 
 

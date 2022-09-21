@@ -61,7 +61,8 @@ move_corrupt: skip;
         :: else
         fi
     };
-    StampBit( unsafe, memberID );
+    StampBit(    unsafe, memberID );
+//    StampBit( memberKey, memberID );
     attacker_check_knowledge ( epoch );
 }
 
