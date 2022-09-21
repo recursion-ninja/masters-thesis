@@ -104,18 +104,45 @@ inline select_evictee ( )
 inline select_hoarder ( )
 {   atomic {
 
+    hoarderID = NONE;
+
     unsigned candidateHoarders : BITS_USERID;
     candidates_for_hoarding ( );
 
+    printf ( "\n\tHoarding Select: candidateHoarders = 0x2%x ~~ %d\n", candidateHoarders, candidateHoarders );
     if
-    :: candidateHoarders == 0 -> hoarderID = NONE
+    :: candidateHoarders == 0 -> skip; // Leave ID as NONE!
     :: else ->
-        unsigned selection : BITS_USERID = NONE;
+        printf ( "Hoarding Select: ... need to choose" );
+    
         d_step
         {
             unsigned sample : BITS_USERID;
             select ( sample : 0 .. candidateHoarders - 1 );
-            unsigned n : BITS_USERID;
+            printf ( "Hoarding Select: sample = 0x2%x ~~ %d\n", sample, sample );
+
+            d_step
+            {
+                CandidateHoarderArray( buffer );
+                printf ( "Hoarding Select: buffer = 0x2%x ~~ %d\n", buffer, buffer );
+            
+                unsigned n : BITS_USERID = FIRST_USERID;
+                do
+                :: hoarderID != NONE -> break
+                :: else ->
+                        if
+                        :: !( CheckBit ( buffer, n) ) -> skip
+                        :: else ->
+                            if
+                            :: sample == 0 -> hoarderID = n
+                            :: sample != 0 -> sample--
+                            fi
+                        fi
+                        n++;
+                od
+            }
+
+/*
             for ( n : FIRST_USERID .. FINAL_USERID )
             {
                 d_step
@@ -123,21 +150,21 @@ inline select_hoarder ( )
                     if
                     :: selection != NONE -> skip
                     :: else ->
-                        bool candidateHoarder
-                        candidate_hoarder ( n );
                         if
-                        :: !(candidateHoarder) -> skip
+                        :: !( CheckBit ( buffer, n) ) -> skip
                         :: else ->
                             if
-                            :: sample == 0 -> selection = n
+                            :: sample == 0 -> hoarderID = n
                             :: sample != 0 -> sample--
                             fi
                         fi
                     fi
                 }
             }
+*/
         }
-        hoarderID = selection
+        
+        printf ( "Hoarding Select: hoarderID = 0x2%x ~~ %d\n", hoarderID, hoarderID )
     fi
 }   }
 

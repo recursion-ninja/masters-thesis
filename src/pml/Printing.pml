@@ -36,8 +36,8 @@ inline print_membership ( )
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: CheckBit( membership, p ) -> printf ( "\n\t  %d [\tTrue\t]",  p );
-            :: else                      -> printf ( "\n\t  %d [\tFalse\t]", p );
+            :: CheckBit( membership, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p )
+            :: else                      -> printf ( "\n\t  %d [\tFalse\t]", p )
             fi
         };
         printf ( "\n" );
@@ -49,13 +49,13 @@ inline print_membership ( )
 inline print_user_hoarding ( )
 {
     d_step {
-        printf ( "\n\tHoarding since:" );
+        printf ( "\n\tHoarding:" );
         unsigned p : BITS_USERID;
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: hoarding[p] == NEVER -> printf ( "\n\t  %d [\tNEVER\t]", p )
-            :: else                 -> printf ( "\n\t  %d [\t%d\t]"  , p, hoarding[p])
+            :: CheckBit( hoarding, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p )
+            :: else                    -> printf ( "\n\t  %d [\tFalse\t]", p )
             fi
         }
         printf ( "\n" );
@@ -71,8 +71,8 @@ inline print_user_unsafe ( )
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: CheckBit( unsafe, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p );
-            :: else                  -> printf ( "\n\t  %d [\tFalse\t]", p );
+            :: CheckBit( unsafe, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p )
+            :: else                  -> printf ( "\n\t  %d [\tFalse\t]", p )
             fi
         }
         printf ( "\n" );

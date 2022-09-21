@@ -7,6 +7,12 @@
 #include "TreeKEM-v1.pml"
 
 
+#define CandidateHoarderArray( buffer ) \
+atomic { \
+    buffer = ( ~( hoarding | startHoard ) ) & membership; \
+}
+
+
 /****
   *
   * Global state of derivative variables.
@@ -61,10 +67,13 @@ inline restore_safety ( id )
     d_step // MISS!
     {
         if
-        :: CheckBit( unsafe, id ) -> unsafeIDs--
+        :: CheckBit( unsafe, id ) ->
+            {
+              ClearBit( unsafe, id );
+              unsafeIDs--
+            }
         :: else
         fi
-        ClearBit( unsafe, id );
     }
 }
 
@@ -96,7 +105,7 @@ inline post_play_poll ( e )
         }
         unsafeIDs = recoveriesRequired;
         
-        bool canRevealRoot = e != FINAL_EPOCH && !( learnedKey );
+        bool canRevealRoot = e != FINAL_EPOCH && !( learnedActiveKey );
 
         // Refresh "commitmentRequired"
         bool canHoardMember = false;
@@ -180,7 +189,7 @@ inline candidates_for_corruption ( )
         printf (   "Corruption Check: ( ~unsafe )              = 0x2%x\n"  , ( ~unsafe )              );
         printf (   "Corruption Check:               membership = 0x2%x\n"  ,               membership );
         printf (   "Corruption Check: ( ~unsafe ) & membership = 0x2%x\n\n", ( ~unsafe ) & membership );
-        unsigned buffer : N = ( ~unsafe ) & membership;
+        buffer = ( ~unsafe ) & membership;
         PopCount ( buffer, buffer );
         candidateCorruptibles = buffer;
     }
@@ -196,7 +205,7 @@ inline candidate_corruption ( id )
 {
     // The corrupted user must not previously been instructed to hoard!
     // Violates the "Safety Predicate SAFE" described in Alwen 2020.
-    candidateCorruption = CheckBit( membership, id ) && !( CheckBit( attackerKnowledge[epoch], LEAF + id ) )
+    candidateCorruption = CheckBit( membership, id ) && !( CheckBit( unsafe, id ) ) // !( CheckBit( attackerKnowledge[epoch], LEAF + id ) )
 }
 
 
@@ -206,6 +215,7 @@ inline candidate_corruption ( id )
 ****/
 inline candidates_for_hoarding ( )
 {
+#ifdef SELECT_VIA_LOOP
     unsigned candidates : BITS_USERID = 0;
     d_step
     {
@@ -221,6 +231,20 @@ inline candidates_for_hoarding ( )
         }
     }
     candidateHoarders = candidates
+#else
+    d_step
+    {
+        printf ( "\n\tHoarding Count:      hoarding                               = 0x2%x\n"  ,      hoarding                               );
+        printf (     "Hoarding Count:                 startHoard                  = 0x2%x\n"  ,                 startHoard                  );
+        printf (     "Hoarding Count:                                  membership = 0x2%x\n"  ,                                  membership );
+        printf (     "Hoarding Count:   ~( hoarding | startHoard )                = 0x2%x\n"  ,   ~( hoarding | startHoard )                );
+        printf (     "Hoarding Count: ( ~( hoarding | startHoard ) ) & membership = 0x2%x\n"  , ( ~( hoarding | startHoard ) ) & membership );
+        CandidateHoarderArray( buffer );
+        PopCount ( buffer, buffer );
+        candidateHoarders = buffer;
+        printf (     "Hoarding Count: candidateHoarders = 0x2%x ~~ %d\n", candidateHoarders, candidateHoarders );
+    }
+#endif
 }
 
 
@@ -230,7 +254,7 @@ inline candidates_for_hoarding ( )
 ****/
 inline candidate_hoarder ( id )
 {
-    candidateHoarder = hoarding[id] == NEVER && CheckBit( membership, id )
+    candidateHoarder = !( CheckBit( hoarding | startHoard, id ) ) && CheckBit( membership, id )
 }
 
 

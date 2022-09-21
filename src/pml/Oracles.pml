@@ -27,6 +27,23 @@ inline corrupt ( memberID )
         targetID = memberID;
     };
 
+
+move_corrupt: skip;
+
+    d_step
+    {
+        if
+        :: CheckBit( hoarding & membership, memberID ) -> learnedLegacyKey = true;
+        :: else
+        fi
+    };
+
+    attacker_learn_leaf      ( epoch, memberID );
+    attacker_amend_knowledge ( epoch, memberID );
+    attacker_check_knowledge ( epoch );
+    StampBit( unsafe, memberID );
+
+/*
     // Learn the secret material of the user in their current epoch...
     // plus any additional epochs they have hoarded secrets from.
     unsigned lowerBound : BITS_EPOCH,
@@ -64,6 +81,7 @@ move_corrupt: skip;
     StampBit(    unsafe, memberID );
 //    StampBit( memberKey, memberID );
     attacker_check_knowledge ( epoch );
+*/
 }
 
 
@@ -77,7 +95,7 @@ inline hoard ( memberID )
     };
 
 move_hoard: skip;
-    hoarding[memberID] = epoch;
+    StampBit( startHoard, memberID )
 }
 
 
@@ -88,7 +106,7 @@ inline reveal ( )
 move_reveal: skip;
     d_step {
         challenged = true;
-        learnedKey = true;
+        learnedActiveKey = true;
         attacker_learn_root ( epoch );
     }
 }

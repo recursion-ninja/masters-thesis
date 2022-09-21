@@ -114,7 +114,7 @@ inline play_move_without_commitment ( )
     select_corrupted ( );
     select_hoarder   ( );
 
-    bool canReveal = !( challenged || learnedKey || epoch == FINAL_EPOCH );
+    bool canReveal = !( challenged || learnedActiveKey || epoch == FINAL_EPOCH );
 
     d_step
     {
@@ -155,19 +155,11 @@ inline CGKA_initialize ( )
     {
         printf( "\n***********************\n* CGKA: Initialize!   *\n***********************\n");
         
-        d_step
-        {
-            unsigned n : BITS_USERID;
-            for ( n : FIRST_USERID .. FINAL_USERID )
-            {
-                hoarding[n] = NEVER;
-            };
-        };
-//        hoarding   = 0;
-
         epoch      = 0;
+        hoarding   = 0;
         unsafeIDs  = 0;
-        learnedKey = false;
+//        memberKey  = 0;
+        learnedActiveKey  = false;
 
         attacker_initialize ( )
     };
@@ -230,6 +222,8 @@ start_of_game:
     :: finished -> break
     :: else -> 
         {
+            unsigned buffer     : N = 0;
+            unsigned startHoard : N = 0;
             challenged = false;
 start_of_epoch: skip
             do
@@ -262,6 +256,7 @@ continue_epoch: { play_move_without_commitment ( ) };
             printf( "\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", FINAL_EPOCH - epoch, unsafeIDs );
 
             // Update for next loop iteration
+            hoarding = hoarding | startHoard;
             epoch++;
         }
     od

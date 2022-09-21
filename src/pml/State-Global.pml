@@ -27,12 +27,10 @@
 ****/
 
 // Byte-Arrays
-local byte hoarding[N]; // Epoch from which the user saves secrets
+//local byte hoarding[N]; // Epoch from which the user saves secrets
 
 // 'Unsigned' variables whose values are interpreted as 'Bit-Arrays'
-//local unsigned secretKey  : T; // Attacker knows the group's shared secret key of current epoch?
-//local unsigned memberKey  : N; // Attacker knows the group member's current epoch
-//local unsigned hoarding   : N; // Group membership of current epoch
+local unsigned hoarding   : N; // Group membership of current epoch
 local unsigned membership : N; // Group membership of current epoch
 local unsigned unsafe     : N; // Members which require a change to update
 
@@ -43,8 +41,9 @@ local unsigned targetID  : BITS_USERID; // ID of the effected member
 local unsigned unsafeIDs : BITS_USERID; // Flags set within unsafe
 
 // Scalar variables
-local bool challenged; // Attacker has challenged in current epoch?
-local bool learnedKey; // Attacker knows the group's shared secret key in current epoch?
+local bool challenged;       // Attacker has challenged in current epoch?
+local bool learnedActiveKey; // Attacker learned the group's shared secret key during the key's epoch?
+local bool learnedLegacyKey; // Attacker learned the group's shared secret key after  the key's epoch?
 
 
 #endif /* IMPORT_SPEC_GLOBALS */

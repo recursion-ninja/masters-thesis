@@ -8,7 +8,7 @@
 ****/
 ltl PCS
 { 
-    [] ( ( CGKA@start_of_epoch && ( unsafeIDs == 0 ) ) -> ( !( CheckBit( learnedKey, epoch) ) ) )
+    [] ( ( CGKA@start_of_epoch && ( unsafeIDs == 0 ) ) -> ( !( CheckBit( learnedActiveKey, epoch) ) ) )
 }
 
 
@@ -52,7 +52,7 @@ ltl PCS
         && CGKA@end_of_game
     )
     ->
-    ( !( CheckBit( learnedKey, FINAL_EPOCH ) ) )
+    ( !( CheckBit( learnedActiveKey, FINAL_EPOCH ) ) )
 }
 
 

@@ -159,7 +159,7 @@ inline attacker_check_knowledge ( named_epoch )
         for ( e : FIRST_EPOCH .. named_epoch )
         {
             if
-            :: CheckBit( attackerKnowledge[e], ROOT ) -> learnedKey = true;
+            :: CheckBit( attackerKnowledge[e], ROOT ) -> learnedActiveKey = true;
             :: else -> skip
             fi
         }
@@ -176,7 +176,7 @@ inline attacker_initialize ( )
         {
             attackerKnowledge[t] = 0;
         }
-        learnedKey = false;
+        learnedActiveKey = false;
     }
 }
 

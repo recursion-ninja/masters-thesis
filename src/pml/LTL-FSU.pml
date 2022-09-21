@@ -8,7 +8,10 @@
   *
 ****/
 #define never_trivially_hoard_then_corrupt \
-( []( CGKA@move_corrupt -> hoarding[targetID] == NEVER ) )
+( []( CGKA@move_corrupt -> !( CheckBit( hoarding, targetID ) ) ) )
+
+
+
 
 
 #define future_secrecy_of_epoch( t ) \
@@ -20,12 +23,12 @@
         && \
             ( epoch == (t + 1) ) \
         && \
-            ( !( CheckBit( learnedKey, t) ) ) \
+            ( !( learnedActiveKey ) ) \
         )  \
     ) \
 -> \
     (  \
-        ( !( CheckBit( learnedKey, t) ) ) \
+        ( !( learnedActiveKey ) ) \
     U  \
         ( CGKA@end_of_game ) \
     )  \
@@ -34,7 +37,7 @@
 
 ltl FSU
 {
-    never_trivially_hoard_then_corrupt ->
+    never_trivially_hoard_then_corrupt -> ( []( !( learnedLegacyKey ) ) )
     (   future_secrecy_of_epoch(  0 )
     &&  future_secrecy_of_epoch(  1 )
     &&  future_secrecy_of_epoch(  2 )
