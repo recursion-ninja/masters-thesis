@@ -114,7 +114,7 @@ inline play_move_without_commitment ( )
     select_corrupted ( );
     select_hoarder   ( );
 
-    bool canReveal = epoch != FINAL_EPOCH && !( CheckBit( learnedKey, epoch ) );
+    bool canReveal = !( challenged || learnedKey || epoch == FINAL_EPOCH );
 
     d_step
     {
@@ -154,7 +154,7 @@ inline CGKA_initialize ( )
     d_step
     {
         printf( "\n***********************\n* CGKA: Initialize!   *\n***********************\n");
-
+        
         d_step
         {
             unsigned n : BITS_USERID;
@@ -163,19 +163,11 @@ inline CGKA_initialize ( )
                 hoarding[n] = NEVER;
             };
         };
-        
-        d_step
-        {
-            unsigned t : BITS_EPOCH;
-            for ( t : FIRST_EPOCH .. FINAL_EPOCH )
-            {
-                ClearBit( challenge, t );
-                leadership[t] = NONE;
-            };
-        };
+//        hoarding   = 0;
 
-        epoch     = 0;
-        unsafeIDs = 0;
+        epoch      = 0;
+        unsafeIDs  = 0;
+        learnedKey = false;
 
         attacker_initialize ( )
     };
@@ -206,8 +198,6 @@ inline CGKA_create_group ( )
     unsigned id0 : BITS_USERID = 0;
     unsigned ep0 : BITS_EPOCH  = 0;
 
-    leadership[ep0] = id0;
-
     print_membership ( );
 }
 
@@ -228,35 +218,53 @@ inline CGKA_security_game ( )
     //
     // NOTE: option (1), is implicitly the last move in the model
 
-start_of_game:
+    bool finished      = false;
     commitmentRequired = false;
 
-    // Loop through all epochs
-    for ( epoch : 0 .. FINAL_EPOCH )
-    {
+
+// Loop through epochs
+// Based on model parameter T, non-deterministically loop through T sequences of epochs,
+// with each epoch sequence ranging from 0 to `t` for all `t` in { 0, 1, .. , T - 1 }.
+start_of_game:
+    do
+    :: finished -> break
+    :: else -> 
+        {
+            challenged = false;
 start_of_epoch: skip
-        do
-        // 1. Play the Challenge Move
-        //     The attacker ending the game is implicitly the last move of the model
-        //     so it always happens in the last epoch.
-        :: epoch == FINAL_EPOCH -> break
+            do
 
-progress_epoch:
-        // 2. Play a Commitment Move
-        //     The attacker *may* play a move which commits to a new epoch...
-        //     unless it is the last epoch.
-        :: epoch != FINAL_EPOCH -> play_move_with_commitment ( ); break
+            // 1. Play the Challenge Move
+            //     The attacker ending the game is the last move of the model.
+            //     This is done by querying the 'challenge' oracle.
+            //     *MAY*  query 'challenge' oracle in any epoch before last epoch.
+            //     *MUST* query 'challenge' oracle in the last epoch.
+            //     so it always happens in the last epoch.
+            :: !(challenged) -> 
+cease_in_epoch: { finished = true; break };
 
-        // 3. Play a Non-commital Move
-        //     The attacker *may* play a move and remain in the same epoch...
-        //     unless the attacker has exhausted all idempotent non-comittal moves!
-        :: !(commitmentRequired) -> play_move_without_commitment ( )
-        od;
+            // 2. Play a Commitment Move
+            //     The attacker *may* play a move which commits to a new epoch...
+            //     unless it is the last epoch.
+            :: epoch != FINAL_EPOCH ->
+progress_epoch: { play_move_with_commitment ( ); break };
 
-        // After the operation is complete, check to see if the an endgame condition has been reached.
-        printf( "\nLOOP broken: %d", epoch );
-        printf( "\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", FINAL_EPOCH - epoch, unsafeIDs );
-    }
+            // 3. Play a Non-commital Move
+            //     The attacker *may* play a move and remain in the same epoch...
+            //     unless the attacker has exhausted all idempotent non-comittal moves!
+            :: !(commitmentRequired) -> 
+continue_epoch: { play_move_without_commitment ( ) };
+
+            od;
+
+            // After the operation is complete, check to see if the an endgame condition has been reached.
+            printf( "\nLOOP broken: %d", epoch );
+            printf( "\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", FINAL_EPOCH - epoch, unsafeIDs );
+
+            // Update for next loop iteration
+            epoch++;
+        }
+    od
 
 end_of_game:
     print_entire_state ( );

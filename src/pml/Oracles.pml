@@ -56,7 +56,7 @@ move_corrupt: skip;
         :: CheckBit( membership, memberID ) -> atomic
             {
                 attacker_learn_leaf      ( peek, memberID );
-                attacker_amend_knowledge ( peek );
+                attacker_amend_knowledge ( peek, memberID );
             }
         :: else
         fi
@@ -87,7 +87,8 @@ inline reveal ( )
 
 move_reveal: skip;
     d_step {
-        StampBit( challenge, epoch );
+        challenged = true;
+        learnedKey = true;
         attacker_learn_root ( epoch );
     }
 }

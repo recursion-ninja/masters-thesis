@@ -22,16 +22,7 @@
 inline print_challenges ( )
 {
     d_step {
-        printf ( "\n\tChallenges:" );
-        unsigned p : BITS_EPOCH;
-        for ( p : FIRST_EPOCH .. FINAL_EPOCH )
-        {
-            if
-            :: CheckBit( challenge, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p );
-            :: else                     -> printf ( "\n\t  %d [\tFalse\t]", p );
-            fi
-        }
-        printf ( "\n" );
+        printf ( "\n\tChallenged (Bit):\t%d\n", challenged );
     }
 }
 

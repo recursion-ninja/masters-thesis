@@ -45,8 +45,7 @@ local bool commitmentRequired = false;
 ****/
 inline messaging_move ( e, inviter )
 {
-    leadership[e] = inviter;
-    attacker_study_message ( e );
+    attacker_study_message ( e, inviter );
 }
 
 
@@ -59,7 +58,7 @@ inline messaging_move ( e, inviter )
 ****/
 inline restore_safety ( id )
 {
-    d_step
+    d_step // MISS!
     {
         if
         :: CheckBit( unsafe, id ) -> unsafeIDs--
@@ -97,7 +96,7 @@ inline post_play_poll ( e )
         }
         unsafeIDs = recoveriesRequired;
         
-        bool canRevealRoot = e != FINAL_EPOCH && !( CheckBit( learnedKey, e ) );
+        bool canRevealRoot = e != FINAL_EPOCH && !( learnedKey );
 
         // Refresh "commitmentRequired"
         bool canHoardMember = false;

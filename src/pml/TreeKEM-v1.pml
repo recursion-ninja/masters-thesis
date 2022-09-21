@@ -134,7 +134,7 @@ KNOWLEDGE_DATATYPE attackerKnowledge[T];
 ****/
 
 
-inline attacker_amend_knowledge ( named_epoch )
+inline attacker_amend_knowledge ( named_epoch, memberID )
 {
     // TODO:
     // Starting from 'named_epoch' the attacker updates knowledge.
@@ -144,7 +144,7 @@ inline attacker_amend_knowledge ( named_epoch )
         unsigned t : BITS_EPOCH;
         for ( t : named_epoch + 1 .. epoch )
         {
-            attacker_relay_knowledge ( t - 1 );
+            attacker_relay_knowledge ( t - 1, memberID );
         }
         attacker_check_knowledge ( epoch );
     }
@@ -159,7 +159,7 @@ inline attacker_check_knowledge ( named_epoch )
         for ( e : FIRST_EPOCH .. named_epoch )
         {
             if
-            :: CheckBit( attackerKnowledge[e], ROOT ) -> StampBit( learnedKey, e )
+            :: CheckBit( attackerKnowledge[e], ROOT ) -> learnedKey = true;
             :: else -> skip
             fi
         }
@@ -176,17 +176,14 @@ inline attacker_initialize ( )
         {
             attackerKnowledge[t] = 0;
         }
-        learnedKey = 0;
+        learnedKey = false;
     }
 }
 
 
 inline attacker_learn_root ( named_epoch )
 {
-    d_step {
-        StampBit ( attackerKnowledge[named_epoch], ROOT );
-        StampBit ( learnedKey, named_epoch );
-    };
+    StampBit ( attackerKnowledge[named_epoch], ROOT );
 }
 
 
@@ -211,19 +208,19 @@ inline attacker_learn_leaf ( named_epoch, memberID )
 }
 
 
-inline attacker_study_message ( e )
+inline attacker_study_message ( e, memberID )
 {
     atomic
     {
-        attacker_relay_knowledge ( e - 1 );
-        attacker_check_knowledge ( e     );
+        attacker_relay_knowledge ( e - 1, memberID );
+        attacker_check_knowledge ( e );
     }
 }
 
 
 inline print_attacker_knowledge ( )
 {
-    d_step
+    d_step // MISS!
     {
         printf ( "\n\tAttacker Knowledge:" );
         unsigned pt : BITS_EPOCH;
@@ -270,24 +267,24 @@ inline print_attacker_knowledge ( )
 ****/
 
 
-inline attacker_relay_knowledge ( e )
+inline attacker_relay_knowledge ( e, memberID )
 {   atomic {
 
     // Logic of LEAF vertices
-    d_step
+    d_step // MISS!
     {
         unsigned n : BITS_VERTEX;
         for ( n : FIRST_USERID .. FINAL_USERID )
         {
             unsigned v : BITS_VERTEX = LEAF + n;
             if
-            :: v != LEAF + leadership[e+1] && CheckBit ( attackerKnowledge[e], v ) && CheckBit ( membership, n ) -> StampBit ( attackerKnowledge[e+1], v )
+            :: v != LEAF + memberID && CheckBit ( attackerKnowledge[e], v ) && CheckBit ( membership, n ) -> StampBit ( attackerKnowledge[e+1], v )
             :: else
             fi
         }
     }
 
-    d_step
+    d_step // MISS!
     {
         // Logic of internal vertices
         unsigned height : BITS_VERTEX;
