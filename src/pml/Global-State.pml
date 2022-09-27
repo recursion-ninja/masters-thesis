@@ -19,6 +19,9 @@
 #include "Bit-Array.pml"
 #include "Parameterized-Constants.pml"
 
+// Datatype for an array of bits. Packed tightly, saves space!
+#define BITARRAY( label ) unsigned label : N
+
 
 /****
   *
@@ -26,22 +29,18 @@
   *
 ****/
 
-// Byte-Arrays
-//local byte hoarding[N]; // Epoch from which the user saves secrets
-
-// 'Unsigned' variables whose values are interpreted as 'Bit-Arrays'
-local unsigned hoarding   : N; // Group membership of current epoch
-local unsigned membership : N; // Group membership of current epoch
-local unsigned unsafe     : N; // Members which require a change to update
-
-// 'Unsigned' variables with directly interpreted as scalar values
-local unsigned epoch     : BITS_EPOCH;  // The current epoch
-local unsigned originID  : BITS_USERID; // ID of the  member
-local unsigned targetID  : BITS_USERID; // ID of the effected member
-local unsigned unsafeIDs : BITS_USERID; // Flags set within unsafe
+// 'Bit-Arrays' variables
+local BITARRAY ( hoardPrior ); // Group membership of current epoch
+local BITARRAY ( memberKeys ); // Members whose keys are known (corrupted), require an update/removal
+local BITARRAY ( membership ); // Group membership of current epoch
 
 // Scalar variables
-local bool challenged;       // Attacker has challenged in current epoch?
+local unsigned epoch    : BITS_EPOCH;  // The current epoch
+local unsigned originID : BITS_USERID; // ID of the  member
+local unsigned targetID : BITS_USERID; // ID of the effected member
+local unsigned widestID : BITS_USERID; // The maximum ID during any past/present epoch.
+
+// Knowledge flags
 local bool learnedActiveKey; // Attacker learned the group's shared secret key during the key's epoch?
 local bool learnedLegacyKey; // Attacker learned the group's shared secret key after  the key's epoch?
 

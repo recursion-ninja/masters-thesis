@@ -2,8 +2,7 @@
 #define IMPORT_SPEC_ORACLES
 
 #include "Parameterized-Constants.pml"
-#include "State-Global.pml"
-#include "State-Networking.pml"
+#include "Global-State.pml"
 #include "TreeKEM-v1.pml"
 
 
@@ -18,84 +17,27 @@
 ********/
 
 
-inline corrupt ( memberID )
+inline corrupt ( )
 {
-    d_step
-    {
-        printf ( "\n> > >\n> CGKA: Move Name\t( COR : @ %d <- _ )\n> > >\n", memberID );
-//        assert ( memberID < N );
-        targetID = memberID;
-    };
+    printf ( "\n> > >\n> CGKA: Move Name\t( COR : @ %d <- _ )\n> > >\n", targetID );
 
+    if
+    :: CheckBit( hoardPrior, targetID ) -> learnedLegacyKey = true;
+    :: else
+    fi
 
-move_corrupt: skip;
-
-    d_step
-    {
-        if
-        :: CheckBit( hoarding & membership, memberID ) -> learnedLegacyKey = true;
-        :: else
-        fi
-    };
-
-    attacker_learn_leaf      ( epoch, memberID );
-    attacker_amend_knowledge ( epoch, memberID );
+    StampBit( memberKeys, targetID );
+    attacker_learn_leaf      ( epoch, targetID );
+    attacker_amend_knowledge ( epoch, targetID );
     attacker_check_knowledge ( epoch );
-    StampBit( unsafe, memberID );
-
-/*
-    // Learn the secret material of the user in their current epoch...
-    // plus any additional epochs they have hoarded secrets from.
-    unsigned lowerBound : BITS_EPOCH,
-             upperBound : BITS_EPOCH;
-    d_step
-    {
-        lowerBound = epoch;
-        upperBound = epoch;
-        unsigned savedSince : BITS_EPOCH = hoarding[memberID];
-        if
-        :: savedSince != NEVER -> lowerBound = savedSince
-        :: else
-        fi
-    };
-
-move_corrupt: skip;
-    printf ( "Learning secrets from epochs: [ %d, %d ]\n", lowerBound, upperBound );
-
-    // For each epoch which the member has secrets
-    // (this implies that the user was a member)
-    // Then the attacker learns the secrets on the direct path
-    // between the member and the root node on the LBBT.
-    unsigned peek : BITS_EPOCH;
-    for ( peek : lowerBound .. upperBound )
-    {
-        if
-        :: CheckBit( membership, memberID ) -> atomic
-            {
-                attacker_learn_leaf      ( peek, memberID );
-                attacker_amend_knowledge ( peek, memberID );
-            }
-        :: else
-        fi
-    };
-    StampBit(    unsafe, memberID );
-//    StampBit( memberKey, memberID );
-    attacker_check_knowledge ( epoch );
-*/
 }
 
 
-inline hoard ( memberID )
+inline hoard ( )
 {
-    d_step
-    {
-        printf ( "\n> > >\n> CGKA: Move Name\t( HRD : @ %d <- _ )\n> > >\n", memberID );
-//        assert ( memberID < N );
-        targetID = memberID;
-    };
+    printf ( "\n> > >\n> CGKA: Move Name\t( HRD : @ %d <- _ )\n> > >\n", targetID );
 
-move_hoard: skip;
-    StampBit( startHoard, memberID )
+    StampBit( hoardNovel, targetID )
 }
 
 
@@ -103,12 +45,9 @@ inline reveal ( )
 {
     printf ( "\n> > >\n> CGKA: Move Name\t( RVL : * _ -- _ ) @ %d\n> > >\n", epoch );
 
-move_reveal: skip;
-    d_step {
-        challenged = true;
-        learnedActiveKey = true;
-        attacker_learn_root ( epoch );
-    }
+    challenged = true;
+    learnedActiveKey = true;
+    attacker_learn_root ( epoch );
 }
 
 
@@ -123,63 +62,35 @@ move_reveal: skip;
 ********/
 
 
-// Precondition: invitee is not in the group!
-inline insert_member ( memberID, inviteeID )
+inline insert_member ( )
 {
-    d_step
-    {
-        printf ( "\n> > >\n> CGKA: Move Name\t( ADD : + %d <- %d )\n> > >\n", inviteeID, memberID );
-//        assert (  memberID < N );
-//        assert ( inviteeID < N );
-//        assert ( !( CheckBit( membership, inviteeID) ) );
+    printf ( "\n> > >\n> CGKA: Move Name\t( ADD : + %d <- %d )\n> > >\n", targetID, originID );
 
-        originID =  memberID;
-        targetID = inviteeID;
-    };
-
-move_insert: skip;
-    StampBit( membership, inviteeID )
-    take_attendance ( );
-    messaging_move ( epoch + 1, memberID )
+    if
+    :: targetID > widestID -> widestID = targetID
+    :: else
+    fi
+    StampBit( membership, targetID )
+    attacker_study_message ( epoch + 1, originID );
 }
 
 
-// Precondition: evicteeID is in the group!
-inline remove_member ( memberID, evicteeID )
+inline remove_member ( )
 {
-    d_step
-    {
-        printf ( "\n> > >\n> CGKA: Move Name\t( RMV : - %d <- %d )\n> > >\n", evicteeID, memberID );
-//        assert (  memberID < N );
-//        assert ( evicteeID < N );
-//        assert ( CheckBit( membership, evicteeID ) );
+    printf ( "\n> > >\n> CGKA: Move Name\t( RMV : - %d <- %d )\n> > >\n", targetID, originID );
 
-        originID =  memberID;
-        targetID = evicteeID;
-    };
-
-move_remove: skip;
-    restore_safety ( evicteeID );
-    ClearBit( membership, evicteeID );
-    take_attendance ( );
-    messaging_move ( epoch + 1, memberID )
+    ClearBit( memberKeys, targetID );
+    ClearBit( membership, targetID );
+    attacker_study_message ( epoch + 1, originID );
 }
 
 
-inline oblige_update ( memberID )
+inline oblige_update ( )
 {
-    d_step
-    {
-        printf ( "\n> > >\n> CGKA: Move Name\t( UPD : @ _ <- %d )\n> > >\n", memberID );
-//        assert ( memberID < N );
+    printf ( "\n> > >\n> CGKA: Move Name\t( UPD : @ _ <- %d )\n> > >\n", originID );
 
-        originID = memberID;
-        targetID = NONE;
-    };
-
-move_update: skip;
-    restore_safety ( memberID );
-    messaging_move ( epoch + 1, memberID );
+    ClearBit( memberKeys, originID );
+    attacker_study_message ( epoch + 1, originID );
 }
 
 

@@ -3,8 +3,7 @@
 
 #include "Bit-Array.pml"
 #include "Parameterized-Constants.pml"
-#include "State-Global.pml"
-#include "State-Networking.pml"
+#include "Global-State.pml"
 #include "TreeKEM-v1.pml"
 
 
@@ -14,7 +13,7 @@
     *   - print_challenges
     *   - print_membership
     *   - print_user_hoarding
-    *   - print_user_unsafe
+    *   - print_user_corrupted
     *
 ********/
 
@@ -22,7 +21,10 @@
 inline print_challenges ( )
 {
     d_step {
-        printf ( "\n\tChallenged (Bit):\t%d\n", challenged );
+        if
+        :: challenged -> printf ( "\n\tChallenged:\tTrue\n"  );
+        :: else       -> printf ( "\n\tChallenged:\tFalse\n" );
+        fi
     }
 }
 
@@ -30,6 +32,8 @@ inline print_challenges ( )
 inline print_membership ( )
 {
     d_step {
+        printf ( "\n\tLargest ID:\t%d\n", widestID );
+        
         printf ( "\n\tMembership (val): %d", membership );
         printf ( "\n\tMembership (arr):" );
         unsigned p : BITS_USERID;
@@ -41,7 +45,6 @@ inline print_membership ( )
             fi
         };
         printf ( "\n" );
-        
     }
 }
 
@@ -49,13 +52,24 @@ inline print_membership ( )
 inline print_user_hoarding ( )
 {
     d_step {
-        printf ( "\n\tHoarding:" );
         unsigned p : BITS_USERID;
+        
+        printf ( "\n\tHoarding Prior:" );
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: CheckBit( hoarding, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p )
-            :: else                    -> printf ( "\n\t  %d [\tFalse\t]", p )
+            :: CheckBit( hoardPrior, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p )
+            :: else                      -> printf ( "\n\t  %d [\tFalse\t]", p )
+            fi
+        }
+        printf ( "\n" );
+
+        printf ( "\n\tHoarding Newly:" );
+        for ( p : FIRST_USERID .. FINAL_USERID )
+        {
+            if
+            :: CheckBit( hoardNovel, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p )
+            :: else                      -> printf ( "\n\t  %d [\tFalse\t]", p )
             fi
         }
         printf ( "\n" );
@@ -63,7 +77,7 @@ inline print_user_hoarding ( )
 }
 
 
-inline print_user_unsafe ( )
+inline print_user_corrupted ( )
 {
     d_step {
         printf ( "\n\tRequired healing:" );
@@ -71,43 +85,10 @@ inline print_user_unsafe ( )
         for ( p : FIRST_USERID .. FINAL_USERID )
         {
             if
-            :: CheckBit( unsafe, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p )
-            :: else                  -> printf ( "\n\t  %d [\tFalse\t]", p )
+            :: CheckBit( memberKeys, p ) -> printf ( "\n\t  %d [\tTrue\t]" , p )
+            :: else                      -> printf ( "\n\t  %d [\tFalse\t]", p )
             fi
         }
-        printf ( "\n" );
-    }
-}
-
-
-/********
-    *
-    * Network state priniting utilities:
-    *   - print_group_composition
-    *   - print_protocol_state
-    *
-********/
-
-
-inline print_group_composition ( )
-{
-    d_step
-    {
-        printf ( "\n\tGroup Composition:" );
-        printf ( "\n\t  - attendees \t=  %d", attendees );
-        printf ( "\n\t  - absentees \t=  %d", absentees );
-        printf ( "\n\t  - groupMost \t=  %d", groupMost );
-        printf ( "\n" );
-    }
-}
-
-
-inline print_protocol_state ( )
-{
-    d_step
-    {
-        printf ( "\n\tProtocol State:" );
-        printf ( "\n\t  - unsafeIDs  \t=  %d", unsafeIDs  );
         printf ( "\n" );
     }
 }
@@ -128,11 +109,11 @@ inline print_entire_state ( )
         printf ( "\n-=-=-=-=-=-=-=-=-=-=-=-\n-=-  GLOBAL  STATE  -=-\n-=-=-=-=-=-=-=-=-=-=-=-\n" );
         printf ( "\n\tCurrent Epoch \t%d\n", epoch );
         print_challenges         ( );
+        printf ( "\n\tNon-Commitment Options:\t[ %d, %d, %d ]\n", CheckBit (nonCommitmentOptions, 0), CheckBit (nonCommitmentOptions, 1), CheckBit (nonCommitmentOptions, 2) );
+        printf ( "\n\tNon-Commitment Ability:\t%d\n", nonCommitmentOptions != 0 );
         print_membership         ( );
         print_user_hoarding      ( );
-        print_user_unsafe        ( );
-        print_group_composition  ( );
-        print_protocol_state     ( );
+        print_user_corrupted     ( );
         print_attacker_knowledge ( );
     }
 }

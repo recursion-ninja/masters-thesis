@@ -2,12 +2,12 @@
 #define IMPORT_SPEC_CGKAGAME
 
 #include "Bit-Array.pml"
-#include "Nondeterministic-Selection.pml"
+#include "Selection.pml"
 #include "Oracles.pml"
 #include "Parameterized-Constants.pml"
+#include "Pop-Count.pml"
 #include "Printing.pml"
-#include "State-Global.pml"
-#include "State-Networking.pml"
+#include "Global-State.pml"
 
 
 /********
@@ -50,92 +50,6 @@
     *   
 ********/
 
-/********
-    *
-    * Attacker moves interacting with oracles:
-    *
-    *   - play_move_with_commitment
-    *   - play_move_without_commitment
-    *
-********/
-
-
-inline play_move_with_commitment ( )
-{
-    unsigned evictorID : BITS_USERID, 
-             evicteeID : BITS_USERID, 
-             inviteeID : BITS_USERID, 
-             inviterID : BITS_USERID,
-             updaterID : BITS_USERID;
-
-    select_evictee ( );
-    select_evictor ( evicteeID );
-    select_invitee ( );
-    select_inviter ( );
-    select_updater ( );
-
-    d_step
-    {
-        print_entire_state ( );
-        printf( "\n> > >\n> CGKA: Move Type\tCommitment\n> > >\n" );
-        printf( "\n\tCommitment values:" );
-        printf( "\n\t   - evictorID \t=   %d", evictorID );
-        printf( "\n\t   - evicteeID \t=   %d", evicteeID );
-        printf( "\n\t   - inviterID \t=   %d", inviterID );
-        printf( "\n\t   - inviteeID \t=   %d", inviteeID );
-        printf( "\n\t   - updaterID \t=   %d", updaterID );
-        printf( "\n");
-    };
-
-    if
-    :: inviterID != NONE && inviteeID != NONE -> insert_member ( inviterID, inviteeID )
-    :: evictorID != NONE && evicteeID != NONE -> remove_member ( evictorID, evicteeID )
-    :: else                                   -> oblige_update ( updaterID            )
-    fi
-
-    post_play_poll ( epoch + 1 );
-} 
-
-
-/****
-  *
-  * Attacker moves without advancing the epoch via one of the following oracles:
-  *
-  *   - Corrupt
-  *   - Hoard
-  *   - Reveal
-  *
-****/
-inline play_move_without_commitment ( )
-{
-    unsigned corruptedID : BITS_USERID, 
-               hoarderID : BITS_USERID;
-
-    select_corrupted ( );
-    select_hoarder   ( );
-
-    bool canReveal = !( challenged || learnedActiveKey || epoch == FINAL_EPOCH );
-
-    d_step
-    {
-        print_entire_state ( )
-        printf( "\n> > >\n> CGKA: Move Type\tNON-Commital\n> > >\n" );
-        printf( "\n\tNon-commital values:" );
-        printf( "\n\t   - corruptedID  \t=   %d", corruptedID );
-        printf( "\n\t   - hoarderID    \t=   %d",   hoarderID );
-        printf( "\n\t   - canRevealKey \t=   %d",  canReveal  );
-        printf( "\n");
-    };
-
-    if
-    :: corruptedID != NONE -> corrupt ( corruptedID )
-    :: hoarderID   != NONE -> hoard   (   hoarderID )
-    :: canReveal           -> reveal  (             )
-    fi
-
-    post_play_poll ( epoch );
-}
-
 
 /********
     *
@@ -156,10 +70,9 @@ inline CGKA_initialize ( )
         printf( "\n***********************\n* CGKA: Initialize!   *\n***********************\n");
         
         epoch      = 0;
-        hoarding   = 0;
-        unsafeIDs  = 0;
-//        memberKey  = 0;
-        learnedActiveKey  = false;
+        hoardPrior = 0;
+        memberKeys = 0;
+        learnedActiveKey = false;
 
         attacker_initialize ( )
     };
@@ -180,9 +93,7 @@ inline CGKA_create_group ( )
         {
             StampBit( membership, n )
         };
-        groupMost = sample - 1;
-        attendees = sample;
-        absentees = N - attendees;
+        widestID = sample - 1;
     };
 
     printf( "\n***********************\n* CGKA: Create Group! *\n***********************\n" );
@@ -199,6 +110,17 @@ inline CGKA_security_game ( )
     printf( "\n***********************\n* CGKA: Begin Play!   *\n***********************\n" );
     printf( "\nEpoch: %d\n", epoch );
 
+    bool finished = false;
+    unsigned nonCommitmentOptions : 3 = 7;
+
+    // Loop through all possible epochs up to parameter `T`.
+    // Stop at some `t` in range `[ 0, T - 1 ]` by querying "Challenge" oracle.
+    // Non-deterministically explores epoch sequences:
+    //   - { 0 }
+    //   - { 0, 1 }
+    //   - { 0, 1, 2 }
+    //   - ...
+    //   - { 0, 1, ... , T - 1 }
 
     // Each time the attacker takes a turn, they must decide whether or not to:
     //
@@ -207,25 +129,18 @@ inline CGKA_security_game ( )
     //   3. Play a move which where the group members remain in the current epoch
     //
     // We call selection the options "challenge," "commitment," and "non-committal" moves, respectively.
-    //
-    // NOTE: option (1), is implicitly the last move in the model
 
-    bool finished      = false;
-    commitmentRequired = false;
-
-
-// Loop through epochs
-// Based on model parameter T, non-deterministically loop through T sequences of epochs,
-// with each epoch sequence ranging from 0 to `t` for all `t` in { 0, 1, .. , T - 1 }.
-start_of_game:
+start_of_game: skip;
     do
     :: finished -> break
     :: else -> 
+
+start_of_epoch:
         {
-            unsigned buffer     : N = 0;
-            unsigned startHoard : N = 0;
-            challenged = false;
-start_of_epoch: skip
+            printf ( "\n\n> > >\tStarting Epoch: %d\n\n", epoch );
+            BITARRAY ( buffer     ) = 0;
+            BITARRAY ( hoardNovel ) = 0;
+            bool challenged = false;
             do
 
             // 1. Play the Challenge Move
@@ -240,29 +155,189 @@ cease_in_epoch: { finished = true; break };
             // 2. Play a Commitment Move
             //     The attacker *may* play a move which commits to a new epoch...
             //     unless it is the last epoch.
-            :: epoch != FINAL_EPOCH ->
+            :: epoch < FINAL_EPOCH ->
 progress_epoch: { play_move_with_commitment ( ); break };
 
             // 3. Play a Non-commital Move
             //     The attacker *may* play a move and remain in the same epoch...
             //     unless the attacker has exhausted all idempotent non-comittal moves!
-            :: !(commitmentRequired) -> 
+            :: nonCommitmentOptions != 0 -> 
 continue_epoch: { play_move_without_commitment ( ) };
 
             od;
 
-            // After the operation is complete, check to see if the an endgame condition has been reached.
-            printf( "\nLOOP broken: %d", epoch );
-            printf( "\n< < <\n< Moves:   %d\n< Unsafe:  %d\n< < < \n", FINAL_EPOCH - epoch, unsafeIDs );
+            printf ( "\n> > >\tEnding Epoch: %d\n\n", epoch );
+            post_epoch_update ( );
+        };
+    od;
 
-            // Update for next loop iteration
-            hoarding = hoarding | startHoard;
-            epoch++;
-        }
-    od
+end_of_game: skip
+}
 
-end_of_game:
-    print_entire_state ( );
+
+/********
+    *
+    * Adversary moves interacting with oracles:
+    *
+    *   - play_move_with_commitment
+    *   - play_move_without_commitment
+    *
+********/
+
+
+inline play_move_with_commitment ( )
+{
+    buffer = membership;
+    PopCount ( buffer, buffer );
+    printf ( "\n\tAttendees:\t%d", buffer );
+
+    if
+    :: buffer != N -> atomic { select_invitee ( ); select_inviter ( ); insert_member ( ) }
+    :: buffer >  2 -> atomic { select_evictee ( ); select_evictor ( ); remove_member ( ) }
+    :: else        -> atomic {                     select_updater ( ); oblige_update ( ) }
+    fi
+
+    post_move_update ( );
+} 
+
+
+/****
+  *
+  * Adversary moves without advancing the epoch via one of the following oracles:
+  *
+  *   - Corrupt
+  *   - Hoard
+  *   - Reveal
+  *
+****/
+inline play_move_without_commitment ( )
+{
+    if
+    :: CheckBit ( nonCommitmentOptions, 0 ) -> { select_corrupted ( ); corrupt ( ) }
+    :: CheckBit ( nonCommitmentOptions, 1 ) -> { select_hoarder   ( ); hoard   ( ) }
+    :: CheckBit ( nonCommitmentOptions, 2 ) -> {                       reveal  ( ) }
+    fi
+
+    post_move_update ( );
+}
+
+
+/********
+    *
+    * Updating functions:
+    *
+    *   - post_epoch_update
+    *   - post_move_update
+    *
+********/
+
+
+/****
+  * External result variable(s):
+  *   - challenged
+  *   - epoch
+  *   - hoardPrior
+  *   - nonCommitmentOptions
+****/
+inline post_epoch_update ( )
+{
+    d_step 
+    {
+        // After the operation is complete, check to see if the an endgame condition has been reached.
+        printf( "\nLOOP broken: %d", epoch );
+        printf( "\n< < <\n< Moves:   %d\n", FINAL_EPOCH - epoch );
+
+/*
+        // Check if the largest member ID has increased
+        // BUT, not over the maximum value of N - 1
+        if 
+        :: widestID < N - 1 -> 
+            {
+                buffer = membership;
+                ClearBit( buffer, widestID );
+                if 
+                :: buffer > widestID -> widestID++
+                :: else
+                fi
+            }
+        :: else
+        fi
+*/
+
+        // Increment epoch
+        epoch++;
+
+        // Reset the challenge bit
+        challenged = false;
+
+        // Re-check if the reveal oracle can be queried 
+        check_query_reveal ( );
+
+        // Merge new hoarders into accumulator for next epoch
+        hoardPrior = hoardPrior | hoardNovel;
+
+        print_entire_state ( );
+    }
+}
+
+
+/****
+  * External result variable(s):
+  *   - nonCommitmentOptions
+  *   - originID
+  *   - targetID
+****/
+inline post_move_update ( )
+{
+    d_step
+    {
+        // Unset the "active IDs"
+        originID = NONE;
+        targetID = NONE;
+
+        // Determine if non-commitment is an option, or if commitment is forced
+        //
+        // Commitment is not forced if and only if one or more is true:
+        //   * Can Corrupt Member
+        //   * Can Hoard Member
+        //   * Can Reveal Root
+        nonCommitmentOptions = 0;
+        buffer = 0;
+
+        // Check if "Can Corrupt Member"
+        buffer_for_corrupt ( buffer );
+        PopCount ( buffer, buffer );
+        if
+        :: buffer > 0 -> StampBit ( nonCommitmentOptions, 0 )
+        :: else
+        fi
+
+        // Check if "Can Hoard Member"
+        buffer_for_hoard ( buffer );
+        PopCount ( buffer, buffer );
+        if
+        :: buffer > 0 -> StampBit ( nonCommitmentOptions, 1 )
+        :: else
+        fi
+
+        check_query_reveal ( );
+
+        printf ( "\n\tNon-Commitment Options:\t[ %d, %d, %d ]\n", CheckBit (nonCommitmentOptions, 0), CheckBit (nonCommitmentOptions, 1), CheckBit (nonCommitmentOptions, 2) );
+    }
+}
+
+
+/****
+  *
+  *  Check if adversary can query the "Reveal" oracle
+  *
+****/
+inline check_query_reveal ( )
+{
+    if
+    :: !( challenged || learnedActiveKey || epoch == FINAL_EPOCH ) -> StampBit ( nonCommitmentOptions, 2 )
+    :: else -> ClearBit ( nonCommitmentOptions, 2 )
+    fi
 }
 
 

@@ -1,53 +1,21 @@
-#include "Parameterized-Constants.pml"
-#include "State-Global.pml"
+#include "Bit-Array.pml"
+#include "Global-State.pml"
 
 
 /****
   *
   * LTL: FSU (Future Secrecy with Updates)
   *
+  * Never corrupt a hoarder implies never learn the past
+  *
 ****/
-#define never_trivially_hoard_then_corrupt \
-( []( CGKA@move_corrupt -> !( CheckBit( hoarding, targetID ) ) ) )
-
-
-
-
-
-#define future_secrecy_of_epoch( t ) \
-(  \
-    (  \
-        <> \
-        (  \
-            ( CGKA@start_of_epoch ) \
-        && \
-            ( epoch == (t + 1) ) \
-        && \
-            ( !( learnedActiveKey ) ) \
-        )  \
-    ) \
--> \
-    (  \
-        ( !( learnedActiveKey ) ) \
-    U  \
-        ( CGKA@end_of_game ) \
-    )  \
-)
-
-
 ltl FSU
 {
-    never_trivially_hoard_then_corrupt -> ( []( !( learnedLegacyKey ) ) )
-    (   future_secrecy_of_epoch(  0 )
-    &&  future_secrecy_of_epoch(  1 )
-    &&  future_secrecy_of_epoch(  2 )
-    &&  future_secrecy_of_epoch(  3 )
-    &&  future_secrecy_of_epoch(  4 )
-    &&  future_secrecy_of_epoch(  5 )
-    &&  future_secrecy_of_epoch(  6 )
-    &&  future_secrecy_of_epoch(  7 )
-    &&  future_secrecy_of_epoch(  8 )
-    &&  future_secrecy_of_epoch(  9 )
-    &&  future_secrecy_of_epoch( 10 )
+    (
+        []( CGKA@move_corrupt -> !( CheckBit( hoardPrior, targetID ) ) )
+    )
+        ->
+    (
+        []( !( learnedLegacyKey ) )
     )
 }
