@@ -17,6 +17,7 @@
 #define C 4
 #define N 4
 
+#define BIT_ARRAY_WIDTH 4
 
 /********
   *

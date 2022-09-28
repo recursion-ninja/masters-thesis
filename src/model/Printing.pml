@@ -1,7 +1,7 @@
 #ifndef IMPORT_SPEC_PRINTING
 #define IMPORT_SPEC_PRINTING
 
-#include "Bit-Array.pml"
+#include "Bitpack/Bit-Array.pml"
 #include "Parameterized-Constants.pml"
 #include "Global-State.pml"
 #include "TreeKEM-v1.pml"

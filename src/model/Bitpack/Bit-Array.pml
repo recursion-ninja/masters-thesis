@@ -11,6 +11,8 @@
     *
 ********/
 
+#define BitArray( name ) unsigned name : BIT_ARRAY_WIDTH
+
 
 #define CheckBit( A, I ) (   ( A &     ( 1 << ( I ) )   ) != 0 )
 

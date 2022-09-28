@@ -1,11 +1,11 @@
 #ifndef IMPORT_SPEC_CGKAGAME
 #define IMPORT_SPEC_CGKAGAME
 
-#include "Bit-Array.pml"
+#include "Bitpack/Bit-Array.pml"
 #include "Selection.pml"
 #include "Oracles.pml"
 #include "Parameterized-Constants.pml"
-#include "Pop-Count.pml"
+#include "Bitpack/Pop-Count.pml"
 #include "Printing.pml"
 #include "Global-State.pml"
 

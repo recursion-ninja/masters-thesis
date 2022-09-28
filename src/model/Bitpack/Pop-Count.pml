@@ -1,10 +1,8 @@
 #ifndef IMPORT_SPEC_POPCOUNT
 #define IMPORT_SPEC_POPCOUNT
 
-#include "Parameterized-Constants.pml"
 
-
-#if N <= 8
+#if BIT_ARRAY_WIDTH <= 8
 /*
     IMPORTANT NOTE:
         Equivalent for all:
@@ -14,7 +12,7 @@
             - ( b ) in [1, 8]
             - ( pop_in ) and ( pop_out ) are the same dimension ( b ).
 
-    Three assignments for N <= 8 ...
+    Three assignments for BIT_ARRAY_WIDTH <= 8 ...
 
     mask-1 = 55_{16} =  85_{10} = 01010101_{2}
     mask-2 = 33_{16} =  51_{10} = 00110011_{2}
@@ -40,7 +38,7 @@ atomic { \
             - ( b ) in [1, 16]
             - ( pop_in ) and ( pop_out ) are the same dimension ( b ).
 
-    Four assignments for 9 <= N ...
+    Four assignments for 9 <= BIT_ARRAY_WIDTH ...
 
     mask-1 = 5555_{16} = 21845_{10} = 0101010101010101_{2}
     mask-2 = 3333_{16} = 13107_{10} = 0011001100110011_{2}

@@ -1,12 +1,12 @@
 #ifndef IMPORT_SPEC_SELECTION
 #define IMPORT_SPEC_SELECTION
 
-#include "Bit-Array.pml"
+#include "Bitpack/Bit-Array.pml"
 #include "Parameterized-Constants.pml"
-#include "Pop-Count.pml"
+#include "Bitpack/Pop-Count.pml"
 #include "Global-State.pml"
 #include "TreeKEM-v1.pml"
-#include "Bit-Array.pml"
+#include "Bitpack/Bit-Array.pml"
 
 
 /********
@@ -26,8 +26,6 @@
 inline select_from ( options, selected )
 {
     atomic
-    {
-    d_step
     {
         selected = NONE;
         BITARRAY ( count );
@@ -56,7 +54,6 @@ inline select_from ( options, selected )
                 od
             }
         fi
-    }
     }
 }
 
