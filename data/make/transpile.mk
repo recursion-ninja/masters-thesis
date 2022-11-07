@@ -79,7 +79,7 @@ token-encoding-code: amend-constants $(dir-output-encoding) $(filepath-modeling-
 #	1. Transpile specification to C code encoding
 #	2. Add requisite yet missing include to C header file
 #	3. Copy C code encoding files to 'encoding directory'
-	@(
+	@( \
 	    cd $(dir-transpile); \
 	    spin -a $(filename-modeling-spec) -F $(filepath-property); \
 	    echo "#include <stdio.h>" > $(tmp-transpile); \
@@ -87,7 +87,7 @@ token-encoding-code: amend-constants $(dir-output-encoding) $(filepath-modeling-
 	    mv  $(tmp-transpile) $(mod-transpile); \
 	    cp $(filename-encoding-code) $(abspath $(dir-output-encoding)); \
 	)
-	-rm -fr $(dir-transpile)
+	@rm -fr $(dir-transpile)
 
 #######
 ###
