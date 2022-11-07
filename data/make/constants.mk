@@ -7,7 +7,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 ###
 #######
 
-.ONESHELL:
+
 .DEFAULT:;
 SHELL := /bin/sh
 COMMA := ,

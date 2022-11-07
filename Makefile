@@ -7,7 +7,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 ###
 #######
 
-.ONESHELL:
+
 .DEFAULT:;
 SHELL := /bin/sh
 COMMA := ,
@@ -33,27 +33,32 @@ extension-portabledoc := pdf
 extension-postscript  := ps
 
 dir-binaries          := ./bin/
+dir-data              := ./data/
 dir-distribution      := ./dist/
 dir-documents         := ./doc/
 dir-logging           := ./log/
 dir-source-code       := ./src/
 dir-thesis-relative   := ./thesis/
 dir-slides-relative   := ./slides/
-dir-make-definitions  := $(abspath $(addprefix $(dir-source-code),$(extension-makefile)))/
-dir-output-encoding   := $(abspath $(addprefix $(dir-source-code),$(basename-encoding)))/
-dir-pbs-script-parts  := $(abspath $(addprefix $(dir-source-code),$(basename-pbs-script)))/
-dir-protocol-model    := $(abspath $(addprefix $(dir-source-code),$(extension-promela)))/
+
+# Source Locations
+dir-make-definitions  := $(abspath $(addprefix $(dir-data),make))/
+dir-pbs-script-parts  := $(abspath $(addprefix $(dir-data),$(basename-pbs-script)))/
+dir-protocol-model    := $(abspath $(addprefix $(dir-source-code),model))/
 dir-slides-source     := $(abspath $(dir-source-code)$(dir-slides-relative))/
+dir-thesis-source     := $(abspath $(dir-source-code)$(dir-thesis-relative))/
+dir-thesis-utilities  := $(abspath $(addprefix $(dir-source-code),utilities))/
+
+# Output Locations
 dir-slides-deck       := $(dir-documents)$(dir-slides-relative)
 dir-thesis-manuscript := $(dir-documents)$(dir-thesis-relative)
-dir-thesis-source     := $(abspath $(dir-source-code)$(dir-thesis-relative))/
-dir-thesis-utilities  := $(abspath $(addprefix $(dir-source-code),$(extension-haskell)))/
 dir-backup-record     := $(abspath $(addprefix $(dir-logging),records))/
 dir-backup-trail      := $(abspath $(addprefix $(dir-logging),trails))/
+dir-output-encoding   := $(abspath $(addprefix $(dir-source-code),$(basename-encoding)))/
 
 filepath-make-definitions := $(wildcard $(dir-make-definitions)*.$(extension-makefile))
 
-#$(info Including the following:\
+$(info Including the following:\
   $(NEWLINE)$(TAB)$(subst $(SPACE),$(NEWLINE)$(TAB),$(notdir $(filepath-make-definitions))))
 
 -include $(filepath-make-definitions)

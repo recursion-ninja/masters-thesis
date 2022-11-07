@@ -7,7 +7,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 ###
 #######
 
-.ONESHELL:
+
 .DEFAULT:;
 SHELL := /bin/sh
 COMMA := ,
@@ -251,6 +251,7 @@ $(dir-backup-trail):
 	mkdir -p $@
 
 $(filepath-verifier): $(dir-binaries) $(sources-verifier)
+	$(info $(sources-verifier))
 	$(subst $(SPACE),$(directives-glue),gcc $(directives-list)) \
 	-O3 \
 	-o $@ \

@@ -7,7 +7,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 ###
 #######
 
-.ONESHELL:
+
 .DEFAULT:;
 SHELL := /bin/sh
 COMMA := ,
@@ -68,25 +68,25 @@ installdirs:: $(dir-output-encoding)
 #######
 
 .INTERMEDIATE: token-encoding-code
-token-encoding-code: amend-constants amend-properties $(dir-output-encoding) $(filepath-modeling-code)
+token-encoding-code: amend-constants $(dir-output-encoding) $(filepath-modeling-code) $(filepath-property)
 #	Setup the temporary compilation environment
-	@$(eval dir-transpile := $(shell mktemp -d -t transpile-XXXXXXXXXX))
-	@$(eval dir-beginning := $(shell pwd))
+	$(eval dir-transpile := $(shell mktemp -d -t transpile-XXXXXXXXXX))
+	$(eval dir-beginning := $(shell pwd))
+	$(eval tmp-transpile := $(shell mktemp -t transpile-HEADER-XXX))
+	$(eval mod-transpile := $(filter %.h,$(filename-encoding-code)))
 #	Transfer requisite source files and working location
-	@cp $(filter %.$(extension-promela),$^) $(dir-transpile)
-	@cd $(dir-transpile)
-#	Transpile specification to C code encoding
-	spin -a $(filename-modeling-spec)
-#	Add requisite yet missing include to C header file
-	@$(eval tmp-transpile := $(shell mktemp -t transpile-HEADER-XXX))
-	@$(eval mod-transpile := $(filter %.h,$(filename-encoding-code)))
-	@echo "#include <stdio.h>" > $(tmp-transpile)
-	@cat $(mod-transpile)     >> $(tmp-transpile)
-	@mv  $(tmp-transpile) $(mod-transpile)
-#	Copy C code encoding files to 'encoding directory'
-	@cp $(filename-encoding-code) $(abspath $(dir-output-encoding))
-	@cd $(dir-beginning)
-	@-rm -fr $(dir-transpile)
+	cp -R $(filepath-modeling-code) $(dir-transpile)
+#	1. Transpile specification to C code encoding
+#	2. Add requisite yet missing include to C header file
+#	3. Copy C code encoding files to 'encoding directory'
+	( cd $(dir-transpile); \
+	  spin -a $(filename-modeling-spec) -F $(filepath-property); \
+	  echo "#include <stdio.h>" > $(tmp-transpile); \
+	  cat $(mod-transpile)     >> $(tmp-transpile); \
+	  mv  $(tmp-transpile) $(mod-transpile); \
+	  cp $(filename-encoding-code) $(abspath $(dir-output-encoding)); \
+	)
+	-rm -fr $(dir-transpile)
 
 #######
 ###

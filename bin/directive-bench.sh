@@ -25,21 +25,53 @@
 # > Inherit environment variables
 #PBS -V
 #
+MINDFA=59
 VECLEN=72
 
 DIRECTIVE_DEFAULTS=(
     'MEMLIM=63488'
-    'NOBOUNDCHECK'
-    'NOFAIR'
-)
-
-DIRECTIVE_ELEMENTS=(
-    'COLLAPSE'
-    'HC'
-    "MA=${VECLEN}"
     'SPACE'
+    'HC4'
+    'JOINPROCS'
+    'MURMUR'
+    'NOBOUNDCHECK'
+    'NOFIX'
+    'SEPQS'
+    'SFH'
     "VECTORSZ=${VECLEN}"
 )
+
+#    'JOINPROCS'
+#    'MURMUR'
+#    'NOBOUNDCHECK'
+#    'NOFIX'
+#    'SEPQS'
+#    'SFH'
+
+SLURM_ARRAY_TASK_ID=0
+DIRECTIVE_ELEMENTS=(
+)
+
+#DIRECTIVE_ELEMENTS=(
+#    'COLLAPSE'
+#    'JOINPROCS'
+#    'MURMUR'
+#    'NOBOUNDCHECK'
+#    'NOFAIR'
+#    'NOFIX'
+#    'NOVSZ'
+#    'SEPQS'
+#    'SFH'
+#)
+    
+#    'SAFETY'
+
+#DIRECTIVE_ELEMENTS=(
+#    'HC3'
+#    "MA=${MINDFA}"
+#    'SPACE'
+#    "VECTORSZ=${VECLEN}"
+#)
 
 FLAG_DEFAULTS=("${DIRECTIVE_DEFAULTS[@]/#/-D}")
 FLAG_ELEMENTS=("${DIRECTIVE_ELEMENTS[@]/#/-D}")
@@ -54,9 +86,13 @@ do
     j=0
     while [ ${j} -lt ${count} ]
     do
+        directive="${FLAG_ELEMENTS[$j]} "
         if [ $(((1 << ${j}) & ${i})) -gt 0 ]
         then
-            subset+="${FLAG_ELEMENTS[$j]} "
+            subset+="${directive}"
+        else
+            number=${#directive}
+            subset+=`printf '%*s' "${#directive}"`
         fi
         j=$((${j} + 1))
     done
@@ -75,7 +111,7 @@ NAME_BINARY="CGKA-Bench-${SLURM_ARRAY_TASK_ID}"
 if [[ -z "${FLAG_ELECTION}" ]]; then
     FLAG_RENDERED="{} (Empty Set)"
 else
-    FLAG_RENDERED="{ $(echo -e "${FLAG_ELECTION}" | sed -e 's/[[:space:]]*$//' -e 's/[[:space:]]\+/, /g') }"
+    FLAG_RENDERED="{ $(echo -e "${FLAG_ELECTION}") }"
 fi
 
 echo -e "Benchmarking selected directive set:\n\t${FLAG_RENDERED}"
@@ -89,7 +125,7 @@ gcc \
 
 chmod +x "${NAME_BINARY}"
 
-./"${NAME_BINARY}" -a -A -v -x
+./"${NAME_BINARY}" -a -A -v -w28 -x
 
 sstat --allsteps --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID --jobs ${SLURM_JOBID} --parsable
 

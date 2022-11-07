@@ -1,4 +1,4 @@
-ifndef IMPORT_MAKE_ENVIRONMENT
+	ifndef IMPORT_MAKE_ENVIRONMENT
 IMPORT_MAKE_ENVIRONMENT := 1
 
 #######
@@ -7,7 +7,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 ###
 #######
 
-.ONESHELL:
+
 .DEFAULT:;
 SHELL := /bin/sh
 COMMA := ,
@@ -36,11 +36,13 @@ dir-protocol-model   ?= ./
 ###
 #######
 
-model-specification       := Model-Specification
+model-specification       := CGKA-Security-Game
 filename-modeling-spec    := $(model-specification).$(extension-promela)
-filename-modeling-code    := $(wildcard $(dir-protocol-model)*$(extension-promela))
+filename-modeling-code    := $(wildcard $(dir-protocol-model)*.$(extension-promela)) $(dir-protocol-model)Bitpack
 filepath-modeling-spec    := $(abspath $(addprefix $(dir-protocol-model),$(filename-modeling-spec)))
 filepath-modeling-code    := $(abspath $(filename-modeling-code))
+
+$(info filename-modeling-code:  $(filename-modeling-code))
 
 extensions-encoding-in-C  := c h
 extensions-encoding-code  := $(sort b m p t $(extensions-encoding-in-C))
