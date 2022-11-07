@@ -58,7 +58,7 @@ dir-output-encoding   := $(abspath $(addprefix $(dir-source-code),$(basename-enc
 
 filepath-make-definitions := $(wildcard $(dir-make-definitions)*.$(extension-makefile))
 
-$(info Including the following:\
+#$(info Including the following:\
   $(NEWLINE)$(TAB)$(subst $(SPACE),$(NEWLINE)$(TAB),$(notdir $(filepath-make-definitions))))
 
 -include $(filepath-make-definitions)

@@ -42,8 +42,6 @@ filename-modeling-code    := $(wildcard $(dir-protocol-model)*.$(extension-prome
 filepath-modeling-spec    := $(abspath $(addprefix $(dir-protocol-model),$(filename-modeling-spec)))
 filepath-modeling-code    := $(abspath $(filename-modeling-code))
 
-$(info filename-modeling-code:  $(filename-modeling-code))
-
 extensions-encoding-in-C  := c h
 extensions-encoding-code  := $(sort b m p t $(extensions-encoding-in-C))
 
