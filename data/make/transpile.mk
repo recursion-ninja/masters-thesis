@@ -70,21 +70,22 @@ installdirs:: $(dir-output-encoding)
 .INTERMEDIATE: token-encoding-code
 token-encoding-code: amend-constants $(dir-output-encoding) $(filepath-modeling-code) $(filepath-property)
 #	Setup the temporary compilation environment
-	$(eval dir-transpile := $(shell mktemp -d -t transpile-XXXXXXXXXX))
-	$(eval dir-beginning := $(shell pwd))
-	$(eval tmp-transpile := $(shell mktemp -t transpile-HEADER-XXX))
-	$(eval mod-transpile := $(filter %.h,$(filename-encoding-code)))
+	@$(eval dir-transpile := $(shell mktemp -d -t transpile-XXXXXXXXXX))
+	@$(eval dir-beginning := $(shell pwd))
+	@$(eval tmp-transpile := $(shell mktemp -t transpile-HEADER-XXX))
+	@$(eval mod-transpile := $(filter %.h,$(filename-encoding-code)))
 #	Transfer requisite source files and working location
-	cp -R $(filepath-modeling-code) $(dir-transpile)
+	@cp -R $(filepath-modeling-code) $(dir-transpile)
 #	1. Transpile specification to C code encoding
 #	2. Add requisite yet missing include to C header file
 #	3. Copy C code encoding files to 'encoding directory'
-	( cd $(dir-transpile); \
-	  spin -a $(filename-modeling-spec) -F $(filepath-property); \
-	  echo "#include <stdio.h>" > $(tmp-transpile); \
-	  cat $(mod-transpile)     >> $(tmp-transpile); \
-	  mv  $(tmp-transpile) $(mod-transpile); \
-	  cp $(filename-encoding-code) $(abspath $(dir-output-encoding)); \
+	@(
+	    cd $(dir-transpile); \
+	    spin -a $(filename-modeling-spec) -F $(filepath-property); \
+	    echo "#include <stdio.h>" > $(tmp-transpile); \
+	    cat $(mod-transpile)     >> $(tmp-transpile); \
+	    mv  $(tmp-transpile) $(mod-transpile); \
+	    cp $(filename-encoding-code) $(abspath $(dir-output-encoding)); \
 	)
 	-rm -fr $(dir-transpile)
 
