@@ -13,9 +13,9 @@
   * Parameters (`t`, `c` `n`) defined as constants below:
   *
 ********/
-#define T 5
-#define C 5
-#define N 5
+#define T 3
+#define C 3
+#define N 4
 
 #define BIT_ARRAY_WIDTH 4
 
@@ -27,9 +27,9 @@
   *   - N - 1
   *
 ********/
-#define BITS_T 3
-#define BITS_C 3
-#define BITS_N 3
+#define BITS_T 2
+#define BITS_C 2
+#define BITS_N 2
 
 
 /********
@@ -47,9 +47,9 @@
   *   - 2 * (2 ^ (BITS_N - 1))
   *
 ********/
-#define BITS_EPOCH  3
+#define BITS_EPOCH  2
 #define BITS_USERID 3
-#define BITS_VERTEX 4
+#define BITS_VERTEX 3
 
 
 /********
@@ -62,7 +62,7 @@
   *   - NONE  = (2 ^ BITS_N) - 1
   *
 ********/
-#define NEVER 7
+#define NEVER 3
 #define NONE  7
 
 
@@ -97,9 +97,9 @@
   *   - LEAF       = TREE_ORDER / 2
   *
 ********/
-#define TREE_ORDER 15
+#define TREE_ORDER 7
 #define ROOT       0
-#define LEAF       7
+#define LEAF       3
 
 
 /********
@@ -114,7 +114,7 @@
   *   - MAX_REVEAL = C - 1
   *
 ********/
-#define MAX_REVEAL 4
+#define MAX_REVEAL 2
 
 
 /********
@@ -128,20 +128,20 @@
   *   - FIRST_EPOCH  = FIRST_USERID = FIRST_VERTEX = LEAF_LEVEL = 0
   *   - FINAL_EPOCH  = ( T - 1 )
   *   - FINAL_USERID = ( N - 1 )
-  *   - FINAL_VERTEX = ( TREE_ORDER - 1 )
-  *   - ROOT_LEVEL   = ( BITS_VERTEX -  1)
+  *   - FINAL_VERTEX = ( TREE_ORDER  - 1 )
+  *   - ROOT_LEVEL   = ( BITS_VERTEX - 1 )
   *
 ********/
 #define FIRST_EPOCH  0
-#define FINAL_EPOCH  4
+#define FINAL_EPOCH  2
 
 #define FIRST_USERID 0
-#define FINAL_USERID 4
+#define FINAL_USERID 3
 
 #define FIRST_VERTEX 0
-#define FINAL_VERTEX 14
+#define FINAL_VERTEX 6
 
 #define LEAF_LEVEL 0
-#define ROOT_LEVEL 3
+#define ROOT_LEVEL 2
 
 #endif /* IMPORT_SPEC_CONSTANTS */

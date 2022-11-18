@@ -1,12 +1,2 @@
-#include "Global-State.pml"
+[] ( ( CGKA@start_of_epoch && ( memberKeys == 0 ) ) -> ( !( learnedActiveKey ) ) )
 
-
-/****
-  *
-  * LTL: PCS (Post-Compromise Security)
-  *
-****/
-ltl PCS
-{ 
-    [] ( ( CGKA@start_of_epoch && ( memberKeys == 0 ) ) -> ( !( learnedActiveKey ) ) )
-}

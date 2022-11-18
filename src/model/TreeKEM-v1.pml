@@ -24,14 +24,12 @@
   * Any TreeKEM "module" version must export the following "inline" definitions:
   *
   * Exports:
-  *   - attacker_amend_knowledge
-  *   - attacker_check_knowledge
-  *   - attacker_relay_knowledge
   *   - attacker_initialize
-  *   - attacker_learn_root
   *   - attacker_learn_leaf
+  *   - attacker_learn_root
   *   - attacker_study_message
   *   - print_attacker_knowledge
+  *   - attacker_amend_knowledge
   *
   * The exported definitions correspond to how the attacker observes, stores,
   * and updates knowledge about the TreeKEM protocol's LBBT of secret keys.
@@ -117,144 +115,59 @@
   * as an array of heaps.
   *
 ****/
-KNOWLEDGE_DATATYPE attackerKnowledge[T];
+KNOWLEDGE_DATATYPE attackerKnowledge;
 
 
 /****
   *
   * Export inline definitions for:
-  *   - attacker_amend_knowledge
-  *   - attacker_check_knowledge
   *   - attacker_initialize
-  *   - attacker_learn_root
   *   - attacker_learn_leaf
+  *   - attacker_learn_root
   *   - attacker_study_message
   *   - print_attacker_knowledge
   *
 ****/
 
 
-inline attacker_amend_knowledge ( named_epoch, memberID )
-{
-    // TODO:
-    // Starting from 'named_epoch' the attacker updates knowledge.
-    // Assumes that some knowledge within 'named_epoch' has changed.
-    atomic
-    {
-        unsigned t : BITS_EPOCH;
-        for ( t : named_epoch + 1 .. epoch )
-        {
-            attacker_relay_knowledge ( t - 1, memberID );
-        }
-        attacker_check_knowledge ( epoch );
-    }
-}
-
-
-inline attacker_check_knowledge ( named_epoch )
-{
-    d_step
-    {
-        unsigned e : BITS_EPOCH;
-        for ( e : FIRST_EPOCH .. named_epoch )
-        {
-            if
-            :: CheckBit( attackerKnowledge[e], ROOT ) -> learnedActiveKey = true;
-            :: else -> skip
-            fi
-        }
-    }
-}
-
-
 inline attacker_initialize ( )
 {
     d_step
     {
-        unsigned t : BITS_EPOCH;
-        for ( t : FIRST_EPOCH .. FINAL_EPOCH )
-        {
-            attackerKnowledge[t] = 0;
-        }
-        learnedActiveKey = false;
+        attackerKnowledge = 0;
+        learnedActiveKey  = false;
     }
 }
 
 
-inline attacker_learn_root ( named_epoch )
-{
-    StampBit ( attackerKnowledge[named_epoch], ROOT );
-}
-
-
-inline attacker_learn_leaf ( named_epoch, memberID )
+inline attacker_learn_leaf ( memberID )
 {
     // Attacker learns the node information
-    StampBit ( attackerKnowledge[named_epoch], LEAF + memberID );
+//    StampBit ( attackerKnowledge, LEAF + memberID );
+//    attacker_spine_from ( memberID );
+/**/
     d_step
     {
         unsigned height : BITS_VERTEX;
-        unsigned offset : BITS_VERTEX = LEAF;
         unsigned spine  : BITS_VERTEX = LEAF + memberID;
         for ( height : LEAF_LEVEL .. ROOT_LEVEL )
         {
             d_step
             {
-                StampBit( attackerKnowledge[named_epoch], spine );
+                StampBit( attackerKnowledge, spine );
                 spine = (spine - 1) / 2;
             }
         }
-    }
+    };
+/**/
+    attacker_check_knowledge ( );
 }
 
 
-inline attacker_study_message ( e, memberID )
+inline attacker_learn_root ( )
 {
-    atomic
-    {
-        attacker_relay_knowledge ( e - 1, memberID );
-        attacker_check_knowledge ( e );
-    }
-}
-
-
-inline print_attacker_knowledge ( )
-{
-    d_step // MISS!
-    {
-        printf ( "\n\tAttacker Knowledge:" );
-        unsigned pt : BITS_EPOCH;
-        for ( pt : FIRST_EPOCH .. FINAL_EPOCH )
-        {
-            printf ( "\n\t  >>>\t@ %d\t<<<", pt );
-            d_step
-            {
-                printf ( "\n\t  ---\t-----\t---" );
-                unsigned d : BITS_VERTEX = 2;
-                unsigned v : BITS_VERTEX;
-                for ( v : FIRST_VERTEX .. FINAL_VERTEX )
-                {
-                    if
-                    :: ( v + 1 ) == d ->
-                        printf ( "\n\t  ---\t-----\t---" );
-                        if
-                        :: d < N -> d = d + d;
-                        :: else
-                        fi
-                    :: else
-                    fi
-
-                    if
-                    :: CheckBit( attackerKnowledge[pt], v ) -> printf ( "\n\t  %d [\tTrue \t]", v )
-                    :: else                                 -> printf ( "\n\t  %d [\tFalse\t]", v )
-                    fi
-                }
-            printf ( "\n\t  ---\t-----\t---" );
-            printf ( "\n" );
-            }
-        };
-        printf ( "\n" );
-    }
+    StampBit ( attackerKnowledge, ROOT );
+    attacker_check_knowledge ( );
 }
 
 
@@ -265,11 +178,8 @@ inline print_attacker_knowledge ( )
   * Ensures that knowledge (if any) of the initiating member secrets does not propogate
   *
 ****/
-
-
-inline attacker_relay_knowledge ( e, memberID )
-{   atomic {
-
+inline attacker_study_message ( memberID )
+{
     // Logic of LEAF vertices
     d_step // MISS!
     {
@@ -278,8 +188,8 @@ inline attacker_relay_knowledge ( e, memberID )
         {
             unsigned v : BITS_VERTEX = LEAF + n;
             if
-            :: v != LEAF + memberID && CheckBit ( attackerKnowledge[e], v ) && CheckBit ( membership, n ) -> StampBit ( attackerKnowledge[e+1], v )
-            :: else
+            :: v != LEAF + memberID && CheckBit ( attackerKnowledge, v ) && CheckBit ( membership, n ) -> StampBit ( attackerKnowledge, v )
+            :: else -> ClearBit ( attackerKnowledge, v )
             fi
         }
     }
@@ -294,17 +204,17 @@ inline attacker_relay_knowledge ( e, memberID )
         {
             d_step
             {
-                unsigned n : BITS_VERTEX;
-                for ( n : 0 .. width - 1 )
+                unsigned nn : BITS_VERTEX;
+                for ( nn : 0 .. width - 1 )
                 {
-                    unsigned v : BITS_VERTEX = offset + n;
+                    unsigned v : BITS_VERTEX = offset + nn;
                     d_step
                     {
                         unsigned childL : BITS_VERTEX = v + v + 1;
                         unsigned childR : BITS_VERTEX = v + v + 2;
                         if
-                        :: CheckBit( attackerKnowledge[e], childL ) || CheckBit( attackerKnowledge[e], childR ) -> StampBit( attackerKnowledge[e], v )
-                        :: else
+                        :: CheckBit( attackerKnowledge, childL ) || CheckBit( attackerKnowledge, childR ) -> StampBit( attackerKnowledge, v )
+                        :: else -> ClearBit( attackerKnowledge, v )
                         fi
                     }
                 };
@@ -313,7 +223,86 @@ inline attacker_relay_knowledge ( e, memberID )
             }
         }
     }
+
     print_attacker_knowledge ( );
-}   }
+
+    attacker_check_knowledge ( );
+}
+
+
+inline print_attacker_knowledge ( )
+{
+    d_step // MISS!
+    {
+        printf ( "\n\tAttacker Knowledge:" );
+        d_step
+        {
+            printf ( "\n\t  ---\t-----\t---" );
+            unsigned d : BITS_VERTEX = 2;
+            unsigned v : BITS_VERTEX;
+            for ( v : FIRST_VERTEX .. FINAL_VERTEX )
+            {
+                if
+                :: ( v + 1 ) == d ->
+                    printf ( "\n\t  ---\t-----\t---" );
+                    if
+                    :: d < N -> d = d + d;
+                    :: else
+                    fi
+                :: else
+                fi
+
+                if
+                :: CheckBit( attackerKnowledge, v ) -> printf ( "\n\t  %d [\tTrue \t]", v )
+                :: else                             -> printf ( "\n\t  %d [\tFalse\t]", v )
+                fi
+            }
+            printf ( "\n\t  ---\t-----\t---" );
+            printf ( "\n" );
+        }
+    }
+}
+
+
+/****
+  *
+  * Internal inline definition:
+  *   - attacker_check_knowledge
+  *   - attacker_relay_knowledge
+  *
+****/
+
+
+inline attacker_check_knowledge ( )
+{
+    if
+    :: CheckBit( attackerKnowledge, ROOT ) -> learnedActiveKey = true;
+    :: else -> skip
+    fi
+}
+
+
+/*
+inline attacker_spine_from ( memberID )
+{
+    d_step
+    {
+        unsigned height : BITS_VERTEX = LEAF_LEVEL + 1;
+        unsigned spine  : BITS_VERTEX = LEAF + memberID;
+        spine = (spine - 1) / 2;
+        
+        do
+        :: height >= ROOT_LEVEL || CheckBit( attackerKnowledge, spine ) -> break
+        :: else ->
+            {
+                StampBit( attackerKnowledge, spine );
+                spine = (spine - 1) / 2;
+                height++;
+            }
+        od
+    }
+}
+*/
+
 
 #endif /* IMPORT_SPEC_ATTACKER */ 

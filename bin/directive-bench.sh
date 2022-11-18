@@ -28,9 +28,10 @@
 MINDFA=80
 VECLEN=80
 
+# 120 GiB = 122880 MiB
 DIRECTIVE_DEFAULTS=(
-    'MEMLIM=63488'
     'JOINPROCS'
+    'MEMLIM=122880'
     'MURMUR'
     'NOBOUNDCHECK'
     'NOFIX'
@@ -63,12 +64,21 @@ DIRECTIVE_DEFAULTS=(
     
 #    'SAFETY'
 
-DIRECTIVE_ELEMENTS=(
+DIRECTIVE_STRATEGY_1=(
     'HC4'
+)
+
+DIRECTIVE_STRATEGY_2=(
+    "COLLAPSE"
     "MA=${MINDFA}"
+)
+
+DIRECTIVE_ELEMENTS=(
+    'NOFAIR'
     'SPACE'
     "VECTORSZ=${VECLEN}"
 )
+
 
 FLAG_DEFAULTS=("${DIRECTIVE_DEFAULTS[@]/#/-D}")
 FLAG_ELEMENTS=("${DIRECTIVE_ELEMENTS[@]/#/-D}")
@@ -102,8 +112,19 @@ if [ -z ${SLURM_ARRAY_TASK_ID+x} ]; then
     exit 2
 fi
 
-FLAG_ELECTION="${FLAG_SPECTRUM[$SLURM_ARRAY_TASK_ID]}"
 NAME_BINARY="CGKA-Bench-${SLURM_ARRAY_TASK_ID}"
+
+if [[ ${SLURM_ARRAY_TASK_ID} -ge ${bound} ]]; then
+    FLAG_SELECTION=$((SLURM_ARRAY_TASK_ID-bound))
+    FLAG_STRATEGY="${DIRECTIVE_STRATEGY_1[@]/#/-D}"
+else
+    FLAG_SELECTION=${SLURM_ARRAY_TASK_ID}
+    FLAG_STRATEGY="${DIRECTIVE_STRATEGY_2[@]/#/-D}"
+fi
+
+echo "Strategy: ${FLAG_STRATEGY}"
+
+FLAG_ELECTION="${FLAG_STRATEGY[@]} ${FLAG_SPECTRUM[$FLAG_SELECTION]}"
 
 if [[ -z "${FLAG_ELECTION}" ]]; then
     FLAG_RENDERED="{} (Empty Set)"
@@ -122,7 +143,7 @@ gcc \
 
 chmod +x "${NAME_BINARY}"
 
-./"${NAME_BINARY}" -a -A -v -w28 -x
+./"${NAME_BINARY}" -a -A -N HLT -v -w28 -x
 
 sstat --allsteps --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID --jobs ${SLURM_JOBID} --parsable
 

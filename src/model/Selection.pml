@@ -27,17 +27,20 @@ inline select_from ( options, selected )
 {
     atomic
     {
+        if
+        :: options == 0 -> printf ( "\n-=-=-=-=-=-=-\nSelection Options = NONE!\n-=-=-=-=-=-=-=-\n" );
+        :: else -> skip
+        fi
+        
         selected = NONE;
         BITARRAY ( count );
         PopCount ( options, count );
+//        printf ( "\nCount:\t%d", count );
         if
-        :: count  == 0 -> skip; // Leave ID as NONE!
+        :: count == 0 -> skip; // Leave ID as NONE!
         :: else ->
             unsigned sample : BITS_USERID;
             select ( sample : 0 .. count - 1 );
-            skip;
-            d_step
-            {
                 unsigned n : BITS_USERID = FIRST_USERID;
                 do
                 :: selected != NONE -> break
@@ -52,7 +55,6 @@ inline select_from ( options, selected )
                     fi
                     n++;
                 od
-            }
         fi
     }
 }

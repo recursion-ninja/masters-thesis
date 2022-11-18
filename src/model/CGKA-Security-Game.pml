@@ -47,7 +47,7 @@
     * This predicate is described as the "Safety Predicate" `safe` in Alwen 2020.
     * We use `triviality` as a synonym from `safe` because the term "safety predicate has
     * a different connotation in  formal methods nomenclature.
-    *   
+    *
 ********/
 
 
@@ -68,7 +68,7 @@ inline CGKA_initialize ( )
     d_step
     {
         printf( "\n***********************\n* CGKA: Initialize!   *\n***********************\n");
-        
+
         epoch      = 0;
         hoardPrior = 0;
         memberKeys = 0;
@@ -86,7 +86,7 @@ inline CGKA_create_group ( )
     unsigned sample : BITS_USERID;
     select ( sample : 2 .. N );
     skip;
-    d_step 
+    d_step
     {
         unsigned n : BITS_USERID;
         for ( n : FIRST_USERID .. sample - 1 )
@@ -133,7 +133,7 @@ inline CGKA_security_game ( )
 start_of_game: skip;
     do
     :: finished -> break
-    :: else -> 
+    :: else ->
 
 start_of_epoch:
         {
@@ -141,6 +141,7 @@ start_of_epoch:
             BITARRAY ( buffer     ) = 0;
             BITARRAY ( hoardNovel ) = 0;
             bool challenged = false;
+
             do
 
             // 1. Play the Challenge Move
@@ -149,7 +150,7 @@ start_of_epoch:
             //     *MAY*  query 'challenge' oracle in any epoch before last epoch.
             //     *MUST* query 'challenge' oracle in the last epoch.
             //     so it always happens in the last epoch.
-            :: !(challenged) -> 
+            :: !(challenged) ->
 cease_in_epoch: { finished = true; break };
 
             // 2. Play a Commitment Move
@@ -161,7 +162,7 @@ progress_epoch: { play_move_with_commitment ( ); break };
             // 3. Play a Non-commital Move
             //     The attacker *may* play a move and remain in the same epoch...
             //     unless the attacker has exhausted all idempotent non-comittal moves!
-            :: nonCommitmentOptions != 0 -> 
+            :: nonCommitmentOptions != 0 ->
 continue_epoch: { play_move_without_commitment ( ) };
 
             od;
@@ -198,7 +199,7 @@ inline play_move_with_commitment ( )
     fi
 
     post_move_update ( );
-} 
+}
 
 
 /****
@@ -241,7 +242,7 @@ inline play_move_without_commitment ( )
 ****/
 inline post_epoch_update ( )
 {
-    d_step 
+    d_step
     {
         // After the operation is complete, check to see if the an endgame condition has been reached.
         printf( "\nLOOP broken: %d", epoch );
@@ -250,12 +251,12 @@ inline post_epoch_update ( )
 /*
         // Check if the largest member ID has increased
         // BUT, not over the maximum value of N - 1
-        if 
-        :: widestID < N - 1 -> 
+        if
+        :: widestID < N - 1 ->
             {
                 buffer = membership;
                 ClearBit( buffer, widestID );
-                if 
+                if
                 :: buffer > widestID -> widestID++
                 :: else
                 fi
@@ -270,7 +271,7 @@ inline post_epoch_update ( )
         // Reset the challenge bit
         challenged = false;
 
-        // Re-check if the reveal oracle can be queried 
+        // Re-check if the reveal oracle can be queried
         check_query_reveal ( );
 
         // Merge new hoarders into accumulator for next epoch
@@ -346,6 +347,36 @@ active proctype CGKA ( )
     CGKA_initialize    ( );
     CGKA_create_group  ( );
     CGKA_security_game ( );
+}
+
+
+ltl HLT
+{
+#include "LTL-HLT.pml"
+}
+
+
+/****
+  *
+  * LTL: FSU (Future Secrecy with Updates)
+  *
+  * Never corrupt a hoarder implies never learn the past
+  *
+****/
+ltl FSU
+{
+#include "LTL-FSU.pml"
+}
+
+
+/****
+  *
+  * LTL: PCS (Post-Compromise Security)
+  *
+****/
+ltl PCS
+{
+#include "LTL-PCS.pml"
 }
 
 

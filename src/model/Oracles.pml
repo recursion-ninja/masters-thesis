@@ -21,15 +21,17 @@ inline corrupt ( )
 {
     printf ( "\n> > >\n> CGKA: Move Name\t( COR : @ %d <- _ )\n> > >\n", targetID );
 
-    if
-    :: CheckBit( hoardPrior, targetID ) -> learnedLegacyKey = true;
-    :: else
-    fi
+move_corrupt:
+    atomic
+    {
+        if
+        :: CheckBit( hoardPrior, targetID ) -> learnedLegacyKey = true;
+        :: else
+        fi
 
-    StampBit( memberKeys, targetID );
-    attacker_learn_leaf      ( epoch, targetID );
-    attacker_amend_knowledge ( epoch, targetID );
-    attacker_check_knowledge ( epoch );
+        StampBit( memberKeys, targetID );
+        attacker_learn_leaf ( targetID );
+    }
 }
 
 
@@ -47,7 +49,7 @@ inline reveal ( )
 
     challenged = true;
     learnedActiveKey = true;
-    attacker_learn_root ( epoch );
+    attacker_learn_root ( );
 }
 
 
@@ -71,7 +73,7 @@ inline insert_member ( )
     :: else
     fi
     StampBit( membership, targetID )
-    attacker_study_message ( epoch + 1, originID );
+    attacker_study_message ( originID );
 }
 
 
@@ -81,7 +83,7 @@ inline remove_member ( )
 
     ClearBit( memberKeys, targetID );
     ClearBit( membership, targetID );
-    attacker_study_message ( epoch + 1, originID );
+    attacker_study_message ( originID );
 }
 
 
@@ -90,7 +92,7 @@ inline oblige_update ( )
     printf ( "\n> > >\n> CGKA: Move Name\t( UPD : @ _ <- %d )\n> > >\n", originID );
 
     ClearBit( memberKeys, originID );
-    attacker_study_message ( epoch + 1, originID );
+    attacker_study_message ( originID );
 }
 
 
