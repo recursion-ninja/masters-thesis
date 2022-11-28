@@ -6,30 +6,24 @@
 /********
   *
   * Security game's parameters' valid ranges:
-  *   - T <- [3, 254]
-  *   - C <- [1,   T]
+  *   - T <- Infinity
+  *   - C <- Infinity
   *   - N <- [3,  16]
   *
   * Parameters (`t`, `c` `n`) defined as constants below:
   *
 ********/
-#define T 3
-#define C 3
-#define N 4
+#define N 8
 
 #define BIT_ARRAY_WIDTH 4
 
 /********
   *
   * Number of bits required to represent the number:
-  *   - T - 1
-  *   - C - 1
   *   - N - 1
   *
 ********/
-#define BITS_T 2
-#define BITS_C 2
-#define BITS_N 2
+#define BITS_N 3
 
 
 /********
@@ -42,14 +36,12 @@
   * and Epoch, a UserID, or a vertex in the LBBT.
   *
   * Number of bits required to represent the number:
-  *   - T
   *   - N
   *   - 2 * (2 ^ (BITS_N - 1))
   *
 ********/
-#define BITS_EPOCH  2
-#define BITS_USERID 3
-#define BITS_VERTEX 3
+#define BITS_USERID 4
+#define BITS_VERTEX 4
 
 
 /********
@@ -62,8 +54,7 @@
   *   - NONE  = (2 ^ BITS_N) - 1
   *
 ********/
-#define NEVER 3
-#define NONE  7
+#define NONE  15
 
 
 /********
@@ -97,24 +88,9 @@
   *   - LEAF       = TREE_ORDER / 2
   *
 ********/
-#define TREE_ORDER 7
+#define TREE_ORDER 15
 #define ROOT       0
-#define LEAF       3
-
-
-/********
-  *
-  * The number of revelations the attacker may make during the game is derived
-  * from the security parameter C. Note that revelation moves require using a
-  * "challenge," which are limited to at most C. This is very important because
-  * the last challenge must be reserved as the final move played to end the game,
-  * and consequently a revelation move cannot use the last available challenge!
-  *
-  * Constants defined as:
-  *   - MAX_REVEAL = C - 1
-  *
-********/
-#define MAX_REVEAL 2
+#define LEAF       7
 
 
 /********
@@ -125,23 +101,18 @@
   * the contiguous, discrete domains.
   *
   * Constants defined as:
-  *   - FIRST_EPOCH  = FIRST_USERID = FIRST_VERTEX = LEAF_LEVEL = 0
-  *   - FINAL_EPOCH  = ( T - 1 )
   *   - FINAL_USERID = ( N - 1 )
   *   - FINAL_VERTEX = ( TREE_ORDER  - 1 )
   *   - ROOT_LEVEL   = ( BITS_VERTEX - 1 )
   *
 ********/
-#define FIRST_EPOCH  0
-#define FINAL_EPOCH  2
-
 #define FIRST_USERID 0
-#define FINAL_USERID 3
+#define FINAL_USERID 7
 
 #define FIRST_VERTEX 0
-#define FINAL_VERTEX 6
+#define FINAL_VERTEX 14
 
 #define LEAF_LEVEL 0
-#define ROOT_LEVEL 2
+#define ROOT_LEVEL 3
 
 #endif /* IMPORT_SPEC_CONSTANTS */
