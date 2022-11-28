@@ -45,7 +45,7 @@ inline hoard ( )
 
 inline reveal ( )
 {
-    printf ( "\n> > >\n> CGKA: Move Name\t( RVL : * _ -- _ ) @ %d\n> > >\n", epoch );
+    printf ( "\n> > >\n> CGKA: Move Name\t( RVL : * _ -- _ ) \n> > >\n" );
 
     challenged = true;
     learnedActiveKey = true;

@@ -107,7 +107,6 @@ inline print_entire_state ( )
     d_step
     {
         printf ( "\n-=-=-=-=-=-=-=-=-=-=-=-\n-=-  GLOBAL  STATE  -=-\n-=-=-=-=-=-=-=-=-=-=-=-\n" );
-        printf ( "\n\tCurrent Epoch \t%d\n", epoch );
         print_challenges         ( );
         printf ( "\n\tNon-Commitment Options:\t[ %d, %d, %d ]\n", CheckBit (nonCommitmentOptions, 0), CheckBit (nonCommitmentOptions, 1), CheckBit (nonCommitmentOptions, 2) );
         printf ( "\n\tNon-Commitment Ability:\t%d\n", nonCommitmentOptions != 0 );

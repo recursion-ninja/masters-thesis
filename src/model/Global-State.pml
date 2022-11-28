@@ -35,7 +35,6 @@ local BITARRAY ( memberKeys ); // Members whose keys are known (corrupted), requ
 local BITARRAY ( membership ); // Group membership of current epoch
 
 // Scalar variables
-local unsigned epoch    : BITS_EPOCH;  // The current epoch
 local unsigned originID : BITS_USERID; // ID of the  member
 local unsigned targetID : BITS_USERID; // ID of the effected member
 local unsigned widestID : BITS_USERID; // The maximum ID during any past/present epoch.

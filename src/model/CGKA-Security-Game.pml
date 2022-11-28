@@ -69,7 +69,6 @@ inline CGKA_initialize ( )
     {
         printf( "\n***********************\n* CGKA: Initialize!   *\n***********************\n");
 
-        epoch      = 0;
         hoardPrior = 0;
         memberKeys = 0;
         learnedActiveKey = false;
@@ -98,9 +97,6 @@ inline CGKA_create_group ( )
 
     printf( "\n***********************\n* CGKA: Create Group! *\n***********************\n" );
 
-    unsigned id0 : BITS_USERID = 0;
-    unsigned ep0 : BITS_EPOCH  = 0;
-
     print_membership ( );
 }
 
@@ -108,7 +104,6 @@ inline CGKA_create_group ( )
 inline CGKA_security_game ( )
 {
     printf( "\n***********************\n* CGKA: Begin Play!   *\n***********************\n" );
-    printf( "\nEpoch: %d\n", epoch );
 
     bool finished = false;
     unsigned nonCommitmentOptions : 3 = 7;
@@ -137,7 +132,7 @@ start_of_game: skip;
 
 start_of_epoch:
         {
-            printf ( "\n\n> > >\tStarting Epoch: %d\n\n", epoch );
+            printf ( "\n\n> > >\tStarting Epoch\n\n" );
             BITARRAY ( buffer     ) = 0;
             BITARRAY ( hoardNovel ) = 0;
             bool challenged = false;
@@ -153,21 +148,21 @@ start_of_epoch:
             :: !(challenged) ->
 cease_in_epoch: { finished = true; break };
 
-            // 2. Play a Commitment Move
-            //     The attacker *may* play a move which commits to a new epoch...
-            //     unless it is the last epoch.
-            :: epoch < FINAL_EPOCH ->
-progress_epoch: { play_move_with_commitment ( ); break };
-
-            // 3. Play a Non-commital Move
+            // 2. Play a Non-commital Move
             //     The attacker *may* play a move and remain in the same epoch...
             //     unless the attacker has exhausted all idempotent non-comittal moves!
             :: nonCommitmentOptions != 0 ->
 continue_epoch: { play_move_without_commitment ( ) };
 
+            // 3. Play a Commitment Move
+            //     The attacker *may* play a move which commits to a new epoch...
+            //     unless it is the last epoch.
+            :: else ->
+progress_epoch: { play_move_with_commitment ( ); break };
+
             od;
 
-            printf ( "\n> > >\tEnding Epoch: %d\n\n", epoch );
+            printf ( "\n> > >\tEnding Epoch\n\n" );
             post_epoch_update ( );
         };
     od;
@@ -236,7 +231,6 @@ inline play_move_without_commitment ( )
 /****
   * External result variable(s):
   *   - challenged
-  *   - epoch
   *   - hoardPrior
   *   - nonCommitmentOptions
 ****/
@@ -245,8 +239,7 @@ inline post_epoch_update ( )
     d_step
     {
         // After the operation is complete, check to see if the an endgame condition has been reached.
-        printf( "\nLOOP broken: %d", epoch );
-        printf( "\n< < <\n< Moves:   %d\n", FINAL_EPOCH - epoch );
+        printf( "\nLOOP broken!" );
 
 /*
         // Check if the largest member ID has increased
@@ -264,10 +257,6 @@ inline post_epoch_update ( )
         :: else
         fi
 */
-
-        // Increment epoch
-        epoch++;
-
         // Reset the challenge bit
         challenged = false;
 
@@ -336,7 +325,7 @@ inline post_move_update ( )
 inline check_query_reveal ( )
 {
     if
-    :: !( challenged || learnedActiveKey || epoch == FINAL_EPOCH ) -> StampBit ( nonCommitmentOptions, 2 )
+    :: !( challenged || learnedActiveKey ) -> StampBit ( nonCommitmentOptions, 2 )
     :: else -> ClearBit ( nonCommitmentOptions, 2 )
     fi
 }
