@@ -146,7 +146,7 @@ start_of_epoch:
             //     *MUST* query 'challenge' oracle in the last epoch.
             //     so it always happens in the last epoch.
             :: !(challenged) ->
-cease_in_epoch: { finished = true; break };
+aborting_epoch: { finished = true; break };
 
             // 2. Play a Non-commital Move
             //     The attacker *may* play a move and remain in the same epoch...
@@ -157,8 +157,8 @@ continue_epoch: { play_move_without_commitment ( ) };
             // 3. Play a Commitment Move
             //     The attacker *may* play a move which commits to a new epoch...
             //     unless it is the last epoch.
-            :: else ->
-progress_epoch: { play_move_with_commitment ( ); break };
+            :: true ->
+advanced_epoch: { play_move_with_commitment ( ); break };
 
             od;
 
@@ -190,7 +190,7 @@ inline play_move_with_commitment ( )
     if
     :: buffer != N -> atomic { select_invitee ( ); select_inviter ( ); insert_member ( ) }
     :: buffer >  2 -> atomic { select_evictee ( ); select_evictor ( ); remove_member ( ) }
-    :: else        -> atomic {                     select_updater ( ); oblige_update ( ) }
+    :: true        -> atomic {                     select_updater ( ); oblige_update ( ) }
     fi
 
     post_move_update ( );

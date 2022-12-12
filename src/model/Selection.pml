@@ -80,9 +80,20 @@ inline buffer_for_invitee ( buffer )
     :: else
     fi
 
-    buffer = ( 1 << N ) - 1;
-    buffer = buffer ^ ( (1 << ( most + 1 )) - 1 )
-    buffer = buffer ^ ( membership ^ ( ( 1 << N ) - 1 ) );
+    buffer = (1 << ( most + 1 )) - 1
+
+// Debugging information output:
+//    printf( "\nwidestID  :\t%d", widestID   );
+//    printf( "\nMembership:\t%d", membership );
+//    printf( "\nMost      :\t%d", most       );
+//    printf( "\nBuffer[0] =           %d              = 0x%x"  , most,           most              );
+//    printf( "\nBuffer[0] =         ( %d + 1 )        = 0x%x"  , most,         ( most + 1 )        );
+//    printf( "\nBuffer[0] =   (1 << ( %d + 1 ))       = 0x%x"  , most,   (1 << ( most + 1 ))       );
+//    printf( "\nBuffer[0] = ( (1 << ( %d + 1 )) - 1 ) = 0x%x"  , most, ( (1 << ( most + 1 )) - 1 ) );
+//    printf( "\nBuffer[1] =          ~0x%x   = 0x%x"  ,         most,          ( ~membership ) );
+//    printf( "\nBuffer[1] = 0x%d & ( ~0x%x ) = 0x%x\n", buffer, most, buffer & ( ~membership ) );
+
+    buffer = buffer & ( ~membership )
 }
 
 

@@ -13,7 +13,7 @@
   * Parameters (`t`, `c` `n`) defined as constants below:
   *
 ********/
-#define N 8
+#define N 3
 
 #define BIT_ARRAY_WIDTH 4
 
@@ -23,7 +23,7 @@
   *   - N - 1
   *
 ********/
-#define BITS_N 3
+#define BITS_N 2
 
 
 /********
@@ -40,8 +40,8 @@
   *   - 2 * (2 ^ (BITS_N - 1))
   *
 ********/
-#define BITS_USERID 4
-#define BITS_VERTEX 4
+#define BITS_USERID 2
+#define BITS_VERTEX 3
 
 
 /********
@@ -54,7 +54,7 @@
   *   - NONE  = (2 ^ BITS_N) - 1
   *
 ********/
-#define NONE  15
+#define NONE  3
 
 
 /********
@@ -88,9 +88,9 @@
   *   - LEAF       = TREE_ORDER / 2
   *
 ********/
-#define TREE_ORDER 15
+#define TREE_ORDER 7
 #define ROOT       0
-#define LEAF       7
+#define LEAF       3
 
 
 /********
@@ -107,12 +107,12 @@
   *
 ********/
 #define FIRST_USERID 0
-#define FINAL_USERID 7
+#define FINAL_USERID 2
 
 #define FIRST_VERTEX 0
-#define FINAL_VERTEX 14
+#define FINAL_VERTEX 6
 
 #define LEAF_LEVEL 0
-#define ROOT_LEVEL 3
+#define ROOT_LEVEL 2
 
 #endif /* IMPORT_SPEC_CONSTANTS */

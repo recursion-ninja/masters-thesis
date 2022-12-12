@@ -37,7 +37,7 @@ local BITARRAY ( membership ); // Group membership of current epoch
 // Scalar variables
 local unsigned originID : BITS_USERID; // ID of the  member
 local unsigned targetID : BITS_USERID; // ID of the effected member
-local unsigned widestID : BITS_USERID; // The maximum ID during any past/present epoch.
+local unsigned widestID : BITS_N;      // The maximum ID during any past/present epoch.
 
 // Knowledge flags
 local bool learnedActiveKey; // Attacker learned the group's shared secret key during the key's epoch?
