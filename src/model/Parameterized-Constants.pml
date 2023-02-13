@@ -13,7 +13,9 @@
   * Parameters (`t`, `c` `n`) defined as constants below:
   *
 ********/
-#define N 3
+#define T 11
+#define C 11
+#define N 4
 
 #define BIT_ARRAY_WIDTH 4
 
@@ -40,7 +42,7 @@
   *   - 2 * (2 ^ (BITS_N - 1))
   *
 ********/
-#define BITS_USERID 2
+#define BITS_USERID 3
 #define BITS_VERTEX 3
 
 
@@ -54,7 +56,7 @@
   *   - NONE  = (2 ^ BITS_N) - 1
   *
 ********/
-#define NONE  3
+#define NONE  7
 
 
 /********
@@ -107,7 +109,7 @@
   *
 ********/
 #define FIRST_USERID 0
-#define FINAL_USERID 2
+#define FINAL_USERID 3
 
 #define FIRST_VERTEX 0
 #define FINAL_VERTEX 6

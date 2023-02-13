@@ -9,7 +9,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 
 
 .DEFAULT:;
-SHELL := /bin/sh
+SHELL := /bin/bash
 COMMA := ,
 EMPTY :=
 define NEWLINE
@@ -54,7 +54,7 @@ dir-slides-deck       := $(dir-documents)$(dir-slides-relative)
 dir-thesis-manuscript := $(dir-documents)$(dir-thesis-relative)
 dir-backup-record     := $(abspath $(addprefix $(dir-logging),records))/
 dir-backup-trail      := $(abspath $(addprefix $(dir-logging),trails))/
-dir-output-encoding   := $(abspath $(addprefix $(dir-source-code),$(basename-encoding)))/
+dir-output-encoding   := $(dir-protocol-model)
 
 filepath-make-definitions := $(wildcard $(dir-make-definitions)*.$(extension-makefile))
 

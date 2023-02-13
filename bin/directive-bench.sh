@@ -3,8 +3,10 @@
 # > Nodes & CPUs:
 #PBS -l nodes=1:ppn=8
 #
-# > Memory:
-#PBS -l mem=65536mb
+# > Memory: (  58 GiB =  59392 MiB )
+# > Memory: (  98 GiB = 100352 MiB )
+# > Memory: ( 318 GiB = 325632 MiB )
+#PBS -l mem=325632mb
 #
 # > Estimated runtime:
 #PBS -l walltime=30-00:00:00
@@ -25,18 +27,22 @@
 # > Inherit environment variables
 #PBS -V
 #
-MINDFA=80
-VECLEN=80
+MINDFA=24
+VECLEN=72
 
-# 120 GiB = 122880 MiB
+#  56 GiB =  57344 MiB
+#  96 GiB =  98304 MiB
+# 316 GiB = 323584 MiB
 DIRECTIVE_DEFAULTS=(
+    'HC4'
     'JOINPROCS'
-    'MEMLIM=122880'
+    'MEMLIM=323584'
     'MURMUR'
     'NOBOUNDCHECK'
     'NOFIX'
     'SEPQS'
     'SFH'
+    'SPACE'
 )
 
 #SLURM_ARRAY_TASK_ID=0
@@ -64,21 +70,10 @@ DIRECTIVE_DEFAULTS=(
     
 #    'SAFETY'
 
-DIRECTIVE_STRATEGY_1=(
-    'HC4'
-)
-
-DIRECTIVE_STRATEGY_2=(
-    "COLLAPSE"
-    "MA=${MINDFA}"
-)
-
 DIRECTIVE_ELEMENTS=(
     'NOFAIR'
-    'SPACE'
     "VECTORSZ=${VECLEN}"
 )
-
 
 FLAG_DEFAULTS=("${DIRECTIVE_DEFAULTS[@]/#/-D}")
 FLAG_ELEMENTS=("${DIRECTIVE_ELEMENTS[@]/#/-D}")
@@ -108,23 +103,14 @@ do
 done
 
 if [ -z ${SLURM_ARRAY_TASK_ID+x} ]; then
-    echo "No specified 'SLURM_ARRAY_TASK_ID'"
-    exit 2
+    SLURM_ARRAY_TASK_ID=0
+#    echo "No specified 'SLURM_ARRAY_TASK_ID'"
+#    exit 2
 fi
 
 NAME_BINARY="CGKA-Bench-${SLURM_ARRAY_TASK_ID}"
 
-if [[ ${SLURM_ARRAY_TASK_ID} -ge ${bound} ]]; then
-    FLAG_SELECTION=$((SLURM_ARRAY_TASK_ID-bound))
-    FLAG_STRATEGY="${DIRECTIVE_STRATEGY_1[@]/#/-D}"
-else
-    FLAG_SELECTION=${SLURM_ARRAY_TASK_ID}
-    FLAG_STRATEGY="${DIRECTIVE_STRATEGY_2[@]/#/-D}"
-fi
-
-echo "Strategy: ${FLAG_STRATEGY}"
-
-FLAG_ELECTION="${FLAG_STRATEGY[@]} ${FLAG_SPECTRUM[$FLAG_SELECTION]}"
+FLAG_ELECTION="${FLAG_SPECTRUM[$SLURM_ARRAY_TASK_ID]}"
 
 if [[ -z "${FLAG_ELECTION}" ]]; then
     FLAG_RENDERED="{} (Empty Set)"
@@ -143,7 +129,15 @@ gcc \
 
 chmod +x "${NAME_BINARY}"
 
-./"${NAME_BINARY}" -a -A -N HLT -v -w28 -x
+# Search depth set to
+#  | N |   Depth Limit | Exact Depth |
+#  |:-:|--------------:|------------:|
+#  | 3 |     1,000,000 |     289,137 |
+#  | 4 |    10,000,000 |   5,823,059 |
+#  | 5 |   200,000,000 |  22,614,336 |
+#  | 6 | 2,000,000,000 |  77,008,431 |
+#  | 7 | 
+./"${NAME_BINARY}" -a -A -m2000000000 -N FSU -v -w32 -x
 
 sstat --allsteps --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID --jobs ${SLURM_JOBID} --parsable
 
