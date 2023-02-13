@@ -9,7 +9,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 
 
 .DEFAULT:;
-SHELL := /bin/sh
+SHELL := /bin/bash
 COMMA := ,
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
@@ -61,23 +61,22 @@ $(con-pref)debug := YES
 #######
 
 define amend_definitions_within
-	$(info $(amendment-mapping))
 	@if [ -n "$(amendment-mapping)" ]; then \
 	    printf $(if $($(con-pref)debug),"\nAmending constants within:\n\t%s\n\nAmendments:\n" "$(1)",""); \
 	fi
-	for kvp in $(amendment-mapping); do \
+	@for kvp in $(amendment-mapping); do \
 	    key=$${kvp%,*}; \
 	    val=$${kvp#*,}; \
 	    rep="/^#define/s/\\s+$${key}(\\s+)[[:digit:]]+\\s*$$/ $${key}\\1$${val}/"; \
 	    printf $(if $($(con-pref)debug),"\tREP:\t%s\n" "$${rep}", ""); \
 	    printf $(if $($(con-pref)debug),"\t%-13s-->%4s\n" "$${key}" "$${val}",""); \
-	    sed -E -i "$${rep}" $(1); \
+	    sed -i'.bak' -E "$${rep}" $(1); \
 	done
 	@if [ -n "$(amendment-mapping)" ]; then echo ""; fi
 endef
 
 define bits_required
-$(shell echo "scale=3; l($(1))/l(2)" | bc -l | cut -f1 -d'.' | xargs -n 1 -I "%" echo "scale=0; " "%" " + 1" | bc)
+$(shell echo "scale=3; l($(1))/l(2)" | bc -l | cut -f1 -d'.' | xargs -I "%" echo "scale=0; " "%" " + 1" | bc)
 endef
 
 #######
@@ -89,20 +88,6 @@ endef
 # Conditionally assign security parameter values if they were passed from the command line.
 # Compute the bit widths required for the supplied security parameter(s).
 # Compute the constants values which are derivative of the supplied security parameter(s).
-
-# Security parameter: (T)
-$(con-pref)T            := $($(sec-pref)T)
-$(con-pref)BITS_T       := $(call bits_required,$(shell expr $($(con-pref)T) - 1))
-$(con-pref)BITS_EPOCH   := $(call bits_required,$($(con-pref)T))
-$(con-pref)FIRST_EPOCH  := 0
-$(con-pref)FINAL_EPOCH  := $(shell expr $($(con-pref)T) - 1)
-$(con-pref)NEVER        := $(shell expr $$(( ( 1 << $($(con-pref)BITS_EPOCH) ) - 1 )) )
-
-# Security parameter: (C)
-$(con-pref)C            := $($(sec-pref)C)
-$(con-pref)BITS_C       := $(call bits_required,$(shell expr $($(con-pref)C) - 1))
-$(con-pref)MAX_REVEAL   := $(shell expr $($(con-pref)C) - 1)
-
 # Security parameter: (N)
 $(con-pref)N            := $($(sec-pref)N)
 $(con-pref)BITS_N       := $(call bits_required,$(shell expr $($(con-pref)N) - 1))

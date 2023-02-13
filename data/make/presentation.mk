@@ -9,7 +9,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 
 
 .DEFAULT:;
-SHELL := /bin/sh
+SHELL := /bin/bash
 COMMA := ,
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
@@ -150,7 +150,7 @@ $(presentation-latex): $(slides-filepath) $(dir $(presentation-latex))
 	  $(pandoc-options) \
 	  --output=$@ \
 	  $< ; \
-	  sed -i 's/<\.->/<\.->\[frame\]/g' $@; \
+	  sed -i'.bak' 's/<\.->/<\.->\[frame\]/g' $@; \
 	)
 
 $(presentation-target): $(presentation-latex) $(dir $(presentation-target))

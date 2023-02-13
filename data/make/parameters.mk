@@ -9,7 +9,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 
 
 .DEFAULT:;
-SHELL := /bin/sh
+SHELL := /bin/bash
 COMMA := ,
 EMPTY :=
 define NEWLINE
@@ -42,27 +42,16 @@ extension-promela  ?= pml
 def-pref := default-
 sec-pref := security-parameter-
 
-ltl-property-labels := HLT FSU PCS
+ltl-property-labels := FSU PCS
 
 $(def-pref)ltl-property     := $(firstword $(ltl-property-labels))
 $(def-pref)protocol-version := 1
-$(def-pref)$(sec-pref)T     := 12
-$(def-pref)$(sec-pref)C     := 12
 $(def-pref)$(sec-pref)N     := 8
+
 
 basename-constants := Parameterized-Constants
 filename-constants := $(addsuffix .$(extension-promela),$(basename-constants))
 filepath-constants := $(abspath $(addprefix $(dir-protocol-model),$(filename-constants)))
-
-#######
-###
-#   Custom function definitions for PARAMETERS
-###
-#######
-
-define security_parameter
-$(if $(strip $($(1))),$($(1)),$(if $(strip $(wildcard $(filepath-constants))),$(shell sed -n 's/^#define \+$(1) \+\([^ ]\+\) *$$/\1/p' $(filepath-constants)),$($(def-pref)$(sec-pref)$(1))))
-endef
 
 #######
 ###
@@ -101,10 +90,13 @@ endif
 ###
 #######
 
-security-parameters := T N
-$(sec-pref)T := $(call security_parameter,T)
-$(sec-pref)N := $(call security_parameter,N)
-$(sec-pref)C := $($(sec-pref)T)
+security-parameters := N
+
+ifndef N
+$(sec-pref)N := $($(def-pref)$(sec-pref)N)
+else
+$(sec-pref)N := $(N)
+endif
 
 #######
 ###
@@ -129,6 +121,7 @@ show-ltl-property:
 
 show-protocol-version:
 	@printf "$(protocol-version)"
+
 
 show-security-parameters:
 	@printf "%s = %s\n" $(security-parameter-keys) $(security-parameter-vals)

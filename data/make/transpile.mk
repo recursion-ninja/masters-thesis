@@ -9,7 +9,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 
 
 .DEFAULT:;
-SHELL := /bin/sh
+SHELL := /bin/bash
 COMMA := ,
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
@@ -71,7 +71,6 @@ installdirs:: $(dir-output-encoding)
 token-encoding-code: amend-constants $(dir-output-encoding) $(filepath-modeling-code) $(filepath-property)
 #	Setup the temporary compilation environment
 	@$(eval dir-transpile := $(shell mktemp -d -t transpile-XXXXXXXXXX))
-	@$(eval dir-beginning := $(shell pwd))
 	@$(eval tmp-transpile := $(shell mktemp -t transpile-HEADER-XXX))
 	@$(eval mod-transpile := $(filter %.h,$(filename-encoding-code)))
 #	Transfer requisite source files and working location

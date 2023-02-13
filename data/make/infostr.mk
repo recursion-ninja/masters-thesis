@@ -9,7 +9,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 
 
 .DEFAULT:;
-SHELL := /bin/sh
+SHELL := /bin/bash
 COMMA := ,
 EMPTY :=
 define NEWLINE

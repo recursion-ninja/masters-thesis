@@ -9,7 +9,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 
 
 .DEFAULT:;
-SHELL := /bin/sh
+SHELL := /bin/bash
 COMMA := ,
 EMPTY :=
 define NEWLINE
@@ -251,10 +251,10 @@ $(dir-backup-trail):
 	mkdir -p $@
 
 $(filepath-verifier): $(dir-binaries) $(sources-verifier)
-	$(info $(sources-verifier))
-	$(subst $(SPACE),$(directives-glue),gcc $(directives-list)) \
-	-O3 \
-	-o $@ \
-	$(filepath-encoding-in-C)
+	cd $(dir-protocol-model)
+	$(subst $(SPACE),$(directives-glue),gcc $(directives-list) -O3) \
+	  -I $(dir-output-encoding) \
+	  -o $@ \
+	  $(filter %.c,$(filepath-encoding-in-C))
 
 endif # IMPORT_MAKE_COMPILATION

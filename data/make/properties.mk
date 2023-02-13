@@ -9,7 +9,7 @@ IMPORT_MAKE_ENVIRONMENT := 1
 
 
 .DEFAULT:;
-SHELL := /bin/sh
+SHELL := /bin/bash
 COMMA := ,
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
@@ -78,13 +78,13 @@ define alter_property_FSU
 	@echo "}"     >> "$$LTL_FSU"
 	@pattern="/^ltl\\s\\+FSU\\s*$$/,/[}]/ { /{/,/}/d }; /^ltl\\s\\+FSU\\s*$$/r $${LTL_FSU}"
 
-	sed -i -e "$${pattern}" $(1)
+	sed -i'.bak' -e "$${pattern}" $(1)
 	rm "$$LTL_FSU"
 endef
 
 define amend_property_within
 	@pattern="/^\\s*#include\\s\\+\"$(prop-prefix)\\(.*\\)\"/d"
-	sed -i -e "$${pattern}" $(1)
+	sed -i'.bak' -e "$${pattern}" $(1)
 	@echo '#include "$(filename-property)"' >> $(filepath-model-spec)
 endef
 
