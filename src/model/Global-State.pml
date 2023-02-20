@@ -16,12 +16,8 @@
   *
 ********/
 
-#include "Bitpack/Bit-Array.pml"
+#include "Bit-Array.pml"
 #include "Parameterized-Constants.pml"
-
-// Datatype for an array of bits. Packed tightly, saves space!
-#define BITARRAY( label ) unsigned label : N
-
 
 /****
   *

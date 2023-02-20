@@ -1,11 +1,11 @@
 #ifndef IMPORT_SPEC_CGKAGAME
 #define IMPORT_SPEC_CGKAGAME
 
-#include "Bitpack/Bit-Array.pml"
+#include "Parameterized-Constants.pml"
+#include "Bit-Array.pml"
+#include "Pop-Count.pml"
 #include "Selection.pml"
 #include "Oracles.pml"
-#include "Parameterized-Constants.pml"
-#include "Bitpack/Pop-Count.pml"
 #include "Printing.pml"
 #include "Global-State.pml"
 
@@ -339,11 +339,22 @@ active proctype CGKA ( )
 }
 
 
+#if LTL_PROPERTY_HLT == 1
+
+/****
+  *
+  * LTL: HLT (Halt / Decidablity)
+  *
+  * The model always terminates.
+  *
+****/
 ltl HLT
 {
 #include "LTL-HLT.pml"
 }
 
+#endif
+#if LTL_PROPERTY_FSU == 1
 
 /****
   *
@@ -357,6 +368,8 @@ ltl FSU
 #include "LTL-FSU.pml"
 }
 
+#endif
+#if LTL_PROPERTY_PCS == 1
 
 /****
   *
@@ -368,5 +381,6 @@ ltl PCS
 #include "LTL-PCS.pml"
 }
 
+#endif
 
 #endif /* IMPORT_SPEC_CGKAGAME */

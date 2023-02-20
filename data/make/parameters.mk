@@ -1,4 +1,4 @@
-ifndef IMPORT_MAKE_ENVIRONMENT
+ ifndef IMPORT_MAKE_ENVIRONMENT
 IMPORT_MAKE_ENVIRONMENT := 1
 
 #######
@@ -79,10 +79,12 @@ protocol-name         := TreeKEM
 protocol-version-pref := v
 
 ifndef version
-protocol-version := $(protocol-version-pref)$($(def-pref)protocol-version)
+protocol-version-num := $($(def-pref)protocol-version)
 else
-protocol-version := $(protocol-version-pref)$(version)
+protocol-version-num := $(version)
 endif
+
+protocol-version := $(protocol-version-pref)$(protocol-version-num)
 
 #######
 ###

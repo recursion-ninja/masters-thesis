@@ -90,6 +90,8 @@ endef
 # Compute the constants values which are derivative of the supplied security parameter(s).
 # Security parameter: (N)
 $(con-pref)N            := $($(sec-pref)N)
+$(info $(sec-pref)N = $($(sec-pref)N))
+$(info $(con-pref)N = $($(con-pref)N))
 $(con-pref)BITS_N       := $(call bits_required,$(shell expr $($(con-pref)N) - 1))
 $(con-pref)BITS_USERID  := $(call bits_required,$($(con-pref)N))
 $(con-pref)BITS_VERTEX  := $(shell expr $($(con-pref)BITS_N) + 1)
@@ -103,6 +105,18 @@ $(con-pref)FIRST_VERTEX := 0
 $(con-pref)FINAL_VERTEX := $(shell expr $($(con-pref)TREE_ORDER) - 1)
 $(con-pref)LEAF_LEVEL   := 0
 $(con-pref)ROOT_LEVEL   := $(shell expr $($(con-pref)BITS_VERTEX) - 1)
+
+
+$(con-pref)LTL_PROPERTY_HLT := $(if $(patsubst HLT,,$(ltl-property)),0,1)
+$(con-pref)LTL_PROPERTY_FSU := $(if $(patsubst FSU,,$(ltl-property)),0,1)
+$(con-pref)LTL_PROPERTY_PCS := $(if $(patsubst PCS,,$(ltl-property)),0,1)
+
+$(con-pref)PROTOCOL_VERSION := $(if $(patsubst v2,,$(protocol-version)),1,2)
+
+
+
+
+
 
 # Collect all defined constant variables and construct a key-value pair mapping
 defined-constants := $(sort $(filter $(con-pref)%,$(.VARIABLES)))

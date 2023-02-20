@@ -1,6 +1,8 @@
 #ifndef IMPORT_SPEC_BITARRAY
 #define IMPORT_SPEC_BITARRAY
 
+#include "Parameterized-Constants.pml"
+
 /********
     *
     * Operations on 'unsigned' values used as a 'Bit-Array'
@@ -11,7 +13,7 @@
     *
 ********/
 
-#define BitArray( name ) unsigned name : BIT_ARRAY_WIDTH
+#define BITARRAY( name ) unsigned name : N
 
 
 #define CheckBit( A, I ) (   ( A &     ( 1 << ( I ) )   ) != 0 )

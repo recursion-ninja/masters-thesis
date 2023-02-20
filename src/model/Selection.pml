@@ -1,12 +1,11 @@
 #ifndef IMPORT_SPEC_SELECTION
 #define IMPORT_SPEC_SELECTION
 
-#include "Bitpack/Bit-Array.pml"
+#include "Bit-Array.pml"
 #include "Parameterized-Constants.pml"
-#include "Bitpack/Pop-Count.pml"
+#include "Pop-Count.pml"
 #include "Global-State.pml"
 #include "TreeKEM-v1.pml"
-#include "Bitpack/Bit-Array.pml"
 
 
 /********

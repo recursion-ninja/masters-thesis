@@ -1,4 +1,4 @@
-	ifndef IMPORT_MAKE_ENVIRONMENT
+ifndef IMPORT_MAKE_ENVIRONMENT
 IMPORT_MAKE_ENVIRONMENT := 1
 
 #######
@@ -38,7 +38,7 @@ dir-protocol-model   ?= ./
 
 model-specification       := CGKA-Security-Game
 filename-modeling-spec    := $(model-specification).$(extension-promela)
-filename-modeling-code    := $(wildcard $(dir-protocol-model)*.$(extension-promela)) $(dir-protocol-model)Bitpack
+filename-modeling-code    := $(wildcard $(dir-protocol-model)*.$(extension-promela))
 filepath-modeling-spec    := $(abspath $(addprefix $(dir-protocol-model),$(filename-modeling-spec)))
 filepath-modeling-code    := $(abspath $(filename-modeling-code))
 

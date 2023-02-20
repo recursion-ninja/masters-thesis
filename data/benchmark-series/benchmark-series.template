@@ -1,0 +1,36 @@
+#!/bin/bash
+
+
+##### # # # # # # # # # #
+### Script Configuration
+##### # # # # # # # # # #
+
+# > Nodes & CPUs:
+#PBS -l nodes=1:ppn=4
+#
+# > Memory:
+#PBS -l mem=$VAR_DEPENDANT_MEM_JOB$mb
+#
+# > Estimated runtime:
+#PBS -l walltime=30-00:00:00
+#
+# > Email:
+#PBS -m abe
+#PBS -M cluster-notifications@recursion.ninja
+#
+# > Job name:
+#PBS -N $VAR_DEPENDANT_JOBNAME$
+#
+# > Queue:
+#PBS -q batch-amd
+#
+# > Shell:
+#PBS -S /bin/bash
+#
+# > Inherit environment variables
+#PBS -V
+#
+# > Set key variables
+#PBS -v NOTE_VEC_LEN=$VAR_DEPENDANT_VEC_LEN$,PROG_ENC_LEN=$VAR_DEPENDANT_ENC_LEN$,PROG_HASHTBL=$VAR_DEPENDANT_HASHTBL$,PROG_MAX_STK=$VAR_DEPENDANT_MAX_STK$,PROG_MEM_STK=$VAR_DEPENDANT_MEM_STK$,PROG_MEM_PAN=$VAR_DEPENDANT_MEM_PAN$,TASK_MEM_JOB=$VAR_DEPENDANT_MEM_JOB$,TASK_JOBNAME=$VAR_DEPENDANT_JOBNAME$,TASK_GROUPMAX=$VAR_GROUPMAX$,TASK_PROPERTY=$VAR_PROPERTY$,TASK_TREE_VER=$VAR_TREE_VER$,
+
+$body$

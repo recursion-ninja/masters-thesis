@@ -3,8 +3,14 @@
 
 #include "Parameterized-Constants.pml"
 #include "Global-State.pml"
-#include "TreeKEM-v1.pml"
 
+#ifdef PROTOCOL_VERSION
+#if PROTOCOL_VERSION == 2
+#include "TreeKEM-v2.pml"
+#endif
+#else
+#include "TreeKEM-v1.pml"
+#endif
 
 /********
     *

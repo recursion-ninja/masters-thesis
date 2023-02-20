@@ -3,6 +3,29 @@
 
 //  #define SELECT_VIA_LOOP
 
+
+/********
+  *
+  * Security properties to verify.
+  * Binary indicators for
+  *   - HLT
+  *   - FSU
+  *   - PCS
+  *
+********/
+#define LTL_PROPERTY_HLT 0
+#define LTL_PROPERTY_FSU 0
+#define LTL_PROPERTY_PCS 1
+
+/********
+  *
+  * Version of the TreeKEM protocol under verification.
+  *   - Protocol version <- [1, 2]
+  *
+********/
+#define PROTOCOL_VERSION 2
+
+
 /********
   *
   * Security game's parameters' valid ranges:
@@ -13,11 +36,8 @@
   * Parameters (`t`, `c` `n`) defined as constants below:
   *
 ********/
-#define T 11
-#define C 11
-#define N 4
+#define N 8
 
-#define BIT_ARRAY_WIDTH 4
 
 /********
   *
@@ -25,13 +45,22 @@
   *   - N - 1
   *
 ********/
-#define BITS_N 2
+#define BITS_N 3
 
 
 /********
   *
-  * The range of both Epoch and UserID values is extended by one to include a
-  * "missing data" sentinel value name NEVER and NONE, respectively.
+  * Number of bits used to store a bit-vector of length N
+  *
+********/
+#define BIT_ARRAY_WIDTH BITS_N
+
+
+/********
+  *
+  * The range of UserID values is extended by one to include a "missing data"
+  * sentinel value named NONE.
+  *
   * Furthermore, the number of array cells required to represent the protocol's
   * left balanced binary (LBBT) tree as a heap is equal to 2 ^ (BITS_N + 1) - 1.
   * We assign constants for the number of bits required to store a reference to
@@ -42,8 +71,8 @@
   *   - 2 * (2 ^ (BITS_N - 1))
   *
 ********/
-#define BITS_USERID 3
-#define BITS_VERTEX 3
+#define BITS_USERID 4
+#define BITS_VERTEX 4
 
 
 /********
@@ -52,11 +81,10 @@
   * reference to an Epoch or UserID, respectively, has no real contextual value.
   *
   * Constants defined as:
-  *   - NEVER = (2 ^ BITS_T) - 1
   *   - NONE  = (2 ^ BITS_N) - 1
   *
 ********/
-#define NONE  7
+#define NONE  15
 
 
 /********
@@ -90,9 +118,9 @@
   *   - LEAF       = TREE_ORDER / 2
   *
 ********/
-#define TREE_ORDER 7
+#define TREE_ORDER 15
 #define ROOT       0
-#define LEAF       3
+#define LEAF       7
 
 
 /********
@@ -109,12 +137,12 @@
   *
 ********/
 #define FIRST_USERID 0
-#define FINAL_USERID 3
+#define FINAL_USERID 7
 
 #define FIRST_VERTEX 0
-#define FINAL_VERTEX 6
+#define FINAL_VERTEX 14
 
 #define LEAF_LEVEL 0
-#define ROOT_LEVEL 2
+#define ROOT_LEVEL 3
 
 #endif /* IMPORT_SPEC_CONSTANTS */

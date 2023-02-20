@@ -23,6 +23,7 @@ endif # IMPORT_MAKE_ENVIRONMENT
 
 basename-encoding     := pan
 basename-pbs-script   := pbs
+basename-benchmark    := benchmark-series
 extension-figure      := png
 extension-haskell     := hs
 extension-latex       := tex
@@ -43,6 +44,7 @@ dir-slides-relative   := ./slides/
 
 # Source Locations
 dir-make-definitions  := $(abspath $(addprefix $(dir-data),make))/
+dir-benchmark-series  := $(abspath $(addprefix $(dir-data),$(basename-benchmark)))/
 dir-pbs-script-parts  := $(abspath $(addprefix $(dir-data),$(basename-pbs-script)))/
 dir-protocol-model    := $(abspath $(addprefix $(dir-source-code),model))/
 dir-slides-source     := $(abspath $(dir-source-code)$(dir-slides-relative))/

@@ -1,0 +1,188 @@
+##### # # # # # # # # # # 
+### Script Preamble
+##### # # # # # # # # # #
+
+printenv
+
+### Display the job context
+
+printf \
+"### ### ### ### ### ### ### ###\n\
+### ### ### ###\n\
+### ###\n\
+###\n\
+         %s\n\
+###\n\
+### ###\n\
+### ### ### ###\n\
+### ### ### ### ### ### ### ###\n\n" "${SLURM_JOB_NAME}"
+
+printf "Initialized \t%s\n" "`date`"
+printf "Hosted on   \t%s\n" `hostname`
+printf "Working in  \t%s\n" `pwd`
+printf "LTL property\t%s\n" "${TASK_PROPERTY}"
+printf "CGKA version\t%s\n" "${TASK_TREE_VER}"
+printf "CGKA members\t%s\n" "N=${TASK_GROUPMAX}"
+printf "Limited by  \t%5s MiB RAM\n" "${SLURM_MEM_PER_NODE}"
+printf "Allocating  \t%5s MiB RAM\n" "${PROG_MEM_PAN}"
+printf "Utilizing   \t%5s CPU cores\n\n" "${SLURM_NPROCS}"
+
+
+##### # # # # # # # # # #
+### Script payload
+##### # # # # # # # # # #
+
+
+DIRECTIVE_DEFAULTS=(
+    'HC4'
+    'JOINPROCS'
+    "MEMLIM=${PROG_MEM_PAN}"
+    'MURMUR'
+#    "NCORE=${CPU_NUM}"
+    'NOBOUNDCHECK'
+    'NOFIX'
+    'P_RAND=1618033988'
+    'PMAX=2'
+    'QMAX=0'
+    'SEPQS'
+    'SFH'
+    'SPACE'
+    'T_RAND=1155727349'
+)
+
+DIRECTIVE_STRATEGY_1=(
+)
+
+DIRECTIVE_STRATEGY_2=(
+    'SC'
+)
+
+DIRECTIVE_ELEMENTS=(
+    'NOFAIR'
+    "VECTORSZ=${PROG_VEC_LEN}"
+)
+
+PROG_OPTS_DEFAULT=(
+    '-a'
+    '-A'
+    '-v'
+    "-w${PROG_HASHTBL}"
+    '-x'
+)
+
+PROG_OPTS_STRATEGY_1=(
+    "-m${PROG_MAX_STK}"
+)
+
+PROG_OPTS_STRATEGY_2=(
+    "-m${PROG_MEM_STK}"
+)
+
+FLAG_DEFAULTS=("${DIRECTIVE_DEFAULTS[@]/#/-D}")
+FLAG_ELEMENTS=("${DIRECTIVE_ELEMENTS[@]/#/-D}")
+FLAG_SPECTRUM=()
+
+
+##### # # # # # # # # # #
+### Model Selection
+printf "Selecting model parameters...\n"
+
+count=${#FLAG_ELEMENTS[@]}
+bound=$((1 << ${count}))
+i=0
+while [ ${i} -lt ${bound} ]
+do
+    subset=""
+    j=0
+    while [ ${j} -lt ${count} ]
+    do
+        directive="${FLAG_ELEMENTS[$j]} "
+        if [ $(((1 << ${j}) & ${i})) -gt 0 ]
+        then
+            subset+="${directive}"
+        else
+            number=${#directive}
+            subset+=`printf '%*s' "${#directive}"`
+        fi
+        j=$((${j} + 1))
+    done
+    FLAG_SPECTRUM+=("${subset}")
+    i=$((${i} + 1))
+done
+
+if [ -z ${SLURM_ARRAY_TASK_ID+x} ]; then
+    echo "No specified 'SLURM_ARRAY_TASK_ID'"
+    exit 2
+fi
+
+VERIFIER_NAME="Bench-${SLURM_JOB_NAME}-${SLURM_ARRAY_TASK_ID}"
+
+if [[ ${SLURM_ARRAY_TASK_ID} -ge ${bound} ]]; then
+    FLAG_SELECTION=$((SLURM_ARRAY_TASK_ID-bound))
+    FLAG_STRATEGY="${DIRECTIVE_STRATEGY_1[@]/#/-D}"
+    ARGS_ELECTION=( "${PROG_OPTS_DEFAULT[@]}" "${PROG_OPTS_STRATEGY_1[@]}" )
+else
+    FLAG_SELECTION=${SLURM_ARRAY_TASK_ID}
+    FLAG_STRATEGY="${DIRECTIVE_STRATEGY_2[@]/#/-D}"
+    ARGS_ELECTION=( "${PROG_OPTS_DEFAULT[@]}" "${PROG_OPTS_STRATEGY_2[@]}" )
+fi
+
+printf "C -- (constant directives):\n"
+printf '`%s`\n' "${DIRECTIVE_DEFAULTS[@]}"
+
+printf "E -- (experiment directives):\n"
+printf '`%s`\n' "${DIRECTIVE_STRATEGY_1[@]} ${DIRECTIVE_STRATEGY_1[@]} ${DIRECTIVE_ELEMENTS[@]}"
+
+printf "F -- (runtime flags):\n"
+printf '`%s`\n' "${ARGS_ELECTION[@]}"
+
+printf 'Strategy:\n`%s`\n' "${FLAG_STRATEGY}"
+
+FLAG_ELECTION="${FLAG_STRATEGY[@]} ${FLAG_SPECTRUM[$FLAG_SELECTION]}"
+
+if [[ -z "${FLAG_ELECTION}" ]]; then
+    FLAG_RENDERED="{} (Empty Set)"
+else
+    FLAG_RENDERED="\`$(echo -e "${FLAG_ELECTION}")\`"
+fi
+
+echo -e "Benchmarking selected directive set:\n\t${FLAG_RENDERED}"
+
+
+##### # # # # # # # # # #
+### Model Compilation
+printf "Compiling encoded model from source...\n"
+
+gcc \
+    ${FLAG_DEFAULTS[@]} \
+    ${FLAG_ELECTION} \
+    -O3 \
+    -o "${VERIFIER_NAME}" \
+    pan.h pan.c
+
+chmod +x "${VERIFIER_NAME}"
+
+
+##### # # # # # # # # # #
+### Model Verification
+printf "Running analysis of model %s...\n\n" "${VERIFIER_NAME}"
+
+TIME_INITIATION=$(date +%s)
+./"${VERIFIER_NAME}" -t${VERIFIER_NAME}.trail "${ARGS_ELECTION[@]}"
+TIME_COMPLETION=$(date +%s)
+
+
+##### # # # # # # # # # #
+### Model Results
+printf "Start:\t%s\nEnd:\t%s\n" "${TIME_INITIATION}" "${TIME_COMPLETION}"
+
+B=$TIME_INITIATION
+E=$TIME_COMPLETION
+T=$(( E-B ))
+D=$(( T/60/60/24 ))
+H=$(( T/60/60%24 ))
+M=$(( T/60%60    ))
+S=$(( T%60       ))
+printf '%s runtime:\t%02dd %02dh %02dm %02ds\n' "${VERIFIER_NAME}" $D $H $M $S
+
+sstat --allsteps --format=AveCPU,AvePages,AveRSS,AveVMSize,JobID --jobs ${SLURM_JOBID} --parsable
