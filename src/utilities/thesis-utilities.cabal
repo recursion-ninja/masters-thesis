@@ -5,6 +5,7 @@ Stability:          Stable
 Build-Type:         Simple
 Tested-With:
   GHC == 9.2.2
+  GHC == 9.4.4
 
 Author:             Alex Washburn
 Copyright:          (c) Alex Washburn 2022
@@ -55,6 +56,7 @@ Library cluster-batch
     language
 
   build-depends:
+    thesis-utilities:thesis-catalog,
     base >=4.16 && <5,
     commonmark,
     commonmark-extensions,
@@ -62,7 +64,7 @@ Library cluster-batch
     containers,
     indexed-traversable,
     matrices,
-    pandoc-types,
+    pandoc-types >= 1.23,
     mtl,
     process,
     text,
@@ -78,7 +80,6 @@ Library cluster-batch
     Paths_thesis_utilities
 
   exposed-modules:
-    Thesis.Batch.Catalog
     Thesis.Batch.Invoker
     Thesis.Batch.Mandate
     Thesis.Batch.Printer
@@ -87,12 +88,6 @@ Library cluster-batch
 
   other-modules:
     Paths_thesis_utilities
-    Thesis.Batch.Catalog.LTL
-    Thesis.Batch.Catalog.Option
-    Thesis.Batch.Catalog.Parameter
-    Thesis.Batch.Catalog.UseDFA
-    Thesis.Batch.Catalog.Size
-    Thesis.Batch.Catalog.Time
     Thesis.Batch.Invoker.SubProcess
     Thesis.Batch.Mandate.Type
     Thesis.Batch.Printer.Class
@@ -107,6 +102,69 @@ Library cluster-batch
     private
 
   
+-- Core types
+Library thesis-catalog
+
+  import:
+    language
+
+  build-depends:
+    base >=4.16 && <5,
+    containers,
+    vector,
+
+  hs-source-dirs:
+    lib/catalog
+
+  autogen-modules:
+    Paths_thesis_utilities
+
+  exposed-modules:
+    Thesis.Catalog
+    Thesis.Catalog.LTL
+    Thesis.Catalog.Membership
+    Thesis.Catalog.Option
+    Thesis.Catalog.Parameter
+    Thesis.Catalog.Protocol
+    Thesis.Catalog.UseDFA
+    Thesis.Catalog.Size
+    Thesis.Catalog.Time
+
+  other-modules:
+    Paths_thesis_utilities
+
+  visibility:
+    private
+
+
+Library thesis-measure
+
+  import:
+    language
+
+  build-depends:
+    base >=4.16 && <5,
+    deepseq,
+    time,
+
+  hs-source-dirs:
+    lib/measure
+
+  autogen-modules:
+    Paths_thesis_utilities
+
+  exposed-modules:
+    Thesis.Measure.Memory
+    Thesis.Measure.Runtime
+    Thesis.Measure.VerificationError
+
+  other-modules:
+    Paths_thesis_utilities
+
+  visibility:
+    private
+
+
 Executable parse-table-row
 
   main-is:
@@ -135,3 +193,45 @@ Executable parse-table-row
     Thesis.BinaryUnit
     Thesis.ExtractedRow
     Thesis.Parser.Row
+
+
+Executable parse-benchmark-output
+
+  import:
+    language
+
+  main-is:
+    parse-benchmark-output.hs
+           
+  build-depends:
+    thesis-utilities:thesis-catalog,
+--    thesis-utilities:thesis-measure,
+    base >=4.16 && <5,
+--    bytestring,
+--    cassava,
+    containers,
+    directory >= 1.3.8.1,
+    filepath >= 1.4.100.3,
+    megaparsec,
+    parser-combinators,
+    scientific,
+    text,
+    validation,                     
+    vector,
+
+  default-extensions:
+    ApplicativeDo
+
+  hs-source-dirs:
+    app,
+    src,
+
+  other-modules:
+    Parser.BenchScript
+    Parser.BenchScript.Types
+    Parser.Internal
+    Parser.SPIN.BackMatter
+    Parser.SPIN.FrontMatter
+    Parser.SPIN.RuntimeBody
+    Parser.SPIN.Types
+    Paths_thesis_utilities

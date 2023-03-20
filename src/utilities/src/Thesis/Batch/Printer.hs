@@ -21,12 +21,11 @@ module Thesis.Batch.Printer
     , RenderableStream (..)
     ) where
 
-import Thesis.Batch.Printer.Class
-
 import Data.Foldable (fold)
 import Data.Functor (($>))
 import Data.List (intersperse)
 import Data.Text.Builder.Linear (Builder, fromChar, fromText)
+import Thesis.Batch.Printer.Class
 
 
 delimiterUnicode, conjoinerUnicode, seperatorUnicode :: Builder

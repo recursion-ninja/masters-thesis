@@ -75,14 +75,15 @@ transpile-extra-filepath := $(addprefix $(transpile-bunch-filepath),$(transpile-
 ###
 #######
 
-.PHONY: all benchmark-series clean install installdirs transpile
+.PHONY: all benchmark-series clean clean-encoding-files install installdirs transpile
 
 all:: benchmark-series
 
-clean::
-	@-rm -f \
-	  $(wildcard $(abspath $(dir-distribution))/*) \
-	  $(filepath-encoding-pattern)
+clean:: clean-encoding-files
+
+#distclean :: 
+#	@-rm -f \
+	  $(wildcard $(abspath $(dir-distribution))/*)
 
 install:: benchmark-series
 
@@ -137,6 +138,12 @@ $(dir $(transpile-model-filepath)):
 $(transpile-bench-job-filepath): $(transpile-bench-src-filepath) $(dir $(transpile-bench-job-filepath))
 	$< -n $($(sec-pref)N) -p $(ltl-property) -v $(protocol-version-num) 
 	cp $(patsubst %.sh,%.run,$<) $@
+
+
+clean-encoding-files:
+	@-rm -f \
+	  $(filepath-encoding-pattern)
+
 
 #$(transpile-model-filepath): $(filepath-modeling-spec) $(dir $(transpile-model-filepath))
 #	( \

@@ -5,8 +5,8 @@ module Thesis.Batch.Tabular.Bounding
     ) where
 
 import Data.Vector.Unboxed (Vector)
-import Thesis.Batch.Catalog.Size
-import Thesis.Batch.Catalog.Time
+import Thesis.Catalog.Size
+import Thesis.Catalog.Time
 
 
 data  Bounding a

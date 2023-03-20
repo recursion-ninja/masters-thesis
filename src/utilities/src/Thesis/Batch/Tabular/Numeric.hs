@@ -18,13 +18,12 @@ import Data.Maybe (fromMaybe)
 import Data.Set (Set)
 import Data.Set qualified as Set
 import Data.Vector.Unboxed qualified as V
-
-import Thesis.Batch.Catalog.LTL
-import Thesis.Batch.Catalog.Size
-import Thesis.Batch.Catalog.Time
 import Thesis.Batch.Tabular.Bounding
 import Thesis.Batch.Tabular.CellEntry
 import Thesis.Batch.Tabular.Class
+import Thesis.Catalog.LTL
+import Thesis.Catalog.Size
+import Thesis.Catalog.Time
 
 
 newtype NumericTable

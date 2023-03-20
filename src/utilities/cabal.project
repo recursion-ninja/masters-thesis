@@ -5,7 +5,7 @@
 ---------------------------------------------------------------------------------
 
 executable-static: False
-with-compiler: ghc-9.2.4
+with-compiler: ghc-9.4.4
 
 
 ---------------------------------------------------------------------------------
@@ -91,6 +91,10 @@ package thesis-utilities
         -Wno-monomorphism-restriction
         -Wno-type-defaults
         -Wno-unsafe
+
+        -Wno-missing-deriving-strategies
+        -Wno-redundant-constraints
+        -Wno-unused-packages
 
 packages: .
 

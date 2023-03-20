@@ -35,6 +35,7 @@ import Data.Map.Strict (Map, keysSet, (!))
 import Data.Map.Strict qualified as Map
 import Data.Matrix.Unboxed (Matrix)
 import Data.Matrix.Unboxed qualified as M
+import Data.Maybe (fromMaybe)
 import Data.Set (Set, difference)
 import Data.Set qualified as Set
 import Data.String (IsString(..))
@@ -46,16 +47,16 @@ import Data.Vector.Unboxed qualified as V
 import Text.Pandoc.Builder (Blocks, Inlines)
 import Text.Pandoc.Definition
 import Text.Read (readMaybe)
-import Thesis.Batch.Catalog.LTL
-import Thesis.Batch.Catalog.Option
-import Thesis.Batch.Catalog.Size
-import Thesis.Batch.Catalog.Time
-import Thesis.Batch.Catalog.UseDFA
 import Thesis.Batch.Mandate.Type
 import Thesis.Batch.Scanner.Fault
 import Thesis.Batch.Tabular.Bounding
 import Thesis.Batch.Tabular.CellEntry
 import Thesis.Batch.Tabular.Numeric
+import Thesis.Catalog.LTL
+import Thesis.Catalog.Option
+import Thesis.Catalog.Size
+import Thesis.Catalog.Time
+import Thesis.Catalog.UseDFA
 
 
 {-|
@@ -400,8 +401,8 @@ blockPlainText = foldMap $ \case
     Header _ _ is     -> inlinePlainText is
     HorizontalRule    -> "\n"
     Table{}           -> mempty
+    Figure {}         -> mempty
     Div _ bs          -> blockPlainText bs
-    Null              -> mempty
 
 
 inlinePlainText :: [Inline] -> Text
@@ -456,3 +457,32 @@ fullMarkdownSpec = mconcat
       -- non-table lines
       pipeTableSpec
     ]
+
+
+buildOptionSet :: forall k v . (Eq v, IsString v, Show k) => Set k -> Map k v
+buildOptionSet = Map.fromSet (fromString . show)
+
+
+textualLTL :: forall s . (Eq s, IsString s) => s -> Validation ScanFault LTL
+textualLTL txt =
+    let opts = buildOptionSet completeSetOfLTLs
+
+        seek :: a -> s -> Maybe a -> Maybe a
+        seek k v a
+            | v == txt  = Just k
+            | otherwise = a
+
+    in  pure . fromMaybe Anything $ Map.foldrWithKey seek Nothing opts
+
+
+textualOption :: forall s . (Eq s, IsString s, Show s) => s -> Validation ScanFault Option
+textualOption txt =
+    let opts = buildOptionSet completeSetOfOptions
+
+        seek :: a -> s -> Maybe a -> Maybe a
+        seek k v a
+            | v == txt  = Just k
+            | otherwise = a
+    in  case Map.foldrWithKey seek Nothing opts of
+            Nothing -> textError $ "Unrecognized header: " <> fromString (show txt)
+            Just x  -> pure x

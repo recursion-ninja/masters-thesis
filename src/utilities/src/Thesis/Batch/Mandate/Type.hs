@@ -29,13 +29,12 @@ import Data.Text.Builder.Linear (Builder)
 import Data.Vector (Vector)
 import Data.Vector qualified as V
 import Data.Vector.Unboxed qualified as VU
-import Thesis.Batch.Catalog
-import Thesis.Batch.Catalog.Option
-import Thesis.Batch.Catalog.Size
-import Thesis.Batch.Catalog.Time
 import Thesis.Batch.Printer
 import Thesis.Batch.Tabular
 import Thesis.Batch.Tabular.CellEntry
+import Thesis.Catalog
+import Thesis.Catalog.Option
+import Thesis.Catalog.Time
 
 
 newtype BatchMandate
