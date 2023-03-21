@@ -60,7 +60,7 @@ parse() {
     fi
 
     if [[ -n "${PROVIDED_TREE_VER+x}" ]]; then
-        if ((1 <= PROVIDED_TREE_VER && PROVIDED_GROUPMAX <= 2)); then
+        if ((1 <= PROVIDED_TREE_VER && PROVIDED_TREE_VER <= 2)); then
             PARAM_TREE_VER="${PROVIDED_TREE_VER}"
         fi
     fi

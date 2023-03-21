@@ -136,6 +136,7 @@ $(dir $(transpile-model-filepath)):
 	mkdir -p $@
 
 $(transpile-bench-job-filepath): $(transpile-bench-src-filepath) $(dir $(transpile-bench-job-filepath))
+	$(info $< -n $($(sec-pref)N) -p $(ltl-property) -v $(protocol-version-num) )
 	$< -n $($(sec-pref)N) -p $(ltl-property) -v $(protocol-version-num) 
 	cp $(patsubst %.sh,%.run,$<) $@
 

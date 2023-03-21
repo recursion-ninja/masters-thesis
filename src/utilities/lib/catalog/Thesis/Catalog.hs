@@ -7,6 +7,8 @@ module Thesis.Catalog
     , completeSetOfOptions
       -- * CGKA Security Parameter
     , Parameter ()
+      -- * TreeKEM Version
+    , Protocol ()
       -- * DFA Minimized Representation
     , UseDFA ()
     , enumUseDFA
@@ -18,5 +20,6 @@ module Thesis.Catalog
 import Thesis.Catalog.LTL
 import Thesis.Catalog.Option
 import Thesis.Catalog.Parameter
+import Thesis.Catalog.Protocol
 import Thesis.Catalog.Size
 import Thesis.Catalog.UseDFA
