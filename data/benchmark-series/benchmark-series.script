@@ -143,11 +143,14 @@ FLAG_ELECTION="${FLAG_STRATEGY[@]} ${FLAG_SPECTRUM[$FLAG_SELECTION]}"
 if [[ -z "${FLAG_ELECTION}" ]]; then
     FLAG_RENDERED="{} (Empty Set)"
 else
-    FLAG_RENDERED="\`$(echo -e "${FLAG_ELECTION}")\`"
+    FLAG_RENDERED="$(echo -e "${FLAG_ELECTION}")"
 fi
 
-echo -e "Benchmarking selected directive set:\n\t${FLAG_RENDERED}"
+printf 'Benchmarking selected directive set:\n\t`%s`\n' "${FLAG_RENDERED}"
 
+printf 'Invoked with selected arguments:\n\t`'
+printf '%s ' "${ARGS_ELECTION[@]}"
+printf '`\n'
 
 ##### # # # # # # # # # #
 ### Model Compilation
