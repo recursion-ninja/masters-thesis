@@ -1,5 +1,7 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE Strict #-}
+{-# Language DeriveAnyClass #-}
+{-# Language GeneralizedNewtypeDeriving #-}
+{-# Language OverloadedStrings #-}
+{-# Language Strict #-}
 
 module Thesis.Benchmark.Set
   ( -- * Data-types
@@ -18,6 +20,7 @@ module Thesis.Benchmark.Set
   ) where
 
 
+import Control.DeepSeq
 import Data.Functor (($>))
 import Data.Foldable (toList)
 import Data.IntMap.Strict (IntMap, insert, singleton)
@@ -29,14 +32,15 @@ import Data.Semigroup (Arg(..), Max(..))
 import Data.Text (Text)
 import Data.Text qualified as T
 import GHC.Exts (IsString(fromString))
+import GHC.Generics (Generic)
 --import Numeric.Natural
 import Parser.SPIN.Types(BackMatter(..), RuntimeBody(..), SpinMemory(..), SpinModel(..), SpinTiming(..))
 import Parser.BenchScript.Types
 
 import Thesis.Catalog.LTL
---import Thesis.Catalog.Membership
+import Thesis.Catalog.Membership
 import Thesis.Catalog.Protocol
-import Thesis.Catalog.Size
+--import Thesis.Catalog.Size
 
 
 {- |
@@ -50,6 +54,13 @@ data  BenchmarkFileContent
     } deriving (Show)
 
 
+deriving stock instance Generic BenchmarkFileContent
+
+
+deriving anyclass instance NFData BenchmarkFileContent
+
+
+
 {- |
 Nicely colated output type for consumption / pretty-printing.
 -}
@@ -60,7 +71,7 @@ data  BenchmarkSeriesKey
     = BenchmarkSeriesKey
     { benchSeriesVersion  :: Protocol
     , benchSeriesProperty :: LTL
-    , benchSeriesMembers  :: {-# UNPACK #-} Size
+    , benchSeriesMembers  :: {-# UNPACK #-} Membership
     } deriving (Eq, Ord)
 
 

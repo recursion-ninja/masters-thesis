@@ -111,6 +111,7 @@ Library thesis-catalog
   build-depends:
     base >=4.16 && <5,
     containers,
+    deepseq,
     vector,
 
   hs-source-dirs:

@@ -14,10 +14,13 @@ module Thesis.Catalog
     , enumUseDFA
     , useDFA
       -- * Membership size
+    , Membership()
+      -- * Depricated membership size
     , Size()
     ) where
 
 import Thesis.Catalog.LTL
+import Thesis.Catalog.Membership
 import Thesis.Catalog.Option
 import Thesis.Catalog.Parameter
 import Thesis.Catalog.Protocol

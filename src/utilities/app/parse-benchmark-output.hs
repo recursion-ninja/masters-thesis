@@ -6,6 +6,7 @@ module Main
     ( main
     ) where
 
+import Control.DeepSeq (NFData, force)
 import Control.Monad ((<=<), filterM)
 --import Data.ByteString.Lazy (hPut)
 --import Data.Csv (encodeDefaultOrderedByName)
@@ -19,8 +20,8 @@ import Data.Foldable (fold, traverse_, toList)
 import Data.List (intersperse, isInfixOf, sort)
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Semigroup (Arg(..))
-import Data.Text.Lazy (Text)
-import Data.Text.Lazy.IO (readFile)
+import Data.Text (Text)
+import Data.Text.IO (hGetContents)
 --import Data.Tuple (swap)
 --import Data.Validation
 import Data.Void
@@ -40,7 +41,18 @@ import Thesis.Catalog.Membership
 import Thesis.Catalog.Protocol
 
 import System.Directory.OsPath
+import System.IO (IOMode(ReadMode), withFile)
 import System.OsPath
+
+
+newtype BenchmarkFileParseError = BenchmarkFileParseError (NonEmpty (ParseErrorBundle Text Void))
+    deriving newtype (Eq, NFData, Semigroup)
+
+
+
+instance Show BenchmarkFileParseError where
+
+    show (BenchmarkFileParseError errs) = unlines . intersperse "" $ errorBundlePretty <$> toList errs
 
 
 main :: IO ()
@@ -131,10 +143,10 @@ partitionResults =
 parseBenchmarkFileContent :: OsPath -> IO (Arg FilePath (Either BenchmarkFileParseError BenchmarkFileContent))
 parseBenchmarkFileContent = 
     let parseFile fp =
-            let finalizer :: Either (ParseErrorBundle Text Void) c -> Arg FilePath (Either BenchmarkFileParseError c)
-                finalizer = Arg fp . first makeBenchmarkFileParseError
-                parser    = parse pBenchmarkFileContent fp
-            in  finalizer . parser <$> readFile fp
+            let finalizer :: NFData c => Either (ParseErrorBundle Text Void) c -> Arg FilePath (Either BenchmarkFileParseError c)
+                finalizer = force . Arg fp . first makeBenchmarkFileParseError
+                parser    = force . parse pBenchmarkFileContent fp
+            in  withFile fp ReadMode (fmap (finalizer . parser . force) . hGetContents)
     in  parseFile <=< decodeFS
 
 
@@ -143,15 +155,6 @@ pBenchmarkFileContent = do
     bs <- pBenchScript
     (rb, mbm) <- pFrontMatter *> pRuntimeBody
     pure $ BenchmarkFileContent bs rb mbm
-
-
-newtype BenchmarkFileParseError = BenchmarkFileParseError (NonEmpty (ParseErrorBundle Text Void))
-    deriving (Eq, Semigroup)
-
-
-instance Show BenchmarkFileParseError where
-
-    show (BenchmarkFileParseError errs) = unlines . intersperse "" $ errorBundlePretty <$> toList errs
 
 
 makeBenchmarkFileParseError :: ParseErrorBundle Text Void -> BenchmarkFileParseError

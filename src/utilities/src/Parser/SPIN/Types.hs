@@ -1,4 +1,7 @@
-{-# Language Safe #-}
+{-# Language DeriveAnyClass #-}
+{-# Language GeneralizedNewtypeDeriving #-}
+{-# Language OverloadedStrings #-}
+{-# Language Strict #-}
 
 module Parser.SPIN.Types
   ( BackMatter(..)
@@ -17,9 +20,11 @@ module Parser.SPIN.Types
   , SpinUnreachedLines(..)
   ) where
 
+import Control.DeepSeq
 import Data.List.NonEmpty
 import Data.Map.Strict
 import Data.Text (Text)
+import GHC.Generics (Generic)
 import Numeric.Natural (Natural)
 
 
@@ -93,3 +98,81 @@ data  SpinTiming
     , rateStates      :: Rational
     , transitionDelay :: Rational
     } deriving (Show)
+
+
+deriving stock instance Generic BackMatter
+
+
+deriving stock instance Generic FrontMatter
+
+
+deriving stock instance Generic RuntimeBody
+
+
+deriving stock instance Generic SpinMemory
+
+
+deriving stock instance Generic SpinModel
+
+
+deriving stock instance Generic SpinOptions
+
+
+deriving stock instance Generic SpinSearch
+
+
+deriving stock instance Generic SpinSearchFlag
+
+
+deriving stock instance Generic SpinTiming
+
+
+deriving stock instance Generic SpinUnreached
+
+
+deriving stock instance Generic SpinUnreachedLabel
+
+
+deriving stock instance Generic SpinUnreachedLines
+
+
+deriving stock instance Generic SpinVersion
+
+
+deriving anyclass instance NFData BackMatter
+
+
+deriving anyclass instance NFData FrontMatter
+
+
+deriving anyclass instance NFData RuntimeBody
+
+
+deriving anyclass instance NFData SpinMemory
+
+
+deriving anyclass instance NFData SpinModel
+
+
+deriving anyclass instance NFData SpinOptions
+
+
+deriving anyclass instance NFData SpinSearch
+
+
+deriving anyclass instance NFData SpinSearchFlag
+
+
+deriving anyclass instance NFData SpinTiming
+
+
+deriving anyclass instance NFData SpinUnreached
+
+
+deriving anyclass instance NFData SpinUnreachedLabel
+
+
+deriving anyclass instance NFData SpinUnreachedLines
+
+
+deriving anyclass instance NFData SpinVersion

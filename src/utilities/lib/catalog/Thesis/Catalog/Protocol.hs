@@ -1,14 +1,18 @@
+{-# Language DeriveAnyClass #-}
 {-# Language DerivingStrategies #-}
 {-# Language OverloadedStrings #-}
 {-# Language Safe #-}
+{-# Language UnboxedSums #-}
 
 module Thesis.Catalog.Protocol
     ( Protocol (..)
     , completeSetOfProtocolVersions
     ) where
 
+import Control.DeepSeq
 import Data.Ix
 import Data.Set (Set, fromList)
+import GHC.Generics (Generic)
 
 
 data  Protocol
@@ -25,7 +29,13 @@ deriving stock instance Enum Protocol
 deriving stock instance Eq Protocol
 
 
+deriving stock instance Generic Protocol
+
+
 deriving stock instance Ix Protocol
+
+
+deriving anyclass instance NFData Protocol
 
 
 deriving stock instance Ord Protocol

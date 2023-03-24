@@ -1,6 +1,7 @@
 {-# Language FlexibleContexts #-}
 {-# Language LambdaCase #-}
 {-# Language OverloadedStrings #-}
+{-# Language ScopedTypeVariables #-}
 
 module Parser.BenchScript
   ( BenchScript(..)
@@ -15,10 +16,10 @@ import Control.Monad.Combinators.NonEmpty (some)
 --import Data.Foldable (toList)
 import Data.Functor (($>), void)
 import Data.List.NonEmpty (NonEmpty, sort)
+import Data.Proxy (Proxy(..))
 --import Data.Scientific (floatingOrInteger)
---import Data.String (IsString)
-import Data.Text qualified as T
-import Data.Text.Lazy (Text, toStrict) --, unwords, words)
+import Data.String (IsString(fromString))
+import Data.Text (Text) --, unwords, words)
 import Data.Void
 --import GHC.Exts (IsList(fromList))
 --import Numeric.Natural
@@ -39,7 +40,7 @@ dbgP = const id
 
  
 {-# INLINEABLE pBenchScript #-}
-pBenchScript :: Parsec Void Text BenchScript
+pBenchScript :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s BenchScript
 pBenchScript =
     let pBenchScriptPrefix = anythingTill pBenchTaskID
         pBenchScriptMiddle = anythingTill $ chunk benchDirectivesStartingString
@@ -53,23 +54,25 @@ pBenchScript =
 --            <*> (pBenchParameters <* (anythingTill pBenchDirectives))
 
 
-pBenchTaskID :: Parsec Void Text Word
+pBenchTaskID :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s Word
 pBenchTaskID = chunk "SLURM_ARRAY_TASK_ID" *> char '=' *> decimal <* endOfLine
 
 
-benchDirectivesStartingString :: Text
+benchDirectivesStartingString :: IsString s => s
 benchDirectivesStartingString = "C -- (constant directives):"
 
 
-pBenchParameters :: Parsec Void Text BenchParameters
+pBenchParameters :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s BenchParameters
 pBenchParameters =
-    let pParameterLine :: Show a => Text -> Parsec Void Text a -> Parsec Void Text a
-        pParameterLine x = fmap snd . lineContaining2 (chunk x) 
+    let pParameterLine :: (IsString (Tokens s), Show a, Stream s, Token s ~ Char, VisualStream s) => Tokens s -> Parsec Void s a -> Parsec Void s a
+        pParameterLine x =
+            let prefix = void $ chunk x
+            in  fmap snd . lineContaining2 prefix
 
-        pPropertyLTL   :: Parsec Void Text LTL
+        pPropertyLTL   :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s LTL
         pPropertyLTL   = (chunk "FSU" $> FSU) <|> (chunk "PCS" $> PCS)
 
-        pMembershipNum :: Parsec Void Text Size
+        pMembershipNum :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s Size
         pMembershipNum =
             let f = fmap (toEnum . fromEnum) :: Functor f => f Word -> f Size
             in  char 'N' *> char '=' *> f decimal
@@ -85,22 +88,22 @@ pBenchParameters =
             <*> (pBenchMembers)
 
 
-pBenchDirectives :: Parsec Void Text BenchDirectives
+pBenchDirectives :: forall s. (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s BenchDirectives
 pBenchDirectives =
-    let pBenchOptionLines :: Parsec Void Text (NonEmpty T.Text)
+    let pBenchOptionLines :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s (NonEmpty Text)
         pBenchOptionLines = dbgP "pBenchDirectives" $ sort <$> some pInlineCodeLine
 
-        pBenchOptionSet :: (NonEmpty T.Text -> b) -> Text -> Parsec Void Text b
+        pBenchOptionSet :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => (NonEmpty Text -> b) -> Tokens s -> Parsec Void s b
         pBenchOptionSet f x = chunk x *> nextLine *> (f <$> pBenchOptionLines)
 
         pBenchStrategy = dbgP "pBenchStrategy" $ chunk "Strategy:" *> blankLine *> pInlineCodeLine
 
         -- "C -- (constant directives):"
 
-        pBenchDirectiveSet :: Text -> Parsec Void Text BenchDirectiveSet
+        pBenchDirectiveSet :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Tokens s -> Parsec Void s BenchDirectiveSet
         pBenchDirectiveSet = pBenchOptionSet BenchDirectiveSet
 
-        pBenchRuntimeFlags :: Parsec Void Text BenchRuntimeFlags
+        pBenchRuntimeFlags :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s BenchRuntimeFlags
         pBenchRuntimeFlags = pBenchOptionSet BenchRuntimeFlags "F -- (runtime flags):"
 
     in  dbgP "pBenchDirectives" $ BenchDirectives
@@ -110,13 +113,16 @@ pBenchDirectives =
           <*> pBenchDirectiveSet "Benchmarking selected directive set:"
 
 
-pInlineCodeLine :: Parsec Void Text T.Text
+pInlineCodeLine :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s Text
 pInlineCodeLine = dbgP "pInlineCodeLine" $ try (hspace *> pInlineCode) <* blankLine
 
 
-pInlineCode :: Parsec Void Text T.Text
+pInlineCode :: forall s. (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s Text
 pInlineCode =
-    let tick = '`'
+    let makeText :: Tokens s -> Text
+        makeText = fromString . chunkToTokens (Proxy :: Proxy s)
+
+        tick = '`'
         flag = char tick
         code = takeWhileP Nothing (/= tick)
-    in  dbgP "pInlineCode" $ toStrict <$> between flag flag code
+    in  dbgP "pInlineCode" $ makeText <$> between flag flag code
