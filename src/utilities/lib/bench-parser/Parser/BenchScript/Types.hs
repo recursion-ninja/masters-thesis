@@ -1,6 +1,8 @@
 {-# Language DeriveAnyClass #-}
 {-# Language GeneralizedNewtypeDeriving #-}
+{-# Language ImportQualifiedPost #-}
 {-# Language Strict #-}
+{-# Language TypeFamilies #-}
 
 module Parser.BenchScript.Types
   ( BenchScript(..)
@@ -15,7 +17,9 @@ module Parser.BenchScript.Types
 
 import Control.DeepSeq
 import Data.List.NonEmpty (NonEmpty)
+import Data.List.NonEmpty qualified as NE
 import Data.Text (Text)
+import GHC.Exts (IsList(..))
 import GHC.Generics (Generic)
 import Thesis.Catalog (LTL(..), Protocol, Membership)
 
@@ -74,6 +78,24 @@ deriving stock instance Generic BenchRuntimeFlags
 
 
 deriving stock instance Generic BenchScript
+
+
+instance IsList BenchDirectiveSet where
+
+    type Item BenchDirectiveSet = Text
+
+    toList (BenchDirectiveSet xs) = toList xs
+
+    fromList = BenchDirectiveSet . NE.fromList
+
+
+instance IsList BenchRuntimeFlags where
+
+    type Item BenchRuntimeFlags = Text
+
+    toList (BenchRuntimeFlags xs) = toList xs
+
+    fromList = BenchRuntimeFlags . NE.fromList
 
 
 deriving anyclass instance NFData BenchDirectives

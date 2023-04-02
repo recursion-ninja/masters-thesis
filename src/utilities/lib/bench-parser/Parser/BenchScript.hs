@@ -5,7 +5,11 @@
 
 module Parser.BenchScript
   ( BenchScript(..)
+  -- ** Sub-types
   , BenchParameters(..)
+  , BenchDirectives(..)
+  , BenchDirectiveSet(..)
+  , BenchRuntimeFlags(..)
   , pBenchScript
   ) where
 
@@ -34,11 +38,11 @@ import Thesis.Catalog (LTL(..), Size)
 import Text.Megaparsec.Debug
 
 
-dbgP :: (MonadParsecDbg e s m, Show a) => String -> m a -> m a 
+dbgP :: (MonadParsecDbg e s m, Show a) => String -> m a -> m a
 --dbgP = dbg
 dbgP = const id
 
- 
+
 {-# INLINEABLE pBenchScript #-}
 pBenchScript :: (IsString (Tokens s), Stream s, Token s ~ Char, VisualStream s) => Parsec Void s BenchScript
 pBenchScript =

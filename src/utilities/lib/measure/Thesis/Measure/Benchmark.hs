@@ -1,99 +1,64 @@
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE Strict #-}
-{-# LANGUAGE UnboxedSums #-}
+{-# Language GeneralizedNewtypeDeriving #-}
+{-# Language LambdaCase #-}
+{-# Language OverloadedStrings #-}
 
 module Thesis.Measure.Benchmark
-  ( -- * Data-types
-    Memory()
-  , BinaryMagnitude(..)
-    -- * Construction
-  , asMagnitude
-  -- * Rendering
-  , renderMagnitude
-  ) where
+    ( -- * Batch Parsing
+      colateParseResults
+    , gatherBenchmarkFileContents
+      -- * User Informational Output
+    , notifyParseFailure
+    , notifyParseSuccess
+    , notifyTaggedResult
+    ) where
+
+import Data.Foldable (traverse_, toList)
+import Parser.BenchScript (BenchParameters)
+import System.OsPath
+import Thesis.Measure.Benchmark.File
+import Thesis.Measure.Benchmark.Set
 
 
-import Control.DeepSeq
-import Data.Foldable (fold)
-import Data.List (unfoldr)
-import GHC.Exts (IsString(fromString))
-import Numeric.Natural
+colateParseResults :: Foldable f => f (FilePathNoting BenchmarkFileContent) -> BenchmarkSeriesSet
+colateParseResults = colateBenchmarkSeries . fmap getFileNote . toList
 
 
--- | Information measurement with Byte resolution.
-newtype Memory = Memory Natural
-    deriving (Eq, Ord)
+gatherBenchmarkFileContents :: Foldable f => f OsPath -> IO ([FilePathNoting BenchmarkFileParseError], [FilePathNoting BenchmarkFileContent])
+gatherBenchmarkFileContents = fmap partitionFileNotes . traverse parseBenchmarkFileContent . toList
 
 
-data  BinaryMagnitude
-    = B
-    | KiB
-    | MiB
-    | GiB
-    | TiB
-    | PiB
-    | EiB
-    | ZiB
-    | YiB
-    deriving (Bounded, Enum, Eq, Ord, Show)
+notifyParseFailure :: Foldable f => f (FilePathNoting BenchmarkFileParseError) -> IO ()
+notifyParseFailure = outputFileList "FAILURE"
 
 
-instance NFData BinaryMagnitude where
-
-    rnf (!_) = ()
-
-
-instance NFData Memory where
-
-    rnf (Memory !_) = ()
+notifyParseSuccess :: Foldable f => f (FilePathNoting BenchmarkFileContent) -> IO ()
+notifyParseSuccess = outputFileList "SUCCESS"
 
 
-instance Show Memory where
+notifyTaggedResult :: Foldable f => f (FilePathNoting BenchmarkFileContent) -> IO ()
+notifyTaggedResult ress = 
+    let convert :: FilePathNoting BenchmarkFileContent -> FilePathNoting BenchParameters
+        convert = fmap extractBenchmarkIndex
 
-    show mem@(Memory x) =
-        let mag = inferMagnitude x
-        in  renderMagnitude mag mem
+        indices :: [FilePathNoting BenchParameters]
+        indices = convert <$> toList ress
 
+        render :: Show a => FilePathNoting a -> String
+        render x = unwords [ show $ getFileNote x, "=>", getFilePath x ] 
 
-asMagnitude :: Real n => n -> BinaryMagnitude -> Memory
-asMagnitude input mag =
-    let num = toRational input
-        res = toRational $ magnitudeResolution mag
-    in  Memory . round $ num * res
-
-
-renderMagnitude :: IsString s => BinaryMagnitude -> Memory -> s
-renderMagnitude mag (Memory x) =
-    let pad :: Show a => Int -> a -> String
-        pad n s =
-             let str = show s
-                 len = length str
-             in str <> replicate (n - len) '0'
-
-        res :: Natural
-        res = magnitudeResolution mag
-
-        (q,r) = x `divMod` res
-
-    in  fromString $ fold [show q, ".", pad 3 r, " ", show mag ]
+    in  outputList "Parsed benchmark series indices" render indices
 
 
--- Internal
+outputFileList :: Foldable f => String -> f (FilePathNoting a) -> IO ()
+outputFileList suff = outputList ("Files resulting in parse " <> suff) id . fmap getFilePath . toList
 
 
-binaryMagitude :: Natural
-binaryMagitude = 1024
-
-
-inferMagnitude :: Natural -> BinaryMagnitude
-inferMagnitude =
-    let f 0 = Nothing
-        f x = Just (x, x `div` binaryMagitude)
-    in  fst . last . zip [minBound .. maxBound] . unfoldr f
-
-
-magnitudeResolution :: BinaryMagnitude -> Natural
-magnitudeResolution mag =
-    let applyBasis :: Functor f => f a -> f Natural
-        applyBasis = (binaryMagitude <$)
-    in  product . applyBasis $ takeWhile (< mag) [minBound .. maxBound]
+outputList :: Foldable f => String -> (a -> String) -> f a -> IO ()
+outputList pref f xs =
+            let size  = " (" <> show (length xs) <> "):"
+                above = pref <> size
+                fstIO = putStrLn above
+                sndIO 
+                    | null xs   = putStrLn "(None)"
+                    | otherwise = traverse_ (\x -> putStr "\t" *> putStrLn (f x)) xs
+            in  fstIO *> sndIO *> putChar '\n'

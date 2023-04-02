@@ -3,7 +3,7 @@
 {-# Language OverloadedStrings #-}
 {-# Language Strict #-}
 
-module Thesis.Benchmark.Set
+module Thesis.Measure.Benchmark.Set
   ( -- * Data-types
     BenchmarkSeriesSet(..)
   , BenchmarkSeriesKey(..)
@@ -11,54 +11,39 @@ module Thesis.Benchmark.Set
   , BenchmarkSeriesTable(..)
   , BenchmarkMetadata(..)
   , BenchmarkSeriesRow(..)
+  , BenchmarkNamedRecord()
     -- ** Constructor
   , colateBenchmarkSeries
     -- ** Accessor
   , extractBenchmarkIndex
   , extractBenchmarkMetadata
   , extractBenchmarkRow
+  , extractRowsForCSV
   ) where
 
 
 import Control.DeepSeq
+import Data.Csv (DefaultOrdered(..), Field, NamedRecord, ToField(..), ToNamedRecord(..), namedRecord, (.=))
 import Data.Functor (($>))
-import Data.Foldable (toList)
+--import Data.Foldable (toList)
 import Data.IntMap.Strict (IntMap, insert, singleton)
-import Data.List (sort, transpose, unfoldr)
-import Data.Map.Strict (Map, alter, toAscList)
+import Data.List (intercalate, sort, transpose, unfoldr)
+import Data.Map.Strict (Map, alter, toAscList, foldrWithKey')
 --import Data.Maybe (fromMaybe, maybe)
 import Data.Ratio
 import Data.Semigroup (Arg(..), Max(..))
-import Data.Text (Text)
+import Data.Text (Text, unpack)
 import Data.Text qualified as T
-import GHC.Exts (IsString(fromString))
+import GHC.Exts (IsList(..), IsString(fromString))
 import GHC.Generics (Generic)
 --import Numeric.Natural
-import Parser.SPIN.Types(BackMatter(..), RuntimeBody(..), SpinMemory(..), SpinModel(..), SpinTiming(..))
-import Parser.BenchScript.Types
+import Parser.SPIN (BackMatter(..), SpinMemory(..), SpinModel(..), SpinTiming(..))
+import Parser.BenchScript
 
 import Thesis.Catalog.LTL
 import Thesis.Catalog.Membership
 import Thesis.Catalog.Protocol
---import Thesis.Catalog.Size
-
-
-{- |
-General input type from file parser.
--}
-data  BenchmarkFileContent
-    = BenchmarkFileContent
-    { extractedBenchScript :: BenchScript
-    , extractedRuntimeBody :: RuntimeBody
-    , extractedBackMatter  :: Maybe BackMatter
-    } deriving (Show)
-
-
-deriving stock instance Generic BenchmarkFileContent
-
-
-deriving anyclass instance NFData BenchmarkFileContent
-
+import Thesis.Measure.Benchmark.File(BenchmarkFileContent(..))
 
 
 {- |
@@ -72,11 +57,10 @@ data  BenchmarkSeriesKey
     { benchSeriesVersion  :: Protocol
     , benchSeriesProperty :: LTL
     , benchSeriesMembers  :: {-# UNPACK #-} Membership
-    } deriving (Eq, Ord)
+    }
 
 
 newtype BenchmarkSeriesMeasurement = BenchmarkSeriesMeasurement (Arg BenchmarkMetadata BenchmarkSeriesTable)
-    deriving (Eq, Ord)
 
 
 data  BenchmarkMetadata
@@ -84,7 +68,7 @@ data  BenchmarkMetadata
     { benchSeriesDirectivesConstant   :: BenchDirectiveSet
     , benchSeriesDirectivesExperiment :: BenchDirectiveSet
     , benchSeriesRuntimeFlags         :: BenchRuntimeFlags
-    } deriving (Eq, Ord)
+    }
 
 
 newtype BenchmarkSeriesTable = BenchmarkSeriesTable (IntMap BenchmarkSeriesRow)
@@ -94,7 +78,7 @@ data  BenchmarkSeriesRow
     = BenchmarkSeriesRow
     { benchChosenFlags   :: BenchDirectiveSet
     , benchMaybeSubModel :: Maybe BenchmarkSeriesSubModel
-    } deriving (Show)
+    }
 
 
 data  BenchmarkSeriesSubModel
@@ -102,7 +86,68 @@ data  BenchmarkSeriesSubModel
     { benchSeriesModel :: SpinModel
     , benchSeriesSpace :: SpinMemory
     , benchSeriesTime  :: SpinTiming
-    } deriving (Show)
+    }
+
+
+newtype BenchmarkNamedRecord = BenchmarkNamedRecord NamedRecord deriving (Show)
+
+
+instance DefaultOrdered BenchmarkNamedRecord where
+
+    headerOrder = const $ fromList 
+        [ "Version"
+        , "LTL"    
+        , "N"      
+        , "C"      
+        , "E"      
+        , "Flags"
+        , "Directives"
+        , "Errors"
+        , "Runtime (s)"
+        , "Memory (MiB)"
+        , "Allocation (MiB)"
+        , "Hashtable (MiB)"
+        , "State-Vector (B)"
+        , "Search Depth"
+        , "States (stored)"
+        , "States (matched)"
+        , "Transitions"
+        ]
+
+
+instance ToNamedRecord BenchmarkNamedRecord where
+
+    toNamedRecord (BenchmarkNamedRecord x) = x
+
+
+deriving stock    instance Eq BenchmarkMetadata
+
+
+deriving stock    instance Eq BenchmarkSeriesKey
+
+
+deriving newtype  instance Eq BenchmarkSeriesMeasurement
+
+
+deriving stock    instance Generic BenchmarkSeriesKey
+
+
+deriving anyclass instance NFData BenchmarkSeriesKey
+
+
+deriving stock    instance Ord BenchmarkMetadata
+
+
+deriving newtype  instance Ord BenchmarkSeriesMeasurement
+
+
+deriving stock    instance Ord BenchmarkSeriesKey
+
+
+deriving stock    instance Show BenchmarkSeriesRow
+
+
+deriving stock    instance Show BenchmarkSeriesSubModel
 
 
 instance Show BenchmarkSeriesSet where
@@ -164,15 +209,66 @@ instance Show BenchmarkSeriesTable where
     show = T.unpack . renderBenchmarkSeriesTable
 
 
+extractRowsForCSV :: BenchmarkSeriesSet -> [BenchmarkNamedRecord]
+extractRowsForCSV (BenchmarkSeriesSet mapping) =
+    let makeNamedRecords :: BenchmarkSeriesKey -> BenchmarkSeriesMeasurement -> [BenchmarkNamedRecord] -> [BenchmarkNamedRecord]
+        makeNamedRecords key val =
+            let BenchmarkSeriesMeasurement (Arg meta (BenchmarkSeriesTable table)) = val
+
+                getListing :: (IsList f, Item f ~ Text) => (BenchmarkMetadata -> f) -> Field
+                getListing f = toCommaList $ f meta
+                
+                getPairing :: ToField b => [b] -> [(Field, Field)]
+                getPairing = zipWith (.=)
+                    [ "Directives"
+                    , "Errors"
+                    , "Runtime (s)"
+                    , "Memory (MiB)"
+                    , "Allocation (MiB)"
+                    , "Hashtable (MiB)"
+                    , "State-Vector (B)"
+                    , "Search Depth"
+                    , "States (stored)"
+                    , "States (matched)"
+                    , "Transitions"
+                    ]
+
+                verNum :: Enum e => e -> Int
+                verNum = succ . fromEnum
+                
+                metaFields :: [(Field, Field)]
+                metaFields =
+                    [ "Version" .= verNum   (benchSeriesVersion  key)
+                    , "LTL"     .= show     (benchSeriesProperty key)
+                    , "N"       .= fromEnum (benchSeriesMembers  key)
+                    , "C"       .= getListing benchSeriesDirectivesConstant
+                    , "E"       .= getListing benchSeriesDirectivesExperiment
+                    , "Flags"   .= getListing benchSeriesRuntimeFlags
+                    ]
+
+
+                makeRecord :: [Field] -> BenchmarkNamedRecord
+                makeRecord = BenchmarkNamedRecord . namedRecord . (metaFields <>) . getPairing
+                
+                rowsFields = rowObservation . snd <$> toList table
+                newRecords = makeRecord <$> rowsFields
+            in  (newRecords <>)
+    in  foldrWithKey' makeNamedRecords mempty mapping
+
+
+toCommaList :: (IsList f, Item f ~ Text, IsString s) => f -> s
+toCommaList = fromString . intercalate ", " . fmap unpack . toList
+
+
 {-
 Rendering functions
 -}
 
 
-rowObservation :: BenchmarkSeriesRow -> [Text]
+rowObservation :: IsString s => BenchmarkSeriesRow -> [s]
 rowObservation (BenchmarkSeriesRow flags maybeModel) =
-    let getFlags :: BenchDirectiveSet -> Text
-        getFlags (BenchDirectiveSet xs) = T.unwords $ toList xs
+    let getFlags :: IsString s => BenchDirectiveSet -> s
+        getFlags (BenchDirectiveSet xs) = fromString . unwords $ unpack <$> toList xs
 
         absent =
             [ "SEGFAULT"
@@ -183,13 +279,16 @@ rowObservation (BenchmarkSeriesRow flags maybeModel) =
             , ""
             , ""
             , ""
+            , ""
+            , ""
             ]
 
+        present :: IsString a => BenchmarkSeriesSubModel -> [a]
         present (BenchmarkSeriesSubModel model space time) =
-            let nat :: Show a => (SpinModel -> a) -> Text
+            let nat :: (IsString s, Show a) => (SpinModel -> a) -> s
                 nat f = fromString . show $ f model
 
-                rat :: Rational -> Text
+                rat :: IsString s => Rational -> s
                 rat r =
                     let (d, n) = abs num `quotRem` den
                         num = numerator r
@@ -219,7 +318,7 @@ rowObservation (BenchmarkSeriesRow flags maybeModel) =
 
 renderBenchmarkSeriesTable :: BenchmarkSeriesTable -> Text
 renderBenchmarkSeriesTable (BenchmarkSeriesTable im) =
-    let columns = transpose $ rowObservation <$> toList im
+    let columns = transpose $ rowObservation . snd <$> toList im
         headers =
             [ "Directives"
             , "Errors"

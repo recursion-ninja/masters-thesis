@@ -23,7 +23,7 @@ Common language
     ImportQualifiedPost
     LambdaCase
     NoGeneralizedNewtypeDeriving
-    
+
   default-language:
     GHC2021
 
@@ -101,7 +101,54 @@ Library cluster-batch
   visibility:
     private
 
-  
+
+Library thesis-bench-parser
+
+  import:
+    language
+
+  build-depends:
+    thesis-utilities:thesis-catalog,
+    base >=4.16 && <5,
+    bytestring,
+    cassava,
+    containers,
+    deepseq,
+    directory >= 1.3.8.1,
+    filepath >= 1.4.100.3,
+    megaparsec,
+    parser-combinators,
+    scientific,
+    text,
+    validation,
+    vector,
+
+  default-extensions:
+    ApplicativeDo
+
+  hs-source-dirs:
+    lib/bench-parser
+
+  autogen-modules:
+    Paths_thesis_utilities
+
+  exposed-modules:
+    Parser.BenchScript
+    Parser.SPIN
+
+  other-modules:
+    Parser.BenchScript.Types
+    Parser.Internal
+    Parser.SPIN.BackMatter
+    Parser.SPIN.FrontMatter
+    Parser.SPIN.RuntimeBody
+    Parser.SPIN.Types
+    Paths_thesis_utilities
+
+  visibility:
+    private
+
+
 -- Core types
 Library thesis-catalog
 
@@ -144,9 +191,19 @@ Library thesis-measure
     language
 
   build-depends:
+    thesis-utilities:thesis-bench-parser,
+    thesis-utilities:thesis-catalog,
     base >=4.16 && <5,
+    bytestring,
+    cassava,
+    containers,
     deepseq,
+    directory >= 1.3.8.1,
+    filepath >= 1.4.100.3,
+    megaparsec,
+    text,
     time,
+    vector,
 
   hs-source-dirs:
     lib/measure
@@ -155,9 +212,12 @@ Library thesis-measure
     Paths_thesis_utilities
 
   exposed-modules:
-    Thesis.Measure.Memory
-    Thesis.Measure.Runtime
-    Thesis.Measure.VerificationError
+    Thesis.Measure.Benchmark
+    Thesis.Measure.Benchmark.Set
+    Thesis.Measure.Benchmark.File
+--    Thesis.Measure.Memory
+--    Thesis.Measure.Runtime
+--    Thesis.Measure.VerificationError
 
   other-modules:
     Paths_thesis_utilities
@@ -170,7 +230,7 @@ Executable parse-table-row
 
   main-is:
     parse-table-row.hs
-           
+
   build-depends:
     base >=4.16 && <5,
     bytestring,
@@ -181,7 +241,7 @@ Executable parse-table-row
 
   default-extensions:
     NoGeneralizedNewtypeDeriving
-    
+
   default-language:
     GHC2021
 
@@ -203,13 +263,14 @@ Executable parse-benchmark-output
 
   main-is:
     parse-benchmark-output.hs
-           
+
   build-depends:
+    thesis-utilities:thesis-bench-parser,
     thesis-utilities:thesis-catalog,
---    thesis-utilities:thesis-measure,
+    thesis-utilities:thesis-measure,
     base >=4.16 && <5,
---    bytestring,
---    cassava,
+    bytestring,
+    cassava,
     containers,
     deepseq,
     directory >= 1.3.8.1,
@@ -218,23 +279,8 @@ Executable parse-benchmark-output
     parser-combinators,
     scientific,
     text,
-    validation,                     
+    validation,
     vector,
-
-  default-extensions:
-    ApplicativeDo
 
   hs-source-dirs:
     app,
-    src,
-
-  other-modules:
-    Parser.BenchScript
-    Parser.BenchScript.Types
-    Parser.Internal
-    Parser.SPIN.BackMatter
-    Parser.SPIN.FrontMatter
-    Parser.SPIN.RuntimeBody
-    Parser.SPIN.Types
-    Paths_thesis_utilities
-    Thesis.Benchmark.Set
