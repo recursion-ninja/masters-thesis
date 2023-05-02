@@ -102,7 +102,7 @@ declare -ia DEPENDANT_MAX_STK=(
      550000001
     1900000001
     2800000001
-   25000000001
+   25000000001    
 )
 
 # Maximum stack suffix to keep in memory before swapping prefix to/from disk.
@@ -120,6 +120,14 @@ declare -ia DEPENDANT_MEM_STK=(
      2500000
      7500000
     12500000
+    20000000
+    20000000
+    20000000
+    20000000
+    20000000
+    20000000
+    20000000
+    20000000
     20000000
 )
 
@@ -139,7 +147,15 @@ declare -ia DEPENDANT_MEM_PAN=(
      98304
     323584
     512000
-    972800
+    786432
+    786432
+    786432
+    786432
+    786432
+    786432
+    786432
+    786432
+    786432
 )
 
 # Memory to allocate for cluster job.
@@ -162,6 +178,15 @@ declare -ia DEPENDANT_ENC_LEN=(
     64
     64
     68
+    68
+    92
+    92
+    92
+    92
+    92
+    92
+    92
+    92
 )
 
 # Specify the size of the state vector when compiling verification executable.
@@ -183,6 +208,14 @@ declare -ia DEPENDANT_HASHTBL=(
     30
     31
     31
+    32
+    32
+    32
+    32
+    32
+    32
+    32
+    32
     32
 )
 
