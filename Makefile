@@ -24,6 +24,7 @@ endif # IMPORT_MAKE_ENVIRONMENT
 basename-encoding     := pan
 basename-pbs-script   := pbs
 basename-benchmark    := benchmark-series
+basename-verification := verification-series
 extension-figure      := png
 extension-haskell     := hs
 extension-latex       := tex
@@ -50,6 +51,7 @@ dir-protocol-model    := $(abspath $(addprefix $(dir-source-code),model))/
 dir-slides-source     := $(abspath $(dir-source-code)$(dir-slides-relative))/
 dir-thesis-source     := $(abspath $(dir-source-code)$(dir-thesis-relative))/
 dir-thesis-utilities  := $(abspath $(addprefix $(dir-source-code),utilities))/
+dir-verification      := $(abspath $(addprefix $(dir-data),$(basename-verification)))/
 
 # Output Locations
 dir-slides-deck       := $(dir-documents)$(dir-slides-relative)

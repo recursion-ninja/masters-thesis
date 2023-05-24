@@ -25,14 +25,16 @@ IMPORT_MAKE_TRANSPILE := 1
 ###
 #######
 
-basename-encoding    ?= pan
-basename-benchmark   ?= benchmark-series
-extension-makefile   ?= mk
-extension-promela    ?= pml 
-dir-make-definitions ?= ./
-dir-output-encoding  ?= ./
-dir-protocol-model   ?= ./
-dir-benchmark-series ?= ./
+basename-encoding     ?= pan
+basename-benchmark    ?= benchmark-series
+basename-verification ?= verification-series
+extension-makefile    ?= mk
+extension-promela     ?= pml 
+dir-make-definitions  ?= ./
+dir-output-encoding   ?= ./
+dir-protocol-model    ?= ./
+dir-benchmark-series  ?= ./
+dir-verification      ?= ./
 
 #######
 ###
@@ -67,6 +69,15 @@ transpile-extra-filename := $(addprefix $(basename-encoding).,$(extensions-encod
 transpile-extra-filepath := $(addprefix $(transpile-bunch-filepath),$(transpile-extra-filename))
 
 
+transpile-verify-job-filename := $(basename-verification).run
+transpile-verify-job-filepath := $(transpile-bunch-filepath)$(transpile-verify-job-filename)
+transpile-verify-ext-filename := sh script template
+transpile-verify-src-filename := $(addprefix $(basename-verification).,$(transpile-verify-ext-filename))
+transpile-verify-src-filepath := $(addprefix $(dir-verification),$(transpile-verify-src-filename))
+
+
+
+
 
 
 #######
@@ -75,9 +86,9 @@ transpile-extra-filepath := $(addprefix $(transpile-bunch-filepath),$(transpile-
 ###
 #######
 
-.PHONY: all benchmark-series clean clean-encoding-files install installdirs transpile
+.PHONY: all benchmark-series clean clean-encoding-files install installdirs transpile verification-bundle
 
-all:: benchmark-series
+all:: benchmark-series verification-bundle
 
 clean:: clean-encoding-files
 
@@ -85,7 +96,7 @@ clean:: clean-encoding-files
 #	@-rm -f \
 	  $(wildcard $(abspath $(dir-distribution))/*)
 
-install:: benchmark-series
+install:: benchmark-series verification-bundle
 
 installdirs:: $(transpile-bunch-filepath)
 
@@ -96,6 +107,8 @@ installdirs:: $(transpile-bunch-filepath)
 #######
 
 benchmark-series: token-encoding-code $(transpile-bench-job-filepath)
+
+verification-bundle: token-encoding-code $(transpile-verify-job-filepath)
 
 .INTERMEDIATE: token-encoding-code
 token-encoding-code: amend-constants $(transpile-bunch-filepath) $(filepath-modeling-code)
@@ -136,6 +149,12 @@ $(dir $(transpile-model-filepath)):
 	mkdir -p $@
 
 $(transpile-bench-job-filepath): $(transpile-bench-src-filepath) $(dir $(transpile-bench-job-filepath))
+	$(info $< -n $($(sec-pref)N) -p $(ltl-property) -v $(protocol-version-num) )
+	$< -n $($(sec-pref)N) -p $(ltl-property) -v $(protocol-version-num) 
+	cp $(patsubst %.sh,%.run,$<) $@
+
+
+$(transpile-verify-job-filepath): $(transpile-verify-src-filepath) $(dir $(transpile-verify-job-filepath))
 	$(info $< -n $($(sec-pref)N) -p $(ltl-property) -v $(protocol-version-num) )
 	$< -n $($(sec-pref)N) -p $(ltl-property) -v $(protocol-version-num) 
 	cp $(patsubst %.sh,%.run,$<) $@
