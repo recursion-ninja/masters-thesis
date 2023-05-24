@@ -1,0 +1,710 @@
+\documentclass[runningheads]{llncs}
+%
+\usepackage{graphicx}
+\usepackage{stackengine}
+\usepackage{subcaption}
+\usepackage{multirow}
+
+
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+% --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+% --- --- --- Setup glossary options for abbreviations
+\usepackage[acronyms,shortcuts,toc,section=chapter,numberedsection=autolabel]{glossaries}
+\setacronymstyle{long-short}
+\makenoidxglossaries
+\newcommand{\Abrev}[1]{\gls{#1}}
+\newcommand{\DefineAbbreviation}[2]{\newacronym{#1}{#1}{#2}}
+\newcommand{\OutputAbreviations}{%
+\printnoidxglossary[type=acronym,title={Appendix: Abreviations}]
+\clearpage
+}
+
+
+% --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+% --- --- --- Define abbreviations used
+\DefineAbbreviation{AEAD}{Authenticated Encryption with Associated Data}
+\DefineAbbreviation{ART}{Asynchronous Ratcheting Tree}
+\DefineAbbreviation{AS}{Authentication Service}
+\DefineAbbreviation{BAN logic}{Burrows---Abadi---Needham logic}
+\DefineAbbreviation{BDD}{Binary Decision Tree}
+\DefineAbbreviation{CGKA}{Continuous Group Key Agreement}
+\DefineAbbreviation{DS}{Delivery Service}
+\DefineAbbreviation{FS}{(Perfect) Forward Secrecy}
+\DefineAbbreviation{FSM}{Finite State Machine}
+\DefineAbbreviation{FSU}{Forward Secrecy \emph{with Updates}}
+\DefineAbbreviation{IETF}{Internet Engineering Task Force}
+\DefineAbbreviation{ITM}{Internet threat model}
+\DefineAbbreviation{LBBT}{left-balanced binary tree}
+\DefineAbbreviation{LTS}{Labeled Transition System}
+\DefineAbbreviation{LTL}{Linear Temporal Logic}
+\DefineAbbreviation{MLS}{Message Layer Security}
+\DefineAbbreviation{PCS}{Post-compromise Security}
+\DefineAbbreviation{SM}{Secure Messaging}
+\DefineAbbreviation{SGM}{Secure Group Messaging}
+
+
+\usepackage{adjustbox}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{copyrightbox} % for copyrighted figures
+\usepackage{etoolbox}
+\usepackage{graphicx}
+\usepackage{import}
+\usepackage{makecell} % for \thead and multi-ine header cells
+\usepackage{pifont}
+\usepackage[indentfirst=false]{quoting}
+\usepackage{stmaryrd} % double square bracket / parens
+\usepackage{xfrac} % for sfrac in \NA
+\usepackage{xspace}
+\usepackage{threeparttable}
+
+\newcommand{\Adversary}{\ensuremath{\mathcal{A}}\xspace}
+
+\newcommand{\BigO}[1]{\ensuremath{\mathcal{O}\left(\,#1\,\right)}\xspace}
+
+% Groupings
+\newcommand{\Brackets}[1]{\ensuremath{\left[\;#1\;\right]}\xspace}
+\newcommand{\Parens}[1]{\ensuremath{\left(\;#1\;\right)}\xspace}
+\newcommand{\SetNote}[1]{\ensuremath{\left\{\;#1\;\right\}}\xspace}
+\newcommand{\IndexRange}[2]{\ensuremath{\texttt{{[}\,#1,\ #2\,{]}}}\xspace}
+\newcommand{\NumericRange}[2]{\ensuremath{\left[\,#1,\; #2\,\right]}\xspace}
+\newcommand{\NumericRangeOpenR}[2]{\ensuremath{[\,#1,\; #2\,)}\xspace}
+
+%%\usepackage{nicefrac}
+%\newcommand{\Code}[1]{{\fontfamily{lm}\fontseries{lc}\selectfont\texttt{\textsc{#1}}}\xspace}
+%\newcommand{\NA}{\Code{\nicefrac{N\,}{A}}} % For missing Incidies
+
+\subimport{./auxiliary/}{shorthand}
+\subimport{./auxiliary/}{figure-styles}
+
+\begin{document}
+%
+\title{Verifying the TreeKEM protocol with Spin and Continuous Group Key Agreement}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\author{Alex J. Washburn\inst{1,2}\orcidID{0000-0001-7181-4288} \and\\
+Subash Shankar\inst{1,3}\orcidID{1111-2222-3333-4444}}
+%
+\authorrunning{A. Washburn et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+
+\institute{Hunter College, New York NY  10065, USA\and%\\\url{https://hunter.cuny.edu/csci} \and
+\email{academia@recursion.ninja}\and%
+\email{subash.shankar@hunter.cuny.edu}%
+}%
+%
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+The TreeKEM protocol is the preeminent implementation candidate for the Message Layer Security standard.
+Prior work analyzed TreeKEM by defining the Continuous Group Key Agreement security game,
+which facilitated proof of some security guarantees as well as identifying protocol deficiencies which were subsequently remedied.
+This work extends the such applications by formalizing the Continuous Group Key Agreement security game through multiple soundness preserving abstractions.
+The model is parameterized by $N$, representing an unbounded protocol duration between at most $N$ unique participants.
+Once formalized, the game is encoded it within \Promela and notable security guarantees are verified for $N \le 16$ via the model checker Spin.
+This represents a notable achievement, both in practical security terms for the TreeKEM protocol, as well as demonstrating scalability techniques for non-trivial parameter bounds when modeling a complex, concurrent protocol.
+
+\keywords{Cryptographic Protocols, Formal Verification, Linear Temporal Logic, Model Checking, \Promela, Spin.}
+\end{abstract}
+
+
+
+%
+%
+%
+\section{Introduction}
+
+%Modern cryptography has made great progress in improving accessibility and usability of strong encryption~\cite{sheng2006johnny,hof2015towards,bai2016inconvenient,bai2017balancing,wang2017usability}.
+Secure and asynchronous communication channels between two parties, known as \Abrev{SM}~\cite{unger2015sok}, have become increasingly commonplace~\cite{schroder2016signal,vaziripour2017you,jahn2018usability}.
+The natural extension of \Abrev{SM} requires the expansion of the security guarantees to communication between \emph{more} than two parties, known as \Abrev{SGM} ~\cite{cohn2018ends}.
+To be considered a \Abrev{SGM} protocol~\cite{ietf-mls-protocol-14}, the \Abrev{IETF} states the following operations must exist for each participating member:
+
+\begin{enumerate}
+\item Create a new communication group consisting of a set of known members
+\item Broadcast a message to all members in the group
+\item Receive a message from a member in the group
+\item Add a new member to the group
+\item Remove an existing member from the group
+\item Instruct all group members to use a new shared key via an update algorithm
+\end{enumerate}
+
+Furthermore, the \Abrev{IETF} defines \Abrev{MLS}~\cite{Omara2020}, a standardization specification within which \Abrev{SGM} protocols can be defined.
+\Abrev{MLS} describes the \Abrev{SGM} protocol environment in which protocol agents interact.
+The \Abrev{ITM} of RFC3552~\cite{rescorla2003rfc3552} is the context within which the \Abrev{MLS} specifies its security guarantees.
+Additionally, the existence of an \Abrev{AS}~\cite{perlman1999overview} from which a messenger can request fresh public key for a specified contact which can be immediately used within the \Abrev{MLS} protocol.
+Similarly, the existence of a \Abrev{DS} which can receive messages addressed to any contact and the \Abrev{DS} stores the messages until the contact queries for new messages.
+The ability to query \Abrev{AS} and \Abrev{DS} third-parties simplifies the asynchronicity requirement, mediating potential protocol synchronization issues between participants.
+The \Abrev{MLS} specification also specified \Abrev{FSU}~\cite{Omara2020} and \Abrev{PCS}~\cite{cohn2016post} as security guarantees of the protocol.
+Both \Abrev{FS} and \Abrev{PCS} have been researched with respect to \Abrev{SM}, producing provably secure as well as efficient constructions, but for \Abrev{SGM} were a previously open problems in cryptography.
+
+The TreeKEM protocol \cite{bhargavan:hal-02425247} was conceived in 2018, but thoroughly described in 2019.
+The \Abrev{IETF} has put its support behind the TreeKEM protocol along with many other corporate and government sponsors.
+%As the \Abrev{MLS} draft specification has gone through over a dozen revisions in the last half decade, the complimentary development and refinement of the TreeKEM protocol has significantly informed the direction and language of \Abrev{MLS}.
+TreeKEM provides functionality for achieving each of the six operations to be considered a \Abrev{SGM} protocol.
+Additionally TreeKEM aims to satisfy both the efficiency goals and security guarantees of the \Abrev{MLS} specification, addressing the previously open problems of \Abrev{FS} and \Abrev{PCS} for \Abrev{SGM}.
+Conformance with both of these definitions are a result of TreeKEM's construction.
+
+The essence of TreeKEM is a protocol to generate continuous, fresh, shared, and secret random keys for use by group members.
+This generation process is based around a \Abrev{LBBT}~\cite{baerentzen2003left} shared by all participants, with nodes decorated by public keys~\cite{rfc4949}.
+Leaf nodes of the \Abrev{LBBT} contains the public key uniquely corresponding to a group member, and each 
+internal node contains a constructed public key, with a private key shared by each group member in the sub-tree.
+Hence the root node's key material is known to all group members and used for symmetric encryption of messages.
+The TreeKEM \Abrev{LBBT} of key material evolves over time, delineated by discrete ``communication epochs,'' in such a way that all group members maintain continuous agreement of the shared \Abrev{LBBT} and secret root key.
+
+The TreeKEM protocol is temporally delineated into discrete quanta referred to as ``epochs,'' representing a collection of messages sent using the same secret root key.
+To create a new communication epoch, any group member may broadcast a control message for distribution via the \Abrev{DS}, instructing the other group members how to evolve their \Abrev{LBBT} and associated key material to arrive at the shared symmetric key of the new epoch.
+New encryption ``epochs'' are created by broadcasting a control message for one of the following operations:
+
+\begin{itemize}
+	\item Add a member to the group
+	\item Remove a member from the group
+	\item Update their continuously agreed upon symmetric encryption key
+\end{itemize}
+
+
+
+
+%\section{Verification Goals}
+%
+%This work presents two primary verification goals for the TreeKEM protocol.
+%\Abrev{MLS} specifies the desirable security guarantees of \Abrev{FS} and \Abrev{PCS}.
+%These properties are analyzed and proven by~\cite{alwen2020security} via working with oracle query sequences within the \CGKAsec.
+%This work takes the further step of formalizing the \CGKAsec and verifying the formal model.
+%Formalizations presented in the following section are sound for the properties (\Abrev{FSU} and \Abrev{PCS}) and protocol (TreeKEM) under consideration, but may not be sound for the verification of arbitrary properties.
+
+
+{%
+\section{Verification Goals}\label{sec:forward-secrecy-with-updates}}
+
+This work presents two primary verification goals for the TreeKEM protocol; the security guarantees of \Abrev{FSU} and  \Abrev{PCS} specified by \Abrev{MLS}.
+The former offers protection in the case that a protocol's long-term secret key(s) are compromised \cite{boyd2021modern}.
+The latter ensures that no matter how many compromises of key material occur among the group members previously, once no new compromises occur, the group members will eventually reestablished secrecy through continued protocol usage \cite{alwen2020security}.\\[-1mm]
+
+%\begin{quoting}%
+%``It is always the case that, when \(\mathcal{A}\) corrupts a \(\mathtt{ID_{i}}\) via querying \Oracle{corr}{ID_{i}}, then \(\mathtt{ID_{i}}\) has not been previously instructed to keep secret key material via querying \Oracle{no-del}{ID_{i}}.''
+%\end{quoting}%
+
+
+\section{Formalization Abstractions\label{sec:Formal-Abstractions}}
+
+Because 
+
+\subsection{Continuous Group Key Agreement}
+
+In the two-party case, a general notion of Continuous Key Agreement~\cite{alwen2019double} has been used to provide robust security guarantees such as forward secrecy and post-compromise security.
+For \Abrev{SGM}, this same notion has been extended to \Abrev{CGKA}~\cite{alwen2020security} which is used as an abstraction for reasoning about the \Abrev{MLS} security guarantees.
+The  \CGKAdef\ is used to maintain secure communications between a group of two or more participants.
+A continuous group key-agreement scheme is an abstract collection of algorithms used to maintain secure communications between a group of two or more participants, each algorithm being known and performed locally by participants:\\[2mm]
+\centerline{$\CGKAdef = \left\{\,\Protocol{init},\, \Protocol{create},\, \Protocol{add},\, \Protocol{rem},\, \Protocol{upd},\, \Protocol{proc}\,\right\}$}\\[-3mm]
+
+Additionally, an oracle-based security game for \Abrev{CGKA} is also defined.~\cite{alwen2020security}
+Each oracle is defined in terms of one or more of the algorithms from the \CGKAdef\ definition.
+An adversary can query all ten of the game's oracles, and through the sequence of query's, the adversary uses the oracles to direct the execution of the \Abrev{CGKA} protocol.
+The group members can only call the six \CGKAdef\ algorithms above, while the adversary can only query the ten oracles below.
+However, there exists one oracle which corresponds to each of the six \CGKAdef\ algorithms, effectively giving the attacker comparable options to any group member in addition to the options provided by the remaining four oracles.
+The \CGKAsec\ defines the following oracles:\\[1mm]%
+%
+\noindent%
+{\small%
+\begin{tabular}{ll}%
+\Oracle{init}{}\tnote{1}
+&Begins the \CGKAsec.\\%
+%
+\Oracle{create-group}{\overrightarrow{\mathtt{ID}}^{n}}\tnote{2}
+&Creates initial communication group with $n$ members.\\%
+%
+\Oracle{add-user}{ID,\, ID^{'}}
+&$\mathtt{ID}$ initiates adding $\mathtt{ID}^{'}$ to the group.\\%
+%
+\Oracle{remove-user}{ID,\, ID^{'}}
+&$\mathtt{ID}$ initiates removing $\mathtt{ID}^{'}$ from the group.\\%
+%
+\Oracle{send-update}{ID}
+&$\mathtt{ID}$ initiates updating the shared key of the group.\\%
+%
+\Oracle{deliver}{ID,\, ID^{'}}
+&\Abrev{DS} delivers a message to $\mathtt{ID}^{'}$ which $\mathtt{ID}$ previously broadcast.\\%
+%
+\Oracle{no-del}{ID}
+&$\mathtt{ID}$ stops deleting old keys when entering next epoch.\\%
+%
+\Oracle{corr}{ID}
+&\Adversary learns the current state of $\mathtt{ID}$.\\%
+%
+\Oracle{reveal}{t}&
+\Adversary learns the current shared key of the group.\\%
+%
+\Oracle{chall}{t}\tnote{3}
+&\Adversary ends the \CGKAsec.%
+\end{tabular}%
+}\\%
+
+The \Oracle{init}{} oracle flips a random bit \(b\) uniformly at random and this result remains constant and hidden for the entirety of the game.
+The random result assigned to \(b\) bit is used for the traditional ``real-or-random'' challenges in security games, in which the adversary must distinguish whether they are observing the actual cryptographic protocol or random information being transmitted.
+Figure \ref{fig:CGKA-Direct} depicts a direct formalization of the \CGKAsec abstraction.
+
+The goal of the adversary is said to demonstrate advantage by discriminating the value of \(b\) with probability greater than \(\frac{1}{2}\).
+An adversary \Adversary demonstrating \emph{advantage} is parameterized by \((T, C, N)\).
+The \(T\) value indicates that the protocol runs in at most \(T\) epochs, during which time the \(\mathcal{A}\) can make at most \(C\) challenge queries, and the total unique group members of the protocol can never exceed \(N\).
+The \((T, C, N)\)-adversary \(\mathcal{A}\) demonstrates \emph{advantage} by ending the game via a query to the \Oracle{chall}{} oracle, winning the \CGKAsec, if and only if:
+
+\begin{definition}[Non-adaptive $(T, C, N, \epsilon)$ \Abrev{CGKA} Security]\label{def:CGKA-Security}
+A \Abrev{CGKA} protocol is said to be secure if and only if for all $(T, C, N)$-adversaries $\mathcal{A}$,
+\[ \left|\; \Pr\left[ \,\mathcal{A}\mathrm{~correctly~identifies~}b\, \right] - \frac{1}{2} \;\right| \leq \epsilon \]
+\end{definition}
+
+\begin{figure}
+\centering
+\resizebox{\GamplayFigWidth}{!}{\subimport{./figures/}{CGKA-Direct}}
+\caption[Transition graph of informal CGKA definition]{%
+\label{fig:CGKA-Direct}%
+High-level illustration of the \CGKAsec formalization.\ %
+}%
+\vfill
+\resizebox{\GamplayFigWidth}{!}{\subimport{./figures/}{CGKA-Adversarial-Driven}}
+\caption[Transition graph of informal CGKA definition]{%
+\label{fig:CGKA-Adversarial-Driven}%
+\CGKAsec composed with ``Adversarial Direction'' abstraction.%
+}%
+\end{figure}
+
+
+\subsection{Adversarial Direction}
+
+While both the adversary \Adversary and each group member can initiate new epoch within the \CGKAsec, modeling this explicitly unnecessarily complicates the model.
+Recall that within the Internet threat model, \Adversary controls the network.
+This is modeled within the \CGKAsec by messages sent from any source only being delivered if \Adversary permits it by querying the \Oracle{deliver}{}.
+Furthermore, if and only if the verification methodology will explore all possible interleaving of concurrent actions within the \CGKAsec, simulating nondeterministic computation, this can be utilized to form an additional simplifying abstraction.
+Without loss of generality, the modeling of the \CGKAsec will only consider \Adversary originating calls to algorithms \Protocol{add}, \Protocol{rem}, and \Protocol{upd} via queries to the oracles \Oracle{add-user}{}, \Oracle{remove-user}{}, and \Oracle{send-update}{}, respectively.
+The application of this simplifying abstraction composed with the original \CGKAsec is depicted in Figure \ref{fig:CGKA-Adversarial-Driven}.
+
+
+%\begin{figure}
+%\centering
+%\resizebox{\GamplayFigWidth}{!}{\subimport{./figures/}{CGKA-Adversarial-Driven}}
+%\caption[Transition graph of informal CGKA definition]{%
+%\label{fig:CGKA-Adversarial-Driven}%
+%\CGKAsec composed with ``Adversarial Direction'' abstraction.%
+%}%
+%\end{figure}
+
+
+\subsection{End-to-end Encryption Concession}
+
+The verification of end-to-end encryption is beyond the scope of this model, as the objective is solely the \Abrev{FSU} and \Abrev{PCS} security properties.
+Recognizing this, we can assume that end-to-end encryption of messages between group members holds.
+By conceding this, it is unnecessary to model the communication between group members, as \Adversary will not gain any advantage by observing messages between group members.
+This simplifying abstraction removes the need to maintain message queues as well as model the processing order of messages by the \Abrev{DS}.
+Furthermore, the explicit modeling of the \Abrev{DS} becomes entirely superflous.
+Instead of explicitly modeling the message processing semantics of the \Abrev{DS}, the consistent message delivery requirement  of the \Abrev{DS} is \emph{implicitly} modeled by the actions available to \Adversary at a given protocol state.
+The continued composition of this abstraction is depicted in Figure \ref{fig:CGKA-Concession}.
+
+\begin{figure}%[ht!]
+\centering
+\resizebox{\GamplayFigWidth}{!}{\subimport{./figures/}{CGKA-Concession}}
+\caption[Transition graph of informal CGKA definition]{%
+\label{fig:CGKA-Concession}%
+Gameplay after composing ``End-to-end Encryption Concession'' abstraction.%
+}%
+\vfill
+\resizebox{\GamplayFigWidth}{!}{\subimport{./figures/}{CGKA-Parameterized}}
+\caption[Transition graph of informal CGKA definition]{%
+\label{fig:CGKA-Parameterized}%
+Gameplay after composing ``Parameterized Bounds'' abstraction.%
+}%
+\end{figure}
+
+
+\subsection{Parameterized Bounds of $T$, $C$, and $N$}
+
+Another important simplifying abstraction is the explicit bounding of the $T$, $C$, and $N$ parameters of the \((\,T, C, N\,)\) Adversary \Adversary.
+The model will be parameterized by $T$ and $N$ and entail all possible staring group sizes $s \in \NumericRange{2}{N}$ and all possible sequences of oracle queries consisting of $T$ or fewer epochs.
+This provides a partially-bounded for the model, though not a finite bounding, as idempotent or cyclic query sequences are permitted.
+The continued composition of this abstraction is depicted in Figure \ref{fig:CGKA-Parameterized}.
+Interestingly, with this abstraction $C$ does not need to be explicitly parameterized.
+
+Suppose we fix the number of epochs $T$.
+Then necessarily $C \in \NumericRange{1}{T}$, as \Adversary can only perform \emph{one} challenge query per epoch.
+Within the formalized security game, during each epoch \Adversary has the option to make either zero or one challenging query.
+Given the exhaustiveness of model checking methodology, all possible choices are explored.
+Therefore, without any loss of generality, verification of a model parameterized by a fixed $T$, also implicitly verifies $\forall C \in \NumericRange{1}{T}$, allowing for the specification of $C$ to be elided from the model parameters.
+
+
+%\begin{figure}
+%\centering
+%\resizebox{\GamplayFigWidth}{!}{\subimport{./figures/}{CGKA-Parameterized}}
+%\caption[Transition graph of informal CGKA definition]{%
+%\label{fig:CGKA-Parameterized}%
+%Gameplay after composing ``Parameterized Bounds'' abstraction.%
+%}%
+%\end{figure}
+
+
+\subsection{Required Progression\label{sec:abstraction-progression}}
+
+A fundamental simplifying abstraction in our model is the restriction imposed on the \Adversary, allowing only "non-redundant" moves within the \CGKAsec. Redundancy, in this context, refers to the situation where the \Adversary chooses to query an oracle in such a way that the security game enters a state that has already been reached within the same epoch. Put simply, each query made by the \Adversary must lead to a unique and previously unseen state, which we will refer to as a "fresh" state within the epoch. It is worth noting that this constraint does not sacrifice any expressiveness in the model; it simply eliminates cycles in the model's state transition graph. The application of this constraint has a significant impact by bounding the model's state-space.
+
+Let us consider the oracles that drive the game. A query to \Oracle{add-user}{}, \Oracle{remove-user}{}, or \Oracle{send-update}{} advances the epoch, ensuring that it always results in a fresh state, specifically the first state of the \emph{next} epoch. Additionally, querying \Oracle{chall}{} ends the game, and since the game has not ended before this query, it necessarily leads to a fresh state. These "epoch-ending" queries do not limit the moves available to the \Adversary in the epoch prior to the query, as the previous epoch is no longer relevant to the "non-redundant" constraint after the query.
+
+To query \Oracle{corr}{} or \Oracle{no-del}{}, there must be an applicable member ID. After such a query, the state of the group member is consistently changed from $\top \mapsto \bot$. To change the state of a group member from $\bot \mapsto \top$, the \Adversary must query either \Oracle{remove-user}{} or \Oracle{send-update}{}. However, querying either of these oracles results in a new epoch, which means that querying \Oracle{corr}{} or \Oracle{no-del}{} subsequently leads to a fresh state. Since this query alters the state of the group member from $\top \mapsto \bot$, there is no way the state of a group member could have been changed from $\bot \mapsto \top$ during the current epoch.
+
+Furthermore, considering \Oracle{corr}{} and \Oracle{no-del}{}, we recall that the number of unique group members is bounded by $N$. Although the \Adversary can query both oracles multiple times during an epoch, due to the "non-redundant" constraint, each query monotonically decreases the available moves for the \Adversary. Eventually, since $N$ is finite, there will no longer be an option to make a "non-redundant" query to \Oracle{corr}{} or \Oracle{no-del}{} because the state of all group members will be $\bot$. Similarly, querying \Oracle{reveal}{} can only occur at most once per epoch, resulting in a fresh state and decreasing the available moves for the \Adversary by one, as the "non-redundant" constraint prevents querying \Oracle{reveal}{} again in the current epoch.
+
+Analyzing the relationship of the oracles in the \CGKAsec state, we observe that imposing the "non-redundant" constraint causes the available moves for the \Adversary in the current epoch to monotonically decrease with each query. Eventually, this leads to a point where no "non-redundant" moves are available that would result in the same epoch
+
+\begin{figure}
+\centering
+\resizebox{\GamplayFigWidth}{!}{\subimport{./figures/}{CGKA-Progressing}}
+\caption[Transition graph of informal CGKA definition]{%
+\label{fig:CGKA-Progressing}%
+Gameplay after composing ``Required Progression'' abstraction.%
+}%
+\vfill
+\resizebox{\GamplayFigWidth}{!}{\subimport{./figures/}{CGKA-Markovian}}
+\caption[Transition graph of informal CGKA definition]{%
+\label{fig:CGKA-Markovian}%
+Gameplay after composing ``Markovian Property'' abstraction.%
+}%
+\end{figure}
+
+
+\subsection{Markovian Property}
+
+The final abstraction to utilized in our modeling the TreeKEM protocol is the observation of that the model, in it's currently simplified form, can be viewed as a Markov Process~\cite{markov1906a}.
+Consider \Adversary entering a \CGKAsec state $s_{i}$.
+How the TreeKEM protocol evolved prior to $s_{i}$ does not inform the moves available to \Adversary, only the current game state informs this.
+Furthermore, how the knowledge accumulated by \Adversary prior to $s_{i}$ was obtained does not further inform \Adversary of the TreeKEM protocol's CGKA key, only deductions via the attacker's current knowledge.
+Phrased differently, state $s_{i-1}$ has no unique information which informs state transitions from $s_{i}$, state transitions from $s_{i}$ are determined solely from the information contained within $s_{i}$.
+
+Applying this abstraction has a profoundly important impact on model verification.
+Because the model can be encoded as a Markov process, it can become ``memorylessness'' and not require the encoding of the current epoch number within the game state.
+Consequently, the model applying this ``Markovian Property'' abstraction elides the specification of $T$ from the model parameters.
+The resulting model is parameterized only by $N$, yet verifying all $t \in \NumericRangeOpenR{1}{\infty}$ and $c \in \NumericRange{1}{t}$.
+The culmination of composing all abstractions described within Section \ref{sec:Formal-Abstractions} is depicted in Figure \ref{fig:CGKA-Markovian}.
+
+%\begin{figure}
+%\centering
+%\resizebox{\GamplayFigWidth}{!}{\subimport{./figures/}{CGKA-Markovian}}
+%\caption[Transition graph of informal CGKA definition]{%
+%\label{fig:CGKA-Markovian}%
+%Gameplay after composing ``Markovian Property'' abstraction.%
+%}%
+%\end{figure}
+
+
+\section{Methodology}
+
+\subsection{\Promela}
+
+Let \CGKAmodPN{V}{N} denote the TreeKEM model encoding with parameter $N$, for the model derived by composing the abstractions described in Section \ref{sec:Formal-Abstractions}.
+The encoding implementation of \CGKAmodPN{V}{N} utilized the Protocol Meta Language (\Promela)~\cite{HolzmannSpinBook2003, holzmann1990design}
+The key language feature of \Promela is that \emph{all} branching -- conditional execution, looping, and randomness -- are evaluated non-deterministically, making it a natural choice for encoding the model.
+The \Promela encoding\footnote{Source code: \url{\texttt{https://github.com/recursion-ninja/masters-thesis}}}\ %
+of \CGKAmodPN{V}{N} produces all possible states and transitions of TreeKEM, and this representation is then supplied to a model checker for verification.
+
+\subsection{Spin}
+
+The explicit state model checker the Spin model checker~\cite{HolzmannSpinBook2003} was chosen as the verification tool for this work.
+As an explicit-state model checker, Spin utilizes a representation of all possible model states as an \Abrev{FSM}~\cite{clarke1981design}, with transitions uniquely identifying the possible changes in model state.
+Spin then asserts that a properties holds for the protocol by traversing through all combinations of transitions through the graph~\cite{Vardi1986}.
+The principle drawback of explicit state model checking is the immense state-space resulting as the model complexity grows~\cite{burch1992symbolic}.
+As a venerable tool, Spin does much to address this~\cite{rudin1987limits, godefroid1990using, valmari1993fly, peled1994combining, couvreur1999fly} but our own encoding adaptations which further mitigate the state-space explosion are detailed below in Sections \ref{sec:bit-array} and \ref{sec:popcount}.
+Additionally, Spin supports numerous compile time directive which alter the state-space representation, search trajectories, and time-memory trade-offs (see Table \ref{tab:spin-confg}).
+
+
+\subsection{Encoding  of Bit-arrays\label{sec:bit-array}}
+
+By default the \Promela type system supports an array of bits.
+Unfortunately, at runtime this is encoded as an array of bytes, with each ``\Promela bit value'' requiring 8 bits during verification runtime.
+The impact is two fold.
+First, the bit inflates the size of the state-vector by 8 bits, requiring additional, superfluous memory.
+Secondly, despite the 8 bits within the state-vector having only 2 valid state encodings, the model checker is unaware of this and entertains the possibility of 256 states.
+The result is a larger state-vector yielding slower verification times while also requiring more memory.
+
+Our work remedies this encoding issue by manually toggling bits within a fixed bit-width \Promela type.
+The bit toggling is facilitated by C Pre-processor (CPP) macros which insert the appropriate bit-wise operations at the call site.
+Inclusion of this manual state-vector reduction fully mitigated the issue, improving runtime and reducing memory usage.
+
+
+\subsection{Control Flow Elision via PopCount\label{sec:popcount}}
+
+An additional, significant \Promela encoding technique within our work was the clever application of a bit-wise population count (PopCount) operation.
+PopCount returns the number of bits set in the calue of a fixed bit-width type.
+Within the model encoding, due to the ``Required Progression''  abstraction (Section \ref{sec:abstraction-progression}), it is necessary to count the number of set (or unset) bits to determine which queries are available for \Adversary.
+This bit counting occurs multiple times within the model.
+The naive approach involves a counter along with a looping control flow structure to individually test each applicable bit value.
+In contrast, the PopCount operation returns the number of set bits without iteration.
+
+We define PopCount as a small, inlined sequence of arithmetic and bit-wise operations which runs in \BigO{1} time with \BigO{0} additional memory.
+Substituting PopCount in place of the naive iteration has two notable effects, reducing the state-vector length by removing the loop counter and reducing the number of state transitions by removing the entire control flow structure of the loop.
+For a bit-array of length $n$, the number of transitions encoded in the model by iteration is exponentially related to $n$, whereas the PopCount macro derives a \emph{constant} number of transitions independent of $n$.
+
+\subsection{LTL Properties}
+
+\begin{definition}[Forward Secrecy with Updates]
+If the state of any group member is leaked at some point, all previous shared keys remain hidden from the adversary.
+\end{definition}%
+\noindent\textbf{LTL Predicate} \LTLPredicate{FSU}\textbf{:}%
+\[%
+\Box \Big( \left(\, \texttt{CGKA@start\_of\_epoch} \land \texttt{memberKeys} = 0\right) \implies \texttt{learnedActiveKey} = \bot \, \Big)%
+\]%
+
+\begin{definition}[Post-compromise Security]
+After every group member whose state was leaked initiates an epoch update, and that update instruction message is processed by all group members, the shared key becomes confidential again.
+\end{definition}%
+\noindent\textbf{LTL Predicate} \LTLPredicate{FSU}\textbf{:}%
+\[%
+\Box \left(\, \texttt{CGKA@move\_corrupt} \implies \texttt{hoardPrior}_{\texttt{targetID}} = \bot \,\right)%
+\]%
+
+
+\section{Results}
+
+%Recall that our abstractions allowed for only one parameter.
+Verification of  \Abrev{FSU} and \Abrev{PCS} was conducted on the models \CGKAmodPN{\VersionOne}{16} and \CGKAmodPN{\VersionTwo}{16}.
+Each models had a state-vector of $100$\siBytes.
+Verification runs utilized 1 TiB RAM and \(64\) AMD Opteron Processor 6380 core operating at 2500MHz\footnote{Performed on the American Museum of Natural History scientific computing cluster}.
+Each verification run utilized 2 cores and up to 200 GiB of RAM.
+All Spin performance tuning options used during verification are listed in Table ref{tab:spin-confg}.
+The performance observations of the verification runs are depicted in Table \ref{tab:verification-measurements}.
+Note that all run-times are ``wall clock'' time not ``CPU time.''
+All \Abrev{LTL} properties for all models were successfully verified.
+
+\subsection{Interpretation}
+
+The positive verification of the LTL encodings of  \Abrev{FSU} and \Abrev{PCS} for  \CGKAmodPN{\VersionOne}{16} and \CGKAmodPN{\VersionTwo}{16} are not surprising.
+Rather, it is consistent with the exceptions shown by the previous \CGKAdef abstraction formalization work~\cite{alwen2020security}.
+% Mention we do this, has not been done before.
+While consistent, this is the first instance known to the authors which has modeled the TreeKEM protocol and verified \Abrev{FSU} and \Abrev{PCS} for all $(\,T, C, N\,)$--Adversaries, with $T \in \NumericRangeOpenR{1}{\infty}$, $C \in \NumericRange{1}{T}$, and $N \in \NumericRange{2}{16}$.
+
+\subsection{Scalability}
+
+The combination of presented composed abstractions and encoding techniques constitute an additional and general contribution which may be applicable to other modeling endeavors.
+Empirical results of employing these abstractions in conjunction with the bit-packing and PopCount encodings impressively reduced the model complexity, model parameters, state-vector size, verification time, as well as the memory footprint!
+For comparison Table \ref{tab:state-vector-comparison} compares state-vector length of this work's model encoding with prior verification work~\cite{washburn2022formal}, emphasizing the vast difference in model expressiveness and encoding efficiency.
+Consequently, the verification performance also differs drastically from prior work.
+As depicted in Table \ref{tab:performance-comparison}, a modest time/memory tradeoff permits our model encoding to complete verification much faster than prior verification work~\cite{washburn2022formal}.
+Security guarantee verification not only concludes more quickly, but remarkably the conclusion also literally produces an infinitely stronger result; $\forall T \in \NumericRangeOpenR{1}{\infty}$.
+    
+\section{Conclusion}
+
+This work presents effective, and generally applicable model abstraction and model encoding techniques.
+The exploration of combining these techniques has been shown to be vitally important tools for achieving scalability when verifying a complex model such as the TreeKEM protocol.
+An unqualified improvement was obtained across each of the following measurable dimensions: model complexity,  parameterization, state-vector length, and verification space as well as time.
+While the application and analysis of presented techniques herein was limited to TreeKEM, the techniques are not so bespoke that they apply only to modeling and verifying TreeKEM.
+Rather, it is probably that only minor creativity is require to transfer them to other modeling efforts.
+
+\begin{table}[t!]%
+\begin{center}%
+{%
+\TableHeadFontSize%
+\begin{tabular}[t]{ p{25mm} p{21mm} l }%
+\toprule%
+\multicolumn{2}{c}{\textbf{Compilation Directives:}} & \textbf{Runtime Flags} \\
+\midrule%
+~\SpinConfig{HC4} & \SpinConfig{PMAX=2} & ~\SpinConfig{-a} \\
+~\SpinConfig{JOINPROCS} & \SpinConfig{QMAX=0} & ~\SpinConfig{-A} \\
+~\SpinConfig{MEMLIM=204800} & \SpinConfig{SC} & ~\SpinConfig{-m20000000} \\
+~\SpinConfig{MURMUR} & \SpinConfig{SEPQS} & ~\SpinConfig{-v} \\
+~\SpinConfig{NOBOUNDCHECK} & \SpinConfig{SFH} & ~\SpinConfig{-w32} \\
+~\SpinConfig{NOFAIR} & \SpinConfig{SPACE} & ~\SpinConfig{-x} \\
+~\SpinConfig{NOFIX} & \SpinConfig{VECTORSZ=101} & \\
+\bottomrule%
+\end{tabular}%
+\vspace*{1mm}%
+\caption{Spin performance tuning options used for verification.\label{tab:spin-confg}\hfill}%
+}%
+%\vspace*{-15mm}%
+%
+%\begin{table}[!]%
+%\begin{center}%
+{%
+\TableBodyFontSize%
+\begin{tabular}[t]{ l c c c c c r r r r}%
+\toprule%
+{\TableHeadFontSize Model} &
+{\TableHeadFontSize $V$} &
+{\TableHeadFontSize $N$} &
+{\TableHeadFontSize $T$} &
+{\TableHeadFontSize LTL} &
+{\TableHeadFontSize Runtime} &
+{\TableHeadFontSize Memory} &
+{\TableHeadFontSize States} &
+{\TableHeadFontSize Transitions}\\
+\midrule%
+\multirow{2}{*}{~Ours} &
+\VersionOne & 7 & $\infty$ & \LTLPredicate{FSU} &~6,230s &   52.008 \siGiBytes\ & 1,142,793,000 & 2,082,413,800 \\
+& \VersionOne & 7 & $\infty$ & \LTLPredicate{PCS} & 17,800s &   110.001 \siGiBytes\ & 2,060,603,300 & 3,462,063,000 \\
+\midrule%
+\multirow{2}{*}{~Prior}&
+\VersionOne & 7 & 7& \LTLPredicate{FSU} & 35,659s &   1.325 \siGiBytes\ & 21,597,288 & 31,636,624 \\
+& \VersionOne  & 7 & 7& \LTLPredicate{PCS} & 66,258s &  21.218 \siGiBytes\ &   301,981,490 &  305,034,100 \\
+\bottomrule%
+\end{tabular}%
+}% END font resize
+\vspace*{1mm}%
+\caption{Performance comparison of our model encoding to prior work.\label{tab:performance-comparison}}%
+%\end{center}
+%\end{table}%
+%\vspace*{-15mm}%
+%\begin{table}[!]%
+%\begin{center}%
+{% START font resize
+\TableBodyFontSize
+\begin{subtable}[t]{\TableWidthStateVector}%
+\begin{tabular}[t]{ c c c c c }%
+\toprule%
+& \multicolumn{2}{c}{\TableHeadFontSize\parbox[t]{12mm}{\centering Our\\Model}}
+& \multicolumn{2}{c}{\TableHeadFontSize\parbox[t]{12mm}{\centering Prior\\Model}}\\
+\\[-2mm]
+\parbox[t]{4mm}{\raggedleft$N\:$}
+& \parbox[t]{4mm}{\raggedleft$T\:$}
+& \parbox[t]{8mm}{\scriptsize \centering State\\Vector}
+& \parbox[t]{4mm}{\raggedleft$T$}
+& \parbox[t]{8mm}{\scriptsize\centering State\\Vector}\\
+\midrule%
+& & & 4 &192 \siBytes\ \\
+& &  & 5 &240 \siBytes\ \\
+4 & {$\infty$} & 56 \siBytes\ &  6 & 248 \siBytes\ \\
+& &  & 7 & 248 \siBytes\ \\
+& & & 8 &268 \siBytes\ \\
+\midrule%
+& & & 4 & 200 \siBytes\ \\
+& & & 5 & 264 \siBytes\ \\
+5 & $\infty$ & 64 \siBytes\ & 6 & 264 \siBytes\ \\
+& & & 7 & 264 \siBytes\ \\
+& & & 8 & 284 \siBytes\ \\
+\midrule%
+& & & 4 & 216 \siBytes\ \\
+& & & 5 & 280 \siBytes\ \\
+6 & $\infty$ & 64 \siBytes\ & 6 & 280 \siBytes\ \\
+& & & 7 & 288 \siBytes\ \\
+& & & 8 & 300 \siBytes\ \\
+\bottomrule%
+\end{tabular}%
+\end{subtable}%
+\hspace*{2mm}%
+\begin{subtable}[t]{\TableWidthStateVector}%
+{%
+\begin{tabular}[t]{ r r c r c }%
+\toprule%
+& \multicolumn{2}{c}{\TableHeadFontSize\parbox[t]{12mm}{\centering Our\\Model}}
+& \multicolumn{2}{c}{\TableHeadFontSize\parbox[t]{12mm}{\centering Prior\\Model}}\\
+\\[-2mm]
+\parbox[t]{4mm}{\raggedleft$N$}
+& \parbox[t]{4mm}{\raggedleft$T\:$}
+& \parbox[t]{8mm}{\scriptsize \centering State\\Vector}
+& \parbox[t]{4mm}{\raggedleft$T$}
+& \parbox[t]{8mm}{\scriptsize\centering State\\Vector}\\
+\midrule%
+& & & 4 & 224 \siBytes\ \\
+& & & 5 & 296 \siBytes\ \\
+7 & $\infty$ & 64 \siBytes\ & 6 & 304 \siBytes\ \\
+& & & 7 & 304 \siBytes\ \\
+& & & 8 & 316 \siBytes\ \\
+\midrule%
+& & & 4 & 236 \siBytes\ \\
+& & & 5 & 312 \siBytes\ \\
+8 & $\infty$ & 68 \siBytes\ & 6 & 320 \siBytes\ \\
+& & & 7 & 320 \siBytes\ \\
+& & & 8 & 340 \siBytes\ \\
+\midrule%
+& & & 4 & 244 \siBytes\ \\
+& & & 5 & 336 \siBytes\ \\
+9 & {$\infty$} & 88 \siBytes\ & 6 & 336 \siBytes\ \\
+& & & 7 & 336 \siBytes\ \\
+& & & 8 & 356 \siBytes\ \\
+\bottomrule%
+\end{tabular}%
+}%
+\end{subtable}%
+\hspace*{2mm}%
+\begin{subtable}[t]{\TableWidthStateVector}%
+{%
+\begin{tabular}[t]{ r r c r c }%
+\toprule%
+& \multicolumn{2}{c}{\TableHeadFontSize\parbox[t]{12mm}{\centering Our\\Model}}
+& \multicolumn{2}{c}{\TableHeadFontSize\parbox[t]{12mm}{\centering Prior\\Model}}\\
+\\[-2mm]
+\parbox[t]{4mm}{\raggedleft$N$}
+& \parbox[t]{4mm}{\raggedleft$T\:$}
+& \parbox[t]{8mm}{\scriptsize \centering State\\Vector}
+& \parbox[t]{4mm}{\raggedleft$T$}
+& \parbox[t]{8mm}{\scriptsize\centering State\\Vector}\\
+\midrule%
+& & & 4 & 260 \siBytes\ \\
+& & & 5 & 352 \siBytes\ \\
+10 & {$\infty$} & 88 \siBytes\ & 6 & 352 \siBytes\ \\
+& & & 7 & 360 \siBytes\ \\
+& & & 8 & 372 \siBytes\ \\
+\midrule%
+& & & 4 & 268 \siBytes\ \\
+& & & 5 & 368 \siBytes\ \\
+11 & {$\infty$} & 88 \siBytes\ & 6 & 376 \siBytes\ \\
+& & & 7 & 376 \siBytes\ \\
+& & & 8 & 388 \siBytes\ \\
+\midrule%
+& & & 4 & 276 \siBytes\ \\
+& & & 5 & 384 \siBytes\ \\
+12 & {$\infty$} & 88 \siBytes\ & 6 & 392 \siBytes\ \\
+& & & 7 & 392 \siBytes\ \\
+& & & 8 & 412 \siBytes\ \\
+\bottomrule%
+\end{tabular}%
+}%
+\end{subtable}%
+}% END font resize
+\vspace*{1mm}%
+\caption{Efficiency comparison of novel model encoding with prior work.\label{tab:state-vector-comparison}}%
+%\end{center}%
+%\end{table}%
+%\vspace*{-15mm}%
+%%
+%\begin{table}[!]%
+\centering%
+{% START font resize
+\TableBodyFontSize%
+\begin{tabular}{ c c r r r r r r }%
+\toprule%
+\parbox[t]{7mm}{\TableHeadFontSize\centering $N$}
+& \parbox[t]{6mm}{\TableHeadFontSize\centering LTL}
+& \parbox[t]{10mm}{\TableHeadFontSize\centering Version}
+& \parbox[t]{13mm}{\TableHeadFontSize\raggedleft Runtime\\(s)}
+& \parbox[t]{19mm}{\TableHeadFontSize\raggedleft Memory\\(GiB)}
+& \parbox[t]{19mm}{\TableHeadFontSize\raggedleft Search\\Depth}
+& \parbox[t]{19mm}{\TableHeadFontSize\raggedleft States\;\;\\(stored)}
+& \parbox[t]{19mm}{\TableHeadFontSize\raggedleft Transitions} \\
+\midrule
+16 & \LTLPredicate{FSU} & \VersionOne&  86103 & 160,135.655 & \BigNum{2.598}{9} & \BigNum{3.557}{9} & \BigNum{6.591}{9} \\
+16 & \LTLPredicate{FSU} & \VersionTwo &  77272 & 160,135.655 & \BigNum{2.598}{9} & \BigNum{3.034}{9} & \BigNum{6.591}{9} \\
+16 & \LTLPredicate{PCS} & \VersionOne & 100681 & 195,677.864 & \BigNum{4.386}{9} & \BigNum{4.494}{9} & \BigNum{7.969}{9} \\
+16 & \LTLPredicate{PCS}& \VersionTwo &  79552 & 195,677.864 & \BigNum{4.386}{9} & \BigNum{3.475}{9} & \BigNum{7.969}{9} \\
+\bottomrule%
+\end{tabular}%
+}% END font resize
+\vspace*{1mm}%
+\caption{Performance measurements of updated model verification results.\label{tab:verification-measurements}}%
+\end{center}%
+\end{table}%
+
+%
+% ---- Bibliography ----
+%
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+%
+\bibliographystyle{splncs04}
+\bibliography{auxiliary/references}
+\end{document}

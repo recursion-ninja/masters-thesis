@@ -1,0 +1,152 @@
+\documentclass[runningheads]{llncs}
+%
+\usepackage{graphicx}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+% --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+% --- --- --- Setup glossary options for abbreviations
+\usepackage[acronyms,shortcuts,toc,section=chapter,numberedsection=autolabel]{glossaries}
+\setacronymstyle{long-short}
+\makenoidxglossaries
+\newcommand{\Abrev}[1]{\gls{#1}}
+\newcommand{\DefineAbbreviation}[2]{\newacronym{#1}{#1}{#2}}
+\newcommand{\OutputAbreviations}{%
+	\printnoidxglossary[type=acronym,title={Appendix: Abreviations}]
+	\clearpage
+}
+
+
+% --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+% --- --- --- Define abbreviations used
+\DefineAbbreviation{AEAD}{Authenticated Encryption with Associated Data}
+\DefineAbbreviation{ART}{Asynchronous Ratcheting Tree}
+\DefineAbbreviation{AS}{Authentication Service}
+\DefineAbbreviation{BAN logic}{Burrows---Abadi---Needham logic}
+\DefineAbbreviation{BDD}{Binary Decision Tree}
+\DefineAbbreviation{CGKA}{Continuous Group Key Agreement}
+\DefineAbbreviation{DS}{Delivery Service}
+\DefineAbbreviation{FS}{(Perfect) Forward Secrecy}
+\DefineAbbreviation{FSM}{Finite State Machine}
+\DefineAbbreviation{FSU}{Forward Secrecy \emph{with Updates}}
+\DefineAbbreviation{IETF}{Internet Engineering Task Force}
+\DefineAbbreviation{ITM}{Internet threat model}
+\DefineAbbreviation{LBBT}{left-balanced binary tree}
+\DefineAbbreviation{LTS}{Labeled Transition System}
+\DefineAbbreviation{LTL}{Linear Temporal Logic}
+\DefineAbbreviation{MLS}{Message Layer Security}
+\DefineAbbreviation{PCS}{Post-compromise Security}
+\DefineAbbreviation{SM}{Secure Messaging}
+\DefineAbbreviation{SGM}{Secure Group Messaging}
+
+
+\usepackage{adjustbox}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{copyrightbox} % for copyrighted figures
+\usepackage{etoolbox}
+\usepackage{graphicx}
+\usepackage{import}
+\usepackage{makecell} % for \thead and multi-ine header cells
+\usepackage{pifont}
+\usepackage[indentfirst=false]{quoting}
+\usepackage{stmaryrd} % double square bracket / parens
+\usepackage{xfrac} % for sfrac in \NA
+\usepackage{xspace}
+
+% Shorthands for: CGKA 
+\newcommand{\CGKAdef}{\ensuremath{{}^{\ulcorner}\!\!\textbf{\textit{CGKA}}_{\!\lrcorner}}\xspace}%
+\newcommand{\CGKAsec}{\Abrev{CGKA} security game\xspace}%
+\newcommand{\CGKAmod}[3]{\ensuremath{\mathcal{M}_{\texttt{CGKA}}%
+		\expandafter\ifstrempty\expandafter{#1}
+		{
+			\expandafter\ifstrempty\expandafter{#2}
+			{
+				\expandafter\ifstrempty\expandafter{#3}
+				{}
+				{\langle\,#3\,\rangle}
+			}
+			{
+				\expandafter\ifstrempty\expandafter{#3}
+				{\langle\,#2\,\rangle}
+				{\langle\,#2,\, #3\,\rangle}
+			}
+		}
+		{
+			\expandafter\ifstrempty\expandafter{#2}
+			{
+				\expandafter\ifstrempty\expandafter{#3}
+				{\langle\,\mathtt{#1}\,\rangle}
+				{\langle\,\mathtt{#1},\, #3\,\rangle}
+			}
+			{
+				\expandafter\ifstrempty\expandafter{#3}
+				{\langle\,\mathtt{#1},\, #2\,\rangle}
+				{\langle\,\mathtt{#1},\, #2,\, #3\,\rangle}
+			}
+		}
+	}%
+	\xspace
+}%
+
+% Shorthands for: TreeKEM versions
+\newcommand{\VersionAny}[1]{\ensuremath{\mathtt{v#1}^{\mathtt{\textbf{\scalebox{.55}[1.0]{TreeKEM}}}}}\xspace}%
+\newcommand{\VersionOne}{\VersionAny{1}}%
+\newcommand{\VersionTwo}{\VersionAny{2}}%
+
+% Shorthands for: Oracle and Protocol references
+\newcommand{\Protocol}[1]{\texttt{\textit{#1}}\xspace}
+\newcommand{\Oracle}[2]{%
+	{\ttfamily%
+		\textbf{#1}%
+		\expandafter\ifstrempty\expandafter{#2}{()}%
+		{(\(\,\mathtt{#2}\,\))}%
+	}\xspace%
+}%
+
+
+\begin{document}
+	%
+	\title{Verifying the TreeKEM protocol with SPIN and Continuous Group Key Agreement}
+	%
+	%\titlerunning{Abbreviated paper title}
+	% If the paper title is too long for the running head, you can set
+	% an abbreviated paper title here
+	%
+	\author{Alex J. Washburn\inst{1,2}\orcidID{0000-0001-7181-4288} \and\\
+		Subash Shankar\inst{1,3}}
+	%
+	\authorrunning{F. Author et al.}
+	% First names are abbreviated in the running head.
+	% If there are more than two authors, 'et al.' is used.
+	%
+	
+	\institute{Hunter College, New York NY  10065, USA\\
+		\url{https://hunter.cuny.edu/csci} \and
+		\email{academia@recursion.ninja} \and
+		\email{subash.shankar@hunter.cuny.edu}}
+	%
+	\maketitle              % typeset the header of the contribution
+	%
+	\begin{abstract}
+		The TreeKEM protocol is the preeminent implementation candidate for the Message Layer Security standard.
+		Prior work analyzed TreeKEM by defining the Continuous Group Key Agreement security game,
+		which facilitated proof of some security guarantees as well as identifying protocol deficiencies which were subsequently remedied.
+		This work extends the such applications by formalizing the Continuous Group Key Agreement security game through multiple  soundness preserving abstractions.
+		Once formalized, the game is encoded it within Promela and security guarantees of TreeKEM are formally verifying via the explicit state model checker Spin.
+		The model is parameterized by $N$, representing an infinite TreeKEM protocol execution whose group membership not exceed $N$ unique individuals.
+		Emphasis is placed on security game formalization through abstraction composition and scalability of the model encoding with respect the parameter $N$.
+		Verification results shows that the security guarantees of ``Post-Compromise Security'' and ``Forward Secrecy with Updates'' hold for TreeKEM group sizes $\le 24$.
+		These findings are discussed within the context of other TreeKEM security analyses.
+		This represents a notable achievement, both in practical security terms for Message Layer Security users and the TreeKEM protocol, as well as demonstrating scalability techniques for non-trivial parameter bounds when modeling a complex, concurrent protocol.
+		
+		\keywords{Cryptographic Protocols, Formal Verification, Linear Temporal Logic, Model Checking, Promela, Spin.}
+	\end{abstract}
+	
+	
+\end{document}
